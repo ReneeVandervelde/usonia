@@ -8,7 +8,10 @@ kotlin {
 
     sourceSets {
         val commonMain by getting {
-            dependencies {}
+            dependencies {
+                implementation("com.github.ajalt.colormath:colormath:2.0.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
+            }
         }
 
         val commonTest by getting {

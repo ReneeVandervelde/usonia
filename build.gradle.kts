@@ -13,6 +13,7 @@ subprojects {
     repositories {
         jcenter()
         maven(url = "https://jitpack.io")
+        maven(url = "https://kotlin.bintray.com/kotlinx/")
     }
     tasks.withType(Test::class) {
         testLogging.exceptionFormat = TestExceptionFormat.FULL
