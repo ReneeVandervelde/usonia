@@ -10,7 +10,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":foundation"))
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1")
+                api(Coroutines.core)
             }
         }
 
@@ -27,7 +27,7 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
-                implementation("junit:junit:4.12")
+                implementation(JUnit.core)
             }
         }
     }
