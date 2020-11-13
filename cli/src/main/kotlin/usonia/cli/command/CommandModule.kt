@@ -10,4 +10,8 @@ abstract class CommandModule {
     @Binds
     @IntoSet
     abstract fun helloCommand(command: HelloCommand): CliktCommand
+
+    @Binds
+    @IntoSet
+    abstract fun serverCommand(command: ServerRunCommand): CliktCommand
 }
