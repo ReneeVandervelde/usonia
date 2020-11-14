@@ -1,14 +1,32 @@
-
 plugins {
-    kotlin("jvm")
+    kotlin("multiplatform")
 }
 
-dependencies {
-    api(project(":state"))
-    api(Coroutines.core)
-    api(Kimchi.logger)
-    implementation("io.ktor:ktor-server-netty:1.4.1")
-    implementation("io.ktor:ktor-websockets:1.4.1")
-    implementation("org.slf4j:slf4j-nop:1.7.30")
-}
+kotlin {
+    jvm()
 
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                api(Coroutines.core)
+            }
+        }
+
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
+            }
+        }
+
+        val jvmMain by getting {
+            dependencies {}
+        }
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit"))
+                implementation(JUnit.core)
+            }
+        }
+    }
+}

@@ -1,5 +1,6 @@
 include("cli")
 include("foundation")
 include("server")
+include("server-ktor")
 include("state")
 include("state-memory")

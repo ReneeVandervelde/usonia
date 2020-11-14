@@ -6,6 +6,7 @@ import dagger.Reusable
 import kimchi.logger.KimchiLogger
 import usonia.server.HttpController
 import usonia.server.WebServer
+import usonia.server.ktor.KtorWebServer
 import javax.inject.Singleton
 
 @Module
@@ -21,7 +22,7 @@ class ServerModule {
     fun server(
         controllers: @JvmSuppressWildcards List<HttpController>,
         logger: KimchiLogger
-    ) = WebServer(
+    ): WebServer = KtorWebServer(
         httpControllers = controllers,
         logger = logger
     )

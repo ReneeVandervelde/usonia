@@ -1,4 +1,4 @@
-package usonia.server
+package usonia.server.ktor
 
 import io.ktor.application.*
 import io.ktor.http.*
@@ -16,20 +16,23 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import usonia.server.HttpController
+import usonia.server.HttpRequest
+import usonia.server.WebServer
+import usonia.server.WebSocketController
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
-class WebServer(
+class KtorWebServer(
     private val httpControllers: List<HttpController> = emptyList(),
     private val socketControllers: List<WebSocketController> = emptyList(),
     private val port: Int = 80,
     private val logger: KimchiLogger = EmptyLogger
-) {
+): WebServer {
     @OptIn(ExperimentalTime::class)
-    suspend fun run(
-        gracePeriod: Duration = 5.seconds,
-        timeout: Duration = 20.seconds
+    override suspend fun run(
+        gracePeriod: Duration,
+        timeout: Duration
     ) {
         logger.info("Starting WebServer")
         suspendCancellableCoroutine<Unit> {

@@ -10,7 +10,7 @@ application {
 }
 
 dependencies {
-    implementation(project(":server"))
+    implementation(project(":server-ktor"))
     implementation(project(":state-memory"))
     implementation(Coroutines.core)
     implementation(Kimchi.core)
