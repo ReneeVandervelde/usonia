@@ -12,4 +12,5 @@ sourceSets {
 dependencies {
     api(project(":server"))
     implementation(project(":kotlin-extensions"))
+    api(Kimchi.logger)
 }

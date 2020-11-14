@@ -1,4 +1,5 @@
 include("cli")
+include("client")
 include("foundation")
 include("frontend")
 include("kotlin-extensions")

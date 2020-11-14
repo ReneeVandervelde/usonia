@@ -5,6 +5,9 @@ plugins {
 
 kotlin {
     jvm()
+    js {
+        browser()
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -28,6 +31,11 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-junit"))
                 implementation(JUnit.core)
+            }
+        }
+        val jsMain by getting {
+            dependencies {
+                implementation(npm("uuid", "8.3.1"))
             }
         }
     }
