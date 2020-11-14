@@ -10,7 +10,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("com.github.ajalt.colormath:colormath:2.0.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
+                api("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
             }
         }
 
