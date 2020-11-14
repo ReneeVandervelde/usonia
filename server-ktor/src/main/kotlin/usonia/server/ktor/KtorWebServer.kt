@@ -67,7 +67,12 @@ class KtorWebServer(
                                     body = call.receiveText(),
                                     headers = call.request.headers.toMap()
                                 )
-                                val response = controller.getResponse(request)
+                                val response = runCatching { controller.getResponse(request) }
+                                    .onFailure {
+                                        logger.error("Failed to get response", it)
+                                        it.printStackTrace()
+                                    }
+                                    .getOrThrow()
                                 call.respondText(
                                     text = response.body,
                                     contentType = response.contentType.split('/').let { ContentType(it[0], it.getOrNull(1).orEmpty()) },

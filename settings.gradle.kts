@@ -1,5 +1,7 @@
 include("cli")
 include("foundation")
+include("frontend")
+include("kotlin-extensions")
 include("server")
 include("server-ktor")
 include("state")

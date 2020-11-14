@@ -10,6 +10,7 @@ application {
 }
 
 dependencies {
+    implementation(project(":frontend"))
     implementation(project(":server-ktor"))
     implementation(project(":state-memory"))
     implementation(Coroutines.core)

@@ -9,7 +9,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(Coroutines.core)
-                implementation(project(":kotlin-extensions"))
             }
         }
 
