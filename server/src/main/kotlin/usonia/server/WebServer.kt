@@ -10,6 +10,8 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.util.*
 import io.ktor.websocket.*
+import kimchi.logger.EmptyLogger
+import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
@@ -21,13 +23,15 @@ import kotlin.time.seconds
 class WebServer(
     private val httpControllers: List<HttpController> = emptyList(),
     private val socketControllers: List<WebSocketController> = emptyList(),
-    private val port: Int = 80
+    private val port: Int = 80,
+    private val logger: KimchiLogger = EmptyLogger
 ) {
     @OptIn(ExperimentalTime::class)
     suspend fun run(
         gracePeriod: Duration = 5.seconds,
         timeout: Duration = 20.seconds
     ) {
+        logger.info("Starting WebServer")
         suspendCancellableCoroutine<Unit> {
             val server = embeddedServer(Netty, port) {
                 install(WebSockets)
@@ -35,6 +39,7 @@ class WebServer(
                 routing {
                     socketControllers.forEach { controller ->
                         webSocket(controller.path) {
+                            logger.info("Handling Socket Request to ${controller::class.simpleName}")
                             val input = Channel<String>(Channel.RENDEZVOUS)
                             val output = Channel<String>(Channel.RENDEZVOUS)
                             launch {
@@ -54,6 +59,7 @@ class WebServer(
                     httpControllers.forEach { controller ->
                         route(controller.path, controller.method.let(::HttpMethod)) {
                             handle {
+                                logger.info("Handling HTTP Request to ${controller::class.simpleName}")
                                 val request = HttpRequest(
                                     body = call.receiveText(),
                                     headers = call.request.headers.toMap()
@@ -70,8 +76,10 @@ class WebServer(
                 }
             }
             server.start()
+            logger.trace("WebServer running")
 
             it.invokeOnCancellation {
+                logger.info("Stopping WebServer")
                 server.stop(
                     gracePeriod.inMilliseconds.toLong(),
                     timeout.inMilliseconds.toLong()

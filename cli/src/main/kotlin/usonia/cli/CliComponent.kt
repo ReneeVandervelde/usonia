@@ -10,6 +10,7 @@ import javax.inject.Singleton
 @Component(modules = [
     CommandModule::class,
     ServerModule::class,
+    ExternalModule::class
 ])
 interface CliComponent {
     fun getCommands(): @JvmSuppressWildcards Set<CliktCommand>
