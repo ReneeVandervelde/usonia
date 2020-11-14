@@ -11,6 +11,7 @@ application {
 
 dependencies {
     implementation(project(":server"))
+    implementation(project(":state-memory"))
     implementation(Coroutines.core)
     implementation("com.github.ajalt.clikt:clikt:3.0.1")
     implementation("com.google.dagger:dagger:2.25.2")
