@@ -3,6 +3,7 @@ package usonia.server.ktor
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
+import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -26,6 +27,7 @@ import kotlin.time.ExperimentalTime
 class KtorWebServer(
     private val httpControllers: List<HttpController> = emptyList(),
     private val socketControllers: List<WebSocketController> = emptyList(),
+    private val staticResources: List<String> = emptyList(),
     private val port: Int = 80,
     private val logger: KimchiLogger = EmptyLogger
 ): WebServer {
@@ -41,6 +43,7 @@ class KtorWebServer(
 
                 routing {
                     socketControllers.forEach { controller ->
+                        logger.debug("Loading Socket Controller: ${controller::class.simpleName}")
                         webSocket(controller.path) {
                             logger.info("Handling Socket Request to ${controller::class.simpleName}")
                             val input = Channel<String>(Channel.RENDEZVOUS)
@@ -60,6 +63,7 @@ class KtorWebServer(
                         }
                     }
                     httpControllers.forEach { controller ->
+                        logger.debug("Loading HTTP Controller: ${controller::class.simpleName}")
                         route(controller.path, controller.method.let(::HttpMethod)) {
                             handle {
                                 logger.info("Handling HTTP Request to ${controller::class.simpleName}")
@@ -79,6 +83,12 @@ class KtorWebServer(
                                     status = HttpStatusCode(response.status, "")
                                 )
                             }
+                        }
+                    }
+                    static("static") {
+                        staticResources.forEach {
+                            logger.debug("Including Static Resource: <$it>")
+                            resource(it)
                         }
                     }
                 }

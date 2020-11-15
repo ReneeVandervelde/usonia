@@ -42,6 +42,9 @@ class ServerModule {
     ): WebServer = KtorWebServer(
         httpControllers = controllers,
         socketControllers = sockets,
+        staticResources = listOf(
+            "frontend-controls.js"
+        ),
         logger = logger
     )
 }
