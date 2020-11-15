@@ -4,8 +4,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.Reusable
 import kimchi.logger.KimchiLogger
-import usonia.frontend.ControlPanelController
-import usonia.frontend.LogSocket
+import usonia.core.ControlPanelController
+import usonia.core.LogSocket
 import usonia.server.HttpController
 import usonia.server.WebServer
 import usonia.server.WebSocketController

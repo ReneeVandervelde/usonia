@@ -1,33 +1,23 @@
 plugins {
-    kotlin("jvm")
+    kotlin("js")
 }
 
 configurations {
-    create("importResources")
+    create("dist")
 }
 
-tasks {
-    create("collectImportResources", Sync::class) {
-        into(temporaryDir).from(configurations.getByName("importResources"))
-    }
-    compileJava {
-        dependsOn(":frontend-controls:assemble")
+kotlin {
+    js {
+        browser()
     }
 }
 
-sourceSets {
-    main {
-        resources {
-            srcDirs(
-                tasks.getByName("collectImportResources")
-            )
-        }
-    }
+artifacts {
+    add("dist", File("$buildDir/distributions/frontend-controls.js"))
+    add("dist", File("$projectDir/src/main/html"))
 }
 
 dependencies {
-    api(project(":server"))
-    implementation(project(":kotlin-extensions"))
-    "importResources"(project(":frontend-controls", "dist"))
-    api(Kimchi.logger)
+    implementation(Coroutines.js)
+    implementation(project(":client"))
 }

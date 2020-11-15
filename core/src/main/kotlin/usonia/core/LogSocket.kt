@@ -1,4 +1,4 @@
-package usonia.frontend
+package usonia.core
 
 import kimchi.logger.LogLevel
 import kimchi.logger.LogWriter

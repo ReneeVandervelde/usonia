@@ -11,7 +11,7 @@ application {
 
 dependencies {
     implementation(project(":client"))
-    implementation(project(":frontend"))
+    implementation(project(":core"))
     implementation(project(":server-ktor"))
     implementation(project(":state-memory"))
     implementation(Coroutines.core)
