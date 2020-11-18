@@ -13,7 +13,7 @@ kotlin {
 }
 
 artifacts {
-    add("dist", File("$buildDir/distributions/frontend-controls.js"))
+    add("dist", File("$buildDir/distributions/frontend.js"))
     add("dist", File("$projectDir/src/main/html"))
 }
 

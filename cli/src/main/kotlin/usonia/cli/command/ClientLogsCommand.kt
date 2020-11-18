@@ -7,9 +7,8 @@ import com.github.ajalt.clikt.parameters.types.int
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import usonia.client.UsoniaClient
-import javax.inject.Inject
 
-class ClientLogsCommand @Inject constructor(): CliktCommand(
+class ClientLogsCommand(): CliktCommand(
     name = "client:logs"
 ) {
     private val host by option().default("localhost")

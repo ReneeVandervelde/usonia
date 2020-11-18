@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm")
+    kotlin("multiplatform")
 }
 
 configurations {
@@ -8,26 +8,24 @@ configurations {
 
 tasks {
     create("collectImportResources", Sync::class) {
+        dependsOn(":frontend:assemble")
         into(temporaryDir).from(configurations.getByName("importResources"))
     }
-    compileJava {
-        dependsOn(":frontend:assemble")
-    }
 }
 
-sourceSets {
-    main {
-        resources {
-            srcDirs(
-                tasks.getByName("collectImportResources")
-            )
+kotlin {
+    jvm()
+
+    sourceSets {
+        val commonMain by getting {
+            resources.srcDirs(tasks.getByName("collectImportResources"))
+
+            dependencies {
+                implementation(project(":kotlin-extensions"))
+                api(project(":server"))
+                dependencies.add("importResources", project(":frontend", "dist"))
+                api(Kimchi.logger)
+            }
         }
     }
-}
-
-dependencies {
-    api(project(":server"))
-    implementation(project(":kotlin-extensions"))
-    "importResources"(project(":frontend", "dist"))
-    api(Kimchi.logger)
 }

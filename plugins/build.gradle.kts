@@ -4,18 +4,15 @@ plugins {
 
 kotlin {
     jvm()
-    js {
-        browser()
-    }
 
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("com.github.ajalt.colormath:colormath:2.0.0")
-                api("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
+                implementation(project(":server"))
+                api(Kimchi.logger)
+                implementation(project(":state"))
             }
         }
-
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test-common"))
@@ -23,18 +20,11 @@ kotlin {
             }
         }
 
-        val jvmMain by getting {
-            dependencies {}
-        }
+        val jvmMain by getting
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
                 implementation(JUnit.core)
-            }
-        }
-        val jsMain by getting {
-            dependencies {
-                implementation(npm("uuid", "8.3.1"))
             }
         }
     }

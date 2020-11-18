@@ -16,28 +16,28 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import usonia.server.HttpController
+import usonia.core.Daemon
+import usonia.core.Usonia
 import usonia.server.HttpRequest
-import usonia.server.WebServer
-import usonia.server.WebSocketController
+import kotlin.coroutines.suspendCoroutine
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
-class KtorWebServer(
-    private val httpControllers: List<HttpController> = emptyList(),
-    private val socketControllers: List<WebSocketController> = emptyList(),
-    private val staticResources: List<String> = emptyList(),
+@OptIn(ExperimentalTime::class)
+internal class KtorWebServer(
     private val port: Int = 80,
+    private val gracePeriod: Duration = 5.seconds,
+    private val timeout: Duration = 20.seconds,
     private val logger: KimchiLogger = EmptyLogger
-): WebServer {
-    @OptIn(ExperimentalTime::class)
-    override suspend fun run(
-        gracePeriod: Duration,
-        timeout: Duration
-    ) {
+): Daemon {
+    override suspend fun start(app: Usonia): Nothing {
+        val httpControllers = app.plugins.flatMap { it.httpControllers }
+        val socketControllers = app.plugins.flatMap { it.socketController }
+        val staticResources = app.plugins.flatMap { it.staticResources }
+
         logger.info("Starting WebServer")
-        suspendCancellableCoroutine<Unit> {
+        suspendCoroutine<Nothing> {
             val server = embeddedServer(Netty, port) {
                 install(WebSockets)
 
@@ -95,14 +95,6 @@ class KtorWebServer(
             }
             server.start()
             logger.trace("WebServer running")
-
-            it.invokeOnCancellation {
-                logger.info("Stopping WebServer")
-                server.stop(
-                    gracePeriod.inMilliseconds.toLong(),
-                    timeout.inMilliseconds.toLong()
-                )
-            }
         }
     }
 }

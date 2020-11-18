@@ -1,5 +1,6 @@
 package usonia.frontend
 
+import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collect
@@ -13,7 +14,7 @@ fun main() {
             window.location.host,
             window.location.port.takeIf { it.isNotEmpty() }?.toInt() ?: 80
         ).logs.collect {
-            console.log(it)
+            document.getElementById("logs")?.innerHTML += "$it\n"
         }
     }
 }

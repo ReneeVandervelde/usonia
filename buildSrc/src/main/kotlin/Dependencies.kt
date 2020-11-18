@@ -9,7 +9,7 @@ object JUnit {
 
 object Kimchi {
     const val group = "com.github.inkapplications.kimchi"
-    const val version = "1.0.2"
+    const val version = "991aa06d88dd3" // 1.0.2
 
     const val core = "$group:kimchi:$version"
     const val logger = "$group:logger:$version"

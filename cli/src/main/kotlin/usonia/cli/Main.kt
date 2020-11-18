@@ -2,14 +2,16 @@ package usonia.cli
 
 import com.github.ajalt.clikt.core.NoOpCliktCommand
 import com.github.ajalt.clikt.core.subcommands
+import usonia.cli.command.ClientLogsCommand
+import usonia.cli.command.RunCommand
 import kotlin.system.exitProcess
 
 class Main: NoOpCliktCommand() {
     init {
-        DaggerCliComponent.create()
-            .getCommands()
-            .sortedBy { it.commandName }
-            .run(::subcommands)
+        subcommands(
+            RunCommand(),
+            ClientLogsCommand(),
+        )
     }
 }
 
