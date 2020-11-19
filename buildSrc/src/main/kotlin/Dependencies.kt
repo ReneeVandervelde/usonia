@@ -14,3 +14,7 @@ object Kimchi {
     const val core = "$group:kimchi:$version"
     const val logger = "$group:logger:$version"
 }
+
+object KotlinX {
+    const val dateTime = "org.jetbrains.kotlinx:kotlinx-datetime:0.1.0"
+}
