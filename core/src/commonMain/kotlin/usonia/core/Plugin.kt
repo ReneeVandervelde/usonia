@@ -1,5 +1,6 @@
 package usonia.core
 
+import usonia.core.cron.CronJob
 import usonia.server.HttpController
 import usonia.server.WebSocketController
 
@@ -11,4 +12,5 @@ interface Plugin {
     val httpControllers: List<HttpController> get() = emptyList()
     val socketController: List<WebSocketController> get() = emptyList()
     val staticResources: List<String> get() = emptyList()
+    val crons: List<CronJob> get() = emptyList()
 }

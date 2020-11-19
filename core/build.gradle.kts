@@ -22,6 +22,7 @@ kotlin {
 
             dependencies {
                 implementation(project(":kotlin-extensions"))
+                api(project(":foundation"))
                 api(project(":server"))
                 dependencies.add("importResources", project(":frontend", "dist"))
                 api(Kimchi.logger)
