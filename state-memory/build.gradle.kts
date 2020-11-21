@@ -1,6 +1,5 @@
 plugins {
     kotlin("multiplatform")
-    id("maven-publish")
 }
 
 kotlin {
@@ -18,12 +17,12 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
+                implementation(project(":foundation-testing"))
+                implementation(project(":state-testing"))
+                implementation(Coroutines.test)
             }
         }
 
-        val jvmMain by getting {
-            dependencies {}
-        }
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))

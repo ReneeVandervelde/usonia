@@ -13,6 +13,7 @@ import usonia.foundation.*
 import usonia.state.ActionPublisher
 import usonia.state.ConfigurationAccess
 import usonia.state.EventAccess
+import usonia.state.memory.InMemoryActionAccess
 import usonia.state.memory.InMemoryEventAccess
 import javax.inject.Singleton
 
@@ -37,10 +38,9 @@ object AppModule {
     }
 
     @Provides
+    @Singleton
     fun actionPublisher(): ActionPublisher {
-        return object: ActionPublisher {
-            override suspend fun publishAction(action: Action) = TODO()
-        }
+        return InMemoryActionAccess()
     }
 
     @Provides
