@@ -1,7 +1,7 @@
 package usonia.core
 
-import usonia.server.HttpController
-import usonia.server.WebSocketController
+import usonia.core.server.HttpController
+import usonia.core.server.WebSocketController
 
 object CorePlugin: Plugin {
     override val httpControllers: List<HttpController> = listOf(

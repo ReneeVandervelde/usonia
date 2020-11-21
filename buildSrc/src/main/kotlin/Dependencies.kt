@@ -1,4 +1,5 @@
 object Coroutines {
+    const val test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.1"
     const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1"
     const val js = "org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.4.1"
 }

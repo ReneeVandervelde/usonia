@@ -6,14 +6,19 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
+import usonia.core.server.WebServer
 import usonia.core.timemachine.SecondFrequency
 import usonia.core.timemachine.minutes
 
+/**
+ * The "backend" part of the application that starts up long running services.
+ */
 class Usonia(
-    val plugins: Set<Plugin>,
+    override val plugins: Set<Plugin>,
+    private val server: WebServer,
     private val logger: KimchiLogger = EmptyLogger,
     private val daemonScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-) {
+): AppConfig {
     suspend fun start() {
         logger.info("Hello World! 👋")
 
@@ -24,9 +29,16 @@ class Usonia(
 
         val daemonJobs = startDaemons()
         val cronJobs = startCrons()
+        val webServer = startServer()
 
+        webServer.join()
         cronJobs.joinAll()
         daemonJobs.joinAll()
+    }
+
+    private suspend fun startServer(): Job {
+        logger.info("Starting WebServer")
+        return daemonScope.launch { server.serve(this@Usonia) }
     }
 
     private suspend fun startDaemons(): List<Job> {
@@ -37,7 +49,7 @@ class Usonia(
             daemonScope.launch {
                 while (isActive) {
                     logger.debug { "Starting Daemon <${daemon::class.simpleName}>" }
-                    try { daemon.start(this@Usonia) }
+                    try { daemon.start() }
                     catch (error: Throwable) {
                         logger.error("Daemon <${daemon::class.simpleName}> has stopped. Re-starting.", error)
                         delay(500)

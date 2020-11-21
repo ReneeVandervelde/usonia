@@ -5,7 +5,7 @@ import kimchi.logger.LogWriter
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
-import usonia.server.WebSocketController
+import usonia.core.server.WebSocketController
 
 object LogSocket: WebSocketController, LogWriter {
     override val path: String = "/logs"

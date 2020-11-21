@@ -47,5 +47,10 @@ sealed class Action {
         override val target: Uuid,
         val action: String
     ): Action()
+
+    data class Alert(
+        override val target: Uuid,
+        val message: String
+    ): Action()
 }
 

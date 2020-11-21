@@ -16,25 +16,21 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
-import usonia.core.Daemon
-import usonia.core.Usonia
-import usonia.server.HttpRequest
+import usonia.core.AppConfig
+import usonia.core.server.HttpRequest
+import usonia.core.server.WebServer
 import kotlin.coroutines.suspendCoroutine
-import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 @OptIn(ExperimentalTime::class)
-internal class KtorWebServer(
+class KtorWebServer(
     private val port: Int = 80,
-    private val gracePeriod: Duration = 5.seconds,
-    private val timeout: Duration = 20.seconds,
     private val logger: KimchiLogger = EmptyLogger
-): Daemon {
-    override suspend fun start(app: Usonia): Nothing {
-        val httpControllers = app.plugins.flatMap { it.httpControllers }
-        val socketControllers = app.plugins.flatMap { it.socketController }
-        val staticResources = app.plugins.flatMap { it.staticResources }
+): WebServer {
+    override suspend fun serve(config: AppConfig) {
+        val httpControllers = config.plugins.flatMap { it.httpControllers }
+        val socketControllers = config.plugins.flatMap { it.socketController }
+        val staticResources = config.plugins.flatMap { it.staticResources }
 
         logger.info("Starting WebServer")
         suspendCoroutine<Nothing> {

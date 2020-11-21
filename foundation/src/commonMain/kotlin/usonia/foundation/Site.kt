@@ -5,8 +5,10 @@ package usonia.foundation
  *
  * @param id universally unique identifier.
  * @param name User friendly name for the site.
+ * @param users People to notify of events in the home.
  */
 data class Site(
     val id: Uuid,
-    val name: String
+    val name: String,
+    val users: List<User>
 )

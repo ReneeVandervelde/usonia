@@ -7,5 +7,5 @@ package usonia.core
  * will be re-started should anything cause it to stop.
  */
 interface Daemon {
-    suspend fun start(app: Usonia): Nothing
+    suspend fun start(): Nothing
 }
