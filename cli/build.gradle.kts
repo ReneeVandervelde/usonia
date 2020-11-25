@@ -9,10 +9,21 @@ application {
     mainClassName = "usonia.cli.MainKt"
 }
 
+sourceSets {
+    main {
+        resources {
+            srcDir(
+                "$rootDir"
+            ).include("config.json")
+        }
+    }
+}
+
 dependencies {
     implementation(project(":app"))
     implementation(project(":client"))
     implementation(project(":core"))
+    implementation(project(":serialization"))
     implementation(project(":server-ktor"))
     implementation(project(":state-memory"))
     implementation(Coroutines.core)

@@ -11,29 +11,17 @@ interface ConfigurationAccess {
     /**
      * Configuration key/value pairs for the application.
      */
-    val parameters: Flow<ParameterBag>
-
-    /**
-     * Changes in configuration for the site.
-     */
     val site: Flow<Site>
-
-    /**
-     * Changes in configuration for the rooms on site.
-     */
-    val rooms: Flow<Set<Room>>
-
-    /**
-     * Changes in configuration for the devices.
-     */
-    val devices: Flow<Set<Device>>
 }
 
 /**
  * Get the latest data available for a device with a given [id].
  */
 suspend fun ConfigurationAccess.getDeviceById(id: Uuid): Device? {
-    return devices.first().find { it.id == id }
+    return site.first()
+        .rooms
+        .flatMap { it.devices }
+        .find { it.id == id }
 }
 
 /**

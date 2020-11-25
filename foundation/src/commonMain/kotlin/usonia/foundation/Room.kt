@@ -12,7 +12,8 @@ data class Room(
     val id: Uuid,
     val name: String,
     val type: Type = Type.Generic,
-    val adjacentRooms: Set<Uuid> = emptySet()
+    val adjacentRooms: Set<Uuid> = emptySet(),
+    val devices: Set<Device> = emptySet(),
 ) {
     enum class Type {
         Bathroom,

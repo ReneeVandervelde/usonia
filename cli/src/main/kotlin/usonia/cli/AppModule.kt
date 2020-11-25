@@ -5,11 +5,9 @@ import dagger.Provides
 import dagger.Reusable
 import dagger.multibindings.IntoSet
 import kimchi.logger.KimchiLogger
-import kotlinx.coroutines.flow.Flow
 import usonia.app.AppPlugin
 import usonia.core.CorePlugin
 import usonia.core.Plugin
-import usonia.foundation.*
 import usonia.state.ActionPublisher
 import usonia.state.ConfigurationAccess
 import usonia.state.EventAccess
@@ -21,12 +19,7 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     fun configurationAccess(): ConfigurationAccess {
-        return object: ConfigurationAccess {
-            override val parameters: Flow<ParameterBag> get() = TODO()
-            override val site: Flow<Site> get() = TODO()
-            override val rooms: Flow<Set<Room>> get() = TODO()
-            override val devices: Flow<Set<Device>> get() = TODO()
-        }
+        return FileConfigAccess()
     }
 
     @Provides

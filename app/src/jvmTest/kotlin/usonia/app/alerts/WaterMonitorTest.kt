@@ -12,9 +12,13 @@ import kotlin.test.assertTrue
 class WaterMonitorTest {
     private val standardConfig = object: ConfigurationAccess by ConfigurationAccessStub {
         override val site: Flow<Site> = flowOf(FakeSite.copy(
-            users = listOf(FakeUsers.John)
+            users = setOf(FakeUsers.John),
+            rooms = setOf(
+                FakeRooms.LivingRoom.copy(
+                    devices = setOf(FakeDevices.WaterSensor)
+                )
+            )
         ))
-        override val devices: Flow<Set<Device>> = flowOf(setOf(FakeDevices.WaterSensor))
     }
 
     @Test

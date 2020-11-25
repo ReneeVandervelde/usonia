@@ -10,5 +10,6 @@ package usonia.foundation
 data class Site(
     val id: Uuid,
     val name: String,
-    val users: List<User>
+    val users: Set<User>,
+    val rooms: Set<Room>,
 )

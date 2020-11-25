@@ -5,7 +5,6 @@ data class Device(
     val name: String,
     val capabilities: Capabilities,
     val fixture: Fixture? = null,
-    val room: Uuid? = null,
-    val siblings: Set<Uuid> = emptySet()
+    val siblings: Set<Uuid> = emptySet(),
 )
 
