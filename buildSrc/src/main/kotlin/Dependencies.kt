@@ -18,4 +18,5 @@ object Kimchi {
 
 object KotlinX {
     const val dateTime = "org.jetbrains.kotlinx:kotlinx-datetime:0.1.0"
+    const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1"
 }

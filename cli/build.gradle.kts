@@ -24,6 +24,7 @@ sourceSets {
 dependencies {
     implementation(project(":app"))
     implementation(project(":client"))
+    implementation(project(":bridge"))
     implementation(project(":core"))
     implementation(project(":serialization"))
     implementation(project(":server-ktor"))

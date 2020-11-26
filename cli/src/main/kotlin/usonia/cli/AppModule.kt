@@ -6,11 +6,13 @@ import dagger.Reusable
 import dagger.multibindings.IntoSet
 import kimchi.logger.KimchiLogger
 import usonia.app.AppPlugin
+import usonia.bridge.BridgePlugin
 import usonia.core.CorePlugin
 import usonia.core.Plugin
 import usonia.state.ActionPublisher
 import usonia.state.ConfigurationAccess
 import usonia.state.EventAccess
+import usonia.state.EventPublisher
 import usonia.state.memory.InMemoryActionAccess
 import usonia.state.memory.InMemoryEventAccess
 import javax.inject.Singleton
@@ -24,11 +26,21 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun eventAccess(
+    fun inMemoryEvents(
         config: ConfigurationAccess
-    ): EventAccess {
-        return InMemoryEventAccess(config)
-    }
+    ) = InMemoryEventAccess(config)
+
+    @Provides
+    @Singleton
+    fun eventAccess(
+        events: InMemoryEventAccess
+    ): EventAccess = events
+
+    @Provides
+    @Singleton
+    fun eventPublisher(
+        events: InMemoryEventAccess
+    ): EventPublisher = events
 
     @Provides
     @Singleton
@@ -50,4 +62,17 @@ object AppModule {
         actions: ActionPublisher,
         logger: KimchiLogger
     ): Plugin = AppPlugin(config, events, actions, logger)
+
+    @Provides
+    @Reusable
+    @IntoSet
+    fun bridgePlugin(
+        eventAccess: EventAccess,
+        eventPublisher: EventPublisher,
+        logger: KimchiLogger
+    ): Plugin = BridgePlugin(
+        eventPublisher,
+        eventAccess,
+        logger
+    )
 }
