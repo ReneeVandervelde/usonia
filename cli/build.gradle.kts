@@ -12,9 +12,11 @@ application {
 sourceSets {
     main {
         resources {
-            srcDir(
-                "$rootDir"
-            ).include("config.json")
+            if (System.getProperty("idea.sync.active") == null) {
+                srcDir(
+                    "$rootDir"
+                ).include("config.json")
+            }
         }
     }
 }
