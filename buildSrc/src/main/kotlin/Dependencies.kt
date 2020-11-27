@@ -16,6 +16,10 @@ object Kimchi {
     const val logger = "$group:logger:$version"
 }
 
+object Ktor {
+    const val client = "io.ktor:ktor-client-core:1.4.1"
+}
+
 object KotlinX {
     const val dateTime = "org.jetbrains.kotlinx:kotlinx-datetime:0.1.0"
     const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1"

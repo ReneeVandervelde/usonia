@@ -10,7 +10,8 @@ import usonia.client.UsoniaClient
 import javax.inject.Inject
 
 class ClientLogsCommand @Inject constructor(): CliktCommand(
-    name = "client:logs"
+    name = "client:logs",
+    help = "Listen to log statements being recorded on the server."
 ) {
     private val host by option().default("localhost")
     private val port by option().int().default(80)

@@ -11,7 +11,8 @@ import javax.inject.Inject
 class RunCommand @Inject constructor(
     private val usoniaFactory: UsoniaFactory
 ): CliktCommand(
-    name = "run"
+    name = "run",
+    help = "Runs the main server application."
 ) {
     private val port by option().int().default(80)
 

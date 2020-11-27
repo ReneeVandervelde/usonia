@@ -12,4 +12,5 @@ data class Site(
     val name: String,
     val users: Set<User>,
     val rooms: Set<Room>,
+    val bridges: Set<Bridge>,
 )

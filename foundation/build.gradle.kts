@@ -11,7 +11,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("com.github.ajalt.colormath:colormath:2.0.0")
+                api("com.github.ajalt.colormath:colormath:2.0.0")
                 api(KotlinX.dateTime)
             }
         }

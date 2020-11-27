@@ -9,10 +9,7 @@ import usonia.app.AppPlugin
 import usonia.bridge.BridgePlugin
 import usonia.core.CorePlugin
 import usonia.core.Plugin
-import usonia.state.ActionPublisher
-import usonia.state.ConfigurationAccess
-import usonia.state.EventAccess
-import usonia.state.EventPublisher
+import usonia.state.*
 import usonia.state.memory.InMemoryActionAccess
 import usonia.state.memory.InMemoryEventAccess
 import javax.inject.Singleton
@@ -44,9 +41,19 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun actionPublisher(): ActionPublisher {
-        return InMemoryActionAccess()
-    }
+    fun inMemoryActions() = InMemoryActionAccess()
+
+    @Provides
+    @Singleton
+    fun actionPublisher(
+        actions: InMemoryActionAccess
+    ): ActionPublisher = actions
+
+    @Provides
+    @Singleton
+    fun actionAccess(
+        actions: InMemoryActionAccess
+    ): ActionAccess = actions
 
     @Provides
     @Reusable
@@ -69,10 +76,14 @@ object AppModule {
     fun bridgePlugin(
         eventAccess: EventAccess,
         eventPublisher: EventPublisher,
+        config: ConfigurationAccess,
+        actionAccess: ActionAccess,
         logger: KimchiLogger
     ): Plugin = BridgePlugin(
-        eventPublisher,
-        eventAccess,
-        logger
+        eventPublisher = eventPublisher,
+        eventAccess = eventAccess,
+        actionAccess = actionAccess,
+        configurationAccess = config,
+        logger = logger,
     )
 }

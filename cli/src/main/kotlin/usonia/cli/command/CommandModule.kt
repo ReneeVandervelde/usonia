@@ -23,4 +23,8 @@ interface CommandModule {
     @Binds
     @IntoSet
     fun clientEvents(command: ClientEventsCommand): CliktCommand
+
+    @Binds
+    @IntoSet
+    fun intentSend(command: ClientIntentSendCommand): CliktCommand
 }

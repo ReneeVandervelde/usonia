@@ -5,4 +5,5 @@ val FakeSite = Site(
     name = "Fake Site",
     users = emptySet(),
     rooms = emptySet(),
+    bridges = emptySet(),
 )

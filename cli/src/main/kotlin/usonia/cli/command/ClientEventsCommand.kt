@@ -10,7 +10,8 @@ import usonia.client.UsoniaClient
 import javax.inject.Inject
 
 class ClientEventsCommand @Inject constructor(): CliktCommand(
-    name = "client:events"
+    name = "client:events",
+    help = "Listen to the pipeline of events occurring on the server."
 ) {
     private val host by option().default("localhost")
     private val port by option().int().default(80)

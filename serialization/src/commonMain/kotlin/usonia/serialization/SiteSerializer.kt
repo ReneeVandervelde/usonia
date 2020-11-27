@@ -46,6 +46,16 @@ object SiteSerializer: KSerializer<Site> {
                         )
                     }
                 )
+            },
+            bridges = json.bridges.mapSet { bridge ->
+                Bridge(
+                    id = bridge.id.let(::Uuid),
+                    name = bridge.name,
+                    host = bridge.host,
+                    port = bridge.port,
+                    actionsPath = bridge.actionsPath,
+                    parameters = bridge.parameters,
+                )
             }
         )
     }
@@ -77,6 +87,16 @@ object SiteSerializer: KSerializer<Site> {
                         )
                     }
                 )
+            },
+            bridges = value.bridges.mapSet { bridge ->
+                BridgeJson(
+                    id = bridge.id.value,
+                    name = bridge.name,
+                    host = bridge.host,
+                    port = bridge.port,
+                    actionsPath = bridge.actionsPath,
+                    parameters = bridge.parameters,
+                )
             }
         )
 
@@ -92,6 +112,17 @@ internal data class SiteJson(
     val name: String? = null,
     val users: Set<UserJson> = emptySet(),
     val rooms: Set<RoomJson> = emptySet(),
+    val bridges: Set<BridgeJson> = emptySet(),
+)
+
+@Serializable
+data class BridgeJson(
+    val id: String,
+    val name: String,
+    val host: String,
+    val port: Int,
+    val actionsPath: String?,
+    val parameters: ParameterBag,
 )
 
 @Serializable

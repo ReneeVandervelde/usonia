@@ -43,6 +43,18 @@ class SiteSerializerTest {
                   ]
                 }
               ]
+              "bridges": [
+                {
+                  "id": "fake-bridge-id",
+                  "name": "Fake Bridge",
+                  "host": "fake-host",
+                  "port": 420,
+                  "actionsPath": "fake-actions",
+                  "parameters": {
+                    "foo": "bar"
+                  }
+                }
+              ]
             }
         """
         val result = Json.decodeFromString(SiteSerializer, json)
@@ -66,6 +78,13 @@ class SiteSerializerTest {
         assertEquals("Fake Device", device.name)
         assertEquals(emptySet(), device.capabilities.actions)
         assertEquals(emptySet(), device.capabilities.events)
+        val bridge = result.bridges.single()
+        assertEquals("fake-bridge-id", bridge.id.value)
+        assertEquals("Fake Bridge", bridge.name)
+        assertEquals("fake-host", bridge.host)
+        assertEquals(420, bridge.port)
+        assertEquals("fake-actions", bridge.actionsPath)
+        assertEquals(mapOf("foo" to "bar"), bridge.parameters)
     }
 
     @Test
@@ -81,6 +100,7 @@ class SiteSerializerTest {
         assertEquals("fake-site-id", result.name)
         assertEquals(emptySet(), result.users)
         assertEquals(emptySet(), result.rooms)
+        assertEquals(emptySet(), result.bridges)
     }
 
     @Test
