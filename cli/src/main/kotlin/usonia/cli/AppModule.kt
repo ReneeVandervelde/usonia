@@ -78,11 +78,13 @@ object AppModule {
         eventPublisher: EventPublisher,
         config: ConfigurationAccess,
         actionAccess: ActionAccess,
+        actionPublisher: ActionPublisher,
         logger: KimchiLogger
     ): Plugin = BridgePlugin(
         eventPublisher = eventPublisher,
         eventAccess = eventAccess,
         actionAccess = actionAccess,
+        actionPublisher = actionPublisher,
         configurationAccess = config,
         logger = logger,
     )
