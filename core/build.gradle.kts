@@ -1,6 +1,5 @@
 plugins {
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.4.10"
 }
 
 configurations {
@@ -23,8 +22,8 @@ kotlin {
 
             dependencies {
                 implementation(project(":kotlin-extensions"))
+                implementation(project(":serialization"))
                 api(KotlinX.dateTime)
-                api(KotlinX.serialization)
                 dependencies.add("importResources", project(":frontend", "dist"))
                 api(Kimchi.logger)
             }

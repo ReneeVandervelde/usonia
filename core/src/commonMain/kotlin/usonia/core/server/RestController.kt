@@ -4,6 +4,7 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
+import usonia.serialization.StatusSerializer
 
 abstract class RestController<IN: Any, OUT: Any>(
     val logger: KimchiLogger = EmptyLogger
@@ -19,7 +20,7 @@ abstract class RestController<IN: Any, OUT: Any>(
         } catch (error: Throwable) {
             logger.error("Failed to decode request body", error)
             return HttpResponse(
-                body = errorResponseBody("Failed to decode request body"),
+                body = StatusSerializer.encodedString(2, "Failed to decode request body"),
                 contentType = "text/json",
                 status = 400,
             )
@@ -36,7 +37,7 @@ abstract class RestController<IN: Any, OUT: Any>(
         } catch (error: Throwable) {
             logger.error("Failed generating response body.", error)
             return HttpResponse(
-                body = errorResponseBody("Internal error generating response."),
+                body = StatusSerializer.encodedString(3, "Internal error generating response."),
                 contentType = "text/json",
                 status = 500,
             )

@@ -5,7 +5,10 @@ import kimchi.logger.KimchiLogger
 import kotlinx.serialization.KSerializer
 import usonia.core.server.*
 import usonia.foundation.Event
+import usonia.foundation.Status
+import usonia.foundation.Statuses.SUCCESS
 import usonia.serialization.EventSerializer
+import usonia.serialization.StatusSerializer
 import usonia.state.EventPublisher
 
 /**
@@ -14,15 +17,15 @@ import usonia.state.EventPublisher
 class EventPublishHttpBridge(
     private val eventPublisher: EventPublisher,
     logger: KimchiLogger = EmptyLogger
-): RestController<Event, StatusResponse>(logger) {
+): RestController<Event, Status>(logger) {
     override val method: String = "POST"
     override val path: String = "/events"
     override val deserializer: KSerializer<Event> = EventSerializer
-    override val serializer: KSerializer<StatusResponse> = StatusResponse.serializer()
+    override val serializer: KSerializer<Status> = StatusSerializer
 
-    override suspend fun getResponse(data: Event, request: HttpRequest): RestResponse<StatusResponse> {
+    override suspend fun getResponse(data: Event, request: HttpRequest): RestResponse<Status> {
         eventPublisher.publishEvent(data)
-        return SUCCESS
+        return RestResponse(SUCCESS)
     }
 }
 
