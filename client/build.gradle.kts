@@ -13,6 +13,7 @@ kotlin {
             dependencies {
                 api(project(":foundation"))
                 api(project(":state"))
+                api(project(":serialization"))
                 api(Coroutines.core)
                 implementation("io.ktor:ktor-client-core:1.4.1")
             }

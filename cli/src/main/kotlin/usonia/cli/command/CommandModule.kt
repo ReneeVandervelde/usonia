@@ -19,4 +19,8 @@ interface CommandModule {
     @Binds
     @IntoSet
     fun clientLogs(command: ClientLogsCommand): CliktCommand
+
+    @Binds
+    @IntoSet
+    fun clientEvents(command: ClientEventsCommand): CliktCommand
 }

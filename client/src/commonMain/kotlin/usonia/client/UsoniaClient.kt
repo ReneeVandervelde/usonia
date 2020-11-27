@@ -6,6 +6,9 @@ import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
+import usonia.foundation.Event
+import usonia.serialization.EventSerializer
 
 class UsoniaClient(
     private val host: String,
@@ -23,6 +26,20 @@ class UsoniaClient(
         ) {
             incoming.consumeEach {
                 if (it is Frame.Text) emit(it.readText())
+            }
+        }
+    }
+
+    val events: Flow<Event> = flow {
+        httpClient.ws(
+            host = host,
+            port = port,
+            path = "events"
+        ) {
+            incoming.consumeEach {
+                if (it !is Frame.Text) return@consumeEach
+                val event = it.readText().let { Json.decodeFromString(EventSerializer, it) }
+                emit(event)
             }
         }
     }
