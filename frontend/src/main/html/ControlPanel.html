@@ -12,6 +12,20 @@
 <body>
 <header>
     <h1>Control Panel</h1>
+
+    <script id="config-template" type="text/template">
+        <h1>{{name}} Config</h1>
+        {{#rooms}}
+        <h2>{{name}}</h2>
+        <h3>Devices</h3>
+        <ul>
+            {{#devices}}
+            <li>{{name}}</li>
+            {{/devices}}
+        </ul>
+        {{/rooms}}
+    </script>
+    <section id="config"></section>
     <section>
         <h1>Logs</h1>
         <pre>

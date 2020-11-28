@@ -22,6 +22,7 @@ kotlin {
 
             dependencies {
                 implementation(project(":kotlin-extensions"))
+                implementation(project(":state"))
                 implementation(project(":serialization"))
                 api(KotlinX.dateTime)
                 dependencies.add("importResources", project(":frontend", "dist"))

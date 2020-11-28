@@ -58,7 +58,9 @@ object AppModule {
     @Provides
     @Reusable
     @IntoSet
-    fun corePlugin(): Plugin = CorePlugin
+    fun corePlugin(
+        config: ConfigurationAccess
+    ): Plugin = CorePlugin(config)
 
     @Provides
     @Reusable

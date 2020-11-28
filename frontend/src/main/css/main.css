@@ -1,0 +1,22 @@
+@import url("https://assets.inkapplications.com/css/main-v1.css");
+
+:root
+{
+    --color-accent: #cc3366;
+}
+.ascii
+{
+    font-size: 1rem;
+    font-weight: 300;
+}
+body
+{
+    padding-top: 1rem;
+}
+
+
+@media(max-width: 800px) {
+    .ascii {
+        font-size: 1.75vw;
+    }
+}

@@ -11,8 +11,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 import usonia.foundation.Action
 import usonia.foundation.Event
+import usonia.foundation.Site
 import usonia.serialization.ActionSerializer
 import usonia.serialization.EventSerializer
+import usonia.serialization.SiteSerializer
+import usonia.serialization.StatusSerializer
 
 /**
  * HTTP Client for interacting with a Usonia server.
@@ -53,6 +56,20 @@ class UsoniaClient(
                 if (it !is Frame.Text) return@consumeEach
                 val event = it.readText().let { Json.decodeFromString(EventSerializer, it) }
                 emit(event)
+            }
+        }
+    }
+
+    val config: Flow<Site> = flow {
+        httpClient.ws(
+            host = host,
+            port = port,
+            path = "config",
+        ) {
+            incoming.consumeEach {
+                if (it !is Frame.Text) return@consumeEach
+                val site = it.readText().let { Json.decodeFromString(SiteSerializer, it) }
+                emit(site)
             }
         }
     }

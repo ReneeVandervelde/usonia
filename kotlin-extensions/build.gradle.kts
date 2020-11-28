@@ -4,6 +4,9 @@ plugins {
 
 kotlin {
     jvm()
+    js {
+        browser()
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -12,16 +15,6 @@ kotlin {
             }
         }
 
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
-            }
-        }
-
-        val jvmMain by getting {
-            dependencies {}
-        }
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
