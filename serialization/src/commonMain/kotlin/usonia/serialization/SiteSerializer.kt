@@ -41,6 +41,9 @@ object SiteSerializer: KSerializer<Site> {
                             id = device.id.let(::Uuid),
                             name = device.name ?: device.id,
                             capabilities = Capabilities(),
+                            source = if (device.sourceId != null && device.sourceService != null) {
+                                ExternalSource(id = device.sourceId, service = device.sourceService)
+                            } else null,
                             fixture = device.fixture?.let { Fixture.valueOf(it) },
                             siblings = device.siblings.mapSet(::Uuid)
                         )
@@ -83,6 +86,8 @@ object SiteSerializer: KSerializer<Site> {
                             id = device.id.value,
                             name = device.name,
                             capabilitiesArchetype = null,
+                            sourceId = device.source?.id,
+                            sourceService = device.source?.service,
                             fixture = device.fixture?.name,
                             siblings = device.siblings.mapSet(Uuid::value)
                         )
@@ -149,6 +154,8 @@ internal data class DeviceJson(
     val id: String,
     val name: String? = null,
     val capabilitiesArchetype: String? = null,
+    val sourceId: String? = null,
+    val sourceService: String? = null,
     val fixture: String? = null,
     val siblings: Set<String> = emptySet(),
 )

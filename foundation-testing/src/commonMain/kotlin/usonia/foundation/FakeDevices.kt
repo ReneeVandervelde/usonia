@@ -24,4 +24,22 @@ object FakeDevices {
             )
         )
     )
+
+    val HueGroup = Device(
+        id = Uuid("fake-hue-group"),
+        name = "Fake Hue Group",
+        capabilities = Capabilities(
+            actions = setOf(
+                Action.Switch::class,
+                Action.Dim::class,
+                Action.ColorChange::class,
+                Action.ColorTemperatureChange::class,
+            ),
+            events = emptySet()
+        ),
+        source = ExternalSource(
+            id = "fake-external-id",
+            service = "HueGroup",
+        )
+    )
 }
