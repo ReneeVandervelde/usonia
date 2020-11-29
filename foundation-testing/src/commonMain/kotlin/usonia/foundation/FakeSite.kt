@@ -6,4 +6,5 @@ val FakeSite = Site(
     users = emptySet(),
     rooms = emptySet(),
     bridges = emptySet(),
+    parameters = emptyMap(),
 )

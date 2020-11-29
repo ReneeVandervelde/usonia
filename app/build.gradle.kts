@@ -13,13 +13,7 @@ kotlin {
                 implementation(project(":foundation"))
                 api(project(":state"))
                 api(Coroutines.core)
-            }
-        }
-
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
+                implementation(Ktor.client)
             }
         }
 

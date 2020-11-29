@@ -68,9 +68,10 @@ object AppModule {
     fun appPlugin(
         config: ConfigurationAccess,
         events: EventAccess,
-        actions: ActionPublisher,
+        actionPublisher: ActionPublisher,
+        actionAccess: ActionAccess,
         logger: KimchiLogger
-    ): Plugin = AppPlugin(config, events, actions, logger)
+    ): Plugin = AppPlugin(config, events, actionPublisher, actionAccess, logger)
 
     @Provides
     @Reusable

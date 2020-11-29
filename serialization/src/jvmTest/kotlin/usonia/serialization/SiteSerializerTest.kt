@@ -54,7 +54,10 @@ class SiteSerializerTest {
                     "foo": "bar"
                   }
                 }
-              ]
+              ],
+              "parameters": {
+                "foo": "bar"
+              }
             }
         """
         val result = Json.decodeFromString(SiteSerializer, json)
@@ -85,6 +88,7 @@ class SiteSerializerTest {
         assertEquals(420, bridge.port)
         assertEquals("fake-actions", bridge.actionsPath)
         assertEquals(mapOf("foo" to "bar"), bridge.parameters)
+        assertEquals(mapOf("foo" to "bar"), result.parameters)
     }
 
     @Test
@@ -101,6 +105,7 @@ class SiteSerializerTest {
         assertEquals(emptySet(), result.users)
         assertEquals(emptySet(), result.rooms)
         assertEquals(emptySet(), result.bridges)
+        assertEquals(emptyMap(), result.parameters)
     }
 
     @Test

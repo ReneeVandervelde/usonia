@@ -56,7 +56,8 @@ object SiteSerializer: KSerializer<Site> {
                     actionsPath = bridge.actionsPath,
                     parameters = bridge.parameters,
                 )
-            }
+            },
+            parameters = json.parameters
         )
     }
 
@@ -97,7 +98,8 @@ object SiteSerializer: KSerializer<Site> {
                     actionsPath = bridge.actionsPath,
                     parameters = bridge.parameters,
                 )
-            }
+            },
+            parameters = value.parameters,
         )
 
         encoder.encodeSerializableValue(serializer, json)
@@ -113,6 +115,7 @@ internal data class SiteJson(
     val users: Set<UserJson> = emptySet(),
     val rooms: Set<RoomJson> = emptySet(),
     val bridges: Set<BridgeJson> = emptySet(),
+    val parameters: ParameterBag = emptyMap(),
 )
 
 @Serializable
