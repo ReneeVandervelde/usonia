@@ -14,7 +14,7 @@ import usonia.state.ActionPublisher
 /**
  * Sends Actions to the action publisher.
  */
-class ActionPublishHttpBridge(
+internal class ActionPublishHttpBridge(
     private val actionPublisher: ActionPublisher,
     logger: KimchiLogger = EmptyLogger
 ): RestController<Action, Status>(logger) {

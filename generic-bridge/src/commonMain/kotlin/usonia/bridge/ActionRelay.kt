@@ -6,9 +6,7 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
 import usonia.core.Daemon
 import usonia.foundation.Action
@@ -32,7 +30,7 @@ internal class ActionRelay(
     override suspend fun start() = neverEnding {
         coroutineScope {
             configurationAccess.site
-                .mapLatest { it.bridges.filter { it.actionsPath != null } }
+                .map { it.bridges.filterIsInstance<Bridge.Generic>() }
                 .collectLatest { bridges ->
                     actionAccess.actions.collect { action ->
                         bridges.awaitAll { bridge ->
@@ -43,7 +41,7 @@ internal class ActionRelay(
         }
     }
 
-    private suspend fun Bridge.publish(action: Action) {
+    private suspend fun Bridge.Generic.publish(action: Action) {
         logger.info { "Posting action ${action::class.simpleName} to Bridge <${name}>" }
         try {
             client.post(

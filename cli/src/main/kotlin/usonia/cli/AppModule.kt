@@ -6,9 +6,10 @@ import dagger.Reusable
 import dagger.multibindings.IntoSet
 import kimchi.logger.KimchiLogger
 import usonia.app.AppPlugin
-import usonia.bridge.BridgePlugin
+import usonia.bridge.GenericBridgePlugin
 import usonia.core.CorePlugin
 import usonia.core.Plugin
+import usonia.hue.HueBridgePlugin
 import usonia.state.*
 import usonia.state.memory.InMemoryActionAccess
 import usonia.state.memory.InMemoryEventAccess
@@ -83,11 +84,24 @@ object AppModule {
         actionAccess: ActionAccess,
         actionPublisher: ActionPublisher,
         logger: KimchiLogger
-    ): Plugin = BridgePlugin(
+    ): Plugin = GenericBridgePlugin(
         eventPublisher = eventPublisher,
         eventAccess = eventAccess,
         actionAccess = actionAccess,
         actionPublisher = actionPublisher,
+        configurationAccess = config,
+        logger = logger,
+    )
+
+    @Provides
+    @Reusable
+    @IntoSet
+    fun huePlugin(
+        config: ConfigurationAccess,
+        actionAccess: ActionAccess,
+        logger: KimchiLogger
+    ): Plugin = HueBridgePlugin(
+        actionAccess = actionAccess,
         configurationAccess = config,
         logger = logger,
     )

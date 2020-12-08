@@ -1,5 +1,6 @@
 package usonia.cli
 
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
@@ -20,5 +21,6 @@ class FileConfigAccess: ConfigurationAccess {
     }
     override val site: Flow<Site> = flow {
         emit(siteValue)
+        awaitCancellation()
     }
 }

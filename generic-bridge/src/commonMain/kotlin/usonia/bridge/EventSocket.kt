@@ -13,7 +13,7 @@ import usonia.state.EventAccess
 /**
  * Socket that outputs all event data.
  */
-class EventSocket(
+internal class EventSocket(
     private val eventAccess: EventAccess,
     private val logger: KimchiLogger = EmptyLogger
 ): WebSocketController {

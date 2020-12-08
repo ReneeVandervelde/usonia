@@ -8,7 +8,7 @@ import usonia.core.server.HttpController
 import usonia.core.server.WebSocketController
 import usonia.state.*
 
-class BridgePlugin(
+class GenericBridgePlugin(
     eventPublisher: EventPublisher,
     eventAccess: EventAccess,
     actionAccess: ActionAccess,

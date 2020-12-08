@@ -14,7 +14,7 @@ import usonia.state.EventPublisher
 /**
  * Sends deserialized Events to the event publisher.
  */
-class EventPublishHttpBridge(
+internal class EventPublishHttpBridge(
     private val eventPublisher: EventPublisher,
     logger: KimchiLogger = EmptyLogger
 ): RestController<Event, Status>(logger) {

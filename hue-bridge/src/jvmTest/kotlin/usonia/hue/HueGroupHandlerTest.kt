@@ -1,8 +1,6 @@
 package usonia.hue
 
-import com.github.ajalt.colormath.ConvertibleColor
 import com.github.ajalt.colormath.RGB
-import inkapplications.shade.constructs.Coordinates
 import inkapplications.shade.groups.Group
 import inkapplications.shade.groups.GroupStateModification
 import inkapplications.shade.groups.MutableGroupAttributes
@@ -31,7 +29,9 @@ class HueGroupHandlerTest {
             override val site: Flow<Site> = flowOf(
                 FakeSite.copy(
                     rooms = setOf(
-                        FakeRooms.LivingRoom
+                        FakeRooms.LivingRoom.copy(
+                            devices = setOf(FakeDevices.HueGroup)
+                        )
                     )
                 )
             )
@@ -64,7 +64,12 @@ class HueGroupHandlerTest {
                         FakeRooms.LivingRoom.copy(
                             devices = setOf(FakeDevices.HueGroup)
                         )
-                    )
+                    ),
+                    bridges = setOf(FakeDevices.FakeHueBridge.copy(
+                        deviceMap = mapOf(
+                            FakeDevices.HueGroup.id to "fake-hue-id"
+                        )
+                    )),
                 )
             )
         }
@@ -119,7 +124,12 @@ class HueGroupHandlerTest {
                         FakeRooms.LivingRoom.copy(
                             devices = setOf(FakeDevices.HueGroup)
                         )
-                    )
+                    ),
+                    bridges = setOf(FakeDevices.FakeHueBridge.copy(
+                        deviceMap = mapOf(
+                            FakeDevices.HueGroup.id to "fake-hue-id"
+                        )
+                    )),
                 )
             )
         }
@@ -132,7 +142,7 @@ class HueGroupHandlerTest {
             actionAccess.actions.emit(action)
         }
 
-        assertEquals(FakeDevices.HueGroup.source?.id, shadeSpy.groupsUpdated.single())
+        assertEquals("fake-hue-id", shadeSpy.groupsUpdated.single())
 
         handlerJob.cancelAndJoin()
     }

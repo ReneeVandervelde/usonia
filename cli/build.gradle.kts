@@ -24,8 +24,9 @@ sourceSets {
 dependencies {
     implementation(project(":app"))
     implementation(project(":client"))
-    implementation(project(":bridge"))
     implementation(project(":core"))
+    implementation(project(":generic-bridge"))
+    implementation(project(":hue-bridge"))
     implementation(project(":serialization"))
     implementation(project(":server-ktor"))
     implementation(project(":state-memory"))

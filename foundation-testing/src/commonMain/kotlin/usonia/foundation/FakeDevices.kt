@@ -36,10 +36,14 @@ object FakeDevices {
                 Action.ColorTemperatureChange::class,
             ),
             events = emptySet()
-        ),
-        source = ExternalSource(
-            id = "fake-external-id",
-            service = "HueGroup",
         )
+    )
+
+    val FakeHueBridge = Bridge.Hue(
+        id = Uuid("fake-id"),
+        name = "Fake Hue Bridge",
+        deviceMap = emptyMap(),
+        baseUrl = "fake-url",
+        token = "fake-token",
     )
 }

@@ -3,8 +3,7 @@ package usonia.hue
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runBlockingTest
-import usonia.foundation.FakeSite
-import usonia.foundation.Site
+import usonia.foundation.*
 import usonia.state.ConfigurationAccess
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -16,8 +15,10 @@ class ConfigurationTokenStorageTest {
         val fakeConfiguration = object: ConfigurationAccess {
             override val site: Flow<Site> = flowOf(
                 FakeSite.copy(
-                    parameters = mapOf(
-                        "hue.token" to "test-token"
+                    bridges = setOf(
+                        FakeDevices.FakeHueBridge.copy(
+                            token = "test-token"
+                        )
                     )
                 )
             )
