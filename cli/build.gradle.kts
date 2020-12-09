@@ -25,7 +25,7 @@ dependencies {
     implementation(project(":app"))
     implementation(project(":client"))
     implementation(project(":core"))
-    implementation(project(":generic-bridge"))
+    implementation(project(":hubitat-bridge"))
     implementation(project(":hue-bridge"))
     implementation(project(":serialization"))
     implementation(project(":server-ktor"))

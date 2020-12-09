@@ -17,7 +17,9 @@ class ConfigurationTokenStorageTest {
                 FakeSite.copy(
                     bridges = setOf(
                         FakeDevices.FakeHueBridge.copy(
-                            token = "test-token"
+                            parameters = mapOf(
+                                "token" to "test-token",
+                            ),
                         )
                     )
                 )

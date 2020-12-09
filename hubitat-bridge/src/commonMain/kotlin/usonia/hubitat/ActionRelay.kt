@@ -1,4 +1,4 @@
-package usonia.bridge
+package usonia.hubitat
 
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -30,7 +30,7 @@ internal class ActionRelay(
     override suspend fun start() = neverEnding {
         coroutineScope {
             configurationAccess.site
-                .map { it.bridges.filterIsInstance<Bridge.Generic>() }
+                .map { it.bridges.filter { it.service == "hubitat" } }
                 .collectLatest { bridges ->
                     actionAccess.actions.collect { action ->
                         bridges.awaitAll { bridge ->
@@ -41,16 +41,25 @@ internal class ActionRelay(
         }
     }
 
-    private suspend fun Bridge.Generic.publish(action: Action) {
+    private suspend fun Bridge.publish(action: Action) {
         logger.info { "Posting action ${action::class.simpleName} to Bridge <${name}>" }
         try {
             client.post(
-                host = host,
-                port = port,
-                path = actionsPath!!,
+                host = parameters["host"] ?: run {
+                    logger.error("`host` not configured for bridge <${id}>. Skipping action.")
+                    return
+                },
+                port = parameters["port"]?.toIntOrNull() ?: run {
+                    logger.error("`port` not configured for bridge <${id}>. Skipping action.")
+                    return
+                },
+                path = parameters["actionsPath"] ?: run {
+                    logger.error("`actionsPath` not configured for bridge <${id}>. Skipping action.")
+                    return
+                },
                 body = Json.encodeToString(ActionSerializer, action),
             ) {
-                parameters.forEach { parameter(it.key, it.value) }
+                parameter("access_token", parameters["token"])
             }
         } catch (error: Throwable) {
             logger.error("Failed to post action to <${name}>", error)

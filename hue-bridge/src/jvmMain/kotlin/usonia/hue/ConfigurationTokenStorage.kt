@@ -3,7 +3,6 @@ package usonia.hue
 import inkapplications.shade.auth.TokenStorage
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import usonia.foundation.Bridge
 import usonia.state.ConfigurationAccess
 import usonia.state.getSite
 
@@ -17,10 +16,10 @@ internal class ConfigurationTokenStorage(
     override suspend fun getToken(): String? {
         val bridges = configurationAccess.getSite()
             .bridges
-            .filterIsInstance<Bridge.Hue>()
+            .filter { it.service == HUE_SERVICE }
 
         return when (bridges.size) {
-            1 -> bridges.single().token
+            1 -> bridges.single().parameters[HUE_TOKEN]
             0 -> null.also {
                 logger.info("No Hue bridges configured. Configure a bridge of type `Hue` in site config.")
             }
@@ -28,7 +27,7 @@ internal class ConfigurationTokenStorage(
                 .also {
                     logger.warn("Only one Hue bridge can be configured. Using first configuration: <${it.id}>")
                 }
-                .token
+                .parameters[HUE_TOKEN]
         }
     }
 

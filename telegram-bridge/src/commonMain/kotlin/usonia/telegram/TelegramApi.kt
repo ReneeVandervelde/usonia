@@ -1,11 +1,11 @@
-package usonia.app.alerts.telegram
+package usonia.telegram
 
 import io.ktor.client.*
 import io.ktor.client.request.*
 
 private const val HOST = "api.telegram.org"
 
-interface TelegramApi {
+internal interface TelegramApi {
     suspend fun sendMessage(
         bot: String,
         token: String,

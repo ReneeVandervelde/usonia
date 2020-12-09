@@ -48,29 +48,15 @@ object SiteSerializer: KSerializer<Site> {
                 )
             },
             bridges = json.bridges.mapSet { bridge ->
-                when (bridge.type) {
-                    Bridge.Generic::class.simpleName -> Bridge.Generic(
-                        id = Uuid(bridge.id),
-                        name = bridge.name ?: bridge.id,
-                        deviceMap = bridge.deviceMap.mapKeys {
-                            Uuid(it.key)
-                        },
-                        host = bridge.host!!,
-                        port = bridge.port!!,
-                        actionsPath = bridge.actionsPath,
-                        parameters = bridge.parameters.orEmpty(),
-                    )
-                    Bridge.Hue::class.simpleName -> Bridge.Hue(
-                        id = Uuid(bridge.id),
-                        name = bridge.name ?: bridge.id,
-                        deviceMap = bridge.deviceMap.mapKeys {
-                            Uuid(it.key)
-                        },
-                        baseUrl = bridge.baseUrl!!,
-                        token = bridge.token!!,
-                    )
-                    else -> throw IllegalArgumentException("Unknown Bridge Type <${bridge.type}>")
-                }
+                Bridge(
+                    id = Uuid(bridge.id),
+                    name = bridge.name ?: bridge.id,
+                    service = bridge.service,
+                    deviceMap = bridge.deviceMap.mapKeys {
+                        Uuid(it.key)
+                    },
+                    parameters = bridge.parameters.orEmpty(),
+                )
             },
             parameters = json.parameters
         )
@@ -107,15 +93,10 @@ object SiteSerializer: KSerializer<Site> {
             bridges = value.bridges.mapSet { bridge ->
                 BridgeJson(
                     id = bridge.id.value,
-                    type = bridge::class.simpleName!!,
+                    service = bridge.service,
                     deviceMap = bridge.deviceMap.mapKeys { it.key.value },
                     name = bridge.name,
-                    host = (bridge as? Bridge.Generic)?.host,
-                    port = (bridge as? Bridge.Generic)?.port,
-                    actionsPath = (bridge as? Bridge.Generic)?.actionsPath,
-                    parameters = (bridge as? Bridge.Generic)?.parameters,
-                    baseUrl = (bridge as? Bridge.Hue)?.baseUrl,
-                    token = (bridge as? Bridge.Hue)?.token,
+                    parameters = bridge.parameters,
                 )
             },
             parameters = value.parameters,
@@ -140,17 +121,10 @@ internal data class SiteJson(
 @Serializable
 data class BridgeJson(
     val id: String,
-    val type: String,
-    val deviceMap: Map<String, String> = emptyMap(),
     val name: String? = null,
-
-    val host: String? = null,
-    val port: Int? = null,
-    val actionsPath: String? = null,
+    val service: String,
+    val deviceMap: Map<String, String> = emptyMap(),
     val parameters: ParameterBag? = null,
-
-    val baseUrl: String? = null,
-    val token: String? = null,
 )
 
 @Serializable

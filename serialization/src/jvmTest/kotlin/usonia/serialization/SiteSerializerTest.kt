@@ -46,24 +46,14 @@ class SiteSerializerTest {
               "bridges": [
                 {
                   "id": "fake-bridge-id",
-                  "type": "Generic",
                   "name": "Fake Bridge",
-                  "host": "fake-host",
-                  "port": 420,
-                  "actionsPath": "fake-actions",
+                  "service": "test",
                   "deviceMap": {
                     "foo": "bar"
-                  }
+                  },
                   "parameters": {
-                    "foo": "bar"
+                    "baz": "qux"
                   }
-                },
-                {
-                  "id": "fake-hue-bridge-id",
-                  "type": "Hue",
-                  "name": "Fake Hue Bridge",
-                  "baseUrl": "fake-url",
-                  "token": "fake-token"
                 }
               ],
               "parameters": {
@@ -92,21 +82,12 @@ class SiteSerializerTest {
         assertEquals("Fake Device", device.name)
         assertEquals(emptySet(), device.capabilities.actions)
         assertEquals(emptySet(), device.capabilities.events)
-        assertEquals(2, result.bridges.size)
-        val genericBridge = result.bridges.single { it is Bridge.Generic } as Bridge.Generic
-        assertEquals("fake-bridge-id", genericBridge.id.value)
-        assertEquals("Fake Bridge", genericBridge.name)
-        assertEquals("fake-host", genericBridge.host)
-        assertEquals(mapOf(Uuid("foo") to "bar"), genericBridge.deviceMap)
-        assertEquals(420, genericBridge.port)
-        assertEquals("fake-actions", genericBridge.actionsPath)
-        assertEquals(mapOf("foo" to "bar"), genericBridge.parameters)
-        assertEquals(mapOf("foo" to "bar"), result.parameters)
-        val hueBridge = result.bridges.single { it is Bridge.Hue } as Bridge.Hue
-        assertEquals("fake-hue-bridge-id", hueBridge.id.value)
-        assertEquals("Fake Hue Bridge", hueBridge.name)
-        assertEquals("fake-url", hueBridge.baseUrl)
-        assertEquals("fake-token", hueBridge.token)
+        val bridge = result.bridges.single()
+        assertEquals("fake-bridge-id", bridge.id.value)
+        assertEquals("Fake Bridge", bridge.name)
+        assertEquals("test", bridge.service)
+        assertEquals(mapOf(Uuid("foo") to "bar"), bridge.deviceMap)
+        assertEquals(mapOf("baz" to "qux"), bridge.parameters)
 
     }
 

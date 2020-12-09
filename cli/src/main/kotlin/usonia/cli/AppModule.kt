@@ -6,7 +6,7 @@ import dagger.Reusable
 import dagger.multibindings.IntoSet
 import kimchi.logger.KimchiLogger
 import usonia.app.AppPlugin
-import usonia.bridge.GenericBridgePlugin
+import usonia.hubitat.HubitatPlugin
 import usonia.core.CorePlugin
 import usonia.core.Plugin
 import usonia.hue.HueBridgePlugin
@@ -84,7 +84,7 @@ object AppModule {
         actionAccess: ActionAccess,
         actionPublisher: ActionPublisher,
         logger: KimchiLogger
-    ): Plugin = GenericBridgePlugin(
+    ): Plugin = HubitatPlugin(
         eventPublisher = eventPublisher,
         eventAccess = eventAccess,
         actionAccess = actionAccess,

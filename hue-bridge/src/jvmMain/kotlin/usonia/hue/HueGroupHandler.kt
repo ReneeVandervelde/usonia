@@ -16,6 +16,7 @@ import usonia.foundation.SwitchState
 import usonia.kotlin.neverEnding
 import usonia.state.ActionAccess
 import usonia.state.ConfigurationAccess
+import java.lang.IllegalArgumentException
 
 /**
  * Handles actions sent to Hue Group devices.
@@ -27,30 +28,27 @@ internal class HueGroupHandler(
     private val logger: KimchiLogger = EmptyLogger,
 ): Daemon {
     override suspend fun start() = neverEnding {
-        configurationAccess.site.collectLatest { site ->
-            actionAccess.actions
-                .filter { it is Action.Switch || it is Action.Dim || it is Action.ColorTemperatureChange || it is Action.ColorChange }
-                .collect { action ->
-                    handleAction(action, site)
-                }
-        }
+        configurationAccess.site.collectLatest { site -> onSiteUpdate(site) }
     }
 
-    private suspend fun handleAction(action: Action, site: Site) {
+    private suspend fun onSiteUpdate(site: Site) {
         val bridge = site.bridges
-            .filterIsInstance<Bridge.Hue>()
-            .singleOrNull()
+            .singleOrNull { it.service == HUE_SERVICE }
             ?: run {
-                logger.debug("Hud bridge not configured. Not attempting to handle Action for <${action.target}>")
+                logger.debug("Hue bridge not configured. Not observing Actions.")
                 return
             }
 
-        val hueId = bridge.deviceMap[action.target]
+        actionAccess.actions
+            .filter { it is Action.Switch || it is Action.Dim || it is Action.ColorTemperatureChange || it is Action.ColorChange }
+            .filter { it.target in bridge.deviceMap.keys }
+            .collect { action ->
+                handleAction(action, bridge)
+            }
+    }
 
-        if (hueId == null) {
-            logger.trace("Not handling action for <${action.target}> – not associated with Hue Bridge.")
-            return
-        }
+    private suspend fun handleAction(action: Action, bridge: Bridge) {
+        val hueId = bridge.deviceMap[action.target] ?: throw IllegalArgumentException("Impossible! did the action filter change?")
 
         val modification = when (action) {
             is Action.Switch -> GroupStateModification(

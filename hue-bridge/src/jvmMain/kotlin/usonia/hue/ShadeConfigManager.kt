@@ -5,7 +5,6 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.flow.collect
 import usonia.core.Daemon
-import usonia.foundation.Bridge
 import usonia.foundation.Site
 import usonia.kotlin.neverEnding
 import usonia.state.ConfigurationAccess
@@ -23,10 +22,10 @@ internal class ShadeConfigManager(
     }
 
     private fun configure(site: Site) {
-        val bridges = site.bridges.filterIsInstance<Bridge.Hue>()
+        val bridges = site.bridges.filter { it.service == HUE_SERVICE }
 
         val host = when (bridges.size) {
-            1 -> bridges.single().baseUrl
+            1 -> bridges.single().parameters[HUE_URL]
             0 -> {
                 logger.info("No Hue bridges configured. Configure a bridge of type `Hue` in site config.")
                 return
@@ -35,7 +34,10 @@ internal class ShadeConfigManager(
                 .also {
                     logger.warn("Only one Hue bridge can be configured. Using first configuration: <${it.id}>")
                 }
-                .baseUrl
+                .parameters[HUE_URL]
+        } ?: run {
+            logger.error("Host not configured in hue parameters. Set it with <${HUE_URL}>")
+            return
         }
 
         shade.setBaseUrl(host)

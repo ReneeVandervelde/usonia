@@ -39,11 +39,14 @@ object FakeDevices {
         )
     )
 
-    val FakeHueBridge = Bridge.Hue(
+    val FakeHueBridge = Bridge(
         id = Uuid("fake-id"),
         name = "Fake Hue Bridge",
         deviceMap = emptyMap(),
-        baseUrl = "fake-url",
-        token = "fake-token",
+        service = "hue",
+        parameters = mapOf(
+            "baseUrl" to "fake-url",
+            "token" to "fake-token",
+        ),
     )
 }

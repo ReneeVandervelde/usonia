@@ -1,4 +1,4 @@
-package usonia.bridge
+package usonia.hubitat
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
@@ -8,7 +8,7 @@ import usonia.core.server.HttpController
 import usonia.core.server.WebSocketController
 import usonia.state.*
 
-class GenericBridgePlugin(
+class HubitatPlugin(
     eventPublisher: EventPublisher,
     eventAccess: EventAccess,
     actionAccess: ActionAccess,

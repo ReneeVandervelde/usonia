@@ -1,11 +1,11 @@
-package usonia.app.alerts.telegram
+package usonia.telegram
 
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import usonia.foundation.*
+import usonia.kotlin.suspendedFlow
 import usonia.state.ActionAccessFake
 import usonia.state.ConfigurationAccess
 import kotlin.test.Test
@@ -15,7 +15,7 @@ class TelegramAlertsTest {
     @Test
     fun sendAlert() = runBlockingTest {
         val fakeConfigAccess = object: ConfigurationAccess {
-            override val site: Flow<Site> = flowOf(
+            override val site: Flow<Site> = suspendedFlow(
                 FakeSite.copy(
                     users = setOf(
                         FakeUsers.John.copy(
@@ -24,10 +24,15 @@ class TelegramAlertsTest {
                             ),
                         )
                     ),
-                    parameters = mapOf(
-                        "telegram.bot" to "test-bot",
-                        "telegram.token" to "test-token",
-                    )
+                    bridges = setOf(
+                        FakeBridge.copy(
+                            service = "telegram",
+                            parameters = mapOf(
+                                "bot" to "test-bot",
+                                "token" to "test-token",
+                            ),
+                        )
+                    ),
                 )
             )
         }
@@ -56,7 +61,7 @@ class TelegramAlertsTest {
     @Test
     fun unknownUser() = runBlockingTest {
         val fakeConfigAccess = object: ConfigurationAccess {
-            override val site: Flow<Site> = flowOf(
+            override val site: Flow<Site> = suspendedFlow(
                 FakeSite.copy(
                     users = setOf(
                         FakeUsers.John.copy(
@@ -65,10 +70,15 @@ class TelegramAlertsTest {
                             ),
                         )
                     ),
-                    parameters = mapOf(
-                        "telegram.bot" to "test-bot",
-                        "telegram.token" to "test-token",
-                    )
+                    bridges = setOf(
+                        FakeBridge.copy(
+                            service = "telegram",
+                            parameters = mapOf(
+                                "bot" to "test-bot",
+                                "token" to "test-token",
+                            ),
+                        )
+                    ),
                 )
             )
         }
@@ -97,15 +107,20 @@ class TelegramAlertsTest {
     @Test
     fun noUserConfig() = runBlockingTest {
         val fakeConfigAccess = object: ConfigurationAccess {
-            override val site: Flow<Site> = flowOf(
+            override val site: Flow<Site> = suspendedFlow(
                 FakeSite.copy(
                     users = setOf(
                         FakeUsers.John
                     ),
-                    parameters = mapOf(
-                        "telegram.bot" to "test-bot",
-                        "telegram.token" to "test-token",
-                    )
+                    bridges = setOf(
+                        FakeBridge.copy(
+                            service = "telegram",
+                            parameters = mapOf(
+                                "bot" to "test-bot",
+                                "token" to "test-token",
+                            ),
+                        )
+                    ),
                 )
             )
         }
@@ -134,7 +149,7 @@ class TelegramAlertsTest {
     @Test
     fun noConfig() = runBlockingTest {
         val fakeConfigAccess = object: ConfigurationAccess {
-            override val site: Flow<Site> = flowOf(
+            override val site: Flow<Site> = suspendedFlow(
                 FakeSite
             )
         }

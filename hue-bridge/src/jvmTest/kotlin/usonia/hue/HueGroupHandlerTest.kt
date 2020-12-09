@@ -5,14 +5,17 @@ import inkapplications.shade.groups.Group
 import inkapplications.shade.groups.GroupStateModification
 import inkapplications.shade.groups.MutableGroupAttributes
 import inkapplications.shade.groups.ShadeGroups
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import usonia.foundation.*
 import usonia.foundation.unit.ColorTemperature
 import usonia.foundation.unit.percent
+import usonia.kotlin.suspendedFlow
 import usonia.state.ActionAccessFake
 import usonia.state.ConfigurationAccess
 import kotlin.test.Test
@@ -20,6 +23,29 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class HueGroupHandlerTest {
+    @Test
+    fun notConfigured() = runBlockingTest {
+        val shadeSpy = ShadeGroupsSpy()
+        val actionAccess = ActionAccessFake()
+        val configurationAccess = object: ConfigurationAccess {
+            override val site: Flow<Site> = suspendedFlow(FakeSite)
+        }
+
+        val handler = HueGroupHandler(actionAccess, configurationAccess, shadeSpy)
+
+        val handlerJob = launch { handler.start() }
+
+        pauseDispatcher {
+            actionAccess.actions.emit(Action.Switch(
+                target = FakeDevices.HueGroup.id,
+                state = SwitchState.ON,
+            ))
+        }
+
+        assertTrue(shadeSpy.groupsUpdated.isEmpty(), "No actions taken when not configured.")
+
+        handlerJob.cancelAndJoin()
+    }
 
     @Test
     fun nonHueGroup() = runBlockingTest {
@@ -32,7 +58,10 @@ class HueGroupHandlerTest {
                         FakeRooms.LivingRoom.copy(
                             devices = setOf(FakeDevices.HueGroup)
                         )
-                    )
+                    ),
+                    bridges = setOf(FakeDevices.FakeHueBridge.copy(
+                        deviceMap = mapOf()
+                    )),
                 )
             )
         }

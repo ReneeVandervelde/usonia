@@ -1,4 +1,4 @@
-package usonia.app.alerts.telegram
+package usonia.telegram
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
@@ -12,8 +12,8 @@ import usonia.kotlin.neverEnding
 import usonia.state.ActionAccess
 import usonia.state.ConfigurationAccess
 
-private const val BOT_KEY = "telegram.bot"
-private const val BOT_TOKEN_KEY = "telegram.token"
+private const val BOT_KEY = "bot"
+private const val BOT_TOKEN = "token"
 private const val CHAT_ID_KEY = "telegram.chat"
 
 /**
@@ -23,29 +23,37 @@ private const val CHAT_ID_KEY = "telegram.chat"
  * site-level parameters, and `telegram.chat` configured on each user
  * that should receive a notification with a pre-setup bot chat ID.
  */
-class TelegramAlerts(
+internal class TelegramAlerts(
     private val actionAccess: ActionAccess,
     private val configurationAccess: ConfigurationAccess,
     private val telegramApi: TelegramApi,
     private val logger: KimchiLogger = EmptyLogger,
 ): Daemon {
     override suspend fun start() = neverEnding {
-        configurationAccess.site.collectLatest { site ->
-            site.parameters[BOT_KEY] ?: logger.warn(
-                "Telegram Alerts not configured. Set `$BOT_KEY` in site parameters."
-            )
-            site.parameters[BOT_TOKEN_KEY] ?: logger.warn(
-                "Telegram Alerts not configured. Set `$BOT_TOKEN_KEY` in site parameters."
-            )
-            actionAccess.actions
-                .filterIsInstance<Action.Alert>()
-                .collect { send(site, it) }
-        }
+        configurationAccess.site.collectLatest { site -> onSiteUpdate(site) }
     }
 
-    private suspend fun send(site: Site, alert: Action.Alert) {
-        val bot = site.parameters[BOT_KEY] ?: return
-        val token = site.parameters[BOT_TOKEN_KEY] ?: return
+    private suspend fun onSiteUpdate(site: Site) {
+        val bridge = site.bridges.singleOrNull { it.service == "telegram" } ?: run {
+            logger.warn("Telegram not configured. Not enabling alerts.")
+            return
+        }
+
+        val bot = bridge.parameters[BOT_KEY] ?: run {
+            logger.error("Telegram bridge config does not contain a bot key. Set it in parameters: <${BOT_KEY}>")
+            return
+        }
+
+        val token = bridge.parameters[BOT_TOKEN] ?: run {
+            logger.error("Telegram bridge config does not contain a bot token. Set it in parameters: <${BOT_TOKEN}>")
+            return
+        }
+
+        actionAccess.actions.filterIsInstance<Action.Alert>()
+            .collect { send(bot, token, site, it) }
+    }
+
+    private suspend fun send(bot: String, token: String, site: Site, alert: Action.Alert) {
         val user = site.users.find { it.id == alert.target } ?: run {
             logger.warn("Unable to find user for alert: <${alert.target}>")
             return

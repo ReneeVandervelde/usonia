@@ -1,4 +1,4 @@
-package usonia.bridge
+package usonia.hubitat
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
