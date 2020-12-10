@@ -22,11 +22,11 @@ sourceSets {
 }
 
 dependencies {
-    implementation(project(":app"))
     implementation(project(":client"))
     implementation(project(":core"))
     implementation(project(":hubitat-bridge"))
     implementation(project(":hue-bridge"))
+    implementation(project(":rules"))
     implementation(project(":serialization"))
     implementation(project(":server-ktor"))
     implementation(project(":state-memory"))

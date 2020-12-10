@@ -5,11 +5,11 @@ import dagger.Provides
 import dagger.Reusable
 import dagger.multibindings.IntoSet
 import kimchi.logger.KimchiLogger
-import usonia.app.AppPlugin
 import usonia.hubitat.HubitatPlugin
 import usonia.core.CorePlugin
 import usonia.core.Plugin
 import usonia.hue.HueBridgePlugin
+import usonia.rules.RulesPlugin
 import usonia.state.*
 import usonia.state.memory.InMemoryActionAccess
 import usonia.state.memory.InMemoryEventAccess
@@ -66,13 +66,13 @@ object AppModule {
     @Provides
     @Reusable
     @IntoSet
-    fun appPlugin(
+    fun rulesPlugin(
         config: ConfigurationAccess,
         events: EventAccess,
         actionPublisher: ActionPublisher,
         actionAccess: ActionAccess,
         logger: KimchiLogger
-    ): Plugin = AppPlugin(config, events, actionPublisher, actionAccess, logger)
+    ): Plugin = RulesPlugin(config, events, actionPublisher, actionAccess, logger)
 
     @Provides
     @Reusable

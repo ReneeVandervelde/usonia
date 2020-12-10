@@ -1,4 +1,4 @@
-package usonia.app.alerts
+package usonia.rules.alerts
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger

@@ -1,4 +1,4 @@
-package usonia.app.alerts
+package usonia.rules.alerts
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*

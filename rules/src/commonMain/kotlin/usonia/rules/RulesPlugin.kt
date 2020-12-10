@@ -1,8 +1,8 @@
-package usonia.app
+package usonia.rules
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import usonia.app.alerts.WaterMonitor
+import usonia.rules.alerts.WaterMonitor
 import usonia.core.Daemon
 import usonia.core.Plugin
 import usonia.state.ActionAccess
@@ -10,7 +10,7 @@ import usonia.state.ActionPublisher
 import usonia.state.ConfigurationAccess
 import usonia.state.EventAccess
 
-class AppPlugin(
+class RulesPlugin(
     configurationAccess: ConfigurationAccess,
     eventAccess: EventAccess,
     actionPublisher: ActionPublisher,
