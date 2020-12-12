@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Control Panel</title>
+    <link rel="stylesheet" href="https://assets.inkapplications.com/css/main-v1.css" type="text/css" media="all" />
+    <script src="static/web-frontend.js"></script>
+</head>
+<body>
+<header>
+    <h1>Control Panel</h1>
+
+    <script id="config-template" type="text/template">
+        <h1>{{name}} Config</h1>
+        {{#rooms}}
+        <h2>{{name}}</h2>
+        <h3>Devices</h3>
+        <ul>
+            {{#devices}}
+            <li>{{name}}</li>
+            {{/devices}}
+        </ul>
+        {{/rooms}}
+    </script>
+    <section id="config"></section>
+    <section>
+        <h1>Logs</h1>
+        <pre>
+            <code id="logs" class="shell"></code>
+        </pre>
+    </section>
+</header>
+</body>
+</html>

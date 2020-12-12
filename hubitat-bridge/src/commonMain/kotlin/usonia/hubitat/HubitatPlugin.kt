@@ -6,7 +6,7 @@ import usonia.core.Daemon
 import usonia.core.Plugin
 import usonia.core.server.HttpController
 import usonia.core.server.WebSocketController
-import usonia.state.*
+import usonia.core.state.*
 
 class HubitatPlugin(
     eventPublisher: EventPublisher,

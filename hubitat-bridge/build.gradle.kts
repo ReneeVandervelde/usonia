@@ -10,7 +10,6 @@ kotlin {
             dependencies {
                 api(project(":kotlin-extensions"))
                 api(project(":core"))
-                api(project(":state"))
                 api(project(":serialization"))
                 api(project(":foundation"))
                 api(Coroutines.core)
@@ -22,7 +21,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-junit"))
                 implementation(Coroutines.test)
-                implementation(project(":state-testing"))
+                implementation(project(":core-testing"))
                 implementation(project(":foundation-testing"))
             }
         }

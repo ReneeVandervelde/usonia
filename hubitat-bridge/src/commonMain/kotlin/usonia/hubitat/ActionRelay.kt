@@ -9,13 +9,13 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
 import usonia.core.Daemon
+import usonia.core.state.ActionAccess
+import usonia.core.state.ConfigurationAccess
 import usonia.foundation.Action
 import usonia.foundation.Bridge
 import usonia.kotlin.awaitAll
 import usonia.kotlin.neverEnding
 import usonia.serialization.ActionSerializer
-import usonia.state.ActionAccess
-import usonia.state.ConfigurationAccess
 
 /**
  * Forwards Action events to a bridge.

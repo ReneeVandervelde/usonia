@@ -11,7 +11,6 @@ kotlin {
                 api(project(":kotlin-extensions"))
                 api(project(":core"))
                 implementation(project(":foundation"))
-                api(project(":state"))
                 api(Coroutines.core)
                 implementation(Ktor.client)
             }
@@ -21,7 +20,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-junit"))
                 implementation(Coroutines.test)
-                implementation(project(":state-testing"))
+                implementation(project(":core-testing"))
                 implementation(project(":foundation-testing"))
             }
         }

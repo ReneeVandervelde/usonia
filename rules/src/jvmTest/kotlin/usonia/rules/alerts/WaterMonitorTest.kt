@@ -5,7 +5,10 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Test
 import usonia.foundation.*
-import usonia.state.*
+import usonia.core.state.ActionPublisherSpy
+import usonia.core.state.ConfigurationAccess
+import usonia.core.state.ConfigurationAccessStub
+import usonia.core.state.EventAccessFake
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 

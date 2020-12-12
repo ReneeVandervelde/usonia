@@ -3,8 +3,8 @@ package usonia.hue
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runBlockingTest
+import usonia.core.state.ConfigurationAccess
 import usonia.foundation.*
-import usonia.state.ConfigurationAccess
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull

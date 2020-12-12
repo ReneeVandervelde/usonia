@@ -14,8 +14,8 @@ import usonia.foundation.*
 import usonia.foundation.unit.ColorTemperature
 import usonia.kotlin.unit.percent
 import usonia.kotlin.suspendedFlow
-import usonia.state.ActionAccessFake
-import usonia.state.ConfigurationAccess
+import usonia.core.state.ActionAccessFake
+import usonia.core.state.ConfigurationAccess
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

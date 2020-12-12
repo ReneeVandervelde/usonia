@@ -4,8 +4,8 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import usonia.core.Daemon
 import usonia.core.Plugin
-import usonia.state.ActionAccess
-import usonia.state.ConfigurationAccess
+import usonia.core.state.ActionAccess
+import usonia.core.state.ConfigurationAccess
 
 class TelegramBridgePlugin(
     actions: ActionAccess,

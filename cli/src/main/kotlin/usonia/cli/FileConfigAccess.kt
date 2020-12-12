@@ -2,11 +2,11 @@ package usonia.cli
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.Json
+import usonia.core.state.ConfigurationAccess
 import usonia.foundation.Site
 import usonia.kotlin.getResourceContents
 import usonia.kotlin.suspendedFlow
 import usonia.serialization.SiteSerializer
-import usonia.state.ConfigurationAccess
 
 /**
  * Provide config access from a statically loaded resource.

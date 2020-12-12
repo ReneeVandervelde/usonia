@@ -8,9 +8,9 @@ import com.github.ajalt.clikt.parameters.types.int
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import usonia.client.UsoniaClient
+import usonia.core.state.ConfigurationAccess
 import usonia.foundation.Action
 import usonia.foundation.Uuid
-import usonia.state.ConfigurationAccess
 import javax.inject.Inject
 
 class ClientIntentSendCommand @Inject constructor(

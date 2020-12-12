@@ -12,7 +12,6 @@ kotlin {
                 api(project(":kotlin-extensions"))
                 api(project(":core"))
                 api(project(":foundation"))
-                api(project(":state"))
                 api(Coroutines.core)
                 implementation(Ktor.client)
                 implementation(Ktor.clientJson)
@@ -24,7 +23,7 @@ kotlin {
 
         val jvmTest by getting {
             dependencies {
-                implementation(project(":state-testing"))
+                implementation(project(":core-testing"))
                 implementation(kotlin("test-junit"))
                 implementation(Coroutines.test)
             }

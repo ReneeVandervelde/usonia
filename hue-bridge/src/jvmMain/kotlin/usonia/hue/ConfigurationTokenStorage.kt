@@ -3,8 +3,8 @@ package usonia.hue
 import inkapplications.shade.auth.TokenStorage
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import usonia.state.ConfigurationAccess
-import usonia.state.getSite
+import usonia.core.state.ConfigurationAccess
+import usonia.core.state.getSite
 
 /**
  * Retrieves Hue access tokens from the latest site configuration.

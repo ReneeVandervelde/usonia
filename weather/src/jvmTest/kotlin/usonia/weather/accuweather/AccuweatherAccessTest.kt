@@ -8,11 +8,11 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import usonia.core.state.ConfigurationAccess
 import usonia.foundation.FakeBridge
 import usonia.foundation.FakeSite
 import usonia.foundation.Site
 import usonia.kotlin.unit.percent
-import usonia.state.ConfigurationAccess
 import usonia.weather.Conditions
 import usonia.weather.Forecast
 import kotlin.test.Test

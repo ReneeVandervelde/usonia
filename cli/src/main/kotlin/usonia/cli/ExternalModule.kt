@@ -6,7 +6,7 @@ import dagger.Reusable
 import kimchi.logger.CompositeLogWriter
 import kimchi.logger.ConsolidatedLogger
 import kimchi.logger.KimchiLogger
-import usonia.core.LogSocket
+import usonia.web.LogSocket
 
 @Module
 object ExternalModule {

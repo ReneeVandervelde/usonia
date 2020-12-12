@@ -16,8 +16,3 @@ interface Plugin {
     val staticResources: List<String> get() = emptyList()
     val crons: List<CronJob> get() = emptyList()
 }
-val test: Flow<List<Any>> = TODO()
-val test2: Flow<List<Any>> = TODO()
-val test3 = combine(listOf(test, test2)) {
-    it.toList().flatten()
-}

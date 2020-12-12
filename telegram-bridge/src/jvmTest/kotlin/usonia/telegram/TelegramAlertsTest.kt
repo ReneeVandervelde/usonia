@@ -6,8 +6,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import usonia.foundation.*
 import usonia.kotlin.suspendedFlow
-import usonia.state.ActionAccessFake
-import usonia.state.ConfigurationAccess
+import usonia.core.state.ActionAccessFake
+import usonia.core.state.ConfigurationAccess
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

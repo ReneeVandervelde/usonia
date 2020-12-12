@@ -12,8 +12,8 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import usonia.core.cron.CronJob
 import usonia.core.cron.Schedule
+import usonia.core.state.ConfigurationAccess
 import usonia.kotlin.unit.percent
-import usonia.state.ConfigurationAccess
 import usonia.weather.Conditions
 import usonia.weather.Forecast
 import usonia.weather.WeatherAccess

@@ -6,14 +6,14 @@ import dagger.Reusable
 import dagger.multibindings.IntoSet
 import kimchi.logger.KimchiLogger
 import usonia.hubitat.HubitatPlugin
-import usonia.core.CorePlugin
 import usonia.core.Plugin
+import usonia.core.state.*
 import usonia.hue.HueBridgePlugin
 import usonia.rules.RulesPlugin
-import usonia.state.*
-import usonia.state.memory.InMemoryActionAccess
-import usonia.state.memory.InMemoryEventAccess
+import usonia.core.state.memory.InMemoryActionAccess
+import usonia.core.state.memory.InMemoryEventAccess
 import usonia.weather.WeatherPlugin
+import usonia.web.WebPlugin
 import javax.inject.Singleton
 
 @Module
@@ -60,9 +60,9 @@ object AppModule {
     @Provides
     @Reusable
     @IntoSet
-    fun corePlugin(
+    fun webPlugin(
         config: ConfigurationAccess
-    ): Plugin = CorePlugin(config)
+    ): Plugin = WebPlugin(config)
 
     @Provides
     @Singleton

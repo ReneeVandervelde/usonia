@@ -12,7 +12,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":foundation"))
-                api(project(":state"))
+                api(project(":core"))
                 api(project(":serialization"))
                 api(Coroutines.core)
                 implementation(Ktor.client)

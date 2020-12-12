@@ -5,10 +5,10 @@ import kimchi.logger.KimchiLogger
 import usonia.rules.alerts.WaterMonitor
 import usonia.core.Daemon
 import usonia.core.Plugin
-import usonia.state.ActionAccess
-import usonia.state.ActionPublisher
-import usonia.state.ConfigurationAccess
-import usonia.state.EventAccess
+import usonia.core.state.ActionAccess
+import usonia.core.state.ActionPublisher
+import usonia.core.state.ConfigurationAccess
+import usonia.core.state.EventAccess
 
 class RulesPlugin(
     configurationAccess: ConfigurationAccess,

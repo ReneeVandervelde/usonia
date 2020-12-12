@@ -4,12 +4,12 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.KSerializer
 import usonia.core.server.*
+import usonia.core.state.EventPublisher
 import usonia.foundation.Event
 import usonia.foundation.Status
 import usonia.foundation.Statuses.SUCCESS
 import usonia.serialization.EventSerializer
 import usonia.serialization.StatusSerializer
-import usonia.state.EventPublisher
 
 /**
  * Sends deserialized Events to the event publisher.

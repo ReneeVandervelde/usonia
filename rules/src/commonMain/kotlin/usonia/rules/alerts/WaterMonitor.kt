@@ -5,13 +5,13 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterIsInstance
 import usonia.core.Daemon
+import usonia.core.state.*
 import usonia.foundation.Action
 import usonia.foundation.Event
 import usonia.foundation.User
 import usonia.foundation.Uuid
 import usonia.foundation.WaterState.*
 import usonia.kotlin.neverEnding
-import usonia.state.*
 
 /**
  * Send out an Alert when water is detected by any water sensor.
