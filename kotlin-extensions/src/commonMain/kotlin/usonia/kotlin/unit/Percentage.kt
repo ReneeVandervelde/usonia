@@ -1,4 +1,4 @@
-package usonia.foundation.unit
+package usonia.kotlin.unit
 
 /**
  * Fractional representation of a percentage.

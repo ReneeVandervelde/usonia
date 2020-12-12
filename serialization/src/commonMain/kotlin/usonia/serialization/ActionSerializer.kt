@@ -11,7 +11,7 @@ import usonia.foundation.LockState
 import usonia.foundation.SwitchState
 import usonia.foundation.Uuid
 import usonia.foundation.unit.ColorTemperature
-import usonia.foundation.unit.Percentage
+import usonia.kotlin.unit.Percentage
 
 object ActionSerializer: KSerializer<Action> {
     private val serializer = ActionJson.serializer()

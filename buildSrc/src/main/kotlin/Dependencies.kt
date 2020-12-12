@@ -18,6 +18,8 @@ object Kimchi {
 
 object Ktor {
     const val client = "io.ktor:ktor-client-core:1.4.1"
+    const val clientJson = "io.ktor:ktor-client-json:1.4.1"
+    const val clientSerialization = "io.ktor:ktor-client-serialization:1.4.1"
 }
 
 object KotlinX {

@@ -66,6 +66,7 @@ class Usonia(
         return crons.map { cron ->
             logger.debug { "Starting Cron <${cron::class.simpleName}>"}
             daemonScope.launch {
+                cron.start()
                 SecondFrequency.minutes
                     .filter { it.minute in cron.schedule.minutes }
                     .filter { it.hour in cron.schedule.hours }

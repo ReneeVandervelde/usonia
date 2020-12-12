@@ -1,7 +1,7 @@
 package usonia.foundation
 
 import kotlinx.datetime.Instant
-import usonia.foundation.unit.Percentage
+import usonia.kotlin.unit.Percentage
 
 /**
  * State changes that have already happened.

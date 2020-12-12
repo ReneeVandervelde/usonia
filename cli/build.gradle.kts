@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":serialization"))
     implementation(project(":server-ktor"))
     implementation(project(":state-memory"))
+    implementation(project(":weather"))
     implementation(Coroutines.core)
     implementation(Kimchi.core)
     implementation("com.github.ajalt.clikt:clikt:3.0.1")

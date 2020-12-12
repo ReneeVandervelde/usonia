@@ -2,7 +2,7 @@ package usonia.foundation
 
 import com.github.ajalt.colormath.Color
 import usonia.foundation.unit.ColorTemperature
-import usonia.foundation.unit.Percentage
+import usonia.kotlin.unit.Percentage
 
 /**
  * Instructions for devices to do something or change state.

@@ -7,7 +7,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import usonia.foundation.*
-import usonia.foundation.unit.Percentage
+import usonia.kotlin.unit.Percentage
 
 object EventSerializer: KSerializer<Event> {
     private val serializer = EventJson.serializer()

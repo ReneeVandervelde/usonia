@@ -5,16 +5,14 @@ import inkapplications.shade.groups.Group
 import inkapplications.shade.groups.GroupStateModification
 import inkapplications.shade.groups.MutableGroupAttributes
 import inkapplications.shade.groups.ShadeGroups
-import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import usonia.foundation.*
 import usonia.foundation.unit.ColorTemperature
-import usonia.foundation.unit.percent
+import usonia.kotlin.unit.percent
 import usonia.kotlin.suspendedFlow
 import usonia.state.ActionAccessFake
 import usonia.state.ConfigurationAccess

@@ -13,6 +13,7 @@ import usonia.rules.RulesPlugin
 import usonia.state.*
 import usonia.state.memory.InMemoryActionAccess
 import usonia.state.memory.InMemoryEventAccess
+import usonia.weather.WeatherPlugin
 import javax.inject.Singleton
 
 @Module
@@ -62,6 +63,22 @@ object AppModule {
     fun corePlugin(
         config: ConfigurationAccess
     ): Plugin = CorePlugin(config)
+
+    @Provides
+    @Singleton
+    fun weatherPlugin(
+        config: ConfigurationAccess,
+        logger: KimchiLogger,
+    ) = WeatherPlugin(
+        config = config,
+        logger = logger,
+    )
+
+    @Provides
+    @IntoSet
+    fun weatherPluginBinding(
+        weatherPlugin: WeatherPlugin,
+    ): Plugin = weatherPlugin
 
     @Provides
     @Reusable

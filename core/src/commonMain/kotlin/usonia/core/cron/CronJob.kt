@@ -15,5 +15,10 @@ interface CronJob {
      * Job to be executed when [schedule] matches.
      */
     suspend fun run(time: LocalDateTime)
+
+    /**
+     * Optional start-up procedure.
+     */
+    suspend fun start() = Unit
 }
 
