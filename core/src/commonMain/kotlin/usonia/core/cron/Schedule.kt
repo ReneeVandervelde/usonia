@@ -6,22 +6,22 @@ package usonia.core.cron
 data class Schedule(
     val minutes: Set<Int> = (0..59).toSet(),
     val hours: Set<Int> = (0..23).toSet(),
-    val days: Set<Int> = (0..31).toSet(),
+    val days: Set<Int> = (1..31).toSet(),
     val months: Set<Int> = (1..12).toSet(),
 ) {
     inline fun withMinutes(matching: (Int) -> Boolean) = copy(
-        minutes = minutes.filter(matching).toSet()
+        minutes = (0..59).filter(matching).toSet()
     )
 
     inline fun withHours(matching: (Int) -> Boolean) = copy(
-        hours = hours.filter(matching).toSet()
+        hours = (0..23).filter(matching).toSet()
     )
 
     inline fun withDays(matching: (Int) -> Boolean) = copy(
-        hours = hours.filter(matching).toSet()
+        days = (1..31).filter(matching).toSet()
     )
 
     inline fun withMonths(matching: (Int) -> Boolean) = copy(
-        hours = hours.filter(matching).toSet()
+        months = (1..12).filter(matching).toSet()
     )
 }
