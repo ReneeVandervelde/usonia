@@ -12,6 +12,7 @@ import usonia.hue.HueBridgePlugin
 import usonia.rules.RulesPlugin
 import usonia.core.state.memory.InMemoryActionAccess
 import usonia.core.state.memory.InMemoryEventAccess
+import usonia.weather.WeatherAccess
 import usonia.weather.WeatherPlugin
 import usonia.web.WebPlugin
 import javax.inject.Singleton
@@ -75,6 +76,10 @@ object AppModule {
     )
 
     @Provides
+    @Reusable
+    fun weather(plugin: WeatherPlugin) = plugin.weatherAccess
+
+    @Provides
     @IntoSet
     fun weatherPluginBinding(
         weatherPlugin: WeatherPlugin,
@@ -88,8 +93,9 @@ object AppModule {
         events: EventAccess,
         actionPublisher: ActionPublisher,
         actionAccess: ActionAccess,
-        logger: KimchiLogger
-    ): Plugin = RulesPlugin(config, events, actionPublisher, actionAccess, logger)
+        weather: WeatherAccess,
+        logger: KimchiLogger,
+    ): Plugin = RulesPlugin(config, events, actionPublisher, actionAccess, weather, logger)
 
     @Provides
     @Reusable

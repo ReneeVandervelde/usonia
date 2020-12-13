@@ -5,11 +5,13 @@ package usonia.kotlin.unit
  *
  * @param fraction The percent as a fraction where 1 is 100%
  */
-inline class Percentage(val fraction: Float) {
+inline class Percentage(val fraction: Float): Comparable<Percentage> {
     /**
      * Percentage in hundredths.
      */
     val percent: Int get() = fraction.times(100).toInt()
+
+    override fun compareTo(other: Percentage): Int = percent.compareTo(other.percent)
 }
 
 /**

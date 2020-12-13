@@ -15,3 +15,9 @@ data class Site(
     val bridges: Set<Bridge>,
     val parameters: ParameterBag,
 )
+
+fun Site.findRoomWithDevice(id: Uuid): Room {
+    return rooms.single {
+        it.devices.singleOrNull { it.id == id } != null
+    }
+}

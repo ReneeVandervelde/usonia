@@ -14,6 +14,17 @@ object FakeDevices {
         )
     )
 
+    val Motion = Device(
+        id = Uuid("fake-motion"),
+        name = "Fake Motion Sensor",
+        capabilities = Capabilities(
+            actions = setOf(),
+            events = setOf(
+                Event.Motion::class
+            )
+        )
+    )
+
     val WaterSensor = Device(
         id = Uuid("fake-water-sensor"),
         name = "Fake Water Sensor",

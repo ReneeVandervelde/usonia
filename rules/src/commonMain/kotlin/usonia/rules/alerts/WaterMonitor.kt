@@ -16,7 +16,7 @@ import usonia.kotlin.neverEnding
 /**
  * Send out an Alert when water is detected by any water sensor.
  */
-class WaterMonitor(
+internal class WaterMonitor(
     private val configurationAccess: ConfigurationAccess,
     private val eventAccess: EventAccess,
     private val actionPublisher: ActionPublisher,

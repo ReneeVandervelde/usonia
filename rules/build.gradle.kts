@@ -11,6 +11,7 @@ kotlin {
                 api(project(":kotlin-extensions"))
                 api(project(":core"))
                 implementation(project(":foundation"))
+                implementation(project(":weather"))
                 api(Coroutines.core)
                 implementation(Ktor.client)
             }
