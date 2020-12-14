@@ -7,7 +7,6 @@ import kotlinx.datetime.Instant
  */
 data class Forecast(
     val timestamp: Instant,
-    val expiry: Instant,
     val sunrise: Instant,
     val sunset: Instant,
 )

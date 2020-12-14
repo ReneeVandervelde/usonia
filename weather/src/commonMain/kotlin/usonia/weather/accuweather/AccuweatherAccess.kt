@@ -17,6 +17,8 @@ import usonia.kotlin.unit.percent
 import usonia.weather.Conditions
 import usonia.weather.Forecast
 import usonia.weather.WeatherAccess
+import kotlin.time.ExperimentalTime
+import kotlin.time.hours
 
 private const val SERVICE = "accuweather"
 private const val LOCATION = "location"
@@ -30,6 +32,7 @@ private const val TOKEN = "token"
  * Forecast is updated only after it has expired. Subsequently, sunrise
  * times may not reflect the next day until the previous forecast has expired.
  */
+@OptIn(ExperimentalTime::class)
 internal class AccuweatherAccess(
     private val api: AccuweatherApi,
     private val config: ConfigurationAccess,
@@ -51,7 +54,7 @@ internal class AccuweatherAccess(
         coroutineScope {
             val newConditions = async { getFreshConditions(location, token) }
             val currentForecast = forecast.first()
-            if (currentForecast.expiry < clock.now()) {
+            if (clock.now() - currentForecast.timestamp > 4.hours) {
                 logger.info("Forecast is expired. Updating.")
                 forecastFlow.emit(getFreshForecast(location, token))
             }
@@ -114,7 +117,6 @@ internal class AccuweatherAccess(
 
         return Forecast(
             timestamp = clock.now(),
-            expiry = forecastResponse.headline.expires.let(Instant.Companion::fromEpochSeconds),
             sunrise = forecastResponse.daily.single().sun.rise.let(Instant.Companion::fromEpochSeconds),
             sunset = forecastResponse.daily.single().sun.set.let(Instant.Companion::fromEpochSeconds),
         ).also {
