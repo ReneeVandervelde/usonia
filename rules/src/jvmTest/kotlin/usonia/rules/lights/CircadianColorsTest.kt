@@ -28,7 +28,6 @@ class CircadianColorsTest {
     val weather = object: WeatherAccess {
         override val forecast: Flow<Forecast> = flowOf(Forecast(
             timestamp = Instant.DISTANT_PAST,
-            expiry = Instant.DISTANT_FUTURE,
             sunrise = sunrise,
             sunset = sunset,
         ))

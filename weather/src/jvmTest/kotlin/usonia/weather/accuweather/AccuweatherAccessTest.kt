@@ -17,13 +17,13 @@ import usonia.weather.Conditions
 import usonia.weather.Forecast
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.ExperimentalTime
+import kotlin.time.hours
 
+@OptIn(ExperimentalTime::class)
 class AccuweatherAccessTest {
     private val fakeApi = object: AccuweatherApi {
         var forecast = ForecastResponse(
-            headline = ForecastResponse.Headline(
-                expires = 10,
-            ),
             daily = listOf(
                 ForecastResponse.Daily(
                     sun = ForecastResponse.SunSchedule(
@@ -66,7 +66,7 @@ class AccuweatherAccessTest {
 
     private val now = Instant.fromEpochSeconds(5)
 
-    private val fakeClock = object: Clock {
+    private val stubClock = object: Clock {
         override fun now(): Instant = now
     }
 
@@ -106,7 +106,7 @@ class AccuweatherAccessTest {
         val access = AccuweatherAccess(
             api = fakeApi,
             config = config,
-            clock = fakeClock,
+            clock = stubClock,
         )
 
         val forecasts = mutableListOf<Forecast>()
@@ -123,7 +123,6 @@ class AccuweatherAccessTest {
         assertEquals(1, conditions.size)
 
         assertEquals(5, forecasts.single().timestamp.epochSeconds)
-        assertEquals(10, forecasts.single().expiry.epochSeconds)
         assertEquals(1, forecasts.single().sunrise.epochSeconds)
         assertEquals(4, forecasts.single().sunset.epochSeconds)
 
@@ -143,7 +142,7 @@ class AccuweatherAccessTest {
         val access = AccuweatherAccess(
             api = fakeApi,
             config = config,
-            clock = fakeClock,
+            clock = stubClock,
         )
 
         val forecasts = mutableListOf<Forecast>()
@@ -183,12 +182,14 @@ class AccuweatherAccessTest {
         val config = object: ConfigurationAccess {
             override val site: Flow<Site> = flowOf(configured)
         }
+        val fakeClock = object: Clock {
+            var current = this@AccuweatherAccessTest.now
+            override fun now(): Instant = current
+        }
         val access = AccuweatherAccess(
             api = fakeApi,
             config = config,
-            clock = object: Clock {
-                override fun now(): Instant = Instant.fromEpochSeconds(11)
-            },
+            clock = fakeClock
         )
 
         val forecasts = mutableListOf<Forecast>()
@@ -199,10 +200,8 @@ class AccuweatherAccessTest {
 
         pauseDispatcher {
             access.start()
+            fakeClock.current = fakeClock.current + 5.hours
             fakeApi.forecast = ForecastResponse(
-                headline = ForecastResponse.Headline(
-                    expires = 15,
-                ),
                 daily = listOf(
                     ForecastResponse.Daily(
                         sun = ForecastResponse.SunSchedule(
@@ -218,11 +217,9 @@ class AccuweatherAccessTest {
         assertEquals(2, forecasts.size)
         assertEquals(2, conditions.size)
 
-        assertEquals(10, forecasts[0].expiry.epochSeconds)
         assertEquals(1, forecasts[0].sunrise.epochSeconds)
         assertEquals(4, forecasts[0].sunset.epochSeconds)
 
-        assertEquals(15, forecasts[1].expiry.epochSeconds)
         assertEquals(20, forecasts[1].sunrise.epochSeconds)
         assertEquals(25, forecasts[1].sunset.epochSeconds)
 
