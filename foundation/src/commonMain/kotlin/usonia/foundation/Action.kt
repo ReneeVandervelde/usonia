@@ -8,6 +8,18 @@ import usonia.kotlin.unit.Percentage
  * Instructions for devices to do something or change state.
  */
 sealed class Action {
+    companion object Metadata {
+        val subClasses = setOf(
+            Switch::class,
+            Dim::class,
+            ColorTemperatureChange::class,
+            ColorChange::class,
+            Lock::class,
+            Intent::class,
+            Alert::class,
+        )
+    }
+
     /**
      * The device intended to receive the action.
      */

@@ -12,6 +12,7 @@ import usonia.hue.HueBridgePlugin
 import usonia.rules.RulesPlugin
 import usonia.core.state.memory.InMemoryActionAccess
 import usonia.core.state.memory.InMemoryEventAccess
+import usonia.serialization.SiteSerializer
 import usonia.weather.WeatherAccess
 import usonia.weather.WeatherPlugin
 import usonia.web.WebPlugin
@@ -20,8 +21,15 @@ import javax.inject.Singleton
 @Module
 object AppModule {
     @Provides
-    fun configurationAccess(): ConfigurationAccess {
-        return FileConfigAccess()
+    @Reusable
+    fun siteSerializer() = SiteSerializer(emptySet())
+
+    @Provides
+    @Reusable
+    fun configurationAccess(
+        siteSerializer: SiteSerializer
+    ): ConfigurationAccess {
+        return FileConfigAccess(siteSerializer)
     }
 
     @Provides
@@ -62,8 +70,9 @@ object AppModule {
     @Reusable
     @IntoSet
     fun webPlugin(
-        config: ConfigurationAccess
-    ): Plugin = WebPlugin(config)
+        config: ConfigurationAccess,
+        siteSerializer: SiteSerializer,
+    ): Plugin = WebPlugin(config, siteSerializer)
 
     @Provides
     @Singleton

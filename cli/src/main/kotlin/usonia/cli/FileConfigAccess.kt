@@ -11,11 +11,13 @@ import usonia.serialization.SiteSerializer
 /**
  * Provide config access from a statically loaded resource.
  */
-class FileConfigAccess: ConfigurationAccess {
+class FileConfigAccess(
+    private val siteSerializer: SiteSerializer,
+): ConfigurationAccess {
     val siteValue by lazy {
         getResourceContents("config.json")
             .let {
-                Json.decodeFromString(SiteSerializer, it)
+                Json.decodeFromString(siteSerializer, it)
             }
     }
     override val site: Flow<Site> = suspendedFlow(siteValue)

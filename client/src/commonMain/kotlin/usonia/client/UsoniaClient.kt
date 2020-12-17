@@ -10,19 +10,20 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 import usonia.foundation.Action
+import usonia.foundation.Capabilities
 import usonia.foundation.Event
 import usonia.foundation.Site
 import usonia.serialization.ActionSerializer
 import usonia.serialization.EventSerializer
 import usonia.serialization.SiteSerializer
-import usonia.serialization.StatusSerializer
 
 /**
  * HTTP Client for interacting with a Usonia server.
  */
 class UsoniaClient(
     private val host: String,
-    private val port: Int = 80
+    private val port: Int = 80,
+    private val siteSerializer: SiteSerializer = SiteSerializer(emptySet()),
 ) {
     private val httpClient = HttpClient {
         install(WebSockets)
@@ -68,7 +69,7 @@ class UsoniaClient(
         ) {
             incoming.consumeEach {
                 if (it !is Frame.Text) return@consumeEach
-                val site = it.readText().let { Json.decodeFromString(SiteSerializer, it) }
+                val site = it.readText().let { Json.decodeFromString(siteSerializer, it) }
                 emit(site)
             }
         }

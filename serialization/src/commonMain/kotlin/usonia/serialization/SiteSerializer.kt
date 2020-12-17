@@ -13,7 +13,9 @@ import usonia.foundation.*
  * All of the data classes here are manually deserialized due to:
  * https://github.com/Kotlin/kotlinx.serialization/issues/532
  */
-object SiteSerializer: KSerializer<Site> {
+class SiteSerializer(
+    private val archetypes: Set<Capabilities>,
+): KSerializer<Site> {
     private val serializer = SiteJson.serializer()
     override val descriptor: SerialDescriptor = serializer.descriptor
 
@@ -40,9 +42,18 @@ object SiteSerializer: KSerializer<Site> {
                         Device(
                             id = device.id.let(::Uuid),
                             name = device.name ?: device.id,
-                            capabilities = Capabilities(),
-                            fixture = device.fixture?.let { Fixture.valueOf(it) },
-                            siblings = device.siblings.mapSet(::Uuid)
+                            capabilities = when(device.capabilitiesArchetype) {
+                                null -> Capabilities(
+                                    archetypeId = null,
+                                    actions = device.actionTypes.orEmpty().mapSet { action ->
+                                        Action.subClasses.single { it.simpleName == action }
+                                    },
+                                    events = device.eventTypes.orEmpty().mapSet { event ->
+                                        Event.subClasses.single { it.simpleName == event }
+                                    }
+                                )
+                                else -> archetypes.single { it.archetypeId == device.capabilitiesArchetype }
+                            },
                         )
                     }
                 )
@@ -83,7 +94,9 @@ object SiteSerializer: KSerializer<Site> {
                         DeviceJson(
                             id = device.id.value,
                             name = device.name,
-                            capabilitiesArchetype = null,
+                            capabilitiesArchetype = device.capabilities.archetypeId,
+                            actionTypes = device.capabilities.actions.mapSet { it.simpleName!! },
+                            eventTypes = device.capabilities.events.mapSet { it.simpleName!! },
                             fixture = device.fixture?.name,
                             siblings = device.siblings.mapSet(Uuid::value)
                         )
@@ -148,6 +161,8 @@ internal data class DeviceJson(
     val id: String,
     val name: String? = null,
     val capabilitiesArchetype: String? = null,
+    val actionTypes: Set<String>? = null,
+    val eventTypes: Set<String>? = null,
     val fixture: String? = null,
     val siblings: Set<String> = emptySet(),
 )

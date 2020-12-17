@@ -7,6 +7,22 @@ import usonia.kotlin.unit.Percentage
  * State changes that have already happened.
  */
 sealed class Event {
+    companion object Metadata {
+        val subClasses = setOf(
+            Motion::class,
+            Switch::class,
+            Temperature::class,
+            Humidity::class,
+            Lock::class,
+            Water::class,
+            Latch::class,
+            Presence::class,
+            Battery::class,
+            Tilt::class,
+            Movement::class,
+        )
+    }
+
     /**
      * The device that was affected by this event.
      */

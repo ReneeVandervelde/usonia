@@ -9,13 +9,14 @@ import usonia.core.state.ConfigurationAccess
 import usonia.serialization.SiteSerializer
 
 internal class ConfigSocket(
-    private val configAccess: ConfigurationAccess
+    private val configAccess: ConfigurationAccess,
+    private val siteSerializer: SiteSerializer,
 ): WebSocketController {
     override val path: String = "config"
 
     override suspend fun start(input: ReceiveChannel<String>, output: SendChannel<String>) {
         configAccess.site.collectLatest {
-            output.send(Json.encodeToString(SiteSerializer, it))
+            output.send(Json.encodeToString(siteSerializer, it))
         }
     }
 }

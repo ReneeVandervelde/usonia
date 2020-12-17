@@ -35,6 +35,8 @@ class SiteSerializerTest {
                     {
                       "id": "fake-device-id",
                       "name": "Fake Device",
+                      "actionTypes": ["Switch"],
+                      "eventTypes": ["Motion"],
                       "fixture": "Light",
                       "siblings": [
                         "fake-sibling-id"
@@ -61,7 +63,7 @@ class SiteSerializerTest {
               }
             }
         """
-        val result = Json.decodeFromString(SiteSerializer, json)
+        val result = Json.decodeFromString(SiteSerializer(emptySet()), json)
 
         assertEquals("fake-site-id", result.id.value)
         assertEquals("Fake Site", result.name)
@@ -80,8 +82,8 @@ class SiteSerializerTest {
         val device = room.devices.single()
         assertEquals("fake-device-id", device.id.value)
         assertEquals("Fake Device", device.name)
-        assertEquals(emptySet(), device.capabilities.actions)
-        assertEquals(emptySet(), device.capabilities.events)
+        assertEquals(setOf(Action.Switch::class), device.capabilities.actions)
+        assertEquals(setOf(Event.Motion::class), device.capabilities.events)
         val bridge = result.bridges.single()
         assertEquals("fake-bridge-id", bridge.id.value)
         assertEquals("Fake Bridge", bridge.name)
@@ -98,7 +100,7 @@ class SiteSerializerTest {
               "id": "fake-site-id"
             }
         """
-        val result = Json.decodeFromString(SiteSerializer, json)
+        val result = Json.decodeFromString(SiteSerializer(emptySet()), json)
 
         assertEquals("fake-site-id", result.id.value)
         assertEquals("fake-site-id", result.name)
@@ -120,7 +122,7 @@ class SiteSerializerTest {
               ]
             }
         """
-        val result = Json.decodeFromString(SiteSerializer, json)
+        val result = Json.decodeFromString(SiteSerializer(emptySet()), json)
 
         val room = result.rooms.single()
         assertEquals("fake-room-id", room.id.value)
@@ -145,7 +147,7 @@ class SiteSerializerTest {
               ]
             }
         """
-        val result = Json.decodeFromString(SiteSerializer, json)
+        val result = Json.decodeFromString(SiteSerializer(emptySet()), json)
 
         val room = result.rooms.single()
         val device = room.devices.single()
@@ -156,5 +158,63 @@ class SiteSerializerTest {
         assertEquals(emptySet(), device.siblings)
         assertEquals(emptySet(), device.capabilities.actions)
         assertEquals(emptySet(), device.capabilities.events)
+    }
+
+    @Test
+    fun deviceArchetype() {
+        val json = """
+            {
+              "id": "fake-site-id",
+              "rooms": [
+                {
+                  "id": "fake-room-id",
+                  "devices": [
+                    {
+                        "id": "fake-device-id",
+                        "capabilitiesArchetype": "test"
+                    }
+                  ]
+                }
+              ]
+            }
+        """
+        val archetype = Capabilities(
+            archetypeId = "test",
+            actions = setOf(Action.Lock::class),
+            events = setOf(Event.Water::class),
+        )
+        val result = Json.decodeFromString(SiteSerializer(setOf(archetype)), json)
+
+        val room = result.rooms.single()
+        val device = room.devices.single()
+
+        assertEquals(emptySet(), device.siblings)
+        assertEquals(archetype, device.capabilities)
+    }
+
+    @Test(expected = Exception::class)
+    fun invalidArchetype() {
+        val json = """
+            {
+              "id": "fake-site-id",
+              "rooms": [
+                {
+                  "id": "fake-room-id",
+                  "devices": [
+                    {
+                        "id": "fake-device-id",
+                        "capabilitiesArchetype": "not-real"
+                    }
+                  ]
+                }
+              ]
+            }
+        """
+        val archetype = Capabilities(
+            archetypeId = "test",
+            actions = setOf(Action.Lock::class),
+            events = setOf(Event.Water::class),
+        )
+        Json.decodeFromString(SiteSerializer(setOf(archetype)), json)
     }
 }
