@@ -36,5 +36,7 @@ class ClientIntentSendCommand @Inject constructor(
             target = targetId,
             action = action
         ))
+
+        echo("Ok")
     }
 }

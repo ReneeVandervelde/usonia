@@ -3,9 +3,7 @@ package usonia.frontend.config
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.browser.document
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import mustache.Mustache
 import usonia.client.UsoniaClient
 import usonia.frontend.ViewController

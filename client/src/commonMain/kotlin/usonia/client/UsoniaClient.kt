@@ -10,12 +10,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 import usonia.foundation.Action
-import usonia.foundation.Capabilities
 import usonia.foundation.Event
 import usonia.foundation.Site
+import usonia.foundation.Status
 import usonia.serialization.ActionSerializer
 import usonia.serialization.EventSerializer
 import usonia.serialization.SiteSerializer
+import usonia.serialization.StatusSerializer
 
 /**
  * HTTP Client for interacting with a Usonia server.
@@ -61,6 +62,9 @@ class UsoniaClient(
         }
     }
 
+    /**
+     * Ongoing flow of changes to the site configuration.
+     */
     val config: Flow<Site> = flow {
         httpClient.ws(
             host = host,
@@ -78,11 +82,26 @@ class UsoniaClient(
     /**
      * Send an action to the server to be broadcast.
      */
-    suspend fun sendAction(action: Action) {
+    suspend fun sendAction(action: Action): Status {
         val request = HttpRequestBuilder().apply {
             body = Json.encodeToString(ActionSerializer, action)
         }
 
-        httpClient.post<HttpResponse>(request).readText()
+        val response = httpClient.post<HttpResponse>(request).readText()
+
+        return Json.decodeFromString(StatusSerializer, response)
+    }
+
+    /**
+     * Send an event to the server to be broadcast
+     */
+    suspend fun sendEvent(event: Event): Status {
+        val request = HttpRequestBuilder().apply {
+            body = Json.encodeToString(EventSerializer, event)
+        }
+
+        val response = httpClient.post<HttpResponse>(request).readText()
+
+        return Json.decodeFromString(StatusSerializer, response)
     }
 }
