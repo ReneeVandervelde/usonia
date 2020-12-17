@@ -34,7 +34,7 @@ object SmartThingsArchetypes {
     )
 
     val multi = Capabilities(
-        archetypeId = "usonia.smartthings.moisture",
+        archetypeId = "usonia.smartthings.multi",
         actions = emptySet(),
         events = setOf(
             Event.Movement::class,
