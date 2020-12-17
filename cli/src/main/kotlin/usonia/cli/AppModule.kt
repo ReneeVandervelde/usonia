@@ -13,6 +13,7 @@ import usonia.rules.RulesPlugin
 import usonia.core.state.memory.InMemoryActionAccess
 import usonia.core.state.memory.InMemoryEventAccess
 import usonia.serialization.SiteSerializer
+import usonia.smartthings.SmartThingsArchetypes
 import usonia.weather.WeatherAccess
 import usonia.weather.WeatherPlugin
 import usonia.web.WebPlugin
@@ -22,7 +23,10 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Reusable
-    fun siteSerializer() = SiteSerializer(emptySet())
+    fun siteSerializer(): SiteSerializer {
+        val archetypes = SmartThingsArchetypes.ALL
+        return SiteSerializer(archetypes)
+    }
 
     @Provides
     @Reusable

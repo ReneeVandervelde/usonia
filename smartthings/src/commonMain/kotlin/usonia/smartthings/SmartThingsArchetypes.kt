@@ -5,6 +5,14 @@ import usonia.foundation.Capabilities
 import usonia.foundation.Event
 
 object SmartThingsArchetypes {
+    val ALL get() = setOf(
+        motion,
+        humidity,
+        moisture,
+        multi,
+        outlet,
+    )
+
     val motion = Capabilities(
         archetypeId = "usonia.smartthings.motion",
         actions = emptySet(),

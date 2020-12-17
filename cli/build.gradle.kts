@@ -29,6 +29,7 @@ dependencies {
     implementation(project(":rules"))
     implementation(project(":serialization"))
     implementation(project(":server-ktor"))
+    implementation(project(":smartthings"))
     implementation(project(":state-memory"))
     implementation(project(":weather"))
     implementation(project(":web-backend"))
