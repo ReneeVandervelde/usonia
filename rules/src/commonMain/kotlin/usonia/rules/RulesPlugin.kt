@@ -4,7 +4,7 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import usonia.rules.alerts.WaterMonitor
 import usonia.core.Daemon
-import usonia.core.Plugin
+import usonia.core.ServerPlugin
 import usonia.core.state.ActionAccess
 import usonia.core.state.ActionPublisher
 import usonia.core.state.ConfigurationAccess
@@ -20,7 +20,7 @@ class RulesPlugin(
     actionAccess: ActionAccess,
     weather: WeatherAccess,
     logger: KimchiLogger = EmptyLogger,
-): Plugin {
+): ServerPlugin {
     private val colorPicker = CircadianColors(
         configurationAccess = configurationAccess,
         weather = weather,

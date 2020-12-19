@@ -3,7 +3,7 @@ package usonia.hubitat
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import usonia.core.Daemon
-import usonia.core.Plugin
+import usonia.core.ServerPlugin
 import usonia.core.server.HttpController
 import usonia.core.server.WebSocketController
 import usonia.core.state.*
@@ -15,7 +15,7 @@ class HubitatPlugin(
     actionPublisher: ActionPublisher,
     configurationAccess: ConfigurationAccess,
     logger: KimchiLogger = EmptyLogger,
-): Plugin {
+): ServerPlugin {
     override val httpControllers: List<HttpController> = listOf(
         EventPublishHttpBridge(eventPublisher, logger),
         ActionPublishHttpBridge(actionPublisher, logger),

@@ -6,7 +6,7 @@ import dagger.Provides
 import dagger.Reusable
 import dagger.multibindings.IntoSet
 import kimchi.logger.KimchiLogger
-import usonia.core.Plugin
+import usonia.core.ServerPlugin
 import usonia.core.state.*
 import usonia.hubitat.HubitatPlugin
 import usonia.hue.HueBridgePlugin
@@ -25,7 +25,7 @@ object PluginsModule {
     fun webPlugin(
         config: ConfigurationAccess,
         siteSerializer: SiteSerializer,
-    ): Plugin = WebPlugin(config, siteSerializer)
+    ): ServerPlugin = WebPlugin(config, siteSerializer)
 
     @Provides
     @Singleton
@@ -47,7 +47,7 @@ object PluginsModule {
         actionAccess: ActionAccess,
         weather: WeatherAccess,
         logger: KimchiLogger,
-    ): Plugin = RulesPlugin(config, events, actionPublisher, actionAccess, weather, logger)
+    ): ServerPlugin = RulesPlugin(config, events, actionPublisher, actionAccess, weather, logger)
 
     @Provides
     @Reusable
@@ -59,7 +59,7 @@ object PluginsModule {
         actionAccess: ActionAccess,
         actionPublisher: ActionPublisher,
         logger: KimchiLogger
-    ): Plugin = HubitatPlugin(
+    ): ServerPlugin = HubitatPlugin(
         eventPublisher = eventPublisher,
         eventAccess = eventAccess,
         actionAccess = actionAccess,
@@ -75,7 +75,7 @@ object PluginsModule {
         config: ConfigurationAccess,
         actionAccess: ActionAccess,
         logger: KimchiLogger
-    ): Plugin = HueBridgePlugin(
+    ): ServerPlugin = HueBridgePlugin(
         actionAccess = actionAccess,
         configurationAccess = config,
         logger = logger,
@@ -89,5 +89,5 @@ object PluginsModule {
 private interface PluginBindings {
     @Binds
     @IntoSet
-    fun weatherPlugin(source: WeatherPlugin): Plugin
+    fun weatherPlugin(source: WeatherPlugin): ServerPlugin
 }

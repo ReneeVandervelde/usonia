@@ -14,7 +14,7 @@ import usonia.core.timemachine.minutes
  * The "backend" part of the application that starts up long running services.
  */
 class Usonia(
-    override val plugins: Set<Plugin>,
+    override val plugins: Set<ServerPlugin>,
     private val server: WebServer,
     private val logger: KimchiLogger = EmptyLogger,
     private val daemonScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)

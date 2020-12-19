@@ -2,7 +2,7 @@ package usonia.cli
 
 import dagger.Reusable
 import kimchi.logger.KimchiLogger
-import usonia.core.Plugin
+import usonia.core.ServerPlugin
 import usonia.core.Usonia
 import usonia.server.ktor.KtorWebServer
 import javax.inject.Inject
@@ -11,7 +11,7 @@ import javax.inject.Inject
 @JvmSuppressWildcards
 class UsoniaFactory @Inject constructor(
     private val logger: KimchiLogger,
-    private val plugins: Set<Plugin>,
+    private val plugins: Set<ServerPlugin>,
 ) {
     fun create(
         port: Int
