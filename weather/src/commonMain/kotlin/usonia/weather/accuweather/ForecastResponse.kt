@@ -12,6 +12,8 @@ internal data class ForecastResponse(
     internal data class Daily(
         @SerialName("Sun")
         val sun: SunSchedule,
+        @SerialName("Day")
+        val day: DayConditions,
     )
 
     @Serializable
@@ -20,5 +22,13 @@ internal data class ForecastResponse(
         val rise: Long,
         @SerialName("EpochSet")
         val set: Long,
+    )
+
+    @Serializable
+    internal data class DayConditions(
+        @SerialName("SnowProbability")
+        val snowProbability: Int,
+        @SerialName("RainProbability")
+        val rainProbability: Int,
     )
 }

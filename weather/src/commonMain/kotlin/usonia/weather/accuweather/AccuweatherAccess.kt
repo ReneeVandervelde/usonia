@@ -119,6 +119,8 @@ internal class AccuweatherAccess(
             timestamp = clock.now(),
             sunrise = forecastResponse.daily.single().sun.rise.let(Instant.Companion::fromEpochSeconds),
             sunset = forecastResponse.daily.single().sun.set.let(Instant.Companion::fromEpochSeconds),
+            rainChance = forecastResponse.daily.single().day.rainProbability.percent,
+            snowChance = forecastResponse.daily.single().day.snowProbability.percent,
         ).also {
             logger.debug("New Forecast: <$it>")
         }

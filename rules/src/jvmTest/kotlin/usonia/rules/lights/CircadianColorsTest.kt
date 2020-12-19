@@ -30,6 +30,8 @@ class CircadianColorsTest {
             timestamp = Instant.DISTANT_PAST,
             sunrise = sunrise,
             sunset = sunset,
+            rainChance = 0.percent,
+            snowChance = 0.percent,
         ))
         override val conditions: Flow<Conditions> get() = TODO()
     }

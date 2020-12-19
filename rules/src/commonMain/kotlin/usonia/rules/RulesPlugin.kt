@@ -9,6 +9,7 @@ import usonia.core.state.ActionAccess
 import usonia.core.state.ActionPublisher
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.EventAccess
+import usonia.rules.indicator.Indicator
 import usonia.rules.lights.CircadianColors
 import usonia.rules.lights.LightController
 import usonia.weather.WeatherAccess
@@ -28,6 +29,7 @@ class RulesPlugin(
     )
     override val daemons: List<Daemon> = listOf(
         WaterMonitor(configurationAccess, eventAccess, actionPublisher, logger),
-        LightController(configurationAccess, eventAccess, actionPublisher, colorPicker)
+        LightController(configurationAccess, eventAccess, actionPublisher, colorPicker),
+        Indicator(weather, configurationAccess, actionPublisher, logger),
     )
 }

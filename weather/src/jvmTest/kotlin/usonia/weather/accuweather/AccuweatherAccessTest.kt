@@ -29,7 +29,11 @@ class AccuweatherAccessTest {
                     sun = ForecastResponse.SunSchedule(
                         rise = 1,
                         set = 4,
-                    )
+                    ),
+                    day = ForecastResponse.DayConditions(
+                        snowProbability = 12,
+                        rainProbability = 34,
+                    ),
                 )
             )
         )
@@ -125,6 +129,8 @@ class AccuweatherAccessTest {
         assertEquals(5, forecasts.single().timestamp.epochSeconds)
         assertEquals(1, forecasts.single().sunrise.epochSeconds)
         assertEquals(4, forecasts.single().sunset.epochSeconds)
+        assertEquals(12.percent, forecasts.single().snowChance)
+        assertEquals(34.percent, forecasts.single().rainChance)
 
         assertEquals(5, conditions.single().timestamp.epochSeconds)
         assertEquals(69.percent, conditions.single().cloudCover)
@@ -207,6 +213,10 @@ class AccuweatherAccessTest {
                         sun = ForecastResponse.SunSchedule(
                             rise = 20,
                             set = 25,
+                        ),
+                        day = ForecastResponse.DayConditions(
+                            snowProbability = 56,
+                            rainProbability = 78,
                         )
                     )
                 )
@@ -219,9 +229,13 @@ class AccuweatherAccessTest {
 
         assertEquals(1, forecasts[0].sunrise.epochSeconds)
         assertEquals(4, forecasts[0].sunset.epochSeconds)
+        assertEquals(12.percent, forecasts[0].snowChance)
+        assertEquals(34.percent, forecasts[0].rainChance)
 
         assertEquals(20, forecasts[1].sunrise.epochSeconds)
         assertEquals(25, forecasts[1].sunset.epochSeconds)
+        assertEquals(56.percent, forecasts[1].snowChance)
+        assertEquals(78.percent, forecasts[1].rainChance)
 
         forecastCollection.cancelAndJoin()
         conditionCollection.cancelAndJoin()

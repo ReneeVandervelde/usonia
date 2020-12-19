@@ -30,3 +30,13 @@ suspend fun ConfigurationAccess.getDeviceById(id: Uuid): Device? {
 suspend fun ConfigurationAccess.getSite(): Site {
     return site.first()
 }
+
+/**
+ * Find a site-wide device that matches a [predicate]
+ */
+suspend fun Site.findDeviceBy(predicate: (Device) -> Boolean): Set<Device> {
+    return rooms
+        .flatMap { it.devices }
+        .filter(predicate)
+        .toSet()
+}
