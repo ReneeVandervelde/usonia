@@ -21,6 +21,12 @@ object FakeEvents {
         state = WaterState.WET
     )
 
+    val Away = Event.Presence(
+        source = FakeUsers.John.id,
+        timestamp = Instant.fromEpochSeconds(1),
+        state = PresenceState.AWAY
+    )
+
     val Dry = Event.Water(
         source = FakeDevices.WaterSensor.id,
         timestamp = Instant.fromEpochSeconds(1),

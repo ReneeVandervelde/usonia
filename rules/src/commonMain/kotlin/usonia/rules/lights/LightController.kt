@@ -1,5 +1,7 @@
 package usonia.rules.lights
 
+import kimchi.logger.EmptyLogger
+import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -10,6 +12,7 @@ import usonia.core.Daemon
 import usonia.core.state.ActionPublisher
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.EventAccess
+import usonia.core.state.allAway
 import usonia.foundation.*
 import usonia.foundation.Room.Type.*
 import usonia.kotlin.neverEnding
@@ -26,16 +29,26 @@ internal class LightController(
     private val eventAccess: EventAccess,
     private val actionPublisher: ActionPublisher,
     private val colorPicker: ColorPicker,
+    private val logger: KimchiLogger = EmptyLogger,
 ): Daemon {
     override suspend fun start(): Nothing = neverEnding {
         configurationAccess.site.collectLatest { site ->
             eventAccess.events.filterIsInstance<Event.Motion>().collect { event ->
-                val room = site.findRoomWithDevice(event.source)
-                when (event.state) {
-                    MotionState.MOTION -> onRoomMotion(room)
-                    MotionState.IDLE -> onRoomIdle(room)
-                }
+                onMotion(event, site)
             }
+        }
+    }
+
+    private suspend fun onMotion(event: Event.Motion, site: Site) {
+        if (eventAccess.allAway(site.users)) {
+            logger.info("All ${site.users.size} users are away. Ignoring Motion Event.")
+            return
+        }
+
+        val room = site.findRoomWithDevice(event.source)
+        when (event.state) {
+            MotionState.MOTION -> onRoomMotion(room)
+            MotionState.IDLE -> onRoomIdle(room)
         }
     }
 
