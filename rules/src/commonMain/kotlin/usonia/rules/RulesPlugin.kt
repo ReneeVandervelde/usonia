@@ -30,6 +30,6 @@ class RulesPlugin(
     override val daemons: List<Daemon> = listOf(
         WaterMonitor(configurationAccess, eventAccess, actionPublisher, logger),
         LightController(configurationAccess, eventAccess, actionPublisher, colorPicker),
-        Indicator(weather, configurationAccess, actionPublisher, logger),
+        Indicator(weather, configurationAccess, eventAccess, actionPublisher, logger),
     )
 }

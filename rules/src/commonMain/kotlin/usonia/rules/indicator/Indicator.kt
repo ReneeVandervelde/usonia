@@ -3,14 +3,12 @@ package usonia.rules.indicator
 import com.github.ajalt.colormath.RGB
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import usonia.core.Daemon
-import usonia.core.state.ActionPublisher
-import usonia.core.state.ConfigurationAccess
-import usonia.core.state.findDeviceBy
-import usonia.foundation.Action
-import usonia.foundation.Device
-import usonia.foundation.Fixture
+import usonia.core.state.*
+import usonia.foundation.*
 import usonia.kotlin.neverEnding
 import usonia.kotlin.unit.percent
 import usonia.weather.Conditions
@@ -26,6 +24,7 @@ import kotlin.math.min
 internal class Indicator(
     private val weatherAccess: WeatherAccess,
     private val configurationAccess: ConfigurationAccess,
+    private val eventAccess: EventAccess,
     private val actionPublisher: ActionPublisher,
     private val logger: KimchiLogger = EmptyLogger,
 ): Daemon {
@@ -35,21 +34,22 @@ internal class Indicator(
     private val rainColor = RGB(0, 255 , 255)
 
     override suspend fun start(): Nothing = neverEnding {
-        configurationAccess.site
-            .map { it.findDeviceBy { it.fixture == Fixture.Indicator } }
-            .onEach { logger.debug("Binding ${it.size} Indicators") }
-            .collectLatest { indicators -> updateIndicators(indicators) }
+        configurationAccess.site.collectLatest { site ->
+            coroutineScope {
+                launch { bindColorUpdates(site) }
+                launch { bindAwayBrightness(site) }
+            }
+        }
     }
 
-    private suspend fun updateIndicators(indicators: Set<Device>) {
+    private suspend fun bindColorUpdates(site: Site) {
         weatherAccess.combinedData
             .onEach { logger.debug("Updating indicator with new data: <$it>") }
             .map { (conditions, forecast) ->
-                indicators.map { device ->
+                site.findDeviceBy { it.fixture == Fixture.Indicator }.map { device ->
                     Action.ColorChange(
                         target = device.id,
                         color = getColor(forecast, conditions),
-                        level = 100.percent
                     )
                 }
             }
@@ -58,6 +58,19 @@ internal class Indicator(
                 actions.forEach {
                     actionPublisher.publishAction(it)
                 }
+            }
+    }
+
+    private suspend fun bindAwayBrightness(site: Site) {
+        eventAccess.events
+            .filterIsInstance<Event.Presence>()
+            .mapLatest {
+                if (eventAccess.allAway(site.users)) 5.percent else 100.percent
+            }
+            .collectLatest { level ->
+                site.findDeviceBy { it.fixture == Fixture.Indicator }
+                    .map { Action.Dim(it.id, level) }
+                    .forEach { actionPublisher.publishAction(it) }
             }
     }
 

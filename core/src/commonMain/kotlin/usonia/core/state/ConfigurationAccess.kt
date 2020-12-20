@@ -34,7 +34,7 @@ suspend fun ConfigurationAccess.getSite(): Site {
 /**
  * Find a site-wide device that matches a [predicate]
  */
-suspend fun Site.findDeviceBy(predicate: (Device) -> Boolean): Set<Device> {
+fun Site.findDeviceBy(predicate: (Device) -> Boolean): Set<Device> {
     return rooms
         .flatMap { it.devices }
         .filter(predicate)
