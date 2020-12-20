@@ -5,6 +5,7 @@ package usonia.foundation
  */
 enum class Fixture {
     Light,
+    EntryPoint,
     Door,
     Window,
     Refrigerator,

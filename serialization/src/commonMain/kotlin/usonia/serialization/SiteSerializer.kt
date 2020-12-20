@@ -6,6 +6,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import usonia.foundation.*
+import usonia.kotlin.singleOrThrow
 
 /**
  * Serialize/Deserialize site configuration.
@@ -18,6 +19,7 @@ class SiteSerializer(
 ): KSerializer<Site> {
     private val serializer = SiteJson.serializer()
     override val descriptor: SerialDescriptor = serializer.descriptor
+
 
     override fun deserialize(decoder: Decoder): Site {
         val json = decoder.decodeSerializableValue(serializer)
@@ -46,13 +48,13 @@ class SiteSerializer(
                                 null -> Capabilities(
                                     archetypeId = null,
                                     actions = device.actionTypes.orEmpty().mapSet { action ->
-                                        Action.subClasses.single { it.simpleName == action }
+                                        Action.subClasses.singleOrThrow("No Action of type $action") { it.simpleName == action }
                                     },
                                     events = device.eventTypes.orEmpty().mapSet { event ->
-                                        Event.subClasses.single { it.simpleName == event }
+                                        Event.subClasses.singleOrThrow("No event of type: $event") { it.simpleName == event }
                                     }
                                 )
-                                else -> archetypes.single { it.archetypeId == device.capabilitiesArchetype }
+                                else -> archetypes.singleOrThrow("No archetype of ID: ${device.capabilitiesArchetype}") { it.archetypeId == device.capabilitiesArchetype }
                             },
                         )
                     }

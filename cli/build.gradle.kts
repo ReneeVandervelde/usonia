@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":hubitat-bridge"))
     implementation(project(":hue-bridge"))
     implementation(project(":rules"))
+    implementation(project(":schlage"))
     implementation(project(":serialization"))
     implementation(project(":server-ktor"))
     implementation(project(":smartthings"))

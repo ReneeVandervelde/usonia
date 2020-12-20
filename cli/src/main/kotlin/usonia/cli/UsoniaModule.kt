@@ -7,6 +7,8 @@ import dagger.Reusable
 import usonia.core.state.*
 import usonia.core.state.memory.InMemoryActionAccess
 import usonia.core.state.memory.InMemoryEventAccess
+import usonia.hue.HueArchetypes
+import usonia.schlage.SchlageArchetypes
 import usonia.serialization.SiteSerializer
 import usonia.smartthings.SmartThingsArchetypes
 import javax.inject.Singleton
@@ -16,7 +18,11 @@ object UsoniaModule {
     @Provides
     @Reusable
     fun siteSerializer(): SiteSerializer {
-        val archetypes = SmartThingsArchetypes.ALL
+        val archetypes = setOf(
+            *SmartThingsArchetypes.ALL.toTypedArray(),
+            HueArchetypes.group,
+            SchlageArchetypes.connectLock,
+        )
         return SiteSerializer(archetypes)
     }
 
