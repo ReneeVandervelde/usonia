@@ -39,5 +39,6 @@ class WebPlugin(
     override val staticResources: List<String> = listOf(
         "web-frontend.js",
         "web-frontend.js.map",
+        "main.css",
     )
 }

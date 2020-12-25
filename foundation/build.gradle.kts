@@ -15,6 +15,7 @@ kotlin {
                 api(project(":kotlin-extensions"))
                 api(KotlinX.dateTime)
                 api(project(":kotlin-extensions"))
+                api(Kimchi.logger)
             }
         }
 

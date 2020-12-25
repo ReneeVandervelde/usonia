@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Control Panel</title>
-    <link rel="stylesheet" href="https://assets.inkapplications.com/css/main-v1.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="static/main.css" type="text/css" media="all" />
     <script src="static/web-frontend.js"></script>
 </head>
 <body>
@@ -26,11 +26,18 @@
         {{/rooms}}
     </script>
     <section id="config"></section>
+
+    <script id="log-message-template" type="text/template">
+        <div class="log-message" data-level="{{level.name}}">
+            <div class="log-message-primary">
+                [<span class="log-message-level">{{level.name}}</span>]: {{message}}
+            </div>
+            <div class="log-message-stacktrace">{{stackTrace}}</div>
+        </div>
+    </script>
     <section>
         <h1>Logs</h1>
-        <pre>
-            <code id="logs" class="shell"></code>
-        </pre>
+        <div id="logs"></div>
     </section>
 </header>
 </body>

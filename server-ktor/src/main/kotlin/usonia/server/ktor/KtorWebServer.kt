@@ -36,6 +36,10 @@ class KtorWebServer(
         suspendCoroutine<Nothing> {
             val server = embeddedServer(Netty, port) {
                 install(WebSockets)
+                intercept(ApplicationCallPipeline.Monitoring) {
+                    logger.trace("${call.request.httpMethod.value}: ${call.request.uri}")
+                    proceed()
+                }
 
                 routing {
                     socketControllers.forEach { controller ->
@@ -71,7 +75,6 @@ class KtorWebServer(
                                 val response = runCatching { controller.getResponse(request) }
                                     .onFailure {
                                         logger.error("Failed to get response", it)
-                                        it.printStackTrace()
                                     }
                                     .getOrThrow()
                                 call.respondText(
