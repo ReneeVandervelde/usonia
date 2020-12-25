@@ -21,12 +21,32 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class HueGroupHandlerTest {
+    private val fakeHueBridge = FakeBridge.copy(
+        service = HUE_SERVICE
+    )
+
+    private val fakeHueLight = FakeDevices.HueGroup.copy(
+        parent = ExternalAssociation(
+            context = fakeHueBridge.id,
+            id = Identifier("fake-hue-id")
+        )
+    )
+
     @Test
     fun notConfigured() = runBlockingTest {
         val shadeSpy = ShadeGroupsSpy()
         val actionAccess = ActionAccessFake()
         val configurationAccess = object: ConfigurationAccess {
-            override val site: Flow<Site> = suspendedFlow(FakeSite)
+            override val site: Flow<Site> = suspendedFlow(
+                FakeSite.copy(
+                    rooms = setOf(
+                        FakeRooms.LivingRoom.copy(
+                            devices = setOf(FakeDevices.HueGroup)
+                        )
+                    ),
+                    bridges = setOf(fakeHueBridge),
+                )
+            )
         }
 
         val handler = HueGroupHandler(actionAccess, configurationAccess, shadeSpy)
@@ -57,9 +77,7 @@ class HueGroupHandlerTest {
                             devices = setOf(FakeDevices.HueGroup)
                         )
                     ),
-                    bridges = setOf(FakeDevices.FakeHueBridge.copy(
-                        deviceMap = mapOf()
-                    )),
+                    bridges = setOf(fakeHueBridge),
                 )
             )
         }
@@ -89,14 +107,10 @@ class HueGroupHandlerTest {
                 FakeSite.copy(
                     rooms = setOf(
                         FakeRooms.LivingRoom.copy(
-                            devices = setOf(FakeDevices.HueGroup)
+                            devices = setOf(fakeHueLight)
                         )
                     ),
-                    bridges = setOf(FakeDevices.FakeHueBridge.copy(
-                        deviceMap = mapOf(
-                            FakeDevices.HueGroup.id to "fake-hue-id"
-                        )
-                    )),
+                    bridges = setOf(fakeHueBridge),
                 )
             )
         }
@@ -149,14 +163,10 @@ class HueGroupHandlerTest {
                 FakeSite.copy(
                     rooms = setOf(
                         FakeRooms.LivingRoom.copy(
-                            devices = setOf(FakeDevices.HueGroup)
+                            devices = setOf(fakeHueLight)
                         )
                     ),
-                    bridges = setOf(FakeDevices.FakeHueBridge.copy(
-                        deviceMap = mapOf(
-                            FakeDevices.HueGroup.id to "fake-hue-id"
-                        )
-                    )),
+                    bridges = setOf(fakeHueBridge),
                 )
             )
         }

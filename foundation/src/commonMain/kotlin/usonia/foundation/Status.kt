@@ -15,4 +15,14 @@ object Statuses {
         code = 1,
         message = "Something unexpected went wrong."
     )
+
+    val DEVICE_NOT_FOUND = Status(
+        code = 2,
+        message = "Could not find a device with the specified ID."
+    )
+
+    fun missingRequired(param: String) = Status(
+        code = 3,
+        message = "Missing required Parameter: $param"
+    )
 }

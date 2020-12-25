@@ -4,7 +4,7 @@ package usonia.foundation
  * A real human occupant.
  */
 data class User(
-    val id: Uuid,
+    val id: Identifier,
     val name: String,
     val parameters: ParameterBag
 )

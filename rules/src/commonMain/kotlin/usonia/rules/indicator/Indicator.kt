@@ -46,7 +46,7 @@ internal class Indicator(
         weatherAccess.combinedData
             .onEach { logger.debug("Updating indicator with new data: <$it>") }
             .map { (conditions, forecast) ->
-                site.findDeviceBy { it.fixture == Fixture.Indicator }.map { device ->
+                site.findDevicesBy { it.fixture == Fixture.Indicator }.map { device ->
                     Action.ColorChange(
                         target = device.id,
                         color = getColor(forecast, conditions),
@@ -68,7 +68,7 @@ internal class Indicator(
                 if (eventAccess.allAway(site.users)) 5.percent else 100.percent
             }
             .collectLatest { level ->
-                site.findDeviceBy { it.fixture == Fixture.Indicator }
+                site.findDevicesBy { it.fixture == Fixture.Indicator }
                     .map { Action.Dim(it.id, level) }
                     .forEach { actionPublisher.publishAction(it) }
             }

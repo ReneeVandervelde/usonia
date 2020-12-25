@@ -7,7 +7,7 @@ import kotlinx.serialization.json.Json
 import usonia.serialization.StatusSerializer
 
 abstract class RestController<IN: Any, OUT: Any>(
-    val logger: KimchiLogger = EmptyLogger
+    protected val logger: KimchiLogger = EmptyLogger
 ): HttpController {
     abstract val deserializer: KSerializer<IN>
     abstract val serializer: KSerializer<OUT>

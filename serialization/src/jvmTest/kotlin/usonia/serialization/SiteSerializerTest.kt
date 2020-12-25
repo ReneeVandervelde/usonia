@@ -40,7 +40,9 @@ class SiteSerializerTest {
                       "fixture": "Light",
                       "siblings": [
                         "fake-sibling-id"
-                      ]
+                      ],
+                      "parentContext": "test-parent-context",
+                      "parentId": "test-parent-id"
                     }
                   ]
                 }
@@ -50,9 +52,6 @@ class SiteSerializerTest {
                   "id": "fake-bridge-id",
                   "name": "Fake Bridge",
                   "service": "test",
-                  "deviceMap": {
-                    "foo": "bar"
-                  },
                   "parameters": {
                     "baz": "qux"
                   }
@@ -84,11 +83,12 @@ class SiteSerializerTest {
         assertEquals("Fake Device", device.name)
         assertEquals(setOf(Action.Switch::class), device.capabilities.actions)
         assertEquals(setOf(Event.Motion::class), device.capabilities.events)
+        assertEquals("test-parent-context", device.parent?.context?.value)
+        assertEquals("test-parent-id", device.parent?.id?.value)
         val bridge = result.bridges.single()
         assertEquals("fake-bridge-id", bridge.id.value)
         assertEquals("Fake Bridge", bridge.name)
         assertEquals("test", bridge.service)
-        assertEquals(mapOf(Uuid("foo") to "bar"), bridge.deviceMap)
         assertEquals(mapOf("baz" to "qux"), bridge.parameters)
 
     }

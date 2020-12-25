@@ -7,7 +7,7 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.EventAccess
 import usonia.core.state.EventPublisher
 import usonia.foundation.Event
-import usonia.foundation.Uuid
+import usonia.foundation.Identifier
 import kotlin.reflect.KClass
 
 /**
@@ -20,7 +20,7 @@ class InMemoryEventAccess(
     private val eventChannel = BroadcastChannel<Event>(Channel.BUFFERED)
     override val events: Flow<Event> = eventChannel.asFlow()
 
-    override suspend fun <T : Event> getState(id: Uuid, type: KClass<T>): T? {
+    override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
         return state[id to type] as T?
     }
 

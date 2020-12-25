@@ -25,7 +25,11 @@ object PluginsModule {
     fun webPlugin(
         config: ConfigurationAccess,
         siteSerializer: SiteSerializer,
-    ): ServerPlugin = WebPlugin(config, siteSerializer)
+        eventPublisher: EventPublisher,
+        eventAccess: EventAccess,
+        actionPublisher: ActionPublisher,
+        logger: KimchiLogger,
+    ): ServerPlugin = WebPlugin(config, eventPublisher, eventAccess, actionPublisher, siteSerializer, logger)
 
     @Provides
     @Singleton
@@ -53,17 +57,11 @@ object PluginsModule {
     @Reusable
     @IntoSet
     fun bridgePlugin(
-        eventAccess: EventAccess,
-        eventPublisher: EventPublisher,
         config: ConfigurationAccess,
         actionAccess: ActionAccess,
-        actionPublisher: ActionPublisher,
         logger: KimchiLogger
     ): ServerPlugin = HubitatPlugin(
-        eventPublisher = eventPublisher,
-        eventAccess = eventAccess,
         actionAccess = actionAccess,
-        actionPublisher = actionPublisher,
         configurationAccess = config,
         logger = logger,
     )

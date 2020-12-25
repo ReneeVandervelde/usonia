@@ -23,46 +23,62 @@ sealed class Action {
     /**
      * The device intended to receive the action.
      */
-    abstract val target: Uuid
+    abstract val target: Identifier
+
+    abstract fun withTarget(target: Identifier): Action
 
     data class Switch(
-        override val target: Uuid,
+        override val target: Identifier,
         val state: SwitchState
-    ): Action()
+    ): Action() {
+        override fun withTarget(target: Identifier): Action = copy(target = target)
+    }
 
     data class Dim(
-        override val target: Uuid,
+        override val target: Identifier,
         val level: Percentage,
         val switchState: SwitchState? = null
-    ): Action()
+    ): Action() {
+        override fun withTarget(target: Identifier): Action = copy(target = target)
+    }
 
     data class ColorTemperatureChange(
-        override val target: Uuid,
+        override val target: Identifier,
         val temperature: ColorTemperature,
         val switchState: SwitchState? = null,
         val level: Percentage? = null
-    ): Action()
+    ): Action() {
+        override fun withTarget(target: Identifier): Action = copy(target = target)
+    }
 
     data class ColorChange(
-        override val target: Uuid,
+        override val target: Identifier,
         val color: Color,
         val switchState: SwitchState? = null,
         val level: Percentage? = null
-    ): Action()
+    ): Action() {
+        override fun withTarget(target: Identifier): Action = copy(target = target)
+    }
 
     data class Lock(
-        override val target: Uuid,
+        override val target: Identifier,
         val state: LockState
-    ): Action()
+    ): Action() {
+        override fun withTarget(target: Identifier): Action = copy(target = target)
+    }
 
     data class Intent(
-        override val target: Uuid,
+        override val target: Identifier,
         val action: String
-    ): Action()
+    ): Action() {
+        override fun withTarget(target: Identifier): Action = copy(target = target)
+    }
 
     data class Alert(
-        override val target: Uuid,
+        override val target: Identifier,
         val message: String
-    ): Action()
+    ): Action() {
+        override fun withTarget(target: Identifier): Action = copy(target = target)
+    }
 }
 

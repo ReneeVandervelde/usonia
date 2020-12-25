@@ -9,10 +9,10 @@ package usonia.foundation
  * @param adjacentRooms Rooms that neighbor this room
  */
 data class Room(
-    val id: Uuid,
+    val id: Identifier,
     val name: String,
     val type: Type = Type.Generic,
-    val adjacentRooms: Set<Uuid> = emptySet(),
+    val adjacentRooms: Set<Identifier> = emptySet(),
     val devices: Set<Device> = emptySet(),
 ) {
     enum class Type {

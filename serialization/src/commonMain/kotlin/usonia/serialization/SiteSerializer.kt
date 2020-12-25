@@ -20,29 +20,28 @@ class SiteSerializer(
     private val serializer = SiteJson.serializer()
     override val descriptor: SerialDescriptor = serializer.descriptor
 
-
     override fun deserialize(decoder: Decoder): Site {
         val json = decoder.decodeSerializableValue(serializer)
 
         return Site(
-            id = json.id.let(::Uuid),
+            id = json.id.let(::Identifier),
             name = json.name ?: json.id,
             users = json.users.mapSet { user ->
                 User(
-                    id = user.id.let(::Uuid),
+                    id = user.id.let(::Identifier),
                     name = user.name ?: user.id,
                     parameters = user.parameters
                 )
             },
             rooms = json.rooms.mapSet { room ->
                 Room(
-                    id = room.id.let(::Uuid),
+                    id = room.id.let(::Identifier),
                     name = room.name ?: room.id,
                     type = room.type?.let { Room.Type.valueOf(it) } ?: Room.Type.Generic,
-                    adjacentRooms = room.adjacentRooms.mapSet(::Uuid),
+                    adjacentRooms = room.adjacentRooms.mapSet(::Identifier),
                     devices = room.devices.mapSet { device ->
                         Device(
-                            id = device.id.let(::Uuid),
+                            id = device.id.let(::Identifier),
                             name = device.name ?: device.id,
                             capabilities = when(device.capabilitiesArchetype) {
                                 null -> Capabilities(
@@ -56,18 +55,23 @@ class SiteSerializer(
                                 )
                                 else -> archetypes.singleOrThrow("No archetype of ID: ${device.capabilitiesArchetype}") { it.archetypeId == device.capabilitiesArchetype }
                             },
+                            fixture = device.fixture?.let { Fixture.valueOf(it) },
+                            siblings = device.siblings.mapSet { Identifier(it) },
+                            parent = device.parentContext?.let {
+                                ExternalAssociation(
+                                    context = Identifier(it),
+                                    id = Identifier(device.parentId ?: throw IllegalArgumentException("Context specified with no ID")),
+                                )
+                            }
                         )
                     }
                 )
             },
             bridges = json.bridges.mapSet { bridge ->
                 Bridge(
-                    id = Uuid(bridge.id),
+                    id = Identifier(bridge.id),
                     name = bridge.name ?: bridge.id,
                     service = bridge.service,
-                    deviceMap = bridge.deviceMap.mapKeys {
-                        Uuid(it.key)
-                    },
                     parameters = bridge.parameters.orEmpty(),
                 )
             },
@@ -91,7 +95,7 @@ class SiteSerializer(
                     id = room.id.value,
                     name = room.name,
                     type = room.type.name,
-                    adjacentRooms = room.adjacentRooms.mapSet(Uuid::value),
+                    adjacentRooms = room.adjacentRooms.mapSet(Identifier::value),
                     devices = room.devices.mapSet { device ->
                         DeviceJson(
                             id = device.id.value,
@@ -100,7 +104,9 @@ class SiteSerializer(
                             actionTypes = device.capabilities.actions.mapSet { it.simpleName!! },
                             eventTypes = device.capabilities.events.mapSet { it.simpleName!! },
                             fixture = device.fixture?.name,
-                            siblings = device.siblings.mapSet(Uuid::value)
+                            siblings = device.siblings.mapSet(Identifier::value),
+                            parentContext = device.parent?.context?.value,
+                            parentId = device.parent?.id?.value,
                         )
                     }
                 )
@@ -109,7 +115,6 @@ class SiteSerializer(
                 BridgeJson(
                     id = bridge.id.value,
                     service = bridge.service,
-                    deviceMap = bridge.deviceMap.mapKeys { it.key.value },
                     name = bridge.name,
                     parameters = bridge.parameters,
                 )
@@ -138,7 +143,6 @@ data class BridgeJson(
     val id: String,
     val name: String? = null,
     val service: String,
-    val deviceMap: Map<String, String> = emptyMap(),
     val parameters: ParameterBag? = null,
 )
 
@@ -167,4 +171,6 @@ internal data class DeviceJson(
     val eventTypes: Set<String>? = null,
     val fixture: String? = null,
     val siblings: Set<String> = emptySet(),
+    val parentContext: String? = null,
+    val parentId: String? = null,
 )

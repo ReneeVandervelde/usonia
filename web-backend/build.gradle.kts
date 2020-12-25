@@ -25,7 +25,7 @@ kotlin {
 
             dependencies {
                 api(project(":core"))
-                implementation(project(":serialization"))
+                api(project(":serialization"))
                 dependencies.add("importResources", project(":web-frontend", "dist"))
                 api(Kimchi.logger)
             }

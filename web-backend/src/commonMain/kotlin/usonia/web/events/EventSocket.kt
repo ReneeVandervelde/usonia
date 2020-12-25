@@ -1,4 +1,4 @@
-package usonia.hubitat
+package usonia.web.events
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger

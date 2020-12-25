@@ -9,7 +9,7 @@ import kotlinx.serialization.encoding.Encoder
 import usonia.foundation.Action
 import usonia.foundation.LockState
 import usonia.foundation.SwitchState
-import usonia.foundation.Uuid
+import usonia.foundation.Identifier
 import usonia.foundation.unit.ColorTemperature
 import usonia.kotlin.unit.Percentage
 
@@ -19,7 +19,7 @@ object ActionSerializer: KSerializer<Action> {
 
     override fun deserialize(decoder: Decoder): Action {
         val json = decoder.decodeSerializableValue(serializer)
-        val target = json.target.let(::Uuid)
+        val target = json.target.let(::Identifier)
 
         return when(json.type) {
             Action.Switch::class.simpleName -> Action.Switch(

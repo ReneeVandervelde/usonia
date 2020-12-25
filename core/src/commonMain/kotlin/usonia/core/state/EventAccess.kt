@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import usonia.foundation.Event
 import usonia.foundation.PresenceState
 import usonia.foundation.User
-import usonia.foundation.Uuid
+import usonia.foundation.Identifier
 import kotlin.reflect.KClass
 
 /**
@@ -19,7 +19,7 @@ interface EventAccess {
     /**
      * Get the last known event for an item.
      */
-    suspend fun <T: Event> getState(id: Uuid, type: KClass<T>): T?
+    suspend fun <T: Event> getState(id: Identifier, type: KClass<T>): T?
 }
 
 /**

@@ -26,7 +26,9 @@ sealed class Event {
     /**
      * The device that was affected by this event.
      */
-    abstract val source: Uuid
+    abstract val source: Identifier
+
+    abstract fun withSource(source: Identifier): Event
 
     /**
      * Time that the event occurred.
@@ -34,74 +36,96 @@ sealed class Event {
     abstract val timestamp: Instant
 
     data class Motion(
-        override val source: Uuid,
+        override val source: Identifier,
         override val timestamp: Instant,
         val state: MotionState
-    ): Event()
+    ): Event() {
+        override fun withSource(source: Identifier): Event = copy(source = source)
+    }
 
     data class Switch(
-        override val source: Uuid,
+        override val source: Identifier,
         override val timestamp: Instant,
         val state: SwitchState
-    ): Event()
+    ): Event() {
+        override fun withSource(source: Identifier): Event = copy(source = source)
+    }
 
     data class Temperature(
-        override val source: Uuid,
+        override val source: Identifier,
         override val timestamp: Instant,
         val temperature: Float
-    ): Event()
+    ): Event() {
+        override fun withSource(source: Identifier): Event = copy(source = source)
+    }
 
     data class Humidity(
-        override val source: Uuid,
+        override val source: Identifier,
         override val timestamp: Instant,
         val humidity: Percentage
-    ): Event()
+    ): Event() {
+        override fun withSource(source: Identifier): Event = copy(source = source)
+    }
 
     data class Lock(
-        override val source: Uuid,
+        override val source: Identifier,
         override val timestamp: Instant,
         val state: LockState,
         val method: LockMethod,
         val code: String?
     ): Event() {
+        override fun withSource(source: Identifier): Event = copy(source = source)
+
         enum class LockMethod { MANUAL, KEYPAD, AUTO, COMMAND }
     }
 
     data class Water(
-        override val source: Uuid,
+        override val source: Identifier,
         override val timestamp: Instant,
         val state: WaterState
-    ): Event()
+    ): Event() {
+        override fun withSource(source: Identifier): Event = copy(source = source)
+    }
 
     data class Latch(
-        override val source: Uuid,
+        override val source: Identifier,
         override val timestamp: Instant,
         val state: LatchState
-    ): Event()
+    ): Event() {
+        override fun withSource(source: Identifier): Event = copy(source = source)
+    }
 
     data class Presence(
-        override val source: Uuid,
+        override val source: Identifier,
         override val timestamp: Instant,
         val state: PresenceState
-    ): Event()
+    ): Event() {
+        override fun withSource(source: Identifier): Event = copy(source = source)
+    }
 
     data class Battery(
-        override val source: Uuid,
+        override val source: Identifier,
         override val timestamp: Instant,
         val percentage: Percentage
-    ): Event()
+    ): Event() {
+        override fun withSource(source: Identifier): Event = copy(source = source)
+    }
 
     data class Tilt(
-        override val source: Uuid,
+        override val source: Identifier,
         override val timestamp: Instant,
         val x: Float,
         val y: Float,
         val z: Float
-    ): Event()
+    ): Event() {
+        override fun withSource(source: Identifier): Event = copy(source = source)
+    }
 
     data class Movement(
-        override val source: Uuid,
+        override val source: Identifier,
         override val timestamp: Instant,
         val state: MovementState
-    ): Event()
+    ): Event() {
+        override fun withSource(source: Identifier): Event = copy(source = source)
+    }
 }

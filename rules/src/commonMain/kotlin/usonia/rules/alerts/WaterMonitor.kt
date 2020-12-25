@@ -9,7 +9,7 @@ import usonia.core.state.*
 import usonia.foundation.Action
 import usonia.foundation.Event
 import usonia.foundation.User
-import usonia.foundation.Uuid
+import usonia.foundation.Identifier
 import usonia.foundation.WaterState.*
 import usonia.kotlin.neverEnding
 
@@ -22,7 +22,7 @@ internal class WaterMonitor(
     private val actionPublisher: ActionPublisher,
     private val logger: KimchiLogger = EmptyLogger
 ): Daemon {
-    private val alerted = mutableSetOf<Uuid>()
+    private val alerted = mutableSetOf<Identifier>()
 
     override suspend fun start() = neverEnding {
         eventAccess.events

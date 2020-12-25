@@ -1,7 +1,7 @@
 package usonia.foundation
 
 val FakeSite = Site(
-    id = Uuid("fake-site"),
+    id = Identifier("fake-site"),
     name = "Fake Site",
     users = emptySet(),
     rooms = emptySet(),

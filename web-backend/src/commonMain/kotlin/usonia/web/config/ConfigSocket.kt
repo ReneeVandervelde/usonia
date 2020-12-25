@@ -1,4 +1,4 @@
-package usonia.web
+package usonia.web.config
 
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel

@@ -65,7 +65,8 @@ class KtorWebServer(
                                 logger.info("Handling HTTP Request to ${controller::class.simpleName}")
                                 val request = HttpRequest(
                                     body = call.receiveText(),
-                                    headers = call.request.headers.toMap()
+                                    headers = call.request.headers.toMap(),
+                                    parameters = call.parameters.toMap(),
                                 )
                                 val response = runCatching { controller.getResponse(request) }
                                     .onFailure {

@@ -10,7 +10,7 @@ import kotlinx.coroutines.runBlocking
 import usonia.client.UsoniaClient
 import usonia.core.state.ConfigurationAccess
 import usonia.foundation.Action
-import usonia.foundation.Uuid
+import usonia.foundation.Identifier
 import javax.inject.Inject
 
 class ClientIntentSendCommand @Inject constructor(
@@ -30,7 +30,7 @@ class ClientIntentSendCommand @Inject constructor(
             port = port
         )
 
-        val targetId = target?.let(::Uuid) ?: config.site.first().id
+        val targetId = target?.let(::Identifier) ?: config.site.first().id
 
         client.sendAction(Action.Intent(
             target = targetId,

@@ -5,5 +5,6 @@ package usonia.core.server
  */
 data class HttpRequest(
     val body: String? = null,
-    val headers: Map<String, List<String>>
+    val headers: Map<String, List<String>>,
+    val parameters: Map<String, List<String>>
 )

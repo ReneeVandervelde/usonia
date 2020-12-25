@@ -94,7 +94,7 @@ class TelegramAlertsTest {
 
         pauseDispatcher {
             fakeActions.actions.emit(Action.Alert(
-                target = Uuid("nobody"),
+                target = Identifier("nobody"),
                 message = "test"
             ))
         }

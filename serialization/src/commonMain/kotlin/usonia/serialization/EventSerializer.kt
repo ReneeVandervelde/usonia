@@ -15,7 +15,7 @@ object EventSerializer: KSerializer<Event> {
 
     override fun deserialize(decoder: Decoder): Event {
         val json = decoder.decodeSerializableValue(serializer)
-        val id = Uuid(json.source)
+        val id = Identifier(json.source)
         val timestamp = Instant.fromEpochMilliseconds(json.timestamp)
 
         return when (json.type) {

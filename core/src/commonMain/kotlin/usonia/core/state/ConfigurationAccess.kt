@@ -17,7 +17,7 @@ interface ConfigurationAccess {
 /**
  * Get the latest data available for a device with a given [id].
  */
-suspend fun ConfigurationAccess.getDeviceById(id: Uuid): Device? {
+suspend fun ConfigurationAccess.getDeviceById(id: Identifier): Device? {
     return site.first()
         .rooms
         .flatMap { it.devices }
@@ -29,14 +29,4 @@ suspend fun ConfigurationAccess.getDeviceById(id: Uuid): Device? {
  */
 suspend fun ConfigurationAccess.getSite(): Site {
     return site.first()
-}
-
-/**
- * Find a site-wide device that matches a [predicate]
- */
-fun Site.findDeviceBy(predicate: (Device) -> Boolean): Set<Device> {
-    return rooms
-        .flatMap { it.devices }
-        .filter(predicate)
-        .toSet()
 }

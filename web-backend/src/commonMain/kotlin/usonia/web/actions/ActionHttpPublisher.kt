@@ -1,31 +1,30 @@
-package usonia.hubitat
+package usonia.web.actions
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.serialization.KSerializer
-import usonia.core.server.*
+import usonia.core.server.HttpRequest
+import usonia.core.server.RestController
+import usonia.core.server.RestResponse
 import usonia.core.state.ActionPublisher
 import usonia.foundation.Action
 import usonia.foundation.Status
-import usonia.foundation.Statuses.SUCCESS
+import usonia.foundation.Statuses
 import usonia.serialization.ActionSerializer
 import usonia.serialization.StatusSerializer
 
 /**
- * Sends Actions to the action publisher.
+ * Publishes raw action data.
  */
-internal class ActionPublishHttpBridge(
+internal class ActionHttpPublisher(
     private val actionPublisher: ActionPublisher,
     logger: KimchiLogger = EmptyLogger
 ): RestController<Action, Status>(logger) {
+    override val deserializer = ActionSerializer
+    override val serializer = StatusSerializer
     override val path: String = "/actions"
-    override val method: String = "POST"
-    override val deserializer: KSerializer<Action> = ActionSerializer
-    override val serializer: KSerializer<Status> = StatusSerializer
 
     override suspend fun getResponse(data: Action, request: HttpRequest): RestResponse<Status> {
         actionPublisher.publishAction(data)
-        return RestResponse(SUCCESS)
+        return RestResponse(Statuses.SUCCESS)
     }
-
 }

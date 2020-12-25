@@ -1,5 +1,7 @@
 package usonia.foundation
 
+import usonia.kotlin.singleOrThrow
+
 /**
  * Represents a location in which devices are controlled. Typically a home.
  *
@@ -8,7 +10,7 @@ package usonia.foundation
  * @param users People to notify of events in the home.
  */
 data class Site(
-    val id: Uuid,
+    val id: Identifier,
     val name: String,
     val users: Set<User>,
     val rooms: Set<Room>,
@@ -16,8 +18,46 @@ data class Site(
     val parameters: ParameterBag,
 )
 
-fun Site.findRoomWithDevice(id: Uuid): Room {
+
+/**
+ * Find a site-wide device that matches a [predicate]
+ */
+fun Site.findDevicesBy(predicate: (Device) -> Boolean): Set<Device> {
+    return rooms
+        .flatMap { it.devices }
+        .filter(predicate)
+        .toSet()
+}
+
+/**
+ * Find a site-wide device by ID
+ */
+fun Site.getDevice(id: Identifier): Device {
+    val results = rooms.flatMap { it.devices }.filter { it.id == id }
+    return when (results.size) {
+        0 -> throw IllegalArgumentException("Device not found: $id")
+        1 -> results.single()
+        else -> throw IllegalArgumentException("Duplicate devices with ID: $id")
+    }
+}
+
+fun Site.findRoomWithDevice(id: Identifier): Room {
     return rooms.single {
         it.devices.singleOrNull { it.id == id } != null
     }
 }
+
+fun Site.findAssociatedBridge(device: Device): Bridge? = bridges
+    .filter { it.id == device.parent?.context }
+    .let {
+        when (it.size) {
+            1 -> it.single()
+            0 -> null
+            else -> throw IllegalArgumentException("Multiple bridges matched id: ${device.parent?.context}")
+        }
+    }
+
+
+fun Site.findDeviceBy(predicate: (Device) -> Boolean): Device? = rooms
+    .flatMap { it.devices }
+    .find(predicate)

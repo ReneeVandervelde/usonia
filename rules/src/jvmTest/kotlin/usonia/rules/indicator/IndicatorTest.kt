@@ -181,7 +181,7 @@ class IndicatorTest {
         )
         val eventAccess = object: EventAccess {
             override val events = MutableSharedFlow<Event>()
-            override suspend fun <T : Event> getState(id: Uuid, type: KClass<T>): T? = when (type) {
+            override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = when (type) {
                 Event.Presence::class -> presence as T
                 else -> TODO()
             }
@@ -216,7 +216,7 @@ class IndicatorTest {
         )
         val eventAccess = object: EventAccess {
             override val events = MutableSharedFlow<Event>()
-            override suspend fun <T : Event> getState(id: Uuid, type: KClass<T>): T? = when (type) {
+            override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = when (type) {
                 Event.Presence::class -> presence as T
                 else -> TODO()
             }

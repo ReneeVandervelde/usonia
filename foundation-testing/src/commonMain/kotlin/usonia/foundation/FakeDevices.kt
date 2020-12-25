@@ -2,7 +2,7 @@ package usonia.foundation
 
 object FakeDevices {
     val Switch = Device(
-        id = Uuid("fake-switch"),
+        id = Identifier("fake-switch"),
         name = "Fake Switch",
         capabilities = Capabilities(
             actions = setOf(
@@ -15,7 +15,7 @@ object FakeDevices {
     )
 
     val Motion = Device(
-        id = Uuid("fake-motion"),
+        id = Identifier("fake-motion"),
         name = "Fake Motion Sensor",
         capabilities = Capabilities(
             actions = setOf(),
@@ -26,7 +26,7 @@ object FakeDevices {
     )
 
     val WaterSensor = Device(
-        id = Uuid("fake-water-sensor"),
+        id = Identifier("fake-water-sensor"),
         name = "Fake Water Sensor",
         capabilities = Capabilities(
             actions = emptySet(),
@@ -37,7 +37,7 @@ object FakeDevices {
     )
 
     val HueGroup = Device(
-        id = Uuid("fake-hue-group"),
+        id = Identifier("fake-hue-group"),
         name = "Fake Hue Group",
         capabilities = Capabilities(
             actions = setOf(
@@ -51,9 +51,8 @@ object FakeDevices {
     )
 
     val FakeHueBridge = Bridge(
-        id = Uuid("fake-id"),
+        id = Identifier("fake-id"),
         name = "Fake Hue Bridge",
-        deviceMap = emptyMap(),
         service = "hue",
         parameters = mapOf(
             "baseUrl" to "fake-url",
