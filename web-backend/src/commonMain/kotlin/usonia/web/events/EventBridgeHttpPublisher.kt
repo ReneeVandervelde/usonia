@@ -9,12 +9,9 @@ import usonia.core.server.RestResponse
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.EventPublisher
 import usonia.core.state.getSite
-import usonia.foundation.Event
-import usonia.foundation.Status
-import usonia.foundation.Statuses
+import usonia.foundation.*
 import usonia.foundation.Statuses.DEVICE_NOT_FOUND
 import usonia.foundation.Statuses.SUCCESS
-import usonia.foundation.findDeviceBy
 
 private const val BRIDGE_PARAM = "bridge"
 
@@ -29,7 +26,7 @@ internal class EventBridgeHttpPublisher(
 ): RestController<Event, Status>(json, logger) {
     override val method: String = "POST"
     override val path: String = "/bridges/{$BRIDGE_PARAM}/events"
-    override val deserializer = Event.serializer()
+    override val deserializer = EventSerializer
     override val serializer = Status.serializer()
 
     override suspend fun getResponse(data: Event, request: HttpRequest): RestResponse<Status> {

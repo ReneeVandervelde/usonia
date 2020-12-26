@@ -11,7 +11,6 @@ import usonia.kotlin.unit.Percentage
 /**
  * State changes that have already happened.
  */
-@Serializable(with = EventSerializer::class)
 sealed class Event {
     companion object Metadata {
         val subClasses = setOf(

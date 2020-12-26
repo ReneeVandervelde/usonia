@@ -5,10 +5,10 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.collect
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import usonia.core.server.WebSocketController
 import usonia.core.state.EventAccess
+import usonia.foundation.EventSerializer
 
 /**
  * Socket that outputs all event data.
@@ -23,7 +23,7 @@ internal class EventSocket(
     override suspend fun start(input: ReceiveChannel<String>, output: SendChannel<String>) {
         eventAccess.events.collect {
             try {
-                output.send(json.encodeToString(it))
+                output.send(json.encodeToString(EventSerializer, it))
             } catch (error: Throwable) {
                 logger.error("Failed to encode event to socket: $it", error)
             }

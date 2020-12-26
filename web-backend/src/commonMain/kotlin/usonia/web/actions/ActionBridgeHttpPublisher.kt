@@ -9,11 +9,8 @@ import usonia.core.server.RestResponse
 import usonia.core.state.ActionPublisher
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.getSite
-import usonia.foundation.Action
-import usonia.foundation.Status
-import usonia.foundation.Statuses
+import usonia.foundation.*
 import usonia.foundation.Statuses.SUCCESS
-import usonia.foundation.findDeviceBy
 
 private const val BRIDGE_PARAM = "bridge"
 
@@ -28,7 +25,7 @@ internal class ActionBridgeHttpPublisher(
 ): RestController<Action, Status>(json, logger) {
     override val path: String = "/bridges/{$BRIDGE_PARAM}/actions"
     override val method: String = "POST"
-    override val deserializer = Action.serializer()
+    override val deserializer = ActionSerializer
     override val serializer = Status.serializer()
 
     override suspend fun getResponse(data: Action, request: HttpRequest): RestResponse<Status> {

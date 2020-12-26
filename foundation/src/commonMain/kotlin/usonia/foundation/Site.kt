@@ -42,6 +42,15 @@ fun Site.getDevice(id: Identifier): Device {
     }
 }
 
+fun Site.findDevice(id: Identifier): Device? {
+    val results = rooms.flatMap { it.devices }.filter { it.id == id }
+    return when (results.size) {
+        0 -> null
+        1 -> results.single()
+        else -> throw IllegalArgumentException("Duplicate devices with ID: $id")
+    }
+}
+
 fun Site.findRoomWithDevice(id: Identifier): Room {
     return rooms.single {
         it.devices.singleOrNull { it.id == id } != null

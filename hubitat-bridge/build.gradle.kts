@@ -11,6 +11,7 @@ kotlin {
                 api(project(":kotlin-extensions"))
                 api(project(":core"))
                 api(project(":foundation"))
+                api(project(":serialization"))
                 api(Coroutines.core)
                 implementation(Ktor.client)
             }

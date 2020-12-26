@@ -5,8 +5,8 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import usonia.core.Daemon
 import usonia.core.state.ActionAccess
@@ -20,17 +20,25 @@ import usonia.kotlin.neverEnding
 internal class ActionRelay(
     private val configurationAccess: ConfigurationAccess,
     private val actionAccess: ActionAccess,
+    private val json: Json = Json,
     private val logger: KimchiLogger = EmptyLogger,
 ): Daemon {
     private val client = HttpClient {}
 
     override suspend fun start() = neverEnding {
         configurationAccess.site.collectLatest { site ->
-            actionAccess.actions.collectLatest { action ->
-                val device = site.getDevice(action.target)
-                publish(site, device, action)
+            actionAccess.actions.collect { action ->
+                onAction(site, action)
             }
         }
+    }
+
+    private suspend fun onAction(site: Site, action: Action) {
+        val device = site.findDevice(action.target) ?: run {
+            logger.trace("Ignoring non-device action")
+            return
+        }
+        publish(site, device, action)
     }
 
     private suspend fun publish(site: Site, device: Device, action: Action) {
@@ -64,7 +72,7 @@ internal class ActionRelay(
                     logger.error("`actionsPath` not configured for bridge <${id}>. Skipping action.")
                     return
                 },
-                body = Json.encodeToString(action.withTarget(parent.id)),
+                body = json.encodeToString(ActionSerializer, action.withTarget(parent.id)),
             ) {
                 contentType(ContentType.parse("application/json"))
                 parameter("access_token", parameters["token"])

@@ -8,6 +8,7 @@ import usonia.core.server.RestController
 import usonia.core.server.RestResponse
 import usonia.core.state.EventPublisher
 import usonia.foundation.Event
+import usonia.foundation.EventSerializer
 import usonia.foundation.Status
 import usonia.foundation.Statuses
 
@@ -21,7 +22,7 @@ internal class EventHttpPublisher(
 ): RestController<Event, Status>(json, logger) {
     override val method: String = "POST"
     override val path: String = "/events"
-    override val deserializer = Event.serializer()
+    override val deserializer = EventSerializer
     override val serializer = Status.serializer()
 
     override suspend fun getResponse(data: Event, request: HttpRequest): RestResponse<Status> {

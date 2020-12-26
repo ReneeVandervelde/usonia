@@ -5,6 +5,7 @@ import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
@@ -14,7 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import usonia.foundation.*
 
@@ -101,8 +101,13 @@ class UsoniaClient constructor(
      * Send an action to the server to be broadcast.
      */
     suspend fun sendAction(action: Action): Status {
-        val request = HttpRequestBuilder().apply {
-            body = json.encodeToString(action)
+        val request = HttpRequestBuilder(
+            host = host,
+            port = port,
+            path = "/actions",
+        ).apply {
+            accept(ContentType.Application.Json)
+            body = json.encodeToString(ActionSerializer, action)
         }
 
         return httpClient.post(request)
@@ -112,10 +117,15 @@ class UsoniaClient constructor(
      * Send an event to the server to be broadcast
      */
     suspend fun sendEvent(event: Event): Status {
-        val request = HttpRequestBuilder().apply {
-            body = json.encodeToString(event)
+        val request = HttpRequestBuilder(
+            host = host,
+            port = port,
+            path = "/events",
+        ).apply {
+            accept(ContentType.Application.Json)
+            body = json.encodeToString(EventSerializer, event)
         }
 
-        return httpClient.post(json.encodeToString(event))
+        return httpClient.post(request)
     }
 }

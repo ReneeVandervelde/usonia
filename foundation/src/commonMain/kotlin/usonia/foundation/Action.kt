@@ -13,7 +13,6 @@ import usonia.kotlin.unit.Percentage
 /**
  * Instructions for devices to do something or change state.
  */
-@Serializable(with = ActionSerializer::class)
 sealed class Action {
     companion object Metadata {
         val subClasses = setOf(
@@ -90,7 +89,7 @@ sealed class Action {
 }
 
 
-internal object ActionSerializer: KSerializer<Action> {
+object ActionSerializer: KSerializer<Action> {
     private val serializer = ActionJson.serializer()
     override val descriptor: SerialDescriptor = serializer.descriptor
 
@@ -141,7 +140,7 @@ internal object ActionSerializer: KSerializer<Action> {
             type = value::class.simpleName!!,
             target = value.target.value,
         )
-        when (value) {
+        val json = when (value) {
             is Action.Switch -> prototype.copy(
                 switchState = value.state.name,
             )
@@ -169,6 +168,8 @@ internal object ActionSerializer: KSerializer<Action> {
                 alertMessage = value.message,
             )
         }
+
+        encoder.encodeSerializableValue(serializer, json)
     }
 
 }

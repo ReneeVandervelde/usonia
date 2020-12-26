@@ -8,6 +8,7 @@ import usonia.core.server.RestController
 import usonia.core.server.RestResponse
 import usonia.core.state.ActionPublisher
 import usonia.foundation.Action
+import usonia.foundation.ActionSerializer
 import usonia.foundation.Status
 import usonia.foundation.Statuses
 
@@ -19,8 +20,9 @@ internal class ActionHttpPublisher(
     json: Json = Json,
     logger: KimchiLogger = EmptyLogger
 ): RestController<Action, Status>(json, logger) {
-    override val deserializer = Action.serializer()
+    override val deserializer = ActionSerializer
     override val serializer = Status.serializer()
+    override val method: String = "POST"
     override val path: String = "/actions"
 
     override suspend fun getResponse(data: Action, request: HttpRequest): RestResponse<Status> {

@@ -42,6 +42,7 @@ internal class HueGroupHandler(
             logger.trace("Ignoring non-hue action <$action>")
             return
         }
+        logger.trace { "Handling ${action::class.simpleName} for ${device.name}" }
 
         val modification = when (action) {
             is Action.Switch -> GroupStateModification(

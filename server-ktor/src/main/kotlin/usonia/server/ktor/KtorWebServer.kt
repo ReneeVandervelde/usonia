@@ -32,7 +32,6 @@ class KtorWebServer(
         val socketControllers = config.plugins.flatMap { it.socketController }
         val staticResources = config.plugins.flatMap { it.staticResources }
 
-        logger.info("Starting WebServer")
         suspendCoroutine<Nothing> {
             val server = embeddedServer(Netty, port) {
                 install(WebSockets)
@@ -45,7 +44,7 @@ class KtorWebServer(
                     socketControllers.forEach { controller ->
                         logger.debug("Loading Socket Controller: ${controller::class.simpleName}")
                         webSocket(controller.path) {
-                            logger.info("Handling Socket Request to ${controller::class.simpleName}")
+                            logger.trace("Handling Socket Request to ${controller::class.simpleName}")
                             val input = Channel<String>(Channel.RENDEZVOUS)
                             val output = Channel<String>(Channel.RENDEZVOUS)
                             launch {
@@ -66,7 +65,7 @@ class KtorWebServer(
                         logger.debug("Loading HTTP Controller: ${controller::class.simpleName}")
                         route(controller.path, controller.method.let(::HttpMethod)) {
                             handle {
-                                logger.info("Handling HTTP Request to ${controller::class.simpleName}")
+                                logger.trace("Handling HTTP Request to ${controller::class.simpleName}")
                                 val request = HttpRequest(
                                     body = call.receiveText(),
                                     headers = call.request.headers.toMap(),

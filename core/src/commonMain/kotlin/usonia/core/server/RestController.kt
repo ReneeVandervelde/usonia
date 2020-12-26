@@ -32,14 +32,14 @@ abstract class RestController<IN: Any, OUT: Any>(
 
             return HttpResponse(
                 body = json.encodeToString(serializer, response.data),
-                contentType = "text/json",
+                contentType = "application/json",
                 status = response.status,
             )
         } catch (error: Throwable) {
             logger.error("Failed generating response body.", error)
             return HttpResponse(
                 body = encodedString(3, "Internal error generating response."),
-                contentType = "text/json",
+                contentType = "applicationjson",
                 status = 500,
             )
         }
