@@ -7,14 +7,15 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import usonia.client.UsoniaClient
+import usonia.cli.UsoniaFactory
 import usonia.core.state.ConfigurationAccess
 import usonia.foundation.Action
 import usonia.foundation.Identifier
 import javax.inject.Inject
 
 class ClientIntentSendCommand @Inject constructor(
-    private val config: ConfigurationAccess
+    private val config: ConfigurationAccess,
+    private val factory: UsoniaFactory,
 ): CliktCommand(
     name = "client:intent:send",
     help = "Sends an intent Action to the server to be broadcast."
@@ -25,7 +26,7 @@ class ClientIntentSendCommand @Inject constructor(
     private val target by option()
 
     override fun run() = runBlocking {
-        val client = UsoniaClient(
+        val client = factory.createClient(
             host = host,
             port = port
         )

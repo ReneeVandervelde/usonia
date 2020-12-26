@@ -1,6 +1,7 @@
 package usonia.web
 
 import kimchi.logger.KimchiLogger
+import kimchi.logger.LogWriter
 import usonia.core.ServerPlugin
 import usonia.core.server.HttpController
 import usonia.core.server.WebSocketController
@@ -8,7 +9,7 @@ import usonia.core.state.ActionPublisher
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.EventAccess
 import usonia.core.state.EventPublisher
-import usonia.serialization.SiteSerializer
+import usonia.serialization.SerializationModule
 import usonia.web.actions.ActionBridgeHttpPublisher
 import usonia.web.actions.ActionHttpPublisher
 import usonia.web.config.ConfigSocket
@@ -21,20 +22,21 @@ class WebPlugin(
     eventPublisher: EventPublisher,
     eventAccess: EventAccess,
     actionPublisher: ActionPublisher,
-    siteSerializer: SiteSerializer,
     logger: KimchiLogger,
 ): ServerPlugin {
+    private val json = SerializationModule.json
+
     override val httpControllers: List<HttpController> = listOf(
         ControlPanelController,
-        EventHttpPublisher(eventPublisher, logger),
-        EventBridgeHttpPublisher(eventPublisher, configurationAccess, logger),
-        ActionHttpPublisher(actionPublisher, logger),
-        ActionBridgeHttpPublisher(configurationAccess, actionPublisher, logger),
+        EventHttpPublisher(eventPublisher, json, logger),
+        EventBridgeHttpPublisher(eventPublisher, configurationAccess, json, logger),
+        ActionHttpPublisher(actionPublisher, json, logger),
+        ActionBridgeHttpPublisher(configurationAccess, actionPublisher, json, logger),
     )
     override val socketController: List<WebSocketController> = listOf(
         LogSocket,
-        ConfigSocket(configurationAccess, siteSerializer),
-        EventSocket(eventAccess, logger),
+        ConfigSocket(configurationAccess, json),
+        EventSocket(eventAccess, json, logger),
     )
     override val staticResources: List<String> = listOf(
         "web-frontend.js",

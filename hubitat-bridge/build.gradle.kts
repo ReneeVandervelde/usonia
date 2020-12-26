@@ -10,7 +10,6 @@ kotlin {
             dependencies {
                 api(project(":kotlin-extensions"))
                 api(project(":core"))
-                api(project(":serialization"))
                 api(project(":foundation"))
                 api(Coroutines.core)
                 implementation(Ktor.client)

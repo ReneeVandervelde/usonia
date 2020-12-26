@@ -1,5 +1,8 @@
 package usonia.foundation
 
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
+
 /**
  * Defines a room within a site that contains devices.
  *
@@ -8,12 +11,13 @@ package usonia.foundation
  * @param type What the room is used for. Used to determine device behavior.
  * @param adjacentRooms Rooms that neighbor this room
  */
+@Serializable
 data class Room(
     val id: Identifier,
     val name: String,
     val type: Type = Type.Generic,
     val adjacentRooms: Set<Identifier> = emptySet(),
-    val devices: Set<Device> = emptySet(),
+    val devices: Set<@Contextual Device> = emptySet(),
 ) {
     enum class Type {
         Bathroom,

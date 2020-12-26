@@ -1,30 +1,38 @@
 package usonia.client
 
 import io.ktor.client.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.cio.websocket.*
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import usonia.foundation.*
-import usonia.serialization.*
 
 /**
  * HTTP Client for interacting with a Usonia server.
  */
-class UsoniaClient(
+@OptIn(ExperimentalSerializationApi::class, ExperimentalCoroutinesApi::class)
+class UsoniaClient constructor(
     private val host: String,
     private val port: Int = 80,
-    private val siteSerializer: SiteSerializer = SiteSerializer(emptySet()),
+    private val json: Json,
     private val logger: KimchiLogger = EmptyLogger,
 ) {
     private val httpClient = HttpClient {
         install(WebSockets)
+        install(JsonFeature) {
+            serializer = KotlinxSerializer(json)
+        }
     }
 
     /**
@@ -40,8 +48,7 @@ class UsoniaClient(
                 if (it !is Frame.Text) return@consumeEach
 
                 try {
-                    val logMessage = Json.decodeFromString(LogMessageSerializer, it.readText())
-                    emit(logMessage)
+                    emit(json.decodeFromString(it.readText()))
                 } catch (error: Throwable) {
                     logger.error("Failed to deserialize Log Message", error)
                 }
@@ -61,8 +68,7 @@ class UsoniaClient(
             incoming.consumeEach {
                 if (it !is Frame.Text) return@consumeEach
                 try {
-                    val event = it.readText().let { Json.decodeFromString(EventSerializer, it) }
-                    emit(event)
+                    emit(json.decodeFromString(it.readText()))
                 } catch (error: Throwable) {
                     logger.error("Failed to deserialize Event", error)
                 }
@@ -83,8 +89,7 @@ class UsoniaClient(
                 if (it !is Frame.Text) return@consumeEach
 
                 try {
-                    val site = it.readText().let { Json.decodeFromString(siteSerializer, it) }
-                    emit(site)
+                    emit(json.decodeFromString(it.readText()))
                 } catch (error: Throwable) {
                     logger.error("Failed to deserialize site config", error)
                 }
@@ -97,12 +102,10 @@ class UsoniaClient(
      */
     suspend fun sendAction(action: Action): Status {
         val request = HttpRequestBuilder().apply {
-            body = Json.encodeToString(ActionSerializer, action)
+            body = json.encodeToString(action)
         }
 
-        val response = httpClient.post<HttpResponse>(request).readText()
-
-        return Json.decodeFromString(StatusSerializer, response)
+        return httpClient.post(request)
     }
 
     /**
@@ -110,11 +113,9 @@ class UsoniaClient(
      */
     suspend fun sendEvent(event: Event): Status {
         val request = HttpRequestBuilder().apply {
-            body = Json.encodeToString(EventSerializer, event)
+            body = json.encodeToString(event)
         }
 
-        val response = httpClient.post<HttpResponse>(request).readText()
-
-        return Json.decodeFromString(StatusSerializer, response)
+        return httpClient.post(json.encodeToString(event))
     }
 }

@@ -17,3 +17,8 @@ inline fun <T> Iterable<T>.singleOrThrow(message: String, predicate: (T) -> Bool
         throw IllegalArgumentException(message, e)
     }
 }
+
+/**
+ * Map a set's values from [T] to [R]
+ */
+inline fun <T, R> Set<T>.mapSet(mapping: (T) -> R): Set<R> = map(mapping).toSet()

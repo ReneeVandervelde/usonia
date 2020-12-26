@@ -17,7 +17,7 @@ class RunCommand @Inject constructor(
     private val port by option().int().default(80)
 
     override fun run() = runBlocking {
-        val usonia = usoniaFactory.create(port)
+        val usonia = usoniaFactory.createServer(port)
 
         usonia.start()
     }

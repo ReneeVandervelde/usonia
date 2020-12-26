@@ -5,10 +5,10 @@ import kimchi.logger.LogWriter
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import usonia.core.server.WebSocketController
 import usonia.foundation.LogMessage
-import usonia.serialization.LogMessageSerializer
 
 object LogSocket: WebSocketController, LogWriter {
     override val path: String = "/logs"
@@ -19,8 +19,7 @@ object LogSocket: WebSocketController, LogWriter {
 
     override suspend fun start(input: ReceiveChannel<String>, output: SendChannel<String>) {
         logs.collect {
-            val json = Json.encodeToString(LogMessageSerializer, it)
-            output.send(json)
+            output.send(Json.encodeToString(it))
         }
     }
 

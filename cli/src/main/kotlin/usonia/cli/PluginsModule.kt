@@ -11,7 +11,6 @@ import usonia.core.state.*
 import usonia.hubitat.HubitatPlugin
 import usonia.hue.HueBridgePlugin
 import usonia.rules.RulesPlugin
-import usonia.serialization.SiteSerializer
 import usonia.weather.WeatherAccess
 import usonia.weather.WeatherPlugin
 import usonia.web.WebPlugin
@@ -24,12 +23,11 @@ object PluginsModule {
     @IntoSet
     fun webPlugin(
         config: ConfigurationAccess,
-        siteSerializer: SiteSerializer,
         eventPublisher: EventPublisher,
         eventAccess: EventAccess,
         actionPublisher: ActionPublisher,
         logger: KimchiLogger,
-    ): ServerPlugin = WebPlugin(config, eventPublisher, eventAccess, actionPublisher, siteSerializer, logger)
+    ): ServerPlugin = WebPlugin(config, eventPublisher, eventAccess, actionPublisher, logger)
 
     @Provides
     @Singleton

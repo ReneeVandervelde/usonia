@@ -2,6 +2,7 @@ package usonia.web.actions
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.serialization.json.Json
 import usonia.core.server.HttpRequest
 import usonia.core.server.RestController
 import usonia.core.server.RestResponse
@@ -13,8 +14,6 @@ import usonia.foundation.Status
 import usonia.foundation.Statuses
 import usonia.foundation.Statuses.SUCCESS
 import usonia.foundation.findDeviceBy
-import usonia.serialization.ActionSerializer
-import usonia.serialization.StatusSerializer
 
 private const val BRIDGE_PARAM = "bridge"
 
@@ -24,12 +23,13 @@ private const val BRIDGE_PARAM = "bridge"
 internal class ActionBridgeHttpPublisher(
     private val configurationAccess: ConfigurationAccess,
     private val actionPublisher: ActionPublisher,
+    json: Json = Json,
     logger: KimchiLogger = EmptyLogger
-): RestController<Action, Status>(logger) {
+): RestController<Action, Status>(json, logger) {
     override val path: String = "/bridges/{$BRIDGE_PARAM}/actions"
     override val method: String = "POST"
-    override val deserializer = ActionSerializer
-    override val serializer = StatusSerializer
+    override val deserializer = Action.serializer()
+    override val serializer = Status.serializer()
 
     override suspend fun getResponse(data: Action, request: HttpRequest): RestResponse<Status> {
         val bridgeId = request.parameters[BRIDGE_PARAM]?.first() ?: return RestResponse(Statuses.missingRequired(BRIDGE_PARAM), status = 400)

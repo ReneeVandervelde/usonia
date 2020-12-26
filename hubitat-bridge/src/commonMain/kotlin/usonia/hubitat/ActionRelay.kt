@@ -6,13 +6,13 @@ import io.ktor.http.*
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import usonia.core.Daemon
 import usonia.core.state.ActionAccess
 import usonia.core.state.ConfigurationAccess
 import usonia.foundation.*
 import usonia.kotlin.neverEnding
-import usonia.serialization.ActionSerializer
 
 /**
  * Forwards Action events to a hubitat bridge.
@@ -64,7 +64,7 @@ internal class ActionRelay(
                     logger.error("`actionsPath` not configured for bridge <${id}>. Skipping action.")
                     return
                 },
-                body = Json.encodeToString(ActionSerializer, action.withTarget(parent.id)),
+                body = Json.encodeToString(action.withTarget(parent.id)),
             ) {
                 contentType(ContentType.parse("application/json"))
                 parameter("access_token", parameters["token"])

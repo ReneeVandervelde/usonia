@@ -24,8 +24,6 @@ dependencies {
     implementation(Kimchi.core)
     implementation(project(":kotlin-extensions"))
     implementation(project(":client"))
-    implementation(project(":smartthings"))
-    implementation(project(":hue-bridge"))
-    implementation(project(":schlage"))
+    implementation(project(":serialization"))
     implementation(npm("mustache", "3.1.0"))
 }

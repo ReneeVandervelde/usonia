@@ -1,6 +1,6 @@
 package usonia.foundation
 
-import usonia.kotlin.singleOrThrow
+import kotlinx.serialization.Serializable
 
 /**
  * Represents a location in which devices are controlled. Typically a home.
@@ -9,13 +9,14 @@ import usonia.kotlin.singleOrThrow
  * @param name User friendly name for the site.
  * @param users People to notify of events in the home.
  */
+@Serializable
 data class Site(
     val id: Identifier,
     val name: String,
-    val users: Set<User>,
-    val rooms: Set<Room>,
-    val bridges: Set<Bridge>,
-    val parameters: ParameterBag,
+    val users: Set<User> = emptySet(),
+    val rooms: Set<Room> = emptySet(),
+    val bridges: Set<Bridge> = emptySet(),
+    val parameters: ParameterBag = emptyMap(),
 )
 
 

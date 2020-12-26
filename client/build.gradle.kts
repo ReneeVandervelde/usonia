@@ -13,9 +13,10 @@ kotlin {
             dependencies {
                 api(project(":foundation"))
                 api(project(":core"))
-                api(project(":serialization"))
+                api(KotlinX.serialization)
                 api(Coroutines.core)
                 implementation(Ktor.client)
+                implementation(Ktor.clientSerialization)
             }
         }
 
@@ -42,6 +43,7 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-js:1.4.1")
+                implementation("io.ktor:ktor-client-json-js:1.4.1")
             }
         }
     }

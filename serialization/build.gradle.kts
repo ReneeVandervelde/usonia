@@ -1,6 +1,5 @@
 plugins {
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.4.10"
 }
 
 kotlin {
@@ -13,8 +12,10 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":foundation"))
-                api(Coroutines.core)
                 api(KotlinX.serialization)
+                implementation(project(":hue-bridge"))
+                implementation(project(":schlage"))
+                implementation(project(":smartthings"))
             }
         }
 
