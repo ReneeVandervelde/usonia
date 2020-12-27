@@ -28,8 +28,8 @@ internal class LightController(
     private val actionPublisher: ActionPublisher,
     private val colorPicker: ColorPicker,
     private val logger: KimchiLogger = EmptyLogger,
+    override val coroutineContext: CoroutineContext = Dispatchers.Default + SupervisorJob(),
 ): Daemon, CoroutineScope {
-    override val coroutineContext: CoroutineContext = Dispatchers.Default + SupervisorJob()
 
     override suspend fun start(): Nothing = neverEnding {
         configurationAccess.site.collectLatest { site ->

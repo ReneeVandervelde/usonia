@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
 import usonia.core.cron.CronJob
 import usonia.core.cron.Schedule
 import usonia.core.state.ConfigurationAccess
@@ -48,7 +49,7 @@ internal class AccuweatherAccess(
         minutes = setOf(0)
     )
 
-    override suspend fun run(time: LocalDateTime) {
+    override suspend fun run(time: LocalDateTime, timeZone: TimeZone) {
         val (location, token) = getConfig() ?: return
 
         coroutineScope {

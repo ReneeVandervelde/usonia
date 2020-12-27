@@ -6,6 +6,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
+import kotlinx.datetime.TimeZone
 import usonia.core.server.WebServer
 import usonia.core.timemachine.SecondFrequency
 import usonia.core.timemachine.minutes
@@ -73,7 +74,7 @@ class Usonia(
                     .filter { it.dayOfMonth in cron.schedule.days }
                     .filter { it.monthNumber in cron.schedule.months }
                     .onEach { logger.debug { "Running Cron <${cron::class.simpleName}>"} }
-                    .collect { cron.run(it) }
+                    .collect { cron.run(it, TimeZone.currentSystemDefault()) }
             }
         }
     }

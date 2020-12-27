@@ -18,6 +18,8 @@ import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.ExperimentalTime
+import kotlin.time.minutes
 
 class LightControllerTest {
     @Test
@@ -60,6 +62,7 @@ class LightControllerTest {
         daemonJob.cancelAndJoin()
     }
 
+    @OptIn(ExperimentalTime::class)
     @Test
     fun lightsOff() = runBlockingTest {
         val configurationAccess = object: ConfigurationAccess {
@@ -81,7 +84,7 @@ class LightControllerTest {
         val eventAccess = EventAccessFake()
         val actionPublisher = ActionPublisherSpy()
 
-        val controller = LightController(configurationAccess, eventAccess, actionPublisher, colorPicker)
+        val controller = LightController(configurationAccess, eventAccess, actionPublisher, colorPicker, coroutineContext = coroutineContext)
         val daemonJob = launch { controller.start() }
 
         pauseDispatcher {
@@ -90,6 +93,8 @@ class LightControllerTest {
                 Clock.System.now(),
                 MotionState.IDLE
             ))
+            advanceUntilIdle()
+            advanceTimeBy(31.minutes.inMilliseconds.toLong())
         }
 
         assertEquals(1, actionPublisher.actions.size, "One light action should be published.")

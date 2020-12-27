@@ -3,7 +3,10 @@ package usonia.smartthings
 import usonia.foundation.Action
 import usonia.foundation.Capabilities
 import usonia.foundation.Event
+import kotlin.time.ExperimentalTime
+import kotlin.time.days
 
+@OptIn(ExperimentalTime::class)
 object SmartThingsArchetypes {
     val ALL get() = setOf(
         motion,
@@ -20,7 +23,8 @@ object SmartThingsArchetypes {
             Event.Motion::class,
             Event.Temperature::class,
             Event.Battery::class,
-        )
+        ),
+        heartbeat = 2.days,
     )
 
     val humidity = Capabilities(
@@ -30,6 +34,7 @@ object SmartThingsArchetypes {
             Event.Temperature::class,
             Event.Humidity::class,
         ),
+        heartbeat = 5.days,
     )
 
     val moisture = Capabilities(
@@ -39,6 +44,7 @@ object SmartThingsArchetypes {
             Event.Temperature::class,
             Event.Water::class,
         ),
+        heartbeat = 5.days,
     )
 
     val multi = Capabilities(
@@ -50,6 +56,7 @@ object SmartThingsArchetypes {
             Event.Latch::class,
             Event.Temperature::class,
         ),
+        heartbeat = 3.days,
     )
 
     val outlet = Capabilities(

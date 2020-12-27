@@ -92,7 +92,7 @@ class AccuweatherAccessTest {
 
         pauseDispatcher {
             access.start()
-            access.run(now.toLocalDateTime(TimeZone.UTC))
+            access.run(now.toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
         }
 
         assertEquals(0, forecasts.size)
@@ -167,7 +167,7 @@ class AccuweatherAccessTest {
                     )
                 )
             )
-            access.run(now.toLocalDateTime(TimeZone.UTC))
+            access.run(now.toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
         }
 
         assertEquals(1, forecasts.size)
@@ -221,7 +221,7 @@ class AccuweatherAccessTest {
                     )
                 )
             )
-            access.run(now.toLocalDateTime(TimeZone.UTC))
+            access.run(now.toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
         }
 
         assertEquals(2, forecasts.size)

@@ -1,6 +1,5 @@
 package usonia.foundation
 
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -8,6 +7,8 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import usonia.kotlin.mapSet
 import usonia.kotlin.singleOrThrow
+import kotlin.time.ExperimentalTime
+import kotlin.time.milliseconds
 
 data class Device(
     val id: Identifier,
@@ -18,6 +19,7 @@ data class Device(
     val parent: ExternalAssociation? = null,
 )
 
+@OptIn(ExperimentalTime::class)
 class DeviceSerializer(
     private val archetypes: Set<Capabilities>,
 ): KSerializer<Device> {
@@ -38,7 +40,8 @@ class DeviceSerializer(
                     },
                     events = device.eventTypes.orEmpty().mapSet { event ->
                         Event.subClasses.singleOrThrow("No event of type: $event") { it.simpleName == event }
-                    }
+                    },
+                    heartbeat = device.heartbeat?.milliseconds,
                 )
                 else -> archetypes.singleOrThrow("No archetype of ID: ${device.capabilitiesArchetype}") { it.archetypeId == device.capabilitiesArchetype }
             },
@@ -60,6 +63,7 @@ class DeviceSerializer(
             capabilitiesArchetype = value.capabilities.archetypeId,
             actionTypes = value.capabilities.actions.mapSet { it.simpleName!! },
             eventTypes = value.capabilities.events.mapSet { it.simpleName!! },
+            heartbeat = value.capabilities.heartbeat?.inMilliseconds?.toLong(),
             fixture = value.fixture?.name,
             siblings = value.siblings.mapSet(Identifier::value),
             parentContext = value.parent?.context?.value,
@@ -78,6 +82,7 @@ internal data class DeviceJson(
     val capabilitiesArchetype: String? = null,
     val actionTypes: Set<String>? = null,
     val eventTypes: Set<String>? = null,
+    val heartbeat: Long? = null,
     val fixture: String? = null,
     val siblings: Set<String> = emptySet(),
     val parentContext: String? = null,

@@ -11,6 +11,7 @@ import usonia.core.state.*
 import usonia.hubitat.HubitatPlugin
 import usonia.hue.HueBridgePlugin
 import usonia.rules.RulesPlugin
+import usonia.todoist.TodoistBridgePlugin
 import usonia.weather.WeatherAccess
 import usonia.weather.WeatherPlugin
 import usonia.web.WebPlugin
@@ -38,6 +39,15 @@ object PluginsModule {
         config = config,
         logger = logger,
     )
+
+    @Provides
+    @Singleton
+    @IntoSet
+    fun todoistPlugin(
+        config: ConfigurationAccess,
+        events: EventAccess,
+        logger: KimchiLogger
+    ): ServerPlugin = TodoistBridgePlugin(config, events, logger)
 
     @Provides
     @Reusable
