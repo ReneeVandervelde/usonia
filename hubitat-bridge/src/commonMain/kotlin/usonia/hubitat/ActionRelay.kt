@@ -5,13 +5,16 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import usonia.core.Daemon
 import usonia.core.state.ActionAccess
 import usonia.core.state.ConfigurationAccess
 import usonia.foundation.*
+import usonia.kotlin.IoScope
 import usonia.kotlin.neverEnding
 
 /**
@@ -22,6 +25,7 @@ internal class ActionRelay(
     private val actionAccess: ActionAccess,
     private val json: Json = Json,
     private val logger: KimchiLogger = EmptyLogger,
+    private val requestScope: CoroutineScope = IoScope()
 ): Daemon {
     private val client = HttpClient {}
 
@@ -33,7 +37,7 @@ internal class ActionRelay(
         }
     }
 
-    private suspend fun onAction(site: Site, action: Action) {
+    private fun onAction(site: Site, action: Action) {
         val device = site.findDevice(action.target) ?: run {
             logger.trace("Ignoring non-device action")
             return
@@ -41,7 +45,7 @@ internal class ActionRelay(
         publish(site, device, action)
     }
 
-    private suspend fun publish(site: Site, device: Device, action: Action) {
+    private fun publish(site: Site, device: Device, action: Action) {
         val bridge = site.findAssociatedBridge(device)
         if (bridge?.service != "hubitat") {
             logger.trace("Ignoring non-hubitat action.")
@@ -51,34 +55,40 @@ internal class ActionRelay(
         bridge.publish(device, action)
     }
 
-    private suspend fun Bridge.publish(device: Device, action: Action) {
+    private fun Bridge.publish(device: Device, action: Action) {
         logger.info { "Posting action ${action::class.simpleName} to Bridge <${name}>" }
         val parent = device.parent ?: run {
             logger.error("Impossible, no parent for device. Did the publish filtering change?")
             return
         }
 
-        try {
-            client.post(
-                host = parameters["host"] ?: run {
-                    logger.error("`host` not configured for bridge <${id}>. Skipping action.")
-                    return
-                },
-                port = parameters["port"]?.toIntOrNull() ?: run {
-                    logger.error("`port` not configured for bridge <${id}>. Skipping action.")
-                    return
-                },
-                path = parameters["actionsPath"] ?: run {
-                    logger.error("`actionsPath` not configured for bridge <${id}>. Skipping action.")
-                    return
-                },
-                body = json.encodeToString(ActionSerializer, action.withTarget(parent.id)),
-            ) {
-                contentType(ContentType.parse("application/json"))
-                parameter("access_token", parameters["token"])
+        val host = parameters["host"] ?: run {
+            logger.error("`host` not configured for bridge <${id}>. Skipping action.")
+            return
+        }
+        val port = parameters["port"]?.toIntOrNull() ?: run {
+            logger.error("`port` not configured for bridge <${id}>. Skipping action.")
+            return
+        }
+        val path = parameters["actionsPath"] ?: run {
+            logger.error("`actionsPath` not configured for bridge <${id}>. Skipping action.")
+            return
+        }
+
+        requestScope.launch {
+            try {
+                client.post(
+                    host = host,
+                    port = port,
+                    path = path,
+                    body = json.encodeToString(ActionSerializer, action.withTarget(parent.id)),
+                ) {
+                    contentType(ContentType.parse("application/json"))
+                    parameter("access_token", parameters["token"])
+                }
+            } catch (error: Throwable) {
+                logger.error("Failed to post action to <${name}>", error)
             }
-        } catch (error: Throwable) {
-            logger.error("Failed to post action to <${name}>", error)
         }
     }
 }

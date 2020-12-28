@@ -12,6 +12,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(Coroutines.core)
+                api(KotlinX.dateTime)
             }
         }
 

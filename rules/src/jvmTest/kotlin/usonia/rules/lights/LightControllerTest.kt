@@ -43,7 +43,7 @@ class LightControllerTest {
         val eventAccess = EventAccessFake()
         val actionPublisher = ActionPublisherSpy()
 
-        val controller = LightController(configurationAccess, eventAccess, actionPublisher, colorPicker)
+        val controller = LightController(configurationAccess, eventAccess, actionPublisher, colorPicker, coroutineContext = coroutineContext)
         val daemonJob = launch { controller.start() }
 
         pauseDispatcher {
@@ -126,7 +126,7 @@ class LightControllerTest {
         val eventAccess = EventAccessFake()
         val actionPublisher = ActionPublisherSpy()
 
-        val controller = LightController(configurationAccess, eventAccess, actionPublisher, colorPicker)
+        val controller = LightController(configurationAccess, eventAccess, actionPublisher, colorPicker, coroutineContext = coroutineContext)
         val daemonJob = launch { controller.start() }
 
         eventAccess.events.emit(Event.Motion(
@@ -178,7 +178,7 @@ class LightControllerTest {
         }
         val actionPublisher = ActionPublisherSpy()
 
-        val controller = LightController(configurationAccess, eventAccess, actionPublisher, colorPicker)
+        val controller = LightController(configurationAccess, eventAccess, actionPublisher, colorPicker, coroutineContext = coroutineContext)
         val daemonJob = launch { controller.start() }
 
         pauseDispatcher {

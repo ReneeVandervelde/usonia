@@ -6,6 +6,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -40,8 +41,22 @@ internal class AccuweatherAccess(
     private val clock: Clock = Clock.System,
     private val logger: KimchiLogger = EmptyLogger,
 ): WeatherAccess, CronJob {
-    private val forecastFlow = MutableSharedFlow<Forecast>(replay = 1)
-    private val conditionsFlow = MutableSharedFlow<Conditions>(replay = 1)
+    private val forecastFlow = MutableStateFlow(
+        Forecast(
+            timestamp = Instant.DISTANT_PAST,
+            sunset = Instant.DISTANT_FUTURE,
+            sunrise = Instant.DISTANT_PAST,
+            rainChance = 0.percent,
+            snowChance = 0.percent,
+        )
+    )
+    private val conditionsFlow = MutableStateFlow(
+        Conditions(
+            timestamp = Instant.DISTANT_PAST,
+            cloudCover = 100.percent,
+            temperature = 32,
+        )
+    )
     override val forecast: Flow<Forecast> = forecastFlow
     override val conditions: Flow<Conditions> = conditionsFlow
 

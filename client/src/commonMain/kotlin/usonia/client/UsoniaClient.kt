@@ -1,6 +1,7 @@
 package usonia.client
 
 import io.ktor.client.*
+import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.websocket.*
@@ -11,18 +12,18 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import usonia.foundation.*
+import kotlin.reflect.KClass
 
 /**
  * HTTP Client for interacting with a Usonia server.
  */
 @OptIn(ExperimentalSerializationApi::class, ExperimentalCoroutinesApi::class)
-class UsoniaClient constructor(
+class UsoniaClient(
     private val host: String,
     private val port: Int = 80,
     private val json: Json,
@@ -68,7 +69,7 @@ class UsoniaClient constructor(
             incoming.consumeEach {
                 if (it !is Frame.Text) return@consumeEach
                 try {
-                    emit(json.decodeFromString(it.readText()))
+                    emit(json.decodeFromString(EventSerializer, it.readText()))
                 } catch (error: Throwable) {
                     logger.error("Failed to deserialize Event", error)
                 }
@@ -94,6 +95,25 @@ class UsoniaClient constructor(
                     logger.error("Failed to deserialize site config", error)
                 }
             }
+        }
+    }
+
+    /**
+     * Send an action to the server to be broadcast.
+     */
+    suspend fun <T: Event> getLatestEvent(id: Identifier, type: KClass<T>): T? {
+        val request = HttpRequestBuilder(
+            host = host,
+            port = port,
+            path = "/events/latest/${id.value}/${type.simpleName}",
+        ).apply {
+            accept(ContentType.Application.Json)
+        }
+
+        return try {
+            httpClient.get<String>(request).let { json.decodeFromString(EventSerializer, it) as T }
+        } catch (error: ClientRequestException) {
+            if (error.response.status.value == 404) null else throw error
         }
     }
 

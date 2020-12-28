@@ -7,11 +7,14 @@ import inkapplications.shade.groups.GroupStateModification
 import inkapplications.shade.groups.ShadeGroups
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import usonia.core.Daemon
 import usonia.core.state.ActionAccess
 import usonia.core.state.ConfigurationAccess
 import usonia.foundation.*
+import usonia.kotlin.IoScope
 import usonia.kotlin.neverEnding
 
 /**
@@ -22,6 +25,7 @@ internal class HueGroupHandler(
     private val configurationAccess: ConfigurationAccess,
     private val shade: ShadeGroups,
     private val logger: KimchiLogger = EmptyLogger,
+    private val requestScope: CoroutineScope = IoScope()
 ): Daemon {
     override suspend fun start() = neverEnding {
         configurationAccess.site.collectLatest { site -> onSiteUpdate(site) }
@@ -35,7 +39,7 @@ internal class HueGroupHandler(
             }
     }
 
-    private suspend fun handleAction(site: Site, action: Action) {
+    private fun handleAction(site: Site, action: Action) {
         val device = site.getDevice(action.target)
         val bridge = site.findAssociatedBridge(device)
         if (bridge?.service != HUE_SERVICE) {
@@ -65,6 +69,6 @@ internal class HueGroupHandler(
             else -> throw IllegalStateException("Impossible! Did the event filtering change without updating the modification conditions?")
         }
 
-        shade.setState(device.parent!!.id.value, modification)
+        requestScope.launch { shade.setState(device.parent!!.id.value, modification) }
     }
 }

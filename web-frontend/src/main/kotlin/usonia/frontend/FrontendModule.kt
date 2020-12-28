@@ -6,6 +6,7 @@ import kotlinx.browser.window
 import usonia.client.UsoniaClient
 import usonia.frontend.config.ConfigController
 import usonia.frontend.logs.LogController
+import usonia.frontend.users.UserListController
 import usonia.serialization.SerializationModule
 
 object FrontendModule {
@@ -23,5 +24,6 @@ object FrontendModule {
     val controllers = listOf(
         ConfigController(client, logger),
         LogController(client),
+        UserListController(client, logger)
     )
 }

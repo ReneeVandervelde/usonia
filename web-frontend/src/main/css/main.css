@@ -2,32 +2,79 @@
 
 :root
 {
-    --color-accent: #43B593;
+    --color-magenta: #9e6efe;
+    --color-green: #43B593;
+    --color-blue: #3495CC;
+    --color-orange: #fe9720;
+    --color-red: #f92772;
+
+    --color-accent: var(--color-green);
+
+    --color-positive: var(--color-green);
+    --color-danger: var(--color-orange);
+    --color-nominal: var(--color-blue);
+    --color-error: var(--color-red);
 }
 
-#logs {
+section h1::before,
+section h2::before,
+section h3::before
+{
+    content: none;
+}
+
+#logs
+{
     overflow-y: scroll;
     max-height: 60vh;
     background-color: var(--color-surface);
     padding: 1.5rem 1rem;
 }
 
-.log-message-level {
+.log-message-level
+{
     font-weight: 700;
 }
 
-.log-message[data-level="TRACE"] .log-message-level {
-    color: #9e6efe;
+.log-message[data-level="TRACE"] .log-message-level
+{
+    color: var(--color-magenta);
 }
-.log-message[data-level="DEBUG"] .log-message-level {
-    color: #9DB64E;
+.log-message[data-level="DEBUG"] .log-message-level
+{
+    color: var(--color-green);
 }
-.log-message[data-level="INFO"] .log-message-level {
-    color: #3495CC;
+.log-message[data-level="INFO"] .log-message-level
+{
+    color: var(--color-blue);
 }
-.log-message[data-level="WARNING"] .log-message-level {
-    color: #fe9720;
+.log-message[data-level="WARNING"] .log-message-level
+{
+    color: var(--color-orange);
 }
-.log-message[data-level="ERROR"] .log-message-level {
-    color: #f92772;
+.log-message[data-level="ERROR"] .log-message-level
+{
+    color: var(--color-red);
+}
+
+
+.user .user-state
+{
+    color: var(--color-error);
+}
+.user[data-state="AWAY"] .user-state
+{
+    color: var(--color-nominal);
+}
+.user[data-state="HOME"] .user-state
+{
+    color: var(--color-positive);
+}
+.user[data-state="HOME"] .user-actions button[value="HOME"]
+{
+    display: none;
+}
+.user[data-state="AWAY"] .user-actions button[value="AWAY"]
+{
+    display: none;
 }

@@ -13,6 +13,7 @@ import io.ktor.util.*
 import io.ktor.websocket.*
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
@@ -42,22 +43,35 @@ class KtorWebServer(
 
                 routing {
                     socketControllers.forEach { controller ->
-                        logger.debug("Loading Socket Controller: ${controller::class.simpleName}")
+                        logger.debug { "Loading Socket Controller: ${controller::class.simpleName}" }
                         webSocket(controller.path) {
-                            logger.trace("Handling Socket Request to ${controller::class.simpleName}")
+                            logger.trace { "OPEN: ${controller::class.simpleName}" }
                             val input = Channel<String>(Channel.RENDEZVOUS)
                             val output = Channel<String>(Channel.RENDEZVOUS)
-                            launch {
-                                incoming.consumeEach {
-                                    if (it is Frame.Text) input.send(it.readText())
+                            val controllerJob = launch {
+                                controller.start(input, output)
+                            }
+                            val incomingJob = launch {
+                                incoming.consumeEach { frame ->
+                                    when (frame) {
+                                        is Frame.Text -> input.send(frame.readText())
+                                        is Frame.Close -> {
+                                            logger.debug { "CLOSE: <${controller::class.simpleName}>" }
+                                            controllerJob.cancel()
+                                            close()
+                                        }
+                                    }
                                 }
                             }
-                            launch {
+                            val outputJob = launch {
                                 output.consumeEach {
                                     send(it)
                                 }
                             }
-                            controller.start(input, output)
+                            incomingJob.join()
+                            outputJob.join()
+                            controllerJob.cancel()
+                            logger.trace { "CLOSED: ${controller::class.simpleName}" }
                             close()
                         }
                     }
@@ -65,7 +79,7 @@ class KtorWebServer(
                         logger.debug("Loading HTTP Controller: ${controller::class.simpleName}")
                         route(controller.path, controller.method.let(::HttpMethod)) {
                             handle {
-                                logger.trace("Handling HTTP Request to ${controller::class.simpleName}")
+                                logger.trace { "HANDLE: ${controller::class.simpleName}" }
                                 val request = HttpRequest(
                                     body = call.receiveText(),
                                     headers = call.request.headers.toMap(),

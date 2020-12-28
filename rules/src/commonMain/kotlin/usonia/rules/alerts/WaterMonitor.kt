@@ -2,8 +2,10 @@ package usonia.rules.alerts
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.launch
 import usonia.core.Daemon
 import usonia.core.state.*
 import usonia.foundation.Action
@@ -11,6 +13,7 @@ import usonia.foundation.Event
 import usonia.foundation.User
 import usonia.foundation.Identifier
 import usonia.foundation.WaterState.*
+import usonia.kotlin.UnconfinedScope
 import usonia.kotlin.neverEnding
 
 /**
@@ -20,17 +23,19 @@ internal class WaterMonitor(
     private val configurationAccess: ConfigurationAccess,
     private val eventAccess: EventAccess,
     private val actionPublisher: ActionPublisher,
-    private val logger: KimchiLogger = EmptyLogger
-): Daemon {
+    private val logger: KimchiLogger = EmptyLogger,
+): Daemon, CoroutineScope by UnconfinedScope() {
     private val alerted = mutableSetOf<Identifier>()
 
     override suspend fun start() = neverEnding {
         eventAccess.events
             .filterIsInstance<Event.Water>()
             .collect {
-                when (it.state) {
-                    WET -> onWet(it)
-                    DRY -> onDry(it)
+                launch {
+                    when (it.state) {
+                        WET -> onWet(it)
+                        DRY -> onDry(it)
+                    }
                 }
             }
     }

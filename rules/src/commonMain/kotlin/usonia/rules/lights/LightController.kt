@@ -34,7 +34,7 @@ internal class LightController(
     override suspend fun start(): Nothing = neverEnding {
         configurationAccess.site.collectLatest { site ->
             eventAccess.events.filterIsInstance<Event.Motion>().collect { event ->
-                onMotionEvent(event, site)
+                launch { onMotionEvent(event, site) }
             }
         }
     }
@@ -66,7 +66,7 @@ internal class LightController(
         Utility -> 1.minutes
     }
 
-    private suspend fun onRoomIdle(room: Room) = launch {
+    private suspend fun onRoomIdle(room: Room) {
         val cancellation = launch {
             eventAccess.events
                 .filterIsInstance<Event.Motion>()

@@ -68,7 +68,7 @@ class AccuweatherAccessTest {
         )
     )
 
-    private val now = Instant.fromEpochSeconds(5)
+    private val now = Clock.System.now()
 
     private val stubClock = object: Clock {
         override fun now(): Instant = now
@@ -95,8 +95,8 @@ class AccuweatherAccessTest {
             access.run(now.toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
         }
 
-        assertEquals(0, forecasts.size)
-        assertEquals(0, conditions.size)
+        assertEquals(1, forecasts.size)
+        assertEquals(1, conditions.size)
 
         forecastCollection.cancelAndJoin()
         conditionCollection.cancelAndJoin()
@@ -123,18 +123,18 @@ class AccuweatherAccessTest {
             access.start()
         }
 
-        assertEquals(1, forecasts.size)
-        assertEquals(1, conditions.size)
+        assertEquals(2, forecasts.size)
+        assertEquals(2, conditions.size)
 
-        assertEquals(5, forecasts.single().timestamp.epochSeconds)
-        assertEquals(1, forecasts.single().sunrise.epochSeconds)
-        assertEquals(4, forecasts.single().sunset.epochSeconds)
-        assertEquals(12.percent, forecasts.single().snowChance)
-        assertEquals(34.percent, forecasts.single().rainChance)
+        assertEquals(now, forecasts[1].timestamp)
+        assertEquals(1, forecasts[1].sunrise.epochSeconds)
+        assertEquals(4, forecasts[1].sunset.epochSeconds)
+        assertEquals(12.percent, forecasts[1].snowChance)
+        assertEquals(34.percent, forecasts[1].rainChance)
 
-        assertEquals(5, conditions.single().timestamp.epochSeconds)
-        assertEquals(69.percent, conditions.single().cloudCover)
-        assertEquals(42, conditions.single().temperature)
+        assertEquals(now, conditions[1].timestamp)
+        assertEquals(69.percent, conditions[1].cloudCover)
+        assertEquals(42, conditions[1].temperature)
 
         forecastCollection.cancelAndJoin()
         conditionCollection.cancelAndJoin()
@@ -170,14 +170,14 @@ class AccuweatherAccessTest {
             access.run(now.toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
         }
 
-        assertEquals(1, forecasts.size)
-        assertEquals(2, conditions.size)
+        assertEquals(2, forecasts.size)
+        assertEquals(3, conditions.size)
 
-        assertEquals(69.percent, conditions[0].cloudCover)
-        assertEquals(42, conditions[0].temperature)
+        assertEquals(69.percent, conditions[1].cloudCover)
+        assertEquals(42, conditions[1].temperature)
 
-        assertEquals(100.percent, conditions[1].cloudCover)
-        assertEquals(99, conditions[1].temperature)
+        assertEquals(100.percent, conditions[2].cloudCover)
+        assertEquals(99, conditions[2].temperature)
 
         forecastCollection.cancelAndJoin()
         conditionCollection.cancelAndJoin()
@@ -204,38 +204,38 @@ class AccuweatherAccessTest {
         val forecastCollection = launch { access.forecast.collect { forecasts += it } }
         val conditionCollection = launch { access.conditions.collect { conditions += it } }
 
-        pauseDispatcher {
-            access.start()
-            fakeClock.current = fakeClock.current + 5.hours
-            fakeApi.forecast = ForecastResponse(
-                daily = listOf(
-                    ForecastResponse.Daily(
-                        sun = ForecastResponse.SunSchedule(
-                            rise = 20,
-                            set = 25,
-                        ),
-                        day = ForecastResponse.DayConditions(
-                            snowProbability = 56,
-                            rainProbability = 78,
-                        )
+        access.start()
+        runCurrent()
+        fakeClock.current = fakeClock.current + 5.hours
+        fakeApi.forecast = ForecastResponse(
+            daily = listOf(
+                ForecastResponse.Daily(
+                    sun = ForecastResponse.SunSchedule(
+                        rise = 20,
+                        set = 25,
+                    ),
+                    day = ForecastResponse.DayConditions(
+                        snowProbability = 56,
+                        rainProbability = 78,
                     )
                 )
             )
-            access.run(now.toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
-        }
+        )
+        access.run(now.toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
+        runCurrent()
 
-        assertEquals(2, forecasts.size)
-        assertEquals(2, conditions.size)
+        assertEquals(3, forecasts.size)
+        assertEquals(3, conditions.size)
 
-        assertEquals(1, forecasts[0].sunrise.epochSeconds)
-        assertEquals(4, forecasts[0].sunset.epochSeconds)
-        assertEquals(12.percent, forecasts[0].snowChance)
-        assertEquals(34.percent, forecasts[0].rainChance)
+        assertEquals(1, forecasts[1].sunrise.epochSeconds)
+        assertEquals(4, forecasts[1].sunset.epochSeconds)
+        assertEquals(12.percent, forecasts[1].snowChance)
+        assertEquals(34.percent, forecasts[1].rainChance)
 
-        assertEquals(20, forecasts[1].sunrise.epochSeconds)
-        assertEquals(25, forecasts[1].sunset.epochSeconds)
-        assertEquals(56.percent, forecasts[1].snowChance)
-        assertEquals(78.percent, forecasts[1].rainChance)
+        assertEquals(20, forecasts[2].sunrise.epochSeconds)
+        assertEquals(25, forecasts[2].sunset.epochSeconds)
+        assertEquals(56.percent, forecasts[2].snowChance)
+        assertEquals(78.percent, forecasts[2].rainChance)
 
         forecastCollection.cancelAndJoin()
         conditionCollection.cancelAndJoin()

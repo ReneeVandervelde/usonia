@@ -2,14 +2,17 @@ package usonia.telegram
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.launch
 import usonia.core.Daemon
 import usonia.core.state.ActionAccess
 import usonia.core.state.ConfigurationAccess
 import usonia.foundation.Action
 import usonia.foundation.Site
+import usonia.kotlin.IoScope
 import usonia.kotlin.neverEnding
 
 private const val BOT_KEY = "bot"
@@ -28,6 +31,7 @@ internal class TelegramAlerts(
     private val configurationAccess: ConfigurationAccess,
     private val telegramApi: TelegramApi,
     private val logger: KimchiLogger = EmptyLogger,
+    private val requestScope: CoroutineScope = IoScope()
 ): Daemon {
     override suspend fun start() = neverEnding {
         configurationAccess.site.collectLatest { site -> onSiteUpdate(site) }
@@ -49,11 +53,12 @@ internal class TelegramAlerts(
             return
         }
 
-        actionAccess.actions.filterIsInstance<Action.Alert>()
-            .collect { send(bot, token, site, it) }
+        actionAccess.actions.filterIsInstance<Action.Alert>().collect {
+            send(bot, token, site, it)
+        }
     }
 
-    private suspend fun send(bot: String, token: String, site: Site, alert: Action.Alert) {
+    private fun send(bot: String, token: String, site: Site, alert: Action.Alert) {
         val user = site.users.find { it.id == alert.target } ?: run {
             logger.warn("Unable to find user for alert: <${alert.target}>")
             return
@@ -63,6 +68,6 @@ internal class TelegramAlerts(
             return
         }
         logger.trace("Sending alerts to <${user.name}>")
-        telegramApi.sendMessage(bot, token, chatId, alert.message)
+        requestScope.launch { telegramApi.sendMessage(bot, token, chatId, alert.message) }
     }
 }

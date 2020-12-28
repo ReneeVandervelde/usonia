@@ -11,21 +11,31 @@ data class Status(
 object Statuses {
     val SUCCESS = Status(
         code = 0,
-        message = "We're fine. We're all fine here, now. Thank you. How are you?"
+        message = "We're fine. We're all fine here, now. Thank you. How are you?",
     )
 
     val UNKNOWN = Status(
         code = 1,
-        message = "Something unexpected went wrong."
+        message = "Something unexpected went wrong.",
     )
 
     val DEVICE_NOT_FOUND = Status(
         code = 2,
-        message = "Could not find a device with the specified ID."
+        message = "Could not find a device with the specified ID.",
     )
 
     fun missingRequired(param: String) = Status(
         code = 3,
-        message = "Missing required Parameter: $param"
+        message = "Missing required Parameter <$param>",
+    )
+
+    fun illegalArgument(param: String) = Status(
+        code = 4,
+        message = "Illegal Argument for <$param>",
+    )
+
+    val EVENT_NOT_FOUND = Status(
+        message = "No events were found.",
+        code = 5,
     )
 }

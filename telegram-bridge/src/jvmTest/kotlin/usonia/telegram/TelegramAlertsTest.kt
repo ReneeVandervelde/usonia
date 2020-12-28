@@ -42,6 +42,7 @@ class TelegramAlertsTest {
             fakeActions,
             fakeConfigAccess,
             telegramSpy,
+            requestScope = this
         )
 
         val job = launch { alerts.start() }
@@ -88,6 +89,7 @@ class TelegramAlertsTest {
             fakeActions,
             fakeConfigAccess,
             telegramSpy,
+            requestScope = this
         )
 
         val job = launch { alerts.start() }
@@ -130,6 +132,7 @@ class TelegramAlertsTest {
             fakeActions,
             fakeConfigAccess,
             telegramSpy,
+            requestScope = this
         )
 
         val job = launch { alerts.start() }
@@ -159,6 +162,7 @@ class TelegramAlertsTest {
             fakeActions,
             fakeConfigAccess,
             telegramSpy,
+            requestScope = this
         )
 
         val job = launch { alerts.start() }

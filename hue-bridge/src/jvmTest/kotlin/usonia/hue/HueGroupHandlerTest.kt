@@ -16,6 +16,7 @@ import usonia.kotlin.unit.percent
 import usonia.kotlin.suspendedFlow
 import usonia.core.state.ActionAccessFake
 import usonia.core.state.ConfigurationAccess
+import usonia.kotlin.UnconfinedScope
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -49,7 +50,7 @@ class HueGroupHandlerTest {
             )
         }
 
-        val handler = HueGroupHandler(actionAccess, configurationAccess, shadeSpy)
+        val handler = HueGroupHandler(actionAccess, configurationAccess, shadeSpy, requestScope = this)
 
         val handlerJob = launch { handler.start() }
 
@@ -82,7 +83,7 @@ class HueGroupHandlerTest {
             )
         }
 
-        val handler = HueGroupHandler(actionAccess, configurationAccess, shadeSpy)
+        val handler = HueGroupHandler(actionAccess, configurationAccess, shadeSpy, requestScope = this)
 
         val handlerJob = launch { handler.start() }
 
@@ -115,7 +116,7 @@ class HueGroupHandlerTest {
             )
         }
 
-        val handler = HueGroupHandler(actionAccess, configurationAccess, shadeSpy)
+        val handler = HueGroupHandler(actionAccess, configurationAccess, shadeSpy, requestScope = this)
 
         val handlerJob = launch { handler.start() }
 
@@ -171,7 +172,7 @@ class HueGroupHandlerTest {
             )
         }
 
-        val handler = HueGroupHandler(actionAccess, configurationAccess, shadeSpy)
+        val handler = HueGroupHandler(actionAccess, configurationAccess, shadeSpy, requestScope = this)
 
         val handlerJob = launch { handler.start() }
 

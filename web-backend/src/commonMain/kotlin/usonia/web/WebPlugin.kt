@@ -16,6 +16,7 @@ import usonia.web.config.ConfigSocket
 import usonia.web.events.EventBridgeHttpPublisher
 import usonia.web.events.EventHttpPublisher
 import usonia.web.events.EventSocket
+import usonia.web.events.LatestEventController
 
 class WebPlugin(
     configurationAccess: ConfigurationAccess,
@@ -32,6 +33,7 @@ class WebPlugin(
         EventBridgeHttpPublisher(eventPublisher, configurationAccess, json, logger),
         ActionHttpPublisher(actionPublisher, json, logger),
         ActionBridgeHttpPublisher(configurationAccess, actionPublisher, json, logger),
+        LatestEventController(eventAccess, json),
     )
     override val socketController: List<WebSocketController> = listOf(
         LogSocket,
