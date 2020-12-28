@@ -1,5 +1,5 @@
 include("cli")
-include("client")
+include("client-http")
 include("core")
 include("core-testing")
 include("foundation")

@@ -22,7 +22,7 @@ sourceSets {
 }
 
 dependencies {
-    implementation(project(":client"))
+    implementation(project(":client-http"))
     implementation(project(":core"))
     implementation(project(":hubitat-bridge"))
     implementation(project(":hue-bridge"))

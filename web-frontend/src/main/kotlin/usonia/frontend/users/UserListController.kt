@@ -11,8 +11,8 @@ import kotlinx.datetime.Clock
 import mustache.Mustache
 import org.w3c.dom.Element
 import org.w3c.dom.get
-import usonia.client.UsoniaClient
-import usonia.client.userPresenceStates
+import usonia.client.HttpClient
+import usonia.core.client.userPresenceStates
 import usonia.foundation.Event
 import usonia.foundation.Identifier
 import usonia.foundation.PresenceState
@@ -21,7 +21,7 @@ import usonia.js.addElementClickListener
 import usonia.kotlin.UnconfinedScope
 
 class UserListController(
-    private val client: UsoniaClient,
+    private val client: HttpClient,
     private val logger: KimchiLogger = EmptyLogger,
 ): ViewController, CoroutineScope by UnconfinedScope() {
     private val template by lazy { document.getElementById("user-template")!!.innerHTML }
@@ -61,7 +61,7 @@ class UserListController(
             state = PresenceState.valueOf(state),
         )
 
-        launch { client.sendEvent(event) }
+        launch { client.publishEvent(event) }
     }
 }
 

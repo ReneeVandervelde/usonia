@@ -23,7 +23,7 @@ dependencies {
     implementation(Coroutines.js)
     implementation(Kimchi.core)
     implementation(project(":kotlin-extensions"))
-    implementation(project(":client"))
+    implementation(project(":client-http"))
     implementation(project(":serialization"))
     implementation(npm("mustache", "3.1.0"))
 }

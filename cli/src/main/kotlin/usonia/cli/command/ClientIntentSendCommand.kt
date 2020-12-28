@@ -33,7 +33,7 @@ class ClientIntentSendCommand @Inject constructor(
 
         val targetId = target?.let(::Identifier) ?: config.site.first().id
 
-        client.sendAction(Action.Intent(
+        client.publishAction(Action.Intent(
             target = targetId,
             action = action
         ))

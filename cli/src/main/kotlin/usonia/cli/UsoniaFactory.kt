@@ -3,7 +3,7 @@ package usonia.cli
 import dagger.Reusable
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.json.Json
-import usonia.client.UsoniaClient
+import usonia.client.HttpClient
 import usonia.core.ServerPlugin
 import usonia.core.Usonia
 import usonia.server.ktor.KtorWebServer
@@ -31,7 +31,7 @@ class UsoniaFactory @Inject constructor(
     fun createClient(
         host: String,
         port: Int,
-    ) = UsoniaClient(
+    ) = HttpClient(
         host = host,
         port = port,
         json = json,

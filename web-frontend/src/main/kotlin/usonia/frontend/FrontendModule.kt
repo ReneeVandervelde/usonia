@@ -3,7 +3,7 @@ package usonia.frontend
 import kimchi.Kimchi
 import kimchi.logger.defaultWriter
 import kotlinx.browser.window
-import usonia.client.UsoniaClient
+import usonia.client.HttpClient
 import usonia.frontend.config.ConfigController
 import usonia.frontend.logs.LogController
 import usonia.frontend.users.UserListController
@@ -14,7 +14,7 @@ object FrontendModule {
         addLog(defaultWriter)
     }
 
-    val client = UsoniaClient(
+    val client = HttpClient(
         host = window.location.host,
         port = window.location.port.takeIf { it.isNotEmpty() }?.toInt() ?: 80,
         json = SerializationModule.json,

@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import usonia.core.client.CommonClient
 import usonia.foundation.*
 import kotlin.reflect.KClass
 
@@ -23,12 +24,12 @@ import kotlin.reflect.KClass
  * HTTP Client for interacting with a Usonia server.
  */
 @OptIn(ExperimentalSerializationApi::class, ExperimentalCoroutinesApi::class)
-class UsoniaClient(
+class HttpClient(
     private val host: String,
     private val port: Int = 80,
     private val json: Json,
     private val logger: KimchiLogger = EmptyLogger,
-) {
+): FrontendClient {
     private val httpClient = HttpClient {
         install(WebSockets)
         install(JsonFeature) {
@@ -36,10 +37,7 @@ class UsoniaClient(
         }
     }
 
-    /**
-     * Ongoing flow of log statements being recorded in the server.
-     */
-    val logs: Flow<LogMessage> = flow {
+    override val logs: Flow<LogMessage> = flow {
         httpClient.ws(
             host = host,
             port = port,
@@ -57,10 +55,7 @@ class UsoniaClient(
         }
     }
 
-    /**
-     * Ongoing flow of events being broadcast in the server.
-     */
-    val events: Flow<Event> = flow {
+    override val events: Flow<Event> = flow {
         httpClient.ws(
             host = host,
             port = port,
@@ -77,10 +72,7 @@ class UsoniaClient(
         }
     }
 
-    /**
-     * Ongoing flow of changes to the site configuration.
-     */
-    val config: Flow<Site> = flow {
+    override val site: Flow<Site> = flow {
         httpClient.ws(
             host = host,
             port = port,
@@ -98,10 +90,7 @@ class UsoniaClient(
         }
     }
 
-    /**
-     * Send an action to the server to be broadcast.
-     */
-    suspend fun <T: Event> getLatestEvent(id: Identifier, type: KClass<T>): T? {
+    override suspend fun <T: Event> getState(id: Identifier, type: KClass<T>): T? {
         val request = HttpRequestBuilder(
             host = host,
             port = port,
@@ -117,10 +106,7 @@ class UsoniaClient(
         }
     }
 
-    /**
-     * Send an action to the server to be broadcast.
-     */
-    suspend fun sendAction(action: Action): Status {
+    override suspend fun publishAction(action: Action) {
         val request = HttpRequestBuilder(
             host = host,
             port = port,
@@ -130,13 +116,10 @@ class UsoniaClient(
             body = json.encodeToString(ActionSerializer, action)
         }
 
-        return httpClient.post(request)
+        httpClient.post<Status>(request)
     }
 
-    /**
-     * Send an event to the server to be broadcast
-     */
-    suspend fun sendEvent(event: Event): Status {
+    override suspend fun publishEvent(event: Event) {
         val request = HttpRequestBuilder(
             host = host,
             port = port,
@@ -146,6 +129,6 @@ class UsoniaClient(
             body = json.encodeToString(EventSerializer, event)
         }
 
-        return httpClient.post(request)
+        httpClient.post<Status>(request)
     }
 }
