@@ -13,7 +13,7 @@ import kotlin.test.*
 class InMemoryEventAccessTest {
     @Test
     fun testPublish() = runBlockingTest {
-        val events = InMemoryEventAccess(ConfigurationAccessStub)
+        val events = InMemoryEventAccess()
 
         val result = async { events.events.first() }
         events.publishEvent(FakeEvents.SwitchOff)
@@ -23,7 +23,7 @@ class InMemoryEventAccessTest {
 
     @Test
     fun testStateTracking() = runBlockingTest {
-        val events = InMemoryEventAccess(ConfigurationAccessStub)
+        val events = InMemoryEventAccess()
 
         events.publishEvent(FakeEvents.SwitchOff)
         val currentState = events.getState(FakeDevices.Switch.id, Event.Switch::class)
@@ -33,7 +33,7 @@ class InMemoryEventAccessTest {
 
     @Test
     fun defaultState() = runBlockingTest {
-        val events = InMemoryEventAccess(ConfigurationAccessStub)
+        val events = InMemoryEventAccess()
 
         val currentState = events.getState(FakeDevices.Switch.id, Event.Switch::class)
 
@@ -42,7 +42,7 @@ class InMemoryEventAccessTest {
 
     @Test
     fun overwriteState() = runBlockingTest {
-        val events = InMemoryEventAccess(ConfigurationAccessStub)
+        val events = InMemoryEventAccess()
 
         events.publishEvent(FakeEvents.SwitchOff)
         events.publishEvent(FakeEvents.SwitchOn)

@@ -5,17 +5,16 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import usonia.core.cron.CronJob
-import usonia.core.cron.Schedule
 import usonia.core.state.ConfigurationAccess
 import usonia.kotlin.unit.percent
+import usonia.server.cron.CronJob
+import usonia.server.cron.Schedule
 import usonia.weather.Conditions
 import usonia.weather.Forecast
 import usonia.weather.WeatherAccess
@@ -72,10 +71,10 @@ internal class AccuweatherAccess(
             val currentForecast = forecast.first()
             if (clock.now() - currentForecast.timestamp > 4.hours) {
                 logger.info("Forecast is expired. Updating.")
-                forecastFlow.emit(getFreshForecast(location, token))
+                forecastFlow.value = getFreshForecast(location, token)
             }
 
-            conditionsFlow.emit(newConditions.await())
+            conditionsFlow.value = newConditions.await()
         }
     }
 
@@ -86,8 +85,8 @@ internal class AccuweatherAccess(
             val newConditions = async { getFreshConditions(location, token) }
             val newForecast = async { getFreshForecast(location, token) }
 
-            conditionsFlow.emit(newConditions.await())
-            forecastFlow.emit(newForecast.await())
+            conditionsFlow.value = newConditions.await()
+            forecastFlow.value = newForecast.await()
         }
     }
 

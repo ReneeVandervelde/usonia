@@ -1,4 +1,4 @@
-package usonia.core.server
+package usonia.server.http
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger

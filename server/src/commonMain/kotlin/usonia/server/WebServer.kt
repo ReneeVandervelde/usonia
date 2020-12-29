@@ -1,6 +1,4 @@
-package usonia.core.server
-
-import usonia.core.AppConfig
+package usonia.server
 
 interface WebServer {
     suspend fun serve(config: AppConfig)

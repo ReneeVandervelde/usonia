@@ -1,4 +1,4 @@
-package usonia.core
+package usonia.server
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
@@ -7,9 +7,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
 import kotlinx.datetime.TimeZone
-import usonia.core.server.WebServer
-import usonia.core.timemachine.SecondFrequency
-import usonia.core.timemachine.minutes
+import usonia.server.timemachine.SecondFrequency
+import usonia.server.timemachine.minutes
 
 /**
  * The "backend" part of the application that starts up long running services.

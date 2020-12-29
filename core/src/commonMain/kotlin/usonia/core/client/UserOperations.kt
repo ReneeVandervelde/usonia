@@ -8,7 +8,7 @@ import usonia.foundation.User
 /**
  * Observes a specific user's presence state, starting with its last known state.
  */
-fun CommonClient.userPresence(user: Identifier): Flow<Event.Presence?> {
+fun UsoniaClient.userPresence(user: Identifier): Flow<Event.Presence?> {
     return events
         .filter { it.source == user }
         .filterIsInstance<Event.Presence>()
@@ -19,7 +19,7 @@ fun CommonClient.userPresence(user: Identifier): Flow<Event.Presence?> {
 /**
  * Observes all users' presence states, starting with their last known state.
  */
-val CommonClient.userPresenceStates: Flow<Pair<User, Event.Presence?>> get() {
+val UsoniaClient.userPresenceStates: Flow<Pair<User, Event.Presence?>> get() {
     return site.map { it.users }
         .flatMapLatest { users ->
             users.map { user ->

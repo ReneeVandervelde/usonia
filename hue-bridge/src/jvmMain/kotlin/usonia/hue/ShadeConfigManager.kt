@@ -4,10 +4,10 @@ import inkapplications.shade.Shade
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.flow.collect
-import usonia.core.Daemon
 import usonia.core.state.ConfigurationAccess
 import usonia.foundation.Site
 import usonia.kotlin.neverEnding
+import usonia.server.Daemon
 
 /**
  * Updates the Hue baseurl based on site configuration.

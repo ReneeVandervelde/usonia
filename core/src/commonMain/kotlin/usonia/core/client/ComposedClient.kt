@@ -9,7 +9,7 @@ class ComposedClient(
     private val eventPublisher: EventPublisher,
     private val configurationAccess: ConfigurationAccess,
 ):
-    CommonClient,
+    UsoniaClient,
     ActionAccess by actionAccess,
     ActionPublisher by actionPublisher,
     EventAccess by eventAccess,

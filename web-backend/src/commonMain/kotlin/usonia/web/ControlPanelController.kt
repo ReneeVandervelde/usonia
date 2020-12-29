@@ -1,6 +1,6 @@
 package usonia.web
 
-import usonia.core.server.StaticHtmlController
+import usonia.server.http.StaticHtmlController
 
 internal object ControlPanelController: StaticHtmlController() {
     override val path: String = "/"

@@ -1,25 +1,36 @@
-object Coroutines {
-    const val test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.1"
-    const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1"
-    const val js = "org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.4.1"
+object Coroutines: DependencyGroup(
+    group = "org.jetbrains.kotlinx",
+    version = "1.4.1"
+) {
+    val test = dependency("kotlinx-coroutines-test")
+    val core = dependency("kotlinx-coroutines-core")
+    val js = dependency("kotlinx-coroutines-core-js")
 }
 
 object JUnit {
     const val core = "junit:junit:4.12"
 }
 
-object Kimchi {
-    const val group = "com.github.inkapplications.kimchi"
-    const val version = "991aa06d88dd3" // 1.0.2
-
-    const val core = "$group:kimchi:$version"
-    const val logger = "$group:logger:$version"
+object Kimchi: DependencyGroup(
+    group = "com.github.inkapplications.kimchi",
+    version = "991aa06d88dd3"
+) {
+    val core = dependency("kimchi")
+    val logger = dependency("logger")
 }
 
-object Ktor {
-    const val client = "io.ktor:ktor-client-core:1.4.1"
-    const val clientJson = "io.ktor:ktor-client-json:1.4.1"
-    const val clientSerialization = "io.ktor:ktor-client-serialization:1.4.1"
+object Ktor: DependencyGroup(
+    group = "io.ktor",
+    version = "1.4.1"
+) {
+    val client = dependency("ktor-client-core")
+    val clientJson = dependency("ktor-client-json")
+    val clientSerialization = dependency("ktor-client-serialization")
+    val clientOkHttp = dependency("ktor-client-okhttp")
+    val clientJs = dependency("ktor-client-js")
+    val clientJsonJs = dependency("ktor-client-json-js")
+    val serverNetty = dependency("ktor-server-netty")
+    val websockets = dependency("ktor-websockets")
 }
 
 object KotlinX {

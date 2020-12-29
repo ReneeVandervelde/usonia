@@ -11,6 +11,7 @@ kotlin {
             dependencies {
                 api(project(":kotlin-extensions"))
                 api(project(":core"))
+                api(project(":server"))
                 implementation(project(":foundation"))
                 api(Coroutines.core)
                 implementation(Ktor.client)

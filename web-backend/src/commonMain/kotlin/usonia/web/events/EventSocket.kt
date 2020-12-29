@@ -7,9 +7,9 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.collect
 import kotlinx.serialization.json.Json
-import usonia.core.server.WebSocketController
 import usonia.core.state.EventAccess
 import usonia.foundation.EventSerializer
+import usonia.server.http.WebSocketController
 
 /**
  * Socket that outputs all event data.

@@ -20,16 +20,9 @@ kotlin {
             }
         }
 
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
-            }
-        }
-
         val jvmMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-okhttp:1.4.1")
+                implementation(Ktor.clientOkHttp)
             }
         }
 
@@ -42,8 +35,8 @@ kotlin {
 
         val jsMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-js:1.4.1")
-                implementation("io.ktor:ktor-client-json-js:1.4.1")
+                implementation(Ktor.clientJs)
+                implementation(Ktor.clientJsonJs)
             }
         }
     }

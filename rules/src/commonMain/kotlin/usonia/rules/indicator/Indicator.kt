@@ -6,11 +6,11 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import usonia.core.Daemon
 import usonia.core.state.*
 import usonia.foundation.*
 import usonia.kotlin.neverEnding
 import usonia.kotlin.unit.percent
+import usonia.server.Daemon
 import usonia.weather.Conditions
 import usonia.weather.Forecast
 import usonia.weather.WeatherAccess

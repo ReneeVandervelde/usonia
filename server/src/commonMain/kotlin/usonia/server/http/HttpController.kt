@@ -1,4 +1,4 @@
-package usonia.core.server
+package usonia.server.http
 
 /**
  * Handle an incoming HTTP request.

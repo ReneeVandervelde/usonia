@@ -4,15 +4,15 @@ plugins {
 
 kotlin {
     jvm()
-    js {
-        browser()
-    }
 
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(project(":kotlin-extensions"))
-                api(project(":foundation"))
+                implementation(project(":foundation"))
+                api(KotlinX.dateTime)
+                api(KotlinX.serialization)
+                api(Kimchi.logger)
             }
         }
     }

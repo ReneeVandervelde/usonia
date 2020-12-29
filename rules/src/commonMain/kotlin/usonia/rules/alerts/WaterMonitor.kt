@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
-import usonia.core.Daemon
 import usonia.core.state.*
 import usonia.foundation.Action
 import usonia.foundation.Event
@@ -15,6 +14,7 @@ import usonia.foundation.Identifier
 import usonia.foundation.WaterState.*
 import usonia.kotlin.UnconfinedScope
 import usonia.kotlin.neverEnding
+import usonia.server.Daemon
 
 /**
  * Send out an Alert when water is detected by any water sensor.

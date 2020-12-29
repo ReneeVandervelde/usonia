@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import usonia.core.server.WebSocketController
 import usonia.foundation.LogMessage
+import usonia.server.http.WebSocketController
 
 object LogSocket: WebSocketController, LogWriter {
     override val path: String = "/logs"

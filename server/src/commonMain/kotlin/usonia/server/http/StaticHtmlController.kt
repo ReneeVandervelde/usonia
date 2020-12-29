@@ -1,4 +1,4 @@
-package usonia.core.server
+package usonia.server.http
 
 import usonia.kotlin.getResourceContents
 import usonia.kotlin.weakLazy

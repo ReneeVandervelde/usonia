@@ -1,4 +1,4 @@
-package usonia.core
+package usonia.server
 
 /**
  * A service that runs forever.

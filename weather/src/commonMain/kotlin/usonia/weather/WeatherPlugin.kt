@@ -2,9 +2,9 @@ package usonia.weather
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import usonia.core.ServerPlugin
-import usonia.core.cron.CronJob
 import usonia.core.state.ConfigurationAccess
+import usonia.server.ServerPlugin
+import usonia.server.cron.CronJob
 import usonia.weather.accuweather.AccuweatherAccess
 import usonia.weather.accuweather.AccuweatherApiClient
 

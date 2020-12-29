@@ -2,14 +2,14 @@ package usonia.web.events
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import usonia.core.server.HttpController
-import usonia.core.server.HttpRequest
-import usonia.core.server.HttpResponse
 import usonia.core.state.EventAccess
 import usonia.foundation.Event
 import usonia.foundation.EventSerializer
 import usonia.foundation.Identifier
 import usonia.foundation.Statuses
+import usonia.server.http.HttpController
+import usonia.server.http.HttpRequest
+import usonia.server.http.HttpResponse
 
 class LatestEventController(
     private val eventAccess: EventAccess,

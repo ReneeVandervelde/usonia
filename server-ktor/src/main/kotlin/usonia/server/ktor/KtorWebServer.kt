@@ -13,13 +13,12 @@ import io.ktor.util.*
 import io.ktor.websocket.*
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
-import usonia.core.AppConfig
-import usonia.core.server.HttpRequest
-import usonia.core.server.WebServer
+import usonia.server.AppConfig
+import usonia.server.WebServer
+import usonia.server.http.HttpRequest
 import kotlin.coroutines.suspendCoroutine
 import kotlin.time.ExperimentalTime
 

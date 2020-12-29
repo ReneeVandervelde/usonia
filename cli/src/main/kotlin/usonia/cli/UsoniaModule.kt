@@ -27,9 +27,7 @@ object UsoniaModule {
 
     @Provides
     @Singleton
-    fun inMemoryEvents(
-        config: ConfigurationAccess
-    ) = InMemoryEventAccess(config)
+    fun inMemoryEvents() = InMemoryEventAccess()
 
     @Provides
     @Singleton

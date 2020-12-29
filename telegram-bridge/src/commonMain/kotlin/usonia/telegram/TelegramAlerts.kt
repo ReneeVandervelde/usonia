@@ -7,13 +7,13 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
-import usonia.core.Daemon
 import usonia.core.state.ActionAccess
 import usonia.core.state.ConfigurationAccess
 import usonia.foundation.Action
 import usonia.foundation.Site
 import usonia.kotlin.IoScope
 import usonia.kotlin.neverEnding
+import usonia.server.Daemon
 
 private const val BOT_KEY = "bot"
 private const val BOT_TOKEN = "token"

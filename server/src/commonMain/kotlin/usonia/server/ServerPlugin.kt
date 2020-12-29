@@ -1,8 +1,8 @@
-package usonia.core
+package usonia.server
 
-import usonia.core.cron.CronJob
-import usonia.core.server.HttpController
-import usonia.core.server.WebSocketController
+import usonia.server.cron.CronJob
+import usonia.server.http.HttpController
+import usonia.server.http.WebSocketController
 
 /**
  * Main entry-point for modules to add functionality to backend services.

@@ -1,4 +1,4 @@
-package usonia.core.server
+package usonia.server.http
 
 /**
  * Response data sent back to the client from this server.

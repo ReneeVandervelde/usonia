@@ -4,8 +4,8 @@ import dagger.Reusable
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.json.Json
 import usonia.client.HttpClient
-import usonia.core.ServerPlugin
-import usonia.core.Usonia
+import usonia.server.ServerPlugin
+import usonia.server.Usonia
 import usonia.server.ktor.KtorWebServer
 import javax.inject.Inject
 

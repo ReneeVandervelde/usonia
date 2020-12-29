@@ -12,7 +12,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":kotlin-extensions"))
-                api(project(":core"))
                 implementation(project(":foundation"))
                 api(Coroutines.core)
             }
@@ -20,6 +19,8 @@ kotlin {
 
         val jvmMain by getting {
             dependencies {
+                api(project(":core"))
+                api(project(":server"))
                 implementation("com.github.inkapplications.Shade:shade:1.2.0")
             }
         }

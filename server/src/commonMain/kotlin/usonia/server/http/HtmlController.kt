@@ -1,4 +1,4 @@
-package usonia.core.server
+package usonia.server.http
 
 /**
  * Controller that sends back a simple html response.

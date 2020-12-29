@@ -6,11 +6,11 @@ import dagger.Provides
 import dagger.Reusable
 import dagger.multibindings.IntoSet
 import kimchi.logger.KimchiLogger
-import usonia.core.ServerPlugin
 import usonia.core.state.*
 import usonia.hubitat.HubitatPlugin
 import usonia.hue.HueBridgePlugin
 import usonia.rules.RulesPlugin
+import usonia.server.ServerPlugin
 import usonia.todoist.TodoistBridgePlugin
 import usonia.weather.WeatherAccess
 import usonia.weather.WeatherPlugin

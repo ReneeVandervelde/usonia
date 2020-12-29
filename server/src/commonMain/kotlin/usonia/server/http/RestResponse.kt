@@ -1,4 +1,4 @@
-package usonia.core.server
+package usonia.server.http
 
 data class RestResponse<T>(
     val data: T,

@@ -1,4 +1,4 @@
-package usonia.core.timemachine
+package usonia.server.timemachine
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChangedBy

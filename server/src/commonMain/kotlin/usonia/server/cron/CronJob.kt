@@ -1,4 +1,4 @@
-package usonia.core.cron
+package usonia.server.cron
 
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone

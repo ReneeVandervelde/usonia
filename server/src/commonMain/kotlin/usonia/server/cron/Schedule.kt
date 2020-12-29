@@ -1,4 +1,4 @@
-package usonia.core.cron
+package usonia.server.cron
 
 /**
  * Collection of instants that can be filtered down to form a schedule.

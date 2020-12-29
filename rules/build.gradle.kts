@@ -10,6 +10,7 @@ kotlin {
             dependencies {
                 api(project(":kotlin-extensions"))
                 api(project(":core"))
+                api(project(":server"))
                 implementation(project(":foundation"))
                 implementation(project(":weather"))
                 api(Coroutines.core)

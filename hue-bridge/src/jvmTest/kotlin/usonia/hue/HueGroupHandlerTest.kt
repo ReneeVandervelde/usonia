@@ -16,7 +16,6 @@ import usonia.kotlin.unit.percent
 import usonia.kotlin.suspendedFlow
 import usonia.core.state.ActionAccessFake
 import usonia.core.state.ConfigurationAccess
-import usonia.kotlin.UnconfinedScope
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

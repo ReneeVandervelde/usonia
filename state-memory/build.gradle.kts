@@ -14,18 +14,11 @@ kotlin {
             }
         }
 
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
-                implementation(project(":foundation-testing"))
-                implementation(project(":core-testing"))
-                implementation(Coroutines.test)
-            }
-        }
-
         val jvmTest by getting {
             dependencies {
+                implementation(Coroutines.test)
+                implementation(project(":foundation-testing"))
+                implementation(project(":core-testing"))
                 implementation(kotlin("test-junit"))
                 implementation(JUnit.core)
             }

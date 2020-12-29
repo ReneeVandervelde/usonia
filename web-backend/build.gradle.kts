@@ -15,9 +15,6 @@ tasks {
 
 kotlin {
     jvm()
-    js {
-        browser()
-    }
 
     sourceSets {
         val commonMain by getting {
@@ -25,6 +22,7 @@ kotlin {
 
             dependencies {
                 api(project(":core"))
+                api(project(":server"))
                 api(project(":serialization"))
                 dependencies.add("importResources", project(":web-frontend", "dist"))
                 api(Kimchi.logger)
