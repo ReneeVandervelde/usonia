@@ -32,4 +32,12 @@ data class Room(
         Storage,
         Utility,
     }
+
+    operator fun contains(id: Identifier): Boolean {
+        return id in devices.map { it.id }
+    }
+
+    operator fun contains(device: Device): Boolean {
+        return device in devices
+    }
 }

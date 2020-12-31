@@ -3,11 +3,11 @@ package usonia.web.actions
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.json.Json
-import usonia.core.state.ActionPublisher
 import usonia.foundation.Action
 import usonia.foundation.ActionSerializer
 import usonia.foundation.Status
 import usonia.foundation.Statuses
+import usonia.server.client.BackendClient
 import usonia.server.http.HttpRequest
 import usonia.server.http.RestController
 import usonia.server.http.RestResponse
@@ -16,7 +16,7 @@ import usonia.server.http.RestResponse
  * Publishes raw action data.
  */
 internal class ActionHttpPublisher(
-    private val actionPublisher: ActionPublisher,
+    private val client: BackendClient,
     json: Json = Json,
     logger: KimchiLogger = EmptyLogger
 ): RestController<Action, Status>(json, logger) {
@@ -26,7 +26,7 @@ internal class ActionHttpPublisher(
     override val path: String = "/actions"
 
     override suspend fun getResponse(data: Action, request: HttpRequest): RestResponse<Status> {
-        actionPublisher.publishAction(data)
+        client.publishAction(data)
         return RestResponse(Statuses.SUCCESS)
     }
 }

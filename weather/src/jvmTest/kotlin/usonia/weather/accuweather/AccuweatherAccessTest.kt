@@ -13,6 +13,7 @@ import usonia.foundation.FakeBridge
 import usonia.foundation.FakeSite
 import usonia.foundation.Site
 import usonia.kotlin.unit.percent
+import usonia.server.DummyClient
 import usonia.weather.Conditions
 import usonia.weather.Forecast
 import kotlin.test.Test
@@ -55,17 +56,20 @@ class AccuweatherAccessTest {
             return conditions
         }
     }
-
-    private val configured = FakeSite.copy(
-        bridges = setOf(
-            FakeBridge.copy(
-                service = "accuweather",
-                parameters = mapOf(
-                    "token" to "test-token",
-                    "location" to "test-location",
+    private val testClient = DummyClient.copy(
+        configurationAccess = object: ConfigurationAccess {
+            override val site: Flow<Site> = flowOf(FakeSite.copy(
+                bridges = setOf(
+                    FakeBridge.copy(
+                        service = "accuweather",
+                        parameters = mapOf(
+                            "token" to "test-token",
+                            "location" to "test-location",
+                        )
+                    )
                 )
-            )
-        )
+            ))
+        }
     )
 
     private val now = Clock.System.now()
@@ -79,9 +83,12 @@ class AccuweatherAccessTest {
         val config = object: ConfigurationAccess {
             override val site: Flow<Site> = flowOf(FakeSite)
         }
+        val client = testClient.copy(
+            configurationAccess = config,
+        )
         val access = AccuweatherAccess(
             api = fakeApi,
-            config = config,
+            client = client,
         )
 
         val forecasts = mutableListOf<Forecast>()
@@ -104,12 +111,9 @@ class AccuweatherAccessTest {
 
     @Test
     fun startConfig() = runBlockingTest {
-        val config = object: ConfigurationAccess {
-            override val site: Flow<Site> = flowOf(configured)
-        }
         val access = AccuweatherAccess(
             api = fakeApi,
-            config = config,
+            client = testClient,
             clock = stubClock,
         )
 
@@ -142,12 +146,9 @@ class AccuweatherAccessTest {
 
     @Test
     fun updatedConditions() = runBlockingTest {
-        val config = object: ConfigurationAccess {
-            override val site: Flow<Site> = flowOf(configured)
-        }
         val access = AccuweatherAccess(
             api = fakeApi,
-            config = config,
+            client = testClient,
             clock = stubClock,
         )
 
@@ -185,16 +186,13 @@ class AccuweatherAccessTest {
 
     @Test
     fun updateForecast() = runBlockingTest {
-        val config = object: ConfigurationAccess {
-            override val site: Flow<Site> = flowOf(configured)
-        }
         val fakeClock = object: Clock {
             var current = this@AccuweatherAccessTest.now
             override fun now(): Instant = current
         }
         val access = AccuweatherAccess(
             api = fakeApi,
-            config = config,
+            client = testClient,
             clock = fakeClock
         )
 

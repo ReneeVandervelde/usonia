@@ -10,6 +10,7 @@ kotlin {
             dependencies {
                 implementation(project(":kotlin-extensions"))
                 implementation(project(":foundation"))
+                implementation(project(":core"))
                 api(KotlinX.dateTime)
                 api(KotlinX.serialization)
                 api(Kimchi.logger)

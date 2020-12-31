@@ -11,6 +11,7 @@ import usonia.foundation.*
 import usonia.kotlin.neverEnding
 import usonia.kotlin.unit.percent
 import usonia.server.Daemon
+import usonia.server.client.BackendClient
 import usonia.weather.Conditions
 import usonia.weather.Forecast
 import usonia.weather.WeatherAccess
@@ -22,10 +23,8 @@ import kotlin.math.min
  * Updates a light based on weather data.
  */
 internal class Indicator(
+    private val client: BackendClient,
     private val weatherAccess: WeatherAccess,
-    private val configurationAccess: ConfigurationAccess,
-    private val eventAccess: EventAccess,
-    private val actionPublisher: ActionPublisher,
     private val logger: KimchiLogger = EmptyLogger,
 ): Daemon {
     private val hotIndicator = RGB(255, 0 , 0)
@@ -34,7 +33,7 @@ internal class Indicator(
     private val rainColor = RGB(0, 255 , 255)
 
     override suspend fun start(): Nothing = neverEnding {
-        configurationAccess.site.collectLatest { site ->
+        client.site.collectLatest { site ->
             coroutineScope {
                 launch { bindColorUpdates(site) }
                 launch { bindAwayBrightness(site) }
@@ -56,21 +55,21 @@ internal class Indicator(
             .onEach { logger.debug("Mapped Indicator update to ${it.size} device actions") }
             .collect { actions ->
                 actions.forEach {
-                    actionPublisher.publishAction(it)
+                    client.publishAction(it)
                 }
             }
     }
 
     private suspend fun bindAwayBrightness(site: Site) {
-        eventAccess.events
+        client.events
             .filterIsInstance<Event.Presence>()
             .mapLatest {
-                if (eventAccess.allAway(site.users)) 5.percent else 100.percent
+                if (client.allAway(site.users)) 5.percent else 100.percent
             }
             .collectLatest { level ->
                 site.findDevicesBy { it.fixture == Fixture.Indicator }
                     .map { Action.Dim(it.id, level) }
-                    .forEach { actionPublisher.publishAction(it) }
+                    .forEach { client.publishAction(it) }
             }
     }
 

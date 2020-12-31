@@ -15,18 +15,21 @@ interface ConfigurationAccess {
 }
 
 /**
- * Get the latest data available for a device with a given [id].
- */
-suspend fun ConfigurationAccess.getDeviceById(id: Identifier): Device? {
-    return site.first()
-        .rooms
-        .flatMap { it.devices }
-        .find { it.id == id }
-}
-
-/**
  * Get the latest data available for the configured site.
  */
-suspend fun ConfigurationAccess.getSite(): Site {
-    return site.first()
-}
+suspend fun ConfigurationAccess.getSite(): Site = site.first()
+
+/**
+ * @see [Site.findDevice]
+ */
+suspend fun ConfigurationAccess.findDevice(id: Identifier): Device? = site.first().findDevice(id)
+
+/**
+ * @see [Site.findDevicesBy]
+ */
+suspend fun ConfigurationAccess.findDevicesBy(predicate: (Device) -> Boolean) = getSite().findDevicesBy(predicate)
+
+/**
+ * @see [Site.findBridgeByServiceTag]
+ */
+suspend fun ConfigurationAccess.findBridgeByServiceTag(service: String): Bridge? = getSite().findBridgeByServiceTag(service)

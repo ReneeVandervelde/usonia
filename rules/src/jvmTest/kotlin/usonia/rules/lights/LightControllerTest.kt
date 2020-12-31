@@ -14,6 +14,7 @@ import usonia.core.state.EventAccessFake
 import usonia.foundation.*
 import usonia.foundation.unit.ColorTemperature
 import usonia.kotlin.unit.percent
+import usonia.server.DummyClient
 import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -21,29 +22,40 @@ import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 import kotlin.time.minutes
 
+@OptIn(ExperimentalTime::class)
 class LightControllerTest {
+    val testSite = FakeSite.copy(
+        rooms = setOf(FakeRooms.LivingRoom.copy(
+            devices = setOf(
+                FakeDevices.Motion,
+                FakeDevices.HueGroup,
+            )
+        ))
+    )
+    val configurationAccess = object: ConfigurationAccess {
+        override val site: Flow<Site> = flowOf(testSite)
+    }
+    val testClient = DummyClient.copy(
+        configurationAccess = configurationAccess,
+    )
+
+    private val colorPicker = object: ColorPicker {
+        override suspend fun getRoomColor(room: Room) = LightSettings(
+            temperature = ColorTemperature(420),
+            brightness = 75.percent,
+        )
+    }
+
     @Test
     fun lightsOn() = runBlockingTest {
-        val configurationAccess = object: ConfigurationAccess {
-            override val site: Flow<Site> = flowOf(FakeSite.copy(
-                rooms = setOf(FakeRooms.LivingRoom.copy(
-                    devices = setOf(
-                        FakeDevices.Motion,
-                        FakeDevices.HueGroup,
-                    )
-                ))
-            ))
-        }
-        val colorPicker = object: ColorPicker {
-            override suspend fun getRoomColor(room: Room) = LightSettings(
-                temperature = ColorTemperature(420),
-                brightness = 75.percent,
-            )
-        }
         val eventAccess = EventAccessFake()
         val actionPublisher = ActionPublisherSpy()
+        val client = testClient.copy(
+            eventAccess = eventAccess,
+            actionPublisher = actionPublisher,
+        )
 
-        val controller = LightController(configurationAccess, eventAccess, actionPublisher, colorPicker, coroutineContext = coroutineContext)
+        val controller = LightController(client, colorPicker, backgroundScope = this)
         val daemonJob = launch { controller.start() }
 
         pauseDispatcher {
@@ -62,29 +74,16 @@ class LightControllerTest {
         daemonJob.cancelAndJoin()
     }
 
-    @OptIn(ExperimentalTime::class)
     @Test
     fun lightsOff() = runBlockingTest {
-        val configurationAccess = object: ConfigurationAccess {
-            override val site: Flow<Site> = flowOf(FakeSite.copy(
-                rooms = setOf(FakeRooms.LivingRoom.copy(
-                    devices = setOf(
-                        FakeDevices.Motion,
-                        FakeDevices.HueGroup,
-                    )
-                ))
-            ))
-        }
-        val colorPicker = object: ColorPicker {
-            override suspend fun getRoomColor(room: Room) = LightSettings(
-                temperature = ColorTemperature(420),
-                brightness = 75.percent,
-            )
-        }
         val eventAccess = EventAccessFake()
         val actionPublisher = ActionPublisherSpy()
+        val client = testClient.copy(
+            eventAccess = eventAccess,
+            actionPublisher = actionPublisher,
+        )
 
-        val controller = LightController(configurationAccess, eventAccess, actionPublisher, colorPicker, coroutineContext = coroutineContext)
+        val controller = LightController(client, colorPicker, backgroundScope = this)
         val daemonJob = launch { controller.start() }
 
         pauseDispatcher {
@@ -107,26 +106,14 @@ class LightControllerTest {
 
     @Test
     fun cancelled() = runBlockingTest {
-        val configurationAccess = object: ConfigurationAccess {
-            override val site: Flow<Site> = flowOf(FakeSite.copy(
-                rooms = setOf(FakeRooms.LivingRoom.copy(
-                    devices = setOf(
-                        FakeDevices.Motion,
-                        FakeDevices.HueGroup,
-                    )
-                ))
-            ))
-        }
-        val colorPicker = object: ColorPicker {
-            override suspend fun getRoomColor(room: Room) = LightSettings(
-                temperature = ColorTemperature(420),
-                brightness = 75.percent,
-            )
-        }
         val eventAccess = EventAccessFake()
         val actionPublisher = ActionPublisherSpy()
+        val client = testClient.copy(
+            eventAccess = eventAccess,
+            actionPublisher = actionPublisher,
+        )
 
-        val controller = LightController(configurationAccess, eventAccess, actionPublisher, colorPicker, coroutineContext = coroutineContext)
+        val controller = LightController(client, colorPicker, backgroundScope = this)
         val daemonJob = launch { controller.start() }
 
         eventAccess.events.emit(Event.Motion(
@@ -153,21 +140,9 @@ class LightControllerTest {
     @Test
     fun away() = runBlockingTest {
         val configurationAccess = object: ConfigurationAccess {
-            override val site: Flow<Site> = flowOf(FakeSite.copy(
-                rooms = setOf(FakeRooms.LivingRoom.copy(
-                    devices = setOf(
-                        FakeDevices.Motion,
-                        FakeDevices.HueGroup,
-                    )
-                )),
+            override val site: Flow<Site> = flowOf(testSite.copy(
                 users = setOf(FakeUsers.John)
             ))
-        }
-        val colorPicker = object: ColorPicker {
-            override suspend fun getRoomColor(room: Room) = LightSettings(
-                temperature = ColorTemperature(420),
-                brightness = 75.percent,
-            )
         }
         val eventAccess = object: EventAccess {
             override val events = MutableSharedFlow<Event>()
@@ -177,8 +152,13 @@ class LightControllerTest {
             }
         }
         val actionPublisher = ActionPublisherSpy()
+        val client = testClient.copy(
+            eventAccess = eventAccess,
+            actionPublisher = actionPublisher,
+            configurationAccess = configurationAccess,
+        )
 
-        val controller = LightController(configurationAccess, eventAccess, actionPublisher, colorPicker, coroutineContext = coroutineContext)
+        val controller = LightController(client, colorPicker, backgroundScope = this)
         val daemonJob = launch { controller.start() }
 
         pauseDispatcher {

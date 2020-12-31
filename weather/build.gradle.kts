@@ -25,6 +25,7 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation(project(":core-testing"))
+                implementation(project(":server-testing"))
                 implementation(kotlin("test-junit"))
                 implementation(Coroutines.test)
             }

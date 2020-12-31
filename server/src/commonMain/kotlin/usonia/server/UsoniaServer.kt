@@ -13,7 +13,7 @@ import usonia.server.timemachine.minutes
 /**
  * The "backend" part of the application that starts up long running services.
  */
-class Usonia(
+class UsoniaServer(
     override val plugins: Set<ServerPlugin>,
     private val server: WebServer,
     private val logger: KimchiLogger = EmptyLogger,
@@ -38,7 +38,7 @@ class Usonia(
 
     private suspend fun startServer(): Job {
         logger.info("Starting WebServer")
-        return daemonScope.launch { server.serve(this@Usonia) }
+        return daemonScope.launch { server.serve(this@UsoniaServer) }
     }
 
     private suspend fun startDaemons(): List<Job> {

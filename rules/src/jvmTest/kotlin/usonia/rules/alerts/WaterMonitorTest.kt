@@ -9,6 +9,7 @@ import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessFake
+import usonia.server.DummyClient
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -24,11 +25,19 @@ class WaterMonitorTest {
         ))
     }
 
+    private val testClient = DummyClient.copy(
+        configurationAccess = standardConfig,
+    )
+
     @Test
     fun sendAlert() = runBlockingTest {
         val events = EventAccessFake()
         val actionPublisherSpy = ActionPublisherSpy()
-        val monitor = WaterMonitor(standardConfig, events, actionPublisherSpy)
+        val client = testClient.copy(
+            eventAccess = events,
+            actionPublisher = actionPublisherSpy,
+        )
+        val monitor = WaterMonitor(client, backgroundScope = this)
 
         val monitorJob = launch { monitor.start() }
 
@@ -46,7 +55,11 @@ class WaterMonitorTest {
     fun noDuplicateEvents() = runBlockingTest {
         val events = EventAccessFake()
         val actionPublisherSpy = ActionPublisherSpy()
-        val monitor = WaterMonitor(standardConfig, events, actionPublisherSpy)
+        val client = testClient.copy(
+            eventAccess = events,
+            actionPublisher = actionPublisherSpy,
+        )
+        val monitor = WaterMonitor(client, backgroundScope = this)
 
         val monitorJob = launch { monitor.start() }
 
@@ -64,7 +77,11 @@ class WaterMonitorTest {
     fun resetAfterDry() = runBlockingTest {
         val events = EventAccessFake()
         val actionPublisherSpy = ActionPublisherSpy()
-        val monitor = WaterMonitor(standardConfig, events, actionPublisherSpy)
+        val client = testClient.copy(
+            eventAccess = events,
+            actionPublisher = actionPublisherSpy,
+        )
+        val monitor = WaterMonitor(client, backgroundScope = this)
 
         val monitorJob = launch { monitor.start() }
 
@@ -82,7 +99,11 @@ class WaterMonitorTest {
     fun loneDryEvent() = runBlockingTest {
         val events = EventAccessFake()
         val actionPublisherSpy = ActionPublisherSpy()
-        val monitor = WaterMonitor(standardConfig, events, actionPublisherSpy)
+        val client = testClient.copy(
+            eventAccess = events,
+            actionPublisher = actionPublisherSpy,
+        )
+        val monitor = WaterMonitor(client, backgroundScope = this)
 
         val monitorJob = launch { monitor.start() }
 
@@ -98,7 +119,11 @@ class WaterMonitorTest {
     fun unrelatedEvent() = runBlockingTest {
         val events = EventAccessFake()
         val actionPublisherSpy = ActionPublisherSpy()
-        val monitor = WaterMonitor(standardConfig, events, actionPublisherSpy)
+        val client = testClient.copy(
+            eventAccess = events,
+            actionPublisher = actionPublisherSpy,
+        )
+        val monitor = WaterMonitor(client, backgroundScope = this)
 
         val monitorJob = launch { monitor.start() }
 

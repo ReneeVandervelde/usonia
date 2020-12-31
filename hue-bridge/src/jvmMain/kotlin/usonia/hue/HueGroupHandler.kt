@@ -10,29 +10,27 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import usonia.core.state.ActionAccess
-import usonia.core.state.ConfigurationAccess
 import usonia.foundation.*
 import usonia.kotlin.IoScope
 import usonia.kotlin.neverEnding
 import usonia.server.Daemon
+import usonia.server.client.BackendClient
 
 /**
  * Handles actions sent to Hue Group devices.
  */
 internal class HueGroupHandler(
-    private val actionAccess: ActionAccess,
-    private val configurationAccess: ConfigurationAccess,
+    private val client: BackendClient,
     private val shade: ShadeGroups,
     private val logger: KimchiLogger = EmptyLogger,
     private val requestScope: CoroutineScope = IoScope()
 ): Daemon {
     override suspend fun start() = neverEnding {
-        configurationAccess.site.collectLatest { site -> onSiteUpdate(site) }
+        client.site.collectLatest { site -> onSiteUpdate(site) }
     }
 
     private suspend fun onSiteUpdate(site: Site) {
-        actionAccess.actions
+        client.actions
             .filter { it is Action.Switch || it is Action.Dim || it is Action.ColorTemperatureChange || it is Action.ColorChange }
             .collect { action ->
                 handleAction(site, action)

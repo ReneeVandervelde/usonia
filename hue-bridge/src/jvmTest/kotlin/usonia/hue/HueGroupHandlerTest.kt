@@ -16,6 +16,7 @@ import usonia.kotlin.unit.percent
 import usonia.kotlin.suspendedFlow
 import usonia.core.state.ActionAccessFake
 import usonia.core.state.ConfigurationAccess
+import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -48,8 +49,12 @@ class HueGroupHandlerTest {
                 )
             )
         }
+        val client = DummyClient.copy(
+            actionAccess = actionAccess,
+            configurationAccess = configurationAccess,
+        )
 
-        val handler = HueGroupHandler(actionAccess, configurationAccess, shadeSpy, requestScope = this)
+        val handler = HueGroupHandler(client, shadeSpy, requestScope = this)
 
         val handlerJob = launch { handler.start() }
 
@@ -81,8 +86,12 @@ class HueGroupHandlerTest {
                 )
             )
         }
+        val client = DummyClient.copy(
+            actionAccess = actionAccess,
+            configurationAccess = configurationAccess,
+        )
 
-        val handler = HueGroupHandler(actionAccess, configurationAccess, shadeSpy, requestScope = this)
+        val handler = HueGroupHandler(client, shadeSpy, requestScope = this)
 
         val handlerJob = launch { handler.start() }
 
@@ -114,8 +123,12 @@ class HueGroupHandlerTest {
                 )
             )
         }
+        val client = DummyClient.copy(
+            actionAccess = actionAccess,
+            configurationAccess = configurationAccess,
+        )
 
-        val handler = HueGroupHandler(actionAccess, configurationAccess, shadeSpy, requestScope = this)
+        val handler = HueGroupHandler(client, shadeSpy, requestScope = this)
 
         val handlerJob = launch { handler.start() }
 
@@ -170,8 +183,12 @@ class HueGroupHandlerTest {
                 )
             )
         }
+        val client = DummyClient.copy(
+            actionAccess = actionAccess,
+            configurationAccess = configurationAccess,
+        )
 
-        val handler = HueGroupHandler(actionAccess, configurationAccess, shadeSpy, requestScope = this)
+        val handler = HueGroupHandler(client, shadeSpy, requestScope = this)
 
         val handlerJob = launch { handler.start() }
 

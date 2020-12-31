@@ -5,12 +5,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
 /**
- * Scope with an unconfined context.
- *
- * This allows new coroutines to be launched on the current thread without
- * blocking the current method.
+ * Scope with a default dispatcher.
  */
-fun UnconfinedScope() = CoroutineScope(Dispatchers.Unconfined + SupervisorJob())
+fun DefaultScope() = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
 /**
  * Scope with an IO Dispatcher if the platform supports it.

@@ -3,9 +3,10 @@ package usonia.cli
 import dagger.Reusable
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.json.Json
+import usonia.client.FrontendClient
 import usonia.client.HttpClient
 import usonia.server.ServerPlugin
-import usonia.server.Usonia
+import usonia.server.UsoniaServer
 import usonia.server.ktor.KtorWebServer
 import javax.inject.Inject
 
@@ -18,10 +19,10 @@ class UsoniaFactory @Inject constructor(
 ) {
     fun createServer(
         port: Int
-    ): Usonia {
+    ): UsoniaServer {
         val server = KtorWebServer(port, logger)
 
-        return Usonia(
+        return UsoniaServer(
             plugins = plugins,
             server = server,
             logger = logger,
@@ -31,7 +32,7 @@ class UsoniaFactory @Inject constructor(
     fun createClient(
         host: String,
         port: Int,
-    ) = HttpClient(
+    ): FrontendClient = HttpClient(
         host = host,
         port = port,
         json = json,

@@ -13,6 +13,7 @@ import usonia.core.state.*
 import usonia.foundation.*
 import usonia.kotlin.suspendedFlow
 import usonia.kotlin.unit.percent
+import usonia.server.DummyClient
 import usonia.weather.Conditions
 import usonia.weather.Forecast
 import usonia.weather.WeatherAccess
@@ -36,6 +37,11 @@ class IndicatorTest {
         ))
     }
 
+    val testClient = DummyClient.copy(
+        configurationAccess = fakeConfig,
+        eventAccess = EventAccessStub,
+    )
+
     val fakeForecast = Forecast(
         Clock.System.now(),
         sunrise = Instant.DISTANT_FUTURE,
@@ -58,8 +64,11 @@ class IndicatorTest {
     @Test
     fun initialCold() = runBlockingTest {
         val spyPublisher = ActionPublisherSpy()
+        val client = testClient.copy(
+            actionPublisher = spyPublisher,
+        )
 
-        val indicator = Indicator(fakeWeather, fakeConfig, EventAccessStub, spyPublisher)
+        val indicator = Indicator(client, fakeWeather)
 
         val indicatorJob = launch { indicator.start() }
 
@@ -77,13 +86,16 @@ class IndicatorTest {
     @Test
     fun hot() = runBlockingTest {
         val spyPublisher = ActionPublisherSpy()
+        val client = testClient.copy(
+            actionPublisher = spyPublisher,
+        )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
             override val conditions: Flow<Conditions> = suspendedFlow(fakeConditions.copy(
                 temperature = 100,
             ))
         }
 
-        val indicator = Indicator(fakeWeather, fakeConfig, EventAccessStub, spyPublisher)
+        val indicator = Indicator(client, fakeWeather)
 
         val indicatorJob = launch { indicator.start() }
 
@@ -101,13 +113,16 @@ class IndicatorTest {
     @Test
     fun snow() = runBlockingTest {
         val spyPublisher = ActionPublisherSpy()
+        val client = testClient.copy(
+            actionPublisher = spyPublisher,
+        )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
             override val forecast: Flow<Forecast> = suspendedFlow(fakeForecast.copy(
                 snowChance = 25.percent
             ))
         }
 
-        val indicator = Indicator(fakeWeather, fakeConfig, EventAccessStub, spyPublisher)
+        val indicator = Indicator(client, fakeWeather)
 
         val indicatorJob = launch { indicator.start() }
 
@@ -125,13 +140,16 @@ class IndicatorTest {
     @Test
     fun rain() = runBlockingTest {
         val spyPublisher = ActionPublisherSpy()
+        val client = testClient.copy(
+            actionPublisher = spyPublisher,
+        )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
             override val forecast: Flow<Forecast> = suspendedFlow(fakeForecast.copy(
                 rainChance = 25.percent
             ))
         }
 
-        val indicator = Indicator(fakeWeather, fakeConfig, EventAccessStub, spyPublisher)
+        val indicator = Indicator(client, fakeWeather)
 
         val indicatorJob = launch { indicator.start() }
 
@@ -149,6 +167,9 @@ class IndicatorTest {
     @Test
     fun rainAndSnow() = runBlockingTest {
         val spyPublisher = ActionPublisherSpy()
+        val client = testClient.copy(
+            actionPublisher = spyPublisher,
+        )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
             override val forecast: Flow<Forecast> = suspendedFlow(fakeForecast.copy(
                 rainChance = 25.percent,
@@ -156,7 +177,7 @@ class IndicatorTest {
             ))
         }
 
-        val indicator = Indicator(fakeWeather, fakeConfig, EventAccessStub, spyPublisher)
+        val indicator = Indicator(client, fakeWeather)
 
         val indicatorJob = launch { indicator.start() }
 
@@ -186,12 +207,16 @@ class IndicatorTest {
                 else -> TODO()
             }
         }
+        val client = testClient.copy(
+            actionPublisher = spyPublisher,
+            eventAccess = eventAccess,
+        )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
             override val forecast: Flow<Forecast> = flow {}
             override val conditions: Flow<Conditions> = flow {}
         }
 
-        val indicator = Indicator(fakeWeather, fakeConfig, eventAccess, spyPublisher)
+        val indicator = Indicator(client, fakeWeather)
 
         val indicatorJob = launch { indicator.start() }
         eventAccess.events.emit(presence)
@@ -221,12 +246,16 @@ class IndicatorTest {
                 else -> TODO()
             }
         }
+        val client = testClient.copy(
+            actionPublisher = spyPublisher,
+            eventAccess = eventAccess,
+        )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
             override val forecast: Flow<Forecast> = flow {}
             override val conditions: Flow<Conditions> = flow {}
         }
 
-        val indicator = Indicator(fakeWeather, fakeConfig, eventAccess, spyPublisher)
+        val indicator = Indicator(client, fakeWeather)
 
         val indicatorJob = launch { indicator.start() }
         eventAccess.events.emit(presence)

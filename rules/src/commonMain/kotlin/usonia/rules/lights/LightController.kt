@@ -5,15 +5,14 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.selects.select
-import usonia.core.state.ActionPublisher
-import usonia.core.state.ConfigurationAccess
-import usonia.core.state.EventAccess
 import usonia.core.state.allAway
+import usonia.core.state.publishAll
 import usonia.foundation.*
 import usonia.foundation.Room.Type.*
+import usonia.kotlin.DefaultScope
 import usonia.kotlin.neverEnding
 import usonia.server.Daemon
-import kotlin.coroutines.CoroutineContext
+import usonia.server.client.BackendClient
 import kotlin.time.ExperimentalTime
 import kotlin.time.minutes
 import kotlin.time.seconds
@@ -23,29 +22,27 @@ import kotlin.time.seconds
  */
 @OptIn(ExperimentalTime::class)
 internal class LightController(
-    private val configurationAccess: ConfigurationAccess,
-    private val eventAccess: EventAccess,
-    private val actionPublisher: ActionPublisher,
+    private val client: BackendClient,
     private val colorPicker: ColorPicker,
     private val logger: KimchiLogger = EmptyLogger,
-    override val coroutineContext: CoroutineContext = Dispatchers.Default + SupervisorJob(),
-): Daemon, CoroutineScope {
+    private val backgroundScope: CoroutineScope = DefaultScope(),
+): Daemon {
 
     override suspend fun start(): Nothing = neverEnding {
-        configurationAccess.site.collectLatest { site ->
-            eventAccess.events.filterIsInstance<Event.Motion>().collect { event ->
-                launch { onMotionEvent(event, site) }
+        client.site.collectLatest { site ->
+            client.events.filterIsInstance<Event.Motion>().collect { event ->
+                backgroundScope.launch { onMotionEvent(event, site) }
             }
         }
     }
 
     private suspend fun onMotionEvent(event: Event.Motion, site: Site) {
-        if (eventAccess.allAway(site.users)) {
+        if (client.allAway(site.users)) {
             logger.info("All ${site.users.size} users are away. Ignoring Motion Event.")
             return
         }
 
-        val room = site.findRoomWithDevice(event.source)
+        val room = site.getRoom(event.source)
         when (event.state) {
             MotionState.MOTION -> onRoomMotion(room)
             MotionState.IDLE -> onRoomIdle(room)
@@ -67,17 +64,15 @@ internal class LightController(
     }
 
     private suspend fun onRoomIdle(room: Room) {
-        val cancellation = launch {
-            eventAccess.events
+        val cancellation = backgroundScope.launch {
+            client.events
                 .filterIsInstance<Event.Motion>()
                 .filter { it.state == MotionState.MOTION }
-                .filter { event ->
-                    room.devices.any { it.id == event.source }
-                }
+                .filter { it.source in room }
                 .first()
             logger.trace("Cancelling idle timer for ${room.name}")
         }
-        val action = async {
+        val action = backgroundScope.async {
             logger.trace("Starting ${room.idleTime} idle timer for ${room.name}")
             delay(room.idleTime).let { room }
         }
@@ -102,7 +97,7 @@ internal class LightController(
                 )
             }
 
-        actions.forEach { actionPublisher.publishAction(it) }
+        client.publishAll(actions)
     }
 
     private suspend fun onRoomMotion(room: Room) {
@@ -139,9 +134,7 @@ internal class LightController(
                 )
             }
 
-        (colorTemperatureDevices + dimmingDevices + switchDevices).forEach {
-            actionPublisher.publishAction(it)
-        }
+        client.publishAll(colorTemperatureDevices + dimmingDevices + switchDevices)
     }
 }
 

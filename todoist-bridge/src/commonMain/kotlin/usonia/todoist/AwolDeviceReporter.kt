@@ -6,12 +6,11 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import usonia.core.state.ConfigurationAccess
-import usonia.core.state.EventAccess
-import usonia.core.state.getSite
+import usonia.core.state.*
 import usonia.foundation.Device
 import usonia.foundation.Event
 import usonia.foundation.Identifier
+import usonia.server.client.BackendClient
 import usonia.server.cron.CronJob
 import usonia.server.cron.Schedule
 import usonia.todoist.api.Task
@@ -23,8 +22,7 @@ private const val TODOIST_SERVICE = "todoist"
 
 @OptIn(ExperimentalTime::class)
 internal class AwolDeviceReporter(
-    private val config: ConfigurationAccess,
-    private val events: EventAccess,
+    private val client: BackendClient,
     private val api: TodoistApi,
     private val logger: KimchiLogger = EmptyLogger,
 ): CronJob {
@@ -47,7 +45,7 @@ internal class AwolDeviceReporter(
     ): Event? {
         val threshold = device.capabilities.heartbeat ?: return null
         val events = device.capabilities.events.map { type ->
-            events.getState(device.id, type).also {
+            client.getState(device.id, type).also {
                 val timestamp = it?.timestamp
 
                 if (timestamp != null && timestamp > time - threshold) {
@@ -60,9 +58,7 @@ internal class AwolDeviceReporter(
     }
 
     override suspend fun run(time: LocalDateTime, timeZone: TimeZone) {
-        val bridge = config.getSite().bridges.singleOrNull {
-            it.service == TODOIST_SERVICE
-        } ?: run {
+        val bridge = client.findBridgeByServiceTag(TODOIST_SERVICE) ?: run {
             logger.warn("Todoist not configured. Configure a bridge for the service `$TODOIST_SERVICE`")
             return
         }
@@ -74,10 +70,7 @@ internal class AwolDeviceReporter(
         val label = bridge.parameters["label"]?.toLong()
         val timeInstant = time.toInstant(timeZone)
 
-        val devices = config.getSite()
-            .rooms
-            .flatMap { it.devices }
-            .filter { it.capabilities.heartbeat != null }
+        val devices = client.findDevicesBy { it.capabilities.heartbeat != null }
             .also { logger.debug("Checking ${it.size} device heartbeats") }
 
         val deviceHeartbeats = devices.map { device ->

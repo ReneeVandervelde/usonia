@@ -3,11 +3,11 @@ package usonia.web.events
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.json.Json
-import usonia.core.state.EventPublisher
 import usonia.foundation.Event
 import usonia.foundation.EventSerializer
 import usonia.foundation.Status
 import usonia.foundation.Statuses
+import usonia.server.client.BackendClient
 import usonia.server.http.HttpRequest
 import usonia.server.http.RestController
 import usonia.server.http.RestResponse
@@ -16,7 +16,7 @@ import usonia.server.http.RestResponse
  * Publishes raw event data.
  */
 internal class EventHttpPublisher(
-    private val eventPublisher: EventPublisher,
+    private val client: BackendClient,
     json: Json = Json,
     logger: KimchiLogger = EmptyLogger
 ): RestController<Event, Status>(json, logger) {
@@ -26,7 +26,7 @@ internal class EventHttpPublisher(
     override val serializer = Status.serializer()
 
     override suspend fun getResponse(data: Event, request: HttpRequest): RestResponse<Status> {
-        eventPublisher.publishEvent(data)
+        client.publishEvent(data)
         return RestResponse(Statuses.SUCCESS)
     }
 }

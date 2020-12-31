@@ -10,6 +10,7 @@ import usonia.core.state.EventAccess
 import usonia.core.state.EventAccessStub
 import usonia.foundation.*
 import usonia.kotlin.suspendedFlow
+import usonia.server.DummyClient
 import usonia.todoist.api.Task
 import usonia.todoist.api.TaskParameters
 import usonia.todoist.api.TodoistApi
@@ -44,6 +45,9 @@ class AwolDeviceReporterTest {
             )
         ))
     }
+    val testClient = DummyClient.copy(
+        configurationAccess = config,
+    )
     val zone = TimeZone.UTC
     val now = Clock.System.now()
     val time = now.toLocalDateTime(zone)
@@ -64,8 +68,11 @@ class AwolDeviceReporterTest {
                 return emptyList()
             }
         }
+        val client = testClient.copy(
+            eventAccess = events,
+        )
 
-        AwolDeviceReporter(config, events, api).run(time, zone)
+        AwolDeviceReporter(client, api).run(time, zone)
 
         assertEquals("test-token", api.tokenUsed)
         assertEquals(666, api.projectUsed)
@@ -90,8 +97,11 @@ class AwolDeviceReporterTest {
                 return ApiStub.create(token, task)
             }
         }
+        val client = testClient.copy(
+            eventAccess = events,
+        )
 
-        AwolDeviceReporter(config, events, api).run(time, zone)
+        AwolDeviceReporter(client, api).run(time, zone)
 
         assertEquals(0, api.created.size)
     }
@@ -114,8 +124,11 @@ class AwolDeviceReporterTest {
                 return ApiStub.create(token, task)
             }
         }
+        val client = testClient.copy(
+            eventAccess = events,
+        )
 
-        AwolDeviceReporter(config, events, api).run(time, zone)
+        AwolDeviceReporter(client, api).run(time, zone)
 
         assertEquals(1, api.created.size)
         val parameters = api.created.single()
@@ -134,8 +147,11 @@ class AwolDeviceReporterTest {
                 return ApiStub.create(token, task)
             }
         }
+        val client = testClient.copy(
+            eventAccess = events,
+        )
 
-        AwolDeviceReporter(config, events, api).run(time, zone)
+        AwolDeviceReporter(client, api).run(time, zone)
 
         assertEquals(0, api.created.size)
     }
@@ -165,8 +181,11 @@ class AwolDeviceReporterTest {
                 closed += taskId
             }
         }
+        val client = testClient.copy(
+            eventAccess = events,
+        )
 
-        AwolDeviceReporter(config, events, api).run(time, zone)
+        AwolDeviceReporter(client, api).run(time, zone)
 
         assertEquals(1, api.closed.size)
         assertEquals(432, api.closed.single())
@@ -197,8 +216,11 @@ class AwolDeviceReporterTest {
                 closed += taskId
             }
         }
+        val client = testClient.copy(
+            eventAccess = events,
+        )
 
-        AwolDeviceReporter(config, events, api).run(time, zone)
+        AwolDeviceReporter(client, api).run(time, zone)
 
         assertEquals(0, api.closed.size)
     }
@@ -220,8 +242,11 @@ class AwolDeviceReporterTest {
                 closed += taskId
             }
         }
+        val client = testClient.copy(
+            eventAccess = events,
+        )
 
-        AwolDeviceReporter(config, events, api).run(time, zone)
+        AwolDeviceReporter(client, api).run(time, zone)
 
         assertEquals(0, api.closed.size)
     }
@@ -251,8 +276,11 @@ class AwolDeviceReporterTest {
                 closed += taskId
             }
         }
+        val client = testClient.copy(
+            eventAccess = events,
+        )
 
-        AwolDeviceReporter(config, events, api).run(time, zone)
+        AwolDeviceReporter(client, api).run(time, zone)
 
         assertEquals(0, api.closed.size)
     }

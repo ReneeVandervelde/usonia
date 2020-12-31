@@ -18,12 +18,12 @@ import usonia.foundation.Identifier
 import usonia.foundation.PresenceState
 import usonia.frontend.ViewController
 import usonia.js.addElementClickListener
-import usonia.kotlin.UnconfinedScope
+import usonia.kotlin.DefaultScope
 
 class UserListController(
     private val client: HttpClient,
     private val logger: KimchiLogger = EmptyLogger,
-): ViewController, CoroutineScope by UnconfinedScope() {
+): ViewController, CoroutineScope by DefaultScope() {
     private val template by lazy { document.getElementById("user-template")!!.innerHTML }
     private val container by lazy { document.getElementById("users")!! }
 

@@ -12,26 +12,26 @@ import usonia.foundation.Event
 import usonia.foundation.User
 import usonia.foundation.Identifier
 import usonia.foundation.WaterState.*
-import usonia.kotlin.UnconfinedScope
+import usonia.kotlin.DefaultScope
 import usonia.kotlin.neverEnding
 import usonia.server.Daemon
+import usonia.server.client.BackendClient
 
 /**
  * Send out an Alert when water is detected by any water sensor.
  */
 internal class WaterMonitor(
-    private val configurationAccess: ConfigurationAccess,
-    private val eventAccess: EventAccess,
-    private val actionPublisher: ActionPublisher,
+    private val client: BackendClient,
     private val logger: KimchiLogger = EmptyLogger,
-): Daemon, CoroutineScope by UnconfinedScope() {
+    private val backgroundScope: CoroutineScope = DefaultScope(),
+): Daemon {
     private val alerted = mutableSetOf<Identifier>()
 
     override suspend fun start() = neverEnding {
-        eventAccess.events
+        client.events
             .filterIsInstance<Event.Water>()
             .collect {
-                launch {
+                backgroundScope.launch {
                     when (it.state) {
                         WET -> onWet(it)
                         DRY -> onDry(it)
@@ -55,7 +55,7 @@ internal class WaterMonitor(
             return
         }
         alerted.add(event.source)
-        val device = configurationAccess.getDeviceById(event.source) ?: run {
+        val device = client.findDevice(event.source) ?: run {
             logger.error("Unable to find device with ID: <${event.source}>")
             sendAlerts("<Device: ${event.source}>")
             return
@@ -64,13 +64,13 @@ internal class WaterMonitor(
     }
 
     private suspend fun sendAlerts(deviceName: String) {
-        configurationAccess.getSite().users
+        client.getSite().users
             .also { logger.trace("Sending Water alerts to: [${it.joinToString { it.name }}]") }
             .forEach { user -> sendAlert(user, deviceName) }
     }
 
     private suspend fun sendAlert(user: User, deviceName: String) {
-        actionPublisher.publishAction(Action.Alert(
+        client.publishAction(Action.Alert(
             target = user.id,
             message = "Water detected by $deviceName!"
         ))

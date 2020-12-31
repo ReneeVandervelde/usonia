@@ -31,7 +31,14 @@ fun Site.findDevicesBy(predicate: (Device) -> Boolean): Set<Device> {
 }
 
 /**
- * Find a site-wide device by ID
+ * Find a single device by an arbitrary [predicate]
+ */
+fun Site.findDeviceBy(predicate: (Device) -> Boolean): Device? = rooms
+    .flatMap { it.devices }
+    .find(predicate)
+
+/**
+ * Get a site-wide device by ID
  */
 fun Site.getDevice(id: Identifier): Device {
     val results = rooms.flatMap { it.devices }.filter { it.id == id }
@@ -42,6 +49,9 @@ fun Site.getDevice(id: Identifier): Device {
     }
 }
 
+/**
+ * Find a device by its ID.
+ */
 fun Site.findDevice(id: Identifier): Device? {
     val results = rooms.flatMap { it.devices }.filter { it.id == id }
     return when (results.size) {
@@ -51,12 +61,32 @@ fun Site.findDevice(id: Identifier): Device? {
     }
 }
 
-fun Site.findRoomWithDevice(id: Identifier): Room {
+/**
+ * Get a room by its ID.
+ */
+fun Site.getRoom(id: Identifier): Room {
     return rooms.single {
         it.devices.singleOrNull { it.id == id } != null
     }
 }
 
+/**
+ * Find a single bridge by service tag, if it exists.
+ *
+ * @throws IllegalStateException if more than one bridge with the service tag is configured.
+ */
+fun Site.findBridgeByServiceTag(service: String): Bridge? {
+    val bridges = bridges.filter { it.service == service }
+    return when (bridges.size) {
+        0 -> null
+        1 -> bridges.single()
+        else -> throw IllegalStateException("Multiple bridges defined with service ID: $service")
+    }
+}
+
+/**
+ * Find the bridge associated with a device, if it exists.
+ */
 fun Site.findAssociatedBridge(device: Device): Bridge? = bridges
     .filter { it.id == device.parent?.context }
     .let {
@@ -67,7 +97,9 @@ fun Site.findAssociatedBridge(device: Device): Bridge? = bridges
         }
     }
 
-
-fun Site.findDeviceBy(predicate: (Device) -> Boolean): Device? = rooms
-    .flatMap { it.devices }
-    .find(predicate)
+/**
+ * Find a device by the bridge identifier.
+ */
+fun Site.findBridgeDevice(bridge: Identifier, device: Identifier): Device? {
+    return findDeviceBy { it.parent?.context == bridge && it.parent.id == device }
+}

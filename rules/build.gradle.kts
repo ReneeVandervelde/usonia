@@ -23,6 +23,7 @@ kotlin {
                 implementation(kotlin("test-junit"))
                 implementation(Coroutines.test)
                 implementation(project(":core-testing"))
+                implementation(project(":server-testing"))
                 implementation(project(":foundation-testing"))
             }
         }

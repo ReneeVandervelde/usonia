@@ -11,8 +11,10 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import usonia.core.state.ConfigurationAccess
+import usonia.core.state.findBridgeByServiceTag
+import usonia.core.state.getSite
 import usonia.kotlin.unit.percent
+import usonia.server.client.BackendClient
 import usonia.server.cron.CronJob
 import usonia.server.cron.Schedule
 import usonia.weather.Conditions
@@ -36,7 +38,7 @@ private const val TOKEN = "token"
 @OptIn(ExperimentalTime::class)
 internal class AccuweatherAccess(
     private val api: AccuweatherApi,
-    private val config: ConfigurationAccess,
+    private val client: BackendClient,
     private val clock: Clock = Clock.System,
     private val logger: KimchiLogger = EmptyLogger,
 ): WeatherAccess, CronJob {
@@ -91,7 +93,7 @@ internal class AccuweatherAccess(
     }
 
     private suspend fun getConfig(): Pair<String, String>? {
-        val bridge = config.site.first().bridges.singleOrNull { it.service == SERVICE } ?: run {
+        val bridge = client.findBridgeByServiceTag(SERVICE) ?: run {
             logger.warn("Accuweather Bridge not configured. Create bridge parameters for service <$SERVICE>")
             return null
         }

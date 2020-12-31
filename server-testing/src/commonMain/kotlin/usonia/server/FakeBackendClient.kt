@@ -1,0 +1,29 @@
+package usonia.server
+
+import kotlinx.coroutines.flow.Flow
+import usonia.core.state.*
+import usonia.foundation.Action
+import usonia.foundation.Event
+import usonia.foundation.Identifier
+import usonia.foundation.Site
+import usonia.server.client.ComposedBackendClient
+import kotlin.reflect.KClass
+
+val DummyClient = ComposedBackendClient(
+    actionAccess = object: ActionAccess {
+        override val actions: Flow<Action> get() = TODO("Not yet implemented")
+    },
+    actionPublisher = object: ActionPublisher {
+        override suspend fun publishAction(action: Action) = TODO("Not yet implemented")
+    },
+    eventAccess = object: EventAccess {
+        override val events: Flow<Event> get() = TODO("Not yet implemented")
+        override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = TODO("Not yet implemented")
+    },
+    eventPublisher = object: EventPublisher {
+        override suspend fun publishEvent(event: Event) = TODO("Not yet implemented")
+    },
+    configurationAccess = object: ConfigurationAccess {
+        override val site: Flow<Site> get() = TODO("Not yet implemented")
+    },
+)

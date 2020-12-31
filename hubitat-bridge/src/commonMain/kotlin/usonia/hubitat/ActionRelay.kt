@@ -10,28 +10,26 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import usonia.core.state.ActionAccess
-import usonia.core.state.ConfigurationAccess
 import usonia.foundation.*
 import usonia.kotlin.IoScope
 import usonia.kotlin.neverEnding
 import usonia.server.Daemon
+import usonia.server.client.BackendClient
 
 /**
  * Forwards Action events to a hubitat bridge.
  */
 internal class ActionRelay(
-    private val configurationAccess: ConfigurationAccess,
-    private val actionAccess: ActionAccess,
+    private val client: BackendClient,
     private val json: Json = Json,
     private val logger: KimchiLogger = EmptyLogger,
     private val requestScope: CoroutineScope = IoScope()
 ): Daemon {
-    private val client = HttpClient {}
+    private val httpClient = HttpClient {}
 
     override suspend fun start() = neverEnding {
-        configurationAccess.site.collectLatest { site ->
-            actionAccess.actions.collect { action ->
+        client.site.collectLatest { site ->
+            client.actions.collect { action ->
                 onAction(site, action)
             }
         }
@@ -77,7 +75,7 @@ internal class ActionRelay(
 
         requestScope.launch {
             try {
-                client.post(
+                httpClient.post(
                     host = host,
                     port = port,
                     path = path,
