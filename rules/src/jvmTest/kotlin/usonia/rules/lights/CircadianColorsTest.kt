@@ -3,8 +3,7 @@ package usonia.rules.lights
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runBlockingTest
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlinx.datetime.*
 import usonia.core.state.ConfigurationAccess
 import usonia.foundation.FakeRooms
 import usonia.foundation.FakeSite
@@ -22,8 +21,11 @@ import kotlin.time.minutes
 
 @OptIn(ExperimentalTime::class)
 class CircadianColorsTest {
-    private val sunrise = Instant.fromEpochSeconds(500_000)
-    private val sunset = sunrise.plus(8.hours)
+    private val startOfDay = LocalDateTime(0, 1, 1, 0, 0, 0)
+        .toInstant(TimeZone.currentSystemDefault())
+    private val sunrise = startOfDay.plus(7.hours)
+    private val sunset = startOfDay.plus(18.hours)
+    private val nightStart = startOfDay.plus(DEFAULT_NIGHT_START.minutes)
 
     val weather = object: WeatherAccess {
         override val forecast: Flow<Forecast> = flowOf(Forecast(
@@ -111,16 +113,29 @@ class CircadianColorsTest {
     }
 
     @Test
-    fun eveningBlueHour() = runBlockingTest {
+    fun evening() = runBlockingTest {
         val clock = object: Clock {
-            override fun now(): Instant = sunset.plus(DEFAULT_PERIOD / 4)
+            override fun now(): Instant = sunset.plus(DEFAULT_PERIOD)
+        }
+        val colors = CircadianColors(config, weather, clock)
+
+        val result = colors.getRoomColor(FakeRooms.LivingRoom)
+
+        assertEquals(DEFAULT_EVENING, result.temperature)
+        assertEquals(100.percent, result.brightness)
+    }
+
+    @Test
+    fun twilight() = runBlockingTest {
+        val clock = object: Clock {
+            override fun now(): Instant = nightStart.plus(DEFAULT_PERIOD / 4)
         }
         val colors = CircadianColors(config, weather, clock)
 
         val result = colors.getRoomColor(FakeRooms.LivingRoom)
 
         assertEquals(
-            DEFAULT_DAYLIGHT.kelvinValue + ((DEFAULT_NIGHTLIGHT.kelvinValue - DEFAULT_DAYLIGHT.kelvinValue) / 4),
+            DEFAULT_EVENING.kelvinValue + ((DEFAULT_NIGHTLIGHT.kelvinValue - DEFAULT_EVENING.kelvinValue) / 4),
             result.temperature.kelvinValue
         )
         assertTrue(
@@ -131,7 +146,7 @@ class CircadianColorsTest {
     @Test
     fun night() = runBlockingTest {
         val clock = object: Clock {
-            override fun now(): Instant = sunset.plus(DEFAULT_PERIOD).plus(2.minutes)
+            override fun now(): Instant = nightStart.plus(DEFAULT_PERIOD).plus(2.minutes)
         }
         val colors = CircadianColors(config, weather, clock)
 
@@ -139,5 +154,33 @@ class CircadianColorsTest {
 
         assertEquals(DEFAULT_NIGHTLIGHT, result.temperature)
         assertEquals(DEFAULT_NIGHT_BRIGHTNESS, result.brightness)
+    }
+
+    @Test
+    fun overlapStart() = runBlockingTest {
+        val weather = object: WeatherAccess {
+            override val forecast: Flow<Forecast> = flowOf(Forecast(
+                timestamp = Instant.DISTANT_PAST,
+                sunrise = sunrise,
+                sunset = nightStart,
+                rainChance = 0.percent,
+                snowChance = 0.percent,
+            ))
+            override val conditions: Flow<Conditions> get() = TODO()
+        }
+        val clock = object: Clock {
+            override fun now(): Instant = nightStart
+        }
+        val colors = CircadianColors(config, weather, clock)
+
+        val result = colors.getRoomColor(FakeRooms.LivingRoom)
+
+        assertEquals(
+            DEFAULT_DAYLIGHT,
+            result.temperature
+        )
+        assertTrue(
+            (100f - ((100 - DEFAULT_NIGHT_BRIGHTNESS.percent) / 4)).toInt() - result.brightness.percent <= 1
+        )
     }
 }
