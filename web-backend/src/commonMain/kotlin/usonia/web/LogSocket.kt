@@ -13,7 +13,7 @@ import usonia.server.http.WebSocketController
 object LogSocket: WebSocketController, LogWriter {
     override val path: String = "/logs"
     private val logs = MutableSharedFlow<LogMessage>(
-        replay = 1000,
+        replay = 500,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
