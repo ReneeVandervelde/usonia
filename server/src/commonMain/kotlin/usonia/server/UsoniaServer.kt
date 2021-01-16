@@ -4,6 +4,7 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
 import kotlinx.datetime.TimeZone
@@ -73,7 +74,13 @@ class UsoniaServer(
                     .filter { it.dayOfMonth in cron.schedule.days }
                     .filter { it.monthNumber in cron.schedule.months }
                     .onEach { logger.debug { "Running Cron <${cron::class.simpleName}>"} }
-                    .collect { cron.run(it, TimeZone.currentSystemDefault()) }
+                    .collectLatest {
+                        try {
+                            cron.run(it, TimeZone.currentSystemDefault())
+                        } catch (error: Throwable) {
+                            logger.error("Uncaught Exception in Cron <${cron::class.simpleName}>", error)
+                        }
+                    }
             }
         }
     }
