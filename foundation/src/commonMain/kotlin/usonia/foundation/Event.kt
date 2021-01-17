@@ -11,6 +11,7 @@ import usonia.kotlin.unit.Percentage
 /**
  * State changes that have already happened.
  */
+@Serializable(with = EventSerializer::class)
 sealed class Event {
     companion object Metadata {
         val subClasses = setOf(
@@ -40,6 +41,7 @@ sealed class Event {
      */
     abstract val timestamp: Instant
 
+    @Serializable(with = EventSerializer::class)
     data class Motion(
         override val source: Identifier,
         override val timestamp: Instant,
@@ -48,6 +50,7 @@ sealed class Event {
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
+    @Serializable(with = EventSerializer::class)
     data class Switch(
         override val source: Identifier,
         override val timestamp: Instant,
@@ -56,6 +59,7 @@ sealed class Event {
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
+    @Serializable(with = EventSerializer::class)
     data class Temperature(
         override val source: Identifier,
         override val timestamp: Instant,
@@ -64,6 +68,7 @@ sealed class Event {
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
+    @Serializable(with = EventSerializer::class)
     data class Humidity(
         override val source: Identifier,
         override val timestamp: Instant,
@@ -72,6 +77,7 @@ sealed class Event {
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
+    @Serializable(with = EventSerializer::class)
     data class Lock(
         override val source: Identifier,
         override val timestamp: Instant,
@@ -84,6 +90,7 @@ sealed class Event {
         enum class LockMethod { MANUAL, KEYPAD, AUTO, COMMAND }
     }
 
+    @Serializable(with = EventSerializer::class)
     data class Water(
         override val source: Identifier,
         override val timestamp: Instant,
@@ -92,6 +99,7 @@ sealed class Event {
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
+    @Serializable(with = EventSerializer::class)
     data class Latch(
         override val source: Identifier,
         override val timestamp: Instant,
@@ -100,6 +108,7 @@ sealed class Event {
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
+    @Serializable(with = EventSerializer::class)
     data class Presence(
         override val source: Identifier,
         override val timestamp: Instant,
@@ -108,6 +117,7 @@ sealed class Event {
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
+    @Serializable(with = EventSerializer::class)
     data class Battery(
         override val source: Identifier,
         override val timestamp: Instant,
@@ -116,6 +126,7 @@ sealed class Event {
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
+    @Serializable(with = EventSerializer::class)
     data class Tilt(
         override val source: Identifier,
         override val timestamp: Instant,
@@ -126,6 +137,7 @@ sealed class Event {
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
+    @Serializable(with = EventSerializer::class)
     data class Movement(
         override val source: Identifier,
         override val timestamp: Instant,

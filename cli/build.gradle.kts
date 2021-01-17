@@ -32,6 +32,7 @@ dependencies {
     implementation(project(":server-ktor"))
     implementation(project(":smartthings"))
     implementation(project(":state-memory"))
+    implementation(project(":state-mongodb"))
     implementation(project(":todoist-bridge"))
     implementation(project(":weather"))
     implementation(project(":web-backend"))

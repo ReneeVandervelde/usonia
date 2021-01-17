@@ -5,10 +5,10 @@ import dagger.Provides
 import dagger.Reusable
 import kotlinx.serialization.json.Json
 import usonia.core.state.memory.InMemoryActionAccess
-import usonia.core.state.memory.InMemoryEventAccess
 import usonia.serialization.SerializationModule
 import usonia.server.client.BackendClient
 import usonia.server.client.ComposedBackendClient
+import usonia.state.MongoModule
 import javax.inject.Singleton
 
 @Module
@@ -22,7 +22,7 @@ object UsoniaModule {
     fun backendClient(
         json: Json,
     ): BackendClient {
-        val events = InMemoryEventAccess()
+        val events = MongoModule().stateAccess()
         val actions = InMemoryActionAccess()
         val config = FileConfigAccess(json)
 
