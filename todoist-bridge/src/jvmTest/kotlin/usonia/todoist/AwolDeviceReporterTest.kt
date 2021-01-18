@@ -204,6 +204,13 @@ class AwolDeviceReporterTest {
         }
         val api = object: TodoistApi by ApiStub {
             val closed = mutableListOf<Long>()
+            val created = mutableListOf<TaskParameters>()
+
+            override suspend fun create(token: String, task: TaskParameters): Task {
+                created += task
+                return ApiStub.create(token, task)
+            }
+
             override suspend fun getTasks(token: String, projectId: Long?, labelId: Long?): List<Task> {
                 return listOf(Task(
                     id = 432,
@@ -223,6 +230,7 @@ class AwolDeviceReporterTest {
         AwolDeviceReporter(client, api).run(time, zone)
 
         assertEquals(0, api.closed.size)
+        assertEquals(0, api.created.size)
     }
 
     @Test
@@ -257,7 +265,7 @@ class AwolDeviceReporterTest {
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Water::class) {
                     FakeEvents.Wet.copy(
-                        timestamp = now
+                        timestamp = now - 2.minutes
                     ) as T
                 } else null
             }
@@ -267,7 +275,7 @@ class AwolDeviceReporterTest {
             override suspend fun getTasks(token: String, projectId: Long?, labelId: Long?): List<Task> {
                 return listOf(Task(
                     id = 432,
-                    content = "Test Task",
+                    content = "Test Task (id: fake-sensor)",
                     completed = false,
                 ))
             }

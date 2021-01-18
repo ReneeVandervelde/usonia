@@ -83,11 +83,11 @@ internal class AwolDeviceReporter(
 
         val reports = api.getTasks(token, project, label)
         val new = awol
-            .filter { (device, event) -> event != null }
+            .filter { (device, event) -> event != null && device.id !in reports.map { it.device } }
             .map { (device, _) -> device}
             .also { logger.debug("${it.size} devices are new reports") }
         val found = reports
-            .filter { it.device != null }// && it.device !in awol.map { it.id } }
+            .filter { it.device != null && it.device !in awol.map { it.first.id } }
             .filter { it.device !in awol.map { (device, _) -> device.id } }
             .also { logger.debug("${it.size} devices have been found") }
 
