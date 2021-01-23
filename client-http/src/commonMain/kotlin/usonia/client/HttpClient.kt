@@ -54,6 +54,27 @@ class HttpClient(
         }
     }
 
+    override fun bufferedLogs(limit: Int): Flow<LogMessage> = flow {
+        httpClient.ws(
+            host = host,
+            port = port,
+            path = "logs",
+            request = {
+                parameter("bufferCount", limit)
+            }
+        ) {
+            incoming.consumeEach {
+                if (it !is Frame.Text) return@consumeEach
+
+                try {
+                    emit(json.decodeFromString(it.readText()))
+                } catch (error: Throwable) {
+                    logger.error("Failed to deserialize Log Message", error)
+                }
+            }
+        }
+    }
+
     override val events: Flow<Event> = flow {
         httpClient.ws(
             host = host,

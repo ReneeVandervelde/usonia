@@ -48,7 +48,7 @@ class KtorWebServer(
                             val input = Channel<String>(Channel.RENDEZVOUS)
                             val output = Channel<String>(Channel.RENDEZVOUS)
                             val controllerJob = launch {
-                                controller.start(input, output)
+                                controller.start(input, output, call.parameters.toMap())
                             }
                             val incomingJob = launch {
                                 incoming.consumeEach { frame ->

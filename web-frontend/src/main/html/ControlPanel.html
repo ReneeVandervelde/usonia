@@ -31,17 +31,23 @@
     <div id="users"></div>
 </section>
 
-<template id="log-message-template">
-    <div class="log-message" data-level="{{level.name}}">
-        <div class="log-message-primary">
-            [<span class="log-message-level">{{level.name}}</span>]: {{message}}
+<section id="log">
+    <template id="log-message-template">
+        <div class="log-message" data-level="{{level.name}}">
+            <div class="log-message-primary">
+                [<span class="log-message-level">{{level.name}}</span>]: {{message}}
+            </div>
+            <div class="log-message-stacktrace">{{stackTrace}}</div>
         </div>
-        <div class="log-message-stacktrace">{{stackTrace}}</div>
-    </div>
-</template>
-<section>
+    </template>
+
     <h1>Logs</h1>
-    <div id="logs"></div>
+    <div id="log-console">
+        <div id="log-actions">
+            <button class="primary" name="log-load" value="PART">Start Logger</button>
+            <button class="primary" name="log-load" value="FULL">Load Full Logs</button>
+        </div>
+    </div>
 </section>
 
 <template id="config-template">

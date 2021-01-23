@@ -15,14 +15,16 @@ object ColorWriter: LogWriter {
     val magenta = "$esc[1;35m"
     val normal = "$esc[0m"
 
+    fun formatLine(level: LogLevel, message: String) = when (level) {
+        LogLevel.TRACE -> "[${magenta}Trace$normal]: $message"
+        LogLevel.DEBUG -> "[${green}Debug$normal]: $message"
+        LogLevel.INFO -> "[${blue}Info$normal]: $message"
+        LogLevel.WARNING -> "[${yellow}Warning$normal]: $message"
+        LogLevel.ERROR -> "[${red}Error$normal]: $message"
+    }
+
     override fun log(level: LogLevel, message: String, cause: Throwable?) {
-        when (level) {
-            LogLevel.TRACE -> println("[${magenta}Trace$normal]: $message")
-            LogLevel.DEBUG -> println("[${green}Debug$normal]: $message")
-            LogLevel.INFO -> println("[${blue}Info$normal]: $message")
-            LogLevel.WARNING -> println("[${yellow}Warning$normal]: $message")
-            LogLevel.ERROR -> println("[${red}Error$normal]: $message")
-        }
+        formatLine(level, message).run(::println)
         if (cause != null) {
             println("Caused by")
             cause.printStackTrace()

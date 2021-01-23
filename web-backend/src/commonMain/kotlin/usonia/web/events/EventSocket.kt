@@ -21,7 +21,11 @@ internal class EventSocket(
 ): WebSocketController {
     override val path: String = "/events"
 
-    override suspend fun start(input: ReceiveChannel<String>, output: SendChannel<String>) {
+    override suspend fun start(
+        input: ReceiveChannel<String>,
+        output: SendChannel<String>,
+        parameters: Map<String, List<String>>,
+    ) {
         client.events.collect {
             try {
                 output.offer(json.encodeToString(EventSerializer, it))

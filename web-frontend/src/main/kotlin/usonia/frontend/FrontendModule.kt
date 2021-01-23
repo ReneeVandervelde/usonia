@@ -23,7 +23,7 @@ object FrontendModule {
 
     val controllers = listOf(
         ConfigController(client, logger),
-        LogController(client),
+        LogController(client, logger),
         UserListController(client, logger)
     )
 }

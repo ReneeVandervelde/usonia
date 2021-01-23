@@ -15,5 +15,9 @@ interface WebSocketController {
      * @param input Messages sent from the client.
      * @param output Messages to send back to the client.
      */
-    suspend fun start(input: ReceiveChannel<String>, output: SendChannel<String>)
+    suspend fun start(
+        input: ReceiveChannel<String>,
+        output: SendChannel<String>,
+        parameters: Map<String, List<String>>,
+    )
 }

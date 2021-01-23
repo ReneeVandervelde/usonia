@@ -23,7 +23,7 @@ section h3::before
     content: none;
 }
 
-#logs
+#log-console
 {
     overflow-y: scroll;
     max-height: 60vh;
@@ -55,6 +55,10 @@ section h3::before
 .log-message[data-level="ERROR"] .log-message-level
 {
     color: var(--color-red);
+}
+.log-message-stacktrace
+{
+    white-space: pre;
 }
 
 
