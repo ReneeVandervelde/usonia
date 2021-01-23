@@ -1,4 +1,4 @@
-package usonia.cli
+package usonia.cli.server
 
 import dagger.Binds
 import dagger.Module
@@ -6,7 +6,6 @@ import dagger.Provides
 import dagger.Reusable
 import dagger.multibindings.IntoSet
 import kimchi.logger.KimchiLogger
-import usonia.core.state.*
 import usonia.hubitat.HubitatPlugin
 import usonia.hue.HueBridgePlugin
 import usonia.rules.RulesPlugin
@@ -16,9 +15,11 @@ import usonia.todoist.TodoistBridgePlugin
 import usonia.weather.WeatherAccess
 import usonia.weather.WeatherPlugin
 import usonia.web.WebPlugin
-import javax.inject.Singleton
 
-@Module(includes = [PluginBindings::class])
+/**
+ * Server-side plugins for the Usonia Application.
+ */
+@Module(includes = [PluginBindings::class, ServerModule::class])
 object PluginsModule {
     @Provides
     @Reusable
@@ -29,7 +30,7 @@ object PluginsModule {
     ): ServerPlugin = WebPlugin(client, logger)
 
     @Provides
-    @Singleton
+    @ServerScope
     fun weatherPlugin(
         client: BackendClient,
         logger: KimchiLogger,
@@ -39,7 +40,7 @@ object PluginsModule {
     )
 
     @Provides
-    @Singleton
+    @ServerScope
     @IntoSet
     fun todoistPlugin(
         client: BackendClient,

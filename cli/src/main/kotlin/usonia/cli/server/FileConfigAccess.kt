@@ -1,4 +1,4 @@
-package usonia.cli
+package usonia.cli.server
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.Json

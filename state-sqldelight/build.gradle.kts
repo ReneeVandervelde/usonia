@@ -1,5 +1,12 @@
 plugins {
     kotlin("multiplatform")
+    id("com.squareup.sqldelight")
+}
+
+sqldelight {
+    database("Database") {
+        packageName = "usonia.state"
+    }
 }
 
 kotlin {
@@ -11,13 +18,14 @@ kotlin {
                 api(project(":core"))
                 api(project(":foundation"))
                 api(Coroutines.core)
+                api(KotlinX.serialization)
             }
         }
 
         val jvmMain by getting {
             dependencies {
-//                implementation("org.litote.kmongo:kmongo:4.2.3")
-                implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.2.3")
+                implementation("com.squareup.sqldelight:sqlite-driver:1.4.3")
+                implementation("com.squareup.sqldelight:coroutines-extensions:1.4.3")
             }
         }
 

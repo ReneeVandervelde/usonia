@@ -1,10 +1,14 @@
-package usonia.cli.command
+package usonia.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoSet
 import dagger.multibindings.Multibinds
+import usonia.cli.server.ServerRunCommand
+import usonia.cli.client.ClientEventsCommand
+import usonia.cli.client.ClientIntentSendCommand
+import usonia.cli.client.ClientLogsCommand
 
 @Module
 interface CommandModule {
@@ -14,7 +18,7 @@ interface CommandModule {
 
     @Binds
     @IntoSet
-    fun run(command: RunCommand): CliktCommand
+    fun run(command: ServerRunCommand): CliktCommand
 
     @Binds
     @IntoSet

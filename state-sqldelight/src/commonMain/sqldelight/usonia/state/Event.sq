@@ -1,0 +1,26 @@
+CREATE TABLE IF NOT EXISTS Event (
+  timestamp INTEGER NOT NULL,
+  source TEXT NOT NULL,
+  type TEXT NOT NULL,
+  data BLOB NOT NULL,
+  PRIMARY KEY (source, timestamp, type)
+);
+
+CREATE TRIGGER IF NOT EXISTS EventRecordLimit AFTER INSERT ON Event
+WHEN (SELECT count(*) FROM Event) > 10000
+BEGIN
+    DELETE FROM Event WHERE EXISTS (
+        SELECT * FROM Event ORDER BY timestamp ASC LIMIT (SELECT count(*) FROM Event) - 10000
+    );
+END;
+
+insert:
+INSERT INTO Event(timestamp, source, type, data)
+VALUES (?, ?, ?, ?);
+
+latest:
+SELECT *
+FROM Event
+WHERE type = ? AND source = ?
+ORDER BY timestamp DESC
+LIMIT 1;
