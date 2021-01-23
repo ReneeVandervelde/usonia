@@ -114,14 +114,19 @@ internal class AccuweatherAccess(
         token: String,
     ): Conditions {
         logger.debug("Refreshing Conditions")
-        val conditionsResponse = api.getConditions(location, token)
+        try {
+            val conditionsResponse = api.getConditions(location, token)
 
-        return Conditions(
-            timestamp = clock.now(),
-            cloudCover = conditionsResponse.cloudCover.percent,
-            temperature = conditionsResponse.temperature.imperial.temperature.toInt(),
-        ).also {
-            logger.debug("New Conditions: <$it>")
+            return Conditions(
+                timestamp = clock.now(),
+                cloudCover = conditionsResponse.cloudCover.percent,
+                temperature = conditionsResponse.temperature.imperial.temperature.toInt(),
+            ).also {
+                logger.debug("New Conditions: <$it>")
+            }
+        } catch (error: Throwable) {
+            logger.error("Unable to get fresh conditions.", error)
+            return conditionsFlow.value
         }
     }
 
@@ -130,16 +135,21 @@ internal class AccuweatherAccess(
         token: String,
     ): Forecast {
         logger.debug("Refreshing Conditions")
-        val forecastResponse = api.getForecast(location, token)
+        try {
+            val forecastResponse = api.getForecast(location, token)
 
-        return Forecast(
-            timestamp = clock.now(),
-            sunrise = forecastResponse.daily.single().sun.rise.let(Instant.Companion::fromEpochSeconds),
-            sunset = forecastResponse.daily.single().sun.set.let(Instant.Companion::fromEpochSeconds),
-            rainChance = forecastResponse.daily.single().day.rainProbability.percent,
-            snowChance = forecastResponse.daily.single().day.snowProbability.percent,
-        ).also {
-            logger.debug("New Forecast: <$it>")
+            return Forecast(
+                timestamp = clock.now(),
+                sunrise = forecastResponse.daily.single().sun.rise.let(Instant.Companion::fromEpochSeconds),
+                sunset = forecastResponse.daily.single().sun.set.let(Instant.Companion::fromEpochSeconds),
+                rainChance = forecastResponse.daily.single().day.rainProbability.percent,
+                snowChance = forecastResponse.daily.single().day.snowProbability.percent,
+            ).also {
+                logger.debug("New Forecast: <$it>")
+            }
+        } catch (error: Throwable) {
+            logger.error("Unable to get fresh forecast.", error)
+            return forecastFlow.value
         }
     }
 }
