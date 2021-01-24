@@ -16,6 +16,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
+import kotlin.time.days
 import kotlin.time.hours
 import kotlin.time.minutes
 
@@ -54,6 +55,30 @@ class CircadianColorsTest {
         assertEquals(DEFAULT_NIGHTLIGHT, result.temperature)
         assertEquals(DEFAULT_NIGHT_BRIGHTNESS, result.brightness)
     }
+
+    @Test
+    fun staleForecast() = runBlockingTest {
+        val clock = object: Clock {
+            override fun now(): Instant = startOfDay.plus(1.days)
+        }
+        val weather = object: WeatherAccess {
+            override val forecast: Flow<Forecast> = flowOf(Forecast(
+                timestamp = Instant.DISTANT_PAST,
+                sunrise = sunrise,
+                sunset = sunset,
+                rainChance = 0.percent,
+                snowChance = 0.percent,
+            ))
+            override val conditions: Flow<Conditions> get() = TODO()
+        }
+        val colors = CircadianColors(config, weather, clock)
+
+        val result = colors.getRoomColor(FakeRooms.LivingRoom)
+
+        assertEquals(DEFAULT_NIGHTLIGHT, result.temperature)
+        assertEquals(DEFAULT_NIGHT_BRIGHTNESS, result.brightness)
+    }
+
 
     @Test
     fun morningBlueHour() = runBlockingTest {

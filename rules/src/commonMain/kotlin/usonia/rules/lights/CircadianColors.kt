@@ -103,19 +103,22 @@ internal class CircadianColors(
                     brightness = (100.percent..nightBrightness).transition(position),
                 )
             }
+            now < forecast.sunrise
+                || now > nightStartInstant.plus(period)
+                || localTime.dayOfYear > forecast.sunset.toLocalDateTime(timeZone).dayOfYear
+            -> {
+                logger.trace("In nighttime")
+                return LightSettings(
+                    temperature = nightColor,
+                    brightness = nightBrightness,
+                )
+            }
             now >= forecast.sunset -> {
                 logger.trace("In evening")
                 val position = ((now - forecast.sunset).inMinutes / period.inMinutes).toFloat()
                 return LightSettings(
                     temperature = (daylightColor..eveningColor).transition(position),
                     brightness = 100.percent,
-                )
-            }
-            now < forecast.sunrise || now > nightStartInstant.plus(period) -> {
-                logger.trace("In nighttime")
-                return LightSettings(
-                    temperature = nightColor,
-                    brightness = nightBrightness,
                 )
             }
             else -> throw IllegalStateException("Time not covered in color conditions.")
