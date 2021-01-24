@@ -7,13 +7,12 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
-import usonia.core.state.ActionAccess
-import usonia.core.state.ConfigurationAccess
 import usonia.foundation.Action
 import usonia.foundation.Site
 import usonia.kotlin.IoScope
 import usonia.kotlin.neverEnding
 import usonia.server.Daemon
+import usonia.server.client.BackendClient
 
 private const val BOT_KEY = "bot"
 private const val BOT_TOKEN = "token"
@@ -27,14 +26,13 @@ private const val CHAT_ID_KEY = "telegram.chat"
  * that should receive a notification with a pre-setup bot chat ID.
  */
 internal class TelegramAlerts(
-    private val actionAccess: ActionAccess,
-    private val configurationAccess: ConfigurationAccess,
+    private val client: BackendClient,
     private val telegramApi: TelegramApi,
     private val logger: KimchiLogger = EmptyLogger,
     private val requestScope: CoroutineScope = IoScope()
 ): Daemon {
     override suspend fun start() = neverEnding {
-        configurationAccess.site.collectLatest { site -> onSiteUpdate(site) }
+        client.site.collectLatest { site -> onSiteUpdate(site) }
     }
 
     private suspend fun onSiteUpdate(site: Site) {
@@ -53,7 +51,7 @@ internal class TelegramAlerts(
             return
         }
 
-        actionAccess.actions.filterIsInstance<Action.Alert>().collect {
+        client.actions.filterIsInstance<Action.Alert>().collect {
             send(bot, token, site, it)
         }
     }

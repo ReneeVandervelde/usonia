@@ -8,6 +8,7 @@ import usonia.foundation.*
 import usonia.kotlin.suspendedFlow
 import usonia.core.state.ActionAccessFake
 import usonia.core.state.ConfigurationAccess
+import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -37,10 +38,13 @@ class TelegramAlertsTest {
             )
         }
         val fakeActions = ActionAccessFake()
+        val client = DummyClient.copy(
+            actionAccess = fakeActions,
+            configurationAccess = fakeConfigAccess,
+        )
         val telegramSpy = TelegramSpy()
         val alerts = TelegramAlerts(
-            fakeActions,
-            fakeConfigAccess,
+            client,
             telegramSpy,
             requestScope = this
         )
@@ -85,9 +89,12 @@ class TelegramAlertsTest {
         }
         val fakeActions = ActionAccessFake()
         val telegramSpy = TelegramSpy()
+        val client = DummyClient.copy(
+            actionAccess = fakeActions,
+            configurationAccess = fakeConfigAccess,
+        )
         val alerts = TelegramAlerts(
-            fakeActions,
-            fakeConfigAccess,
+            client,
             telegramSpy,
             requestScope = this
         )
@@ -128,9 +135,12 @@ class TelegramAlertsTest {
         }
         val fakeActions = ActionAccessFake()
         val telegramSpy = TelegramSpy()
+        val client = DummyClient.copy(
+            actionAccess = fakeActions,
+            configurationAccess = fakeConfigAccess,
+        )
         val alerts = TelegramAlerts(
-            fakeActions,
-            fakeConfigAccess,
+            client,
             telegramSpy,
             requestScope = this
         )
@@ -158,9 +168,12 @@ class TelegramAlertsTest {
         }
         val fakeActions = ActionAccessFake()
         val telegramSpy = TelegramSpy()
+        val client = DummyClient.copy(
+            actionAccess = fakeActions,
+            configurationAccess = fakeConfigAccess,
+        )
         val alerts = TelegramAlerts(
-            fakeActions,
-            fakeConfigAccess,
+            client,
             telegramSpy,
             requestScope = this
         )

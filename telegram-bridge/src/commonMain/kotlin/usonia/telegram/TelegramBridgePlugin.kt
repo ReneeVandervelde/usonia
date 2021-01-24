@@ -2,20 +2,17 @@ package usonia.telegram
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import usonia.core.state.ActionAccess
-import usonia.core.state.ConfigurationAccess
 import usonia.server.Daemon
 import usonia.server.ServerPlugin
+import usonia.server.client.BackendClient
 
 class TelegramBridgePlugin(
-    actions: ActionAccess,
-    config: ConfigurationAccess,
+    client: BackendClient,
     logger: KimchiLogger = EmptyLogger,
 ): ServerPlugin {
     override val daemons: List<Daemon> = listOf(
         TelegramAlerts(
-            actionAccess = actions,
-            configurationAccess = config,
+            client = client,
             telegramApi = TelegramClient,
             logger = logger
         )

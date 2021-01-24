@@ -34,6 +34,7 @@ dependencies {
     implementation(project(":state-memory"))
     implementation(project(":state-sqldelight"))
     implementation(project(":todoist-bridge"))
+    implementation(project(":telegram-bridge"))
     implementation(project(":weather"))
     implementation(project(":web-backend"))
     implementation(Coroutines.core)

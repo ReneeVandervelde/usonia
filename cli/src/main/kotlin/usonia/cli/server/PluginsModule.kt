@@ -11,6 +11,7 @@ import usonia.hue.HueBridgePlugin
 import usonia.rules.RulesPlugin
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
+import usonia.telegram.TelegramBridgePlugin
 import usonia.todoist.TodoistBridgePlugin
 import usonia.weather.WeatherAccess
 import usonia.weather.WeatherPlugin
@@ -77,6 +78,14 @@ object PluginsModule {
         client = client,
         logger = logger,
     )
+
+    @Provides
+    @Reusable
+    @IntoSet
+    fun telegram(
+        client: BackendClient,
+        logger: KimchiLogger,
+    ): ServerPlugin = TelegramBridgePlugin(client, logger)
 
     @Provides
     fun weatherAccess(source: WeatherPlugin) = source.weatherAccess
