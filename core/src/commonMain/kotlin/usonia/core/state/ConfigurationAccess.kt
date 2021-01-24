@@ -12,6 +12,11 @@ interface ConfigurationAccess {
      * Configuration key/value pairs for the application.
      */
     val site: Flow<Site>
+
+    /**
+     * Update site configuration.
+     */
+    suspend fun updateSite(site: Site)
 }
 
 /**

@@ -110,6 +110,19 @@ class HttpClient(
         }
     }
 
+    override suspend fun updateSite(site: Site) {
+        val request = HttpRequestBuilder(
+            host = host,
+            port = port,
+            path = "/site",
+        ).apply {
+            accept(ContentType.Application.Json)
+            body = json.encodeToString(Site.serializer(), site)
+        }
+
+        httpClient.post<Status>(request)
+    }
+
     override suspend fun <T: Event> getState(id: Identifier, type: KClass<T>): T? {
         val request = HttpRequestBuilder(
             host = host,

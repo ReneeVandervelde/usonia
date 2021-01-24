@@ -9,6 +9,7 @@ import usonia.cli.server.ServerRunCommand
 import usonia.cli.client.ClientEventsCommand
 import usonia.cli.client.ClientIntentSendCommand
 import usonia.cli.client.ClientLogsCommand
+import usonia.cli.client.SiteUpdateCommand
 
 @Module
 interface CommandModule {
@@ -31,4 +32,8 @@ interface CommandModule {
     @Binds
     @IntoSet
     fun intentSend(command: ClientIntentSendCommand): CliktCommand
+
+    @Binds
+    @IntoSet
+    fun siteUpdate(command: SiteUpdateCommand): CliktCommand
 }

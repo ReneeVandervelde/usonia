@@ -31,14 +31,27 @@ class ServerModule(
     fun databaseBackendClient(
         json: Json,
     ): BackendClient {
+        return if(path == null) inMemoryClient(json) else databaseClient(json, path)
+    }
+
+    private fun databaseClient(json: Json, path: String): BackendClient {
         val databaseModule = DatabaseModule(json)
-        val events = if (path == null) {
-            InMemoryEventAccess()
-        } else {
-            databaseModule.database(path)
-        }
+        val database = databaseModule.database(path)
         val actions = InMemoryActionAccess()
+
+        return ComposedBackendClient(
+            actionAccess = actions,
+            actionPublisher = actions,
+            eventAccess = database,
+            eventPublisher = database,
+            configurationAccess = database,
+        )
+    }
+
+    private fun inMemoryClient(json: Json): BackendClient {
+        val events = InMemoryEventAccess()
         val config = FileConfigAccess(json)
+        val actions = InMemoryActionAccess()
 
         return ComposedBackendClient(
             actionAccess = actions,

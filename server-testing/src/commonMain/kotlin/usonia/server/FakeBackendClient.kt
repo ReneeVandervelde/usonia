@@ -25,5 +25,6 @@ val DummyClient = ComposedBackendClient(
     },
     configurationAccess = object: ConfigurationAccess {
         override val site: Flow<Site> get() = TODO("Not yet implemented")
+        override suspend fun updateSite(site: Site) = TODO("Not yet implemented")
     },
 )

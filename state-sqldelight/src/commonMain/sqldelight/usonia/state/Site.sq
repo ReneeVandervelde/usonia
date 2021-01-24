@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS Site (
+    id INTEGER PRIMARY KEY,
+    data BLOB NOT NULL
+);
+
+update:
+INSERT OR REPLACE INTO Site(id, data)
+VALUES (1, ?);
+
+latest:
+SELECT *
+FROM Site
+LIMIT 1;

@@ -14,6 +14,7 @@ class DatabaseModule(
         }
         return DatabaseStateAccess(
             eventQueries = lazy { database.value.eventQueries },
+            siteQueries = lazy { database.value.siteQueries },
             json = json,
         )
     }
