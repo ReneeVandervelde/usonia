@@ -7,10 +7,10 @@ CREATE TABLE IF NOT EXISTS Event (
 );
 
 CREATE TRIGGER IF NOT EXISTS EventRecordLimit AFTER INSERT ON Event
-WHEN (SELECT count(*) FROM Event) > 10000
+WHEN (SELECT count(*) FROM Event) > 100000
 BEGIN
     DELETE FROM Event WHERE EXISTS (
-        SELECT * FROM Event ORDER BY timestamp ASC LIMIT (SELECT count(*) FROM Event) - 10000
+        SELECT * FROM Event ORDER BY timestamp ASC LIMIT (SELECT count(*) FROM Event) - 100000
     );
 END;
 
