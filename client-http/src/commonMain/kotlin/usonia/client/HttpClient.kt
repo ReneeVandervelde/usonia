@@ -14,6 +14,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.builtins.nullable
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import usonia.foundation.*
@@ -110,6 +112,24 @@ class HttpClient(
         }
     }
 
+    override val flags: Flow<Map<String, String?>> = flow {
+        httpClient.ws(
+            host = host,
+            port = port,
+            path = "flags",
+        ) {
+            incoming.consumeEach {
+                if (it !is Frame.Text) return@consumeEach
+
+                try {
+                    emit(json.decodeFromString(FlagSerializer, it.readText()))
+                } catch (error: Throwable) {
+                    logger.error("Failed to deserialize flags", error)
+                }
+            }
+        }
+    }
+
     override suspend fun updateSite(site: Site) {
         val request = HttpRequestBuilder(
             host = host,
@@ -121,6 +141,31 @@ class HttpClient(
         }
 
         httpClient.post<Status>(request)
+    }
+
+    override suspend fun setFlag(key: String, value: String?) {
+        val request = HttpRequestBuilder(
+            host = host,
+            port = port,
+            path = "/flags/$key",
+        ).apply {
+            accept(ContentType.Application.Json)
+            body = json.encodeToString(String.serializer().nullable, value)
+        }
+
+        httpClient.put<Status>(request)
+    }
+
+    override suspend fun removeFlag(key: String) {
+        val request = HttpRequestBuilder(
+            host = host,
+            port = port,
+            path = "/flags/$key",
+        ).apply {
+            accept(ContentType.Application.Json)
+        }
+
+        httpClient.delete<Status>(request)
     }
 
     override suspend fun <T: Event> getState(id: Identifier, type: KClass<T>): T? {

@@ -6,6 +6,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import usonia.core.state.ConfigurationAccess
+import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccess
 import usonia.core.state.EventAccessStub
 import usonia.foundation.*
@@ -22,7 +23,7 @@ import kotlin.time.minutes
 
 @OptIn(ExperimentalTime::class)
 class AwolDeviceReporterTest {
-    val config = object: ConfigurationAccess {
+    val config = object: ConfigurationAccess by ConfigurationAccessStub {
         override val site: Flow<Site> = suspendedFlow(FakeSite.copy(
             rooms = setOf(FakeRooms.LivingRoom.copy(
                 devices = setOf(FakeDevices.WaterSensor.copy(

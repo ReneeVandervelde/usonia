@@ -24,7 +24,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class IndicatorTest {
-    val fakeConfig = object: ConfigurationAccess {
+    val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
         override val site: Flow<Site> = suspendedFlow(FakeSite.copy(
             users = setOf(FakeUsers.John),
             rooms = setOf(

@@ -8,8 +8,8 @@ import usonia.server.http.HttpController
 import usonia.server.http.WebSocketController
 import usonia.web.actions.ActionBridgeHttpPublisher
 import usonia.web.actions.ActionHttpPublisher
+import usonia.web.config.*
 import usonia.web.config.ConfigSocket
-import usonia.web.config.SiteUpdateController
 import usonia.web.events.EventBridgeHttpPublisher
 import usonia.web.events.EventHttpPublisher
 import usonia.web.events.EventSocket
@@ -29,11 +29,14 @@ class WebPlugin(
         ActionBridgeHttpPublisher(client, json, logger),
         LatestEventController(client, json),
         SiteUpdateController(client, json, logger),
+        FlagUpdateController(client, json, logger),
+        FlagDeleteController(client, json),
     )
     override val socketController: List<WebSocketController> = listOf(
         LogSocket,
         ConfigSocket(client, json),
         EventSocket(client, json, logger),
+        FlagListSocket(client, json),
     )
     override val staticResources: List<String> = listOf(
         "web-frontend.js",

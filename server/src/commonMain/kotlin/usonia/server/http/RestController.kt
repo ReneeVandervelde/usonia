@@ -6,7 +6,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import usonia.foundation.Status
 
-abstract class RestController<IN: Any, OUT: Any>(
+abstract class RestController<IN, OUT>(
     protected val json: Json,
     protected val logger: KimchiLogger = EmptyLogger,
 ): HttpController {

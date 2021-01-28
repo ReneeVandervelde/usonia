@@ -7,10 +7,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.datetime.Clock
-import usonia.core.state.ActionPublisherSpy
-import usonia.core.state.ConfigurationAccess
-import usonia.core.state.EventAccess
-import usonia.core.state.EventAccessFake
+import usonia.core.state.*
 import usonia.foundation.*
 import usonia.foundation.unit.ColorTemperature
 import usonia.kotlin.unit.percent
@@ -32,7 +29,7 @@ class LightControllerTest {
             )
         ))
     )
-    val configurationAccess = object: ConfigurationAccess {
+    val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
         override val site: Flow<Site> = flowOf(testSite)
     }
     val testClient = DummyClient.copy(
@@ -139,7 +136,7 @@ class LightControllerTest {
 
     @Test
     fun away() = runBlockingTest {
-        val configurationAccess = object: ConfigurationAccess {
+        val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: Flow<Site> = flowOf(testSite.copy(
                 users = setOf(FakeUsers.John)
             ))

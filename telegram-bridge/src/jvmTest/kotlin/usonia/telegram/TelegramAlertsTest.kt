@@ -8,6 +8,7 @@ import usonia.foundation.*
 import usonia.kotlin.suspendedFlow
 import usonia.core.state.ActionAccessFake
 import usonia.core.state.ConfigurationAccess
+import usonia.core.state.ConfigurationAccessStub
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -15,7 +16,7 @@ import kotlin.test.assertEquals
 class TelegramAlertsTest {
     @Test
     fun sendAlert() = runBlockingTest {
-        val fakeConfigAccess = object: ConfigurationAccess {
+        val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: Flow<Site> = suspendedFlow(
                 FakeSite.copy(
                     users = setOf(
@@ -65,7 +66,7 @@ class TelegramAlertsTest {
     }
     @Test
     fun unknownUser() = runBlockingTest {
-        val fakeConfigAccess = object: ConfigurationAccess {
+        val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: Flow<Site> = suspendedFlow(
                 FakeSite.copy(
                     users = setOf(
@@ -115,7 +116,7 @@ class TelegramAlertsTest {
 
     @Test
     fun noUserConfig() = runBlockingTest {
-        val fakeConfigAccess = object: ConfigurationAccess {
+        val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: Flow<Site> = suspendedFlow(
                 FakeSite.copy(
                     users = setOf(
@@ -161,7 +162,7 @@ class TelegramAlertsTest {
 
     @Test
     fun noConfig() = runBlockingTest {
-        val fakeConfigAccess = object: ConfigurationAccess {
+        val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: Flow<Site> = suspendedFlow(
                 FakeSite
             )

@@ -16,6 +16,7 @@ import usonia.kotlin.unit.percent
 import usonia.kotlin.suspendedFlow
 import usonia.core.state.ActionAccessFake
 import usonia.core.state.ConfigurationAccess
+import usonia.core.state.ConfigurationAccessStub
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -37,7 +38,7 @@ class HueGroupHandlerTest {
     fun notConfigured() = runBlockingTest {
         val shadeSpy = ShadeGroupsSpy()
         val actionAccess = ActionAccessFake()
-        val configurationAccess = object: ConfigurationAccess {
+        val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: Flow<Site> = suspendedFlow(
                 FakeSite.copy(
                     rooms = setOf(
@@ -74,7 +75,7 @@ class HueGroupHandlerTest {
     fun nonHueGroup() = runBlockingTest {
         val shadeSpy = ShadeGroupsSpy()
         val actionAccess = ActionAccessFake()
-        val configurationAccess = object: ConfigurationAccess {
+        val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: Flow<Site> = flowOf(
                 FakeSite.copy(
                     rooms = setOf(
@@ -111,7 +112,7 @@ class HueGroupHandlerTest {
     fun nonLightAction() = runBlockingTest {
         val shadeSpy = ShadeGroupsSpy()
         val actionAccess = ActionAccessFake()
-        val configurationAccess = object: ConfigurationAccess {
+        val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: Flow<Site> = flowOf(
                 FakeSite.copy(
                     rooms = setOf(
@@ -171,7 +172,7 @@ class HueGroupHandlerTest {
     private fun handlesAction(action: Action) = runBlockingTest {
         val shadeSpy = ShadeGroupsSpy()
         val actionAccess = ActionAccessFake()
-        val configurationAccess = object: ConfigurationAccess {
+        val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: Flow<Site> = flowOf(
                 FakeSite.copy(
                     rooms = setOf(

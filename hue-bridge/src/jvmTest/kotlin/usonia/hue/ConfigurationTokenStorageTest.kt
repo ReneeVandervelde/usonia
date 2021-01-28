@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runBlockingTest
 import usonia.core.state.ConfigurationAccess
+import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -12,7 +13,7 @@ import kotlin.test.assertNull
 class ConfigurationTokenStorageTest {
     @Test
     fun getToken() = runBlockingTest {
-        val fakeConfiguration = object: ConfigurationAccess {
+        val fakeConfiguration = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: Flow<Site> = flowOf(
                 FakeSite.copy(
                     bridges = setOf(
@@ -34,7 +35,7 @@ class ConfigurationTokenStorageTest {
 
     @Test
     fun noToken() = runBlockingTest {
-        val fakeConfiguration = object: ConfigurationAccess {
+        val fakeConfiguration = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: Flow<Site> = flowOf(FakeSite)
         }
         val storage = ConfigurationTokenStorage(fakeConfiguration)

@@ -6,5 +6,8 @@ import usonia.foundation.Site
 
 object ConfigurationAccessStub: ConfigurationAccess {
     override val site: Flow<Site> get() = emptyFlow()
+    override val flags: Flow<Map<String, String?>> = emptyFlow()
     override suspend fun updateSite(site: Site) = Unit
+    override suspend fun setFlag(key: String, value: String?) = Unit
+    override suspend fun removeFlag(key: String) = Unit
 }

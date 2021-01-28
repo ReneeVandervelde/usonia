@@ -9,14 +9,29 @@ import usonia.foundation.*
  */
 interface ConfigurationAccess {
     /**
-     * Configuration key/value pairs for the application.
+     * Site-level device and api configuration for the application.
      */
     val site: Flow<Site>
+
+    /**
+     * Arbitrary key/value settings.
+     */
+    val flags: Flow<Map<String, String?>>
 
     /**
      * Update site configuration.
      */
     suspend fun updateSite(site: Site)
+
+    /**
+     * Set an arbitrary key/value setting.
+     */
+    suspend fun setFlag(key: String, value: String?)
+
+    /**
+     * Remove a key completely from settings.
+     */
+    suspend fun removeFlag(key: String)
 }
 
 /**

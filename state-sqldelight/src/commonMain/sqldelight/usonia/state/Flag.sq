@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS Flag (
+    id TEXT PRIMARY KEY,
+    data TEXT
+);
+
+update:
+INSERT OR REPLACE INTO Flag(id, data)
+VALUES (?, ?);
+
+get:
+SELECT *
+FROM Flag
+WHERE id = ?;
+
+list:
+SELECT *
+FROM Flag
+WHERE 1;
+
+delete:
+DELETE FROM Flag
+WHERE id = ?;

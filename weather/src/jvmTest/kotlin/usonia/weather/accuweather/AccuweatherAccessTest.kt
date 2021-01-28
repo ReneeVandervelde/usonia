@@ -9,6 +9,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import usonia.core.state.ConfigurationAccess
+import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.FakeBridge
 import usonia.foundation.FakeSite
 import usonia.foundation.Site
@@ -57,7 +58,7 @@ class AccuweatherAccessTest {
         }
     }
     private val testClient = DummyClient.copy(
-        configurationAccess = object: ConfigurationAccess {
+        configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: Flow<Site> = flowOf(FakeSite.copy(
                 bridges = setOf(
                     FakeBridge.copy(
@@ -80,7 +81,7 @@ class AccuweatherAccessTest {
 
     @Test
     fun noConfig() = runBlockingTest {
-        val config = object: ConfigurationAccess {
+        val config = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: Flow<Site> = flowOf(FakeSite)
         }
         val client = testClient.copy(

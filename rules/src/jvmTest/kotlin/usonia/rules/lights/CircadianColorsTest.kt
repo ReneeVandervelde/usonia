@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.datetime.*
 import usonia.core.state.ConfigurationAccess
+import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.FakeRooms
 import usonia.foundation.FakeSite
 import usonia.foundation.Site
@@ -39,7 +40,7 @@ class CircadianColorsTest {
         override val conditions: Flow<Conditions> get() = TODO()
     }
 
-    val config = object: ConfigurationAccess {
+    val config = object: ConfigurationAccess by ConfigurationAccessStub {
         override val site: Flow<Site> = flowOf(FakeSite)
     }
 
