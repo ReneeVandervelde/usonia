@@ -71,7 +71,7 @@ internal class AccuweatherAccess(
         coroutineScope {
             val newConditions = async { getFreshConditions(location, token) }
             val currentForecast = forecast.first()
-            if (clock.now() - currentForecast.timestamp > 4.hours) {
+            if (clock.now() - currentForecast.timestamp > 2.hours) {
                 logger.info("Forecast is expired. Updating.")
                 forecastFlow.value = getFreshForecast(location, token)
             }
