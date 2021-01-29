@@ -9,6 +9,7 @@ import kimchi.logger.KimchiLogger
 import kotlinx.serialization.json.Json
 import usonia.cli.ColorWriter
 import usonia.core.state.memory.InMemoryActionAccess
+import usonia.core.state.memory.InMemoryConfigAccess
 import usonia.core.state.memory.InMemoryEventAccess
 import usonia.server.ServerPlugin
 import usonia.server.UsoniaServer
@@ -31,7 +32,7 @@ class ServerModule(
     fun databaseBackendClient(
         json: Json,
     ): BackendClient {
-        return if(path == null) inMemoryClient(json) else databaseClient(json, path)
+        return if(path == null) inMemoryClient() else databaseClient(json, path)
     }
 
     private fun databaseClient(json: Json, path: String): BackendClient {
@@ -48,9 +49,9 @@ class ServerModule(
         )
     }
 
-    private fun inMemoryClient(json: Json): BackendClient {
+    private fun inMemoryClient(): BackendClient {
         val events = InMemoryEventAccess()
-        val config = FileConfigAccess(json)
+        val config = InMemoryConfigAccess()
         val actions = InMemoryActionAccess()
 
         return ComposedBackendClient(
