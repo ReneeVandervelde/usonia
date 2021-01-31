@@ -13,6 +13,7 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.*
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
@@ -89,6 +90,23 @@ class HttpClient(
                     emit(json.decodeFromString(EventSerializer, it.readText()))
                 } catch (error: Throwable) {
                     logger.error("Failed to deserialize Event", error)
+                }
+            }
+        }
+    }
+
+    override val eventsByDay: Flow<Map<LocalDate, Int>> = flow {
+        httpClient.ws(
+            host = host,
+            port = port,
+            path = "events/by-day"
+        ) {
+            incoming.consumeEach {
+                if (it !is Frame.Text) return@consumeEach
+                try {
+                    emit(json.decodeFromString(DateMetricSerializer, it.readText()))
+                } catch (error: Throwable) {
+                    logger.error("Failed to deserialize Date-Events", error)
                 }
             }
         }

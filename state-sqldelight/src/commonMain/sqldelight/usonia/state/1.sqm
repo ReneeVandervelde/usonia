@@ -1,9 +1,0 @@
-DROP TRIGGER IF EXISTS EventRecordLimit;
-
-CREATE TRIGGER IF NOT EXISTS EventRecordLimit AFTER INSERT ON Event
-WHEN (SELECT count(*) FROM Event) > 100000
-BEGIN
-    DELETE FROM Event WHERE EXISTS (
-        SELECT * FROM Event ORDER BY timestamp ASC LIMIT (SELECT count(*) FROM Event) - 100000
-    );
-END;

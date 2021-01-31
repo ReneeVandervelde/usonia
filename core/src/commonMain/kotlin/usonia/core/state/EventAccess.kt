@@ -1,6 +1,7 @@
 package usonia.core.state
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.LocalDate
 import usonia.foundation.Event
 import usonia.foundation.PresenceState
 import usonia.foundation.User
@@ -15,6 +16,11 @@ interface EventAccess {
      * A firehose of all events.
      */
     val events: Flow<Event>
+
+    /**
+     * The number of events that occurred on each day.
+     */
+    val eventsByDay: Flow<Map<LocalDate, Int>>
 
     /**
      * Get the last known event for an item.

@@ -26,4 +26,5 @@ dependencies {
     implementation(project(":client-http"))
     implementation(project(":serialization"))
     implementation(npm("mustache", "3.1.0"))
+    implementation(npm("chart.js", "2.9.4"))
 }

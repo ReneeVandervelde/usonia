@@ -4,6 +4,7 @@ import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
 import kotlinx.coroutines.flow.*
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.Json
 import usonia.foundation.Event
 import usonia.foundation.Identifier
@@ -21,6 +22,16 @@ internal class DatabaseStateAccess(
 ): DatabaseServices {
     private val eventsFlow = MutableSharedFlow<Event>()
     override val events: Flow<Event> = eventsFlow
+    override val eventsByDay: Flow<Map<LocalDate, Int>> by lazy {
+        eventQueries.value.eventsByDay()
+            .asFlow()
+            .mapToList()
+            .map {
+                it.map {
+                    LocalDate.parse(it.localdate) to it.total.toInt()
+                }.toMap()
+            }
+    }
 
     override val site: Flow<Site> by lazy {
         siteQueries.value
@@ -56,7 +67,7 @@ internal class DatabaseStateAccess(
     }
 
     override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
-        return eventQueries.value.latest(type.simpleName!!, id.value) { _, _, _, data ->
+        return eventQueries.value.latest(type.simpleName!!, id.value) { _, _, _, _, data ->
             json.decodeFromString(Event.serializer(), String(data))
         }.executeAsOneOrNull() as T?
     }

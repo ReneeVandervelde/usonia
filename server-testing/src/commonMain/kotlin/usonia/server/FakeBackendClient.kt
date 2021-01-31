@@ -1,6 +1,7 @@
 package usonia.server
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.LocalDate
 import usonia.core.state.*
 import usonia.foundation.Action
 import usonia.foundation.Event
@@ -18,6 +19,8 @@ val DummyClient = ComposedBackendClient(
     },
     eventAccess = object: EventAccess {
         override val events: Flow<Event> get() = TODO("Not yet implemented")
+        override val eventsByDay: Flow<Map<LocalDate, Int>> get() = TODO()
+
         override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = TODO("Not yet implemented")
     },
     eventPublisher = object: EventPublisher {

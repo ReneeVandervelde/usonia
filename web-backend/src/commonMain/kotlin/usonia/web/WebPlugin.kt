@@ -10,10 +10,10 @@ import usonia.web.actions.ActionBridgeHttpPublisher
 import usonia.web.actions.ActionHttpPublisher
 import usonia.web.config.*
 import usonia.web.config.ConfigSocket
+import usonia.web.events.*
 import usonia.web.events.EventBridgeHttpPublisher
 import usonia.web.events.EventHttpPublisher
 import usonia.web.events.EventSocket
-import usonia.web.events.LatestEventController
 
 class WebPlugin(
     client: BackendClient,
@@ -37,6 +37,7 @@ class WebPlugin(
         ConfigSocket(client, json),
         EventSocket(client, json, logger),
         FlagListSocket(client, json),
+        EventsByDaySocket(client, json),
     )
     override val staticResources: List<String> = listOf(
         "web-frontend.js",

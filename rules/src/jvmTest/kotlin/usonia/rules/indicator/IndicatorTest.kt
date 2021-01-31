@@ -200,7 +200,7 @@ class IndicatorTest {
             timestamp = Clock.System.now(),
             state = PresenceState.AWAY,
         )
-        val eventAccess = object: EventAccess {
+        val eventAccess = object: EventAccess by EventAccessStub {
             override val events = MutableSharedFlow<Event>()
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = when (type) {
                 Event.Presence::class -> presence as T
@@ -239,7 +239,7 @@ class IndicatorTest {
             timestamp = Clock.System.now(),
             state = PresenceState.HOME,
         )
-        val eventAccess = object: EventAccess {
+        val eventAccess = object: EventAccess by EventAccessStub {
             override val events = MutableSharedFlow<Event>()
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = when (type) {
                 Event.Presence::class -> presence as T

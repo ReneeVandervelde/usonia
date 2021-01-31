@@ -141,7 +141,7 @@ class LightControllerTest {
                 users = setOf(FakeUsers.John)
             ))
         }
-        val eventAccess = object: EventAccess {
+        val eventAccess = object: EventAccess by EventAccessStub {
             override val events = MutableSharedFlow<Event>()
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = when(type) {
                 Event.Presence::class -> FakeEvents.Away as T

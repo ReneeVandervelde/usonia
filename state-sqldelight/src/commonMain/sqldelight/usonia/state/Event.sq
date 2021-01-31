@@ -1,16 +1,22 @@
 CREATE TABLE IF NOT EXISTS Event (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   timestamp INTEGER NOT NULL,
   source TEXT NOT NULL,
   type TEXT NOT NULL,
-  data BLOB NOT NULL,
-  PRIMARY KEY (source, timestamp, type)
+  data BLOB NOT NULL
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS StateLookup
+ON Event (timestamp, type, source);
+
+CREATE UNIQUE INDEX IF NOT EXISTS Ordered
+ON Event (timestamp);
 
 CREATE TRIGGER IF NOT EXISTS EventRecordLimit AFTER INSERT ON Event
 WHEN (SELECT count(*) FROM Event) > 100000
 BEGIN
-    DELETE FROM Event WHERE EXISTS (
-        SELECT * FROM Event ORDER BY timestamp ASC LIMIT (SELECT count(*) FROM Event) - 100000
+    DELETE FROM Event WHERE id IN (
+        SELECT id FROM Event ORDER BY timestamp ASC LIMIT (SELECT count(*) FROM Event) - 100000
     );
 END;
 
@@ -24,3 +30,10 @@ FROM Event
 WHERE type = ? AND source = ?
 ORDER BY timestamp DESC
 LIMIT 1;
+
+eventsByDay:
+SELECT
+count() total,
+date(timestamp/1000, "unixepoch") localdate
+FROM Event
+GROUP BY date(timestamp/1000, "unixepoch");

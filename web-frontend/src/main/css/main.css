@@ -61,6 +61,11 @@ section h3::before
     white-space: pre;
 }
 
+#graph-container
+{
+    position: relative;
+    height: 20vh;
+}
 
 .user .user-state
 {
