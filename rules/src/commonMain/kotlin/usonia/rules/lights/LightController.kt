@@ -23,7 +23,7 @@ import kotlin.time.seconds
 @OptIn(ExperimentalTime::class)
 internal class LightController(
     private val client: BackendClient,
-    private val colorPicker: ColorPicker,
+    private val lightSettingsPicker: LightSettingsPicker,
     private val logger: KimchiLogger = EmptyLogger,
     private val backgroundScope: CoroutineScope = DefaultScope(),
 ): Daemon {
@@ -102,7 +102,7 @@ internal class LightController(
 
     private suspend fun onRoomMotion(room: Room) {
         logger.trace("Turning on lights in ${room.name}")
-        val color = colorPicker.getRoomColor(room)
+        val color = lightSettingsPicker.getRoomColor(room) as? LightSettings.Temperature ?: return
         val colorTemperatureDevices = room.devices
             .filter { Action.ColorTemperatureChange::class in it.capabilities.actions }
             .map {

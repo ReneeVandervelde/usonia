@@ -5,6 +5,7 @@ import kimchi.logger.defaultWriter
 import kotlinx.browser.window
 import usonia.client.HttpClient
 import usonia.frontend.config.ConfigController
+import usonia.frontend.flags.FlagController
 import usonia.frontend.logs.LogController
 import usonia.frontend.metrics.EventMetricsController
 import usonia.frontend.users.UserListController
@@ -27,5 +28,6 @@ object FrontendModule {
         LogController(client, logger),
         UserListController(client, logger),
         EventMetricsController(client, logger),
+        FlagController(client, logger),
     )
 }

@@ -21,7 +21,7 @@ object FlagSerializer: KSerializer<Map<String, String?>> {
         return json.mapValues {
             when (it.value) {
                 JsonNull -> null
-                else -> it.toString()
+                else -> (it.value as JsonPrimitive).content
             }
         }
     }

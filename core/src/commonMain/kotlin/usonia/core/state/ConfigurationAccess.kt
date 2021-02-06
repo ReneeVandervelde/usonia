@@ -2,6 +2,7 @@ package usonia.core.state
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import usonia.foundation.*
 
 /**
@@ -53,3 +54,9 @@ suspend fun ConfigurationAccess.findDevicesBy(predicate: (Device) -> Boolean) = 
  * @see [Site.findBridgeByServiceTag]
  */
 suspend fun ConfigurationAccess.findBridgeByServiceTag(service: String): Bridge? = getSite().findBridgeByServiceTag(service)
+
+suspend fun ConfigurationAccess.getFlag(key: String): String? = flags.firstOrNull()?.get(key)
+suspend fun ConfigurationAccess.getBooleanFlag(
+    key: String,
+    default: Boolean = false
+): Boolean = flags.firstOrNull()?.get(key)?.toBoolean() ?: default

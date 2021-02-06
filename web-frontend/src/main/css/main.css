@@ -67,6 +67,11 @@ section h3::before
     height: 20vh;
 }
 
+#flags #flag-container > .flag > input
+{
+    display: inline-block;
+}
+
 .user .user-state
 {
     color: var(--color-error);

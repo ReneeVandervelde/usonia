@@ -53,6 +53,7 @@ class CircadianColorsTest {
 
         val result = colors.getRoomColor(FakeRooms.LivingRoom)
 
+        assertTrue(result is LightSettings.Temperature)
         assertEquals(DEFAULT_NIGHTLIGHT, result.temperature)
         assertEquals(DEFAULT_NIGHT_BRIGHTNESS, result.brightness)
     }
@@ -76,6 +77,7 @@ class CircadianColorsTest {
 
         val result = colors.getRoomColor(FakeRooms.LivingRoom)
 
+        assertTrue(result is LightSettings.Temperature)
         assertEquals(DEFAULT_NIGHTLIGHT, result.temperature)
         assertEquals(DEFAULT_NIGHT_BRIGHTNESS, result.brightness)
     }
@@ -90,6 +92,7 @@ class CircadianColorsTest {
 
         val result = colors.getRoomColor(FakeRooms.LivingRoom)
 
+        assertTrue(result is LightSettings.Temperature)
         assertEquals(
             DEFAULT_DAYLIGHT.kelvinValue - ((DEFAULT_DAYLIGHT.kelvinValue - DEFAULT_NIGHTLIGHT.kelvinValue) / 4),
             result.temperature.kelvinValue
@@ -108,6 +111,7 @@ class CircadianColorsTest {
 
         val result = colors.getRoomColor(FakeRooms.LivingRoom)
 
+        assertTrue(result is LightSettings.Temperature)
         assertEquals(DEFAULT_DAYLIGHT, result.temperature)
         assertEquals(100.percent, result.brightness)
     }
@@ -121,6 +125,7 @@ class CircadianColorsTest {
 
         val result = colors.getRoomColor(FakeRooms.LivingRoom)
 
+        assertTrue(result is LightSettings.Temperature)
         assertEquals(DEFAULT_DAYLIGHT, result.temperature)
         assertEquals(100.percent, result.brightness)
     }
@@ -134,6 +139,7 @@ class CircadianColorsTest {
 
         val result = colors.getRoomColor(FakeRooms.LivingRoom)
 
+        assertTrue(result is LightSettings.Temperature)
         assertEquals(DEFAULT_DAYLIGHT, result.temperature)
         assertEquals(100.percent, result.brightness)
     }
@@ -147,6 +153,7 @@ class CircadianColorsTest {
 
         val result = colors.getRoomColor(FakeRooms.LivingRoom)
 
+        assertTrue(result is LightSettings.Temperature)
         assertEquals(DEFAULT_EVENING, result.temperature)
         assertEquals(100.percent, result.brightness)
     }
@@ -160,6 +167,7 @@ class CircadianColorsTest {
 
         val result = colors.getRoomColor(FakeRooms.LivingRoom)
 
+        assertTrue(result is LightSettings.Temperature)
         assertEquals(
             DEFAULT_EVENING.kelvinValue + ((DEFAULT_NIGHTLIGHT.kelvinValue - DEFAULT_EVENING.kelvinValue) / 4),
             result.temperature.kelvinValue
@@ -178,6 +186,7 @@ class CircadianColorsTest {
 
         val result = colors.getRoomColor(FakeRooms.LivingRoom)
 
+        assertTrue(result is LightSettings.Temperature)
         assertEquals(DEFAULT_NIGHTLIGHT, result.temperature)
         assertEquals(DEFAULT_NIGHT_BRIGHTNESS, result.brightness)
     }
@@ -201,6 +210,7 @@ class CircadianColorsTest {
 
         val result = colors.getRoomColor(FakeRooms.LivingRoom)
 
+        assertTrue(result is LightSettings.Temperature)
         assertEquals(
             DEFAULT_DAYLIGHT,
             result.temperature

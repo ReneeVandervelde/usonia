@@ -13,20 +13,48 @@
     <h1>Control Panel</h1>
 </header>
 
-<template id="user-template">
-    <article class="user" data-user-id="{{id}}" data-state="{{state}}">
-        <h2>{{name}}</h2>
-        <p>
-            <span class="user-state">{{state}}</span>
-            since {{since}}
-        </p>
-        <div class="user-actions">
-            <button class="primary" name="user-state" value="HOME" data-user-id="{{id}}">Set to Home</button>
-            <button class="primary" name="user-state" value="AWAY" data-user-id="{{id}}">Set to Away</button>
-        </div>
-    </article>
-</template>
+<section id="flags">
+    <template id="flag-template">
+        <form class="flag">
+            <label for="flag-value-{{key}}">{{key}}:</label>
+            <input type="hidden" name="flag-key" value="{{key}}" />
+            <input type="text" id="flag-value-{{key}}" name="flag-value" value="{{value}}" />
+            <button name="flag-save" type="submit" class="primary">Save</button>
+        </form>
+    </template>
+    <template id="flag-enable-template">
+        <form class="flag">
+            <input type="hidden" name="flag-key" value="{{key}}" />
+            <input type="hidden" name="flag-value" value="true" />
+            <button name="flag-save" type="submit" class="primary">Enable {{key}}</button>
+        </form>
+    </template>
+    <template id="flag-disable-template">
+        <form class="flag">
+            <input type="hidden" name="flag-key" value="{{key}}" />
+            <input type="hidden" name="flag-value" value="false" />
+            <button name="flag-save">Disable {{key}}</button>
+        </form>
+    </template>
+    <h1>Flags</h1>
+    <div id="flag-container"></div>
+</section>
+
 <section>
+    <template id="user-template">
+        <article class="user" data-user-id="{{id}}" data-state="{{state}}">
+            <h2>{{name}}</h2>
+            <p>
+                <span class="user-state">{{state}}</span>
+                since {{since}}
+            </p>
+            <div class="user-actions">
+                <button class="primary" name="user-state" value="HOME" data-user-id="{{id}}">Set to Home</button>
+                <button class="primary" name="user-state" value="AWAY" data-user-id="{{id}}">Set to Away</button>
+            </div>
+        </article>
+    </template>
+
     <h1>Users</h1>
     <div id="users"></div>
 </section>

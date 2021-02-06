@@ -36,8 +36,8 @@ class LightControllerTest {
         configurationAccess = configurationAccess,
     )
 
-    private val colorPicker = object: ColorPicker {
-        override suspend fun getRoomColor(room: Room) = LightSettings(
+    private val colorPicker = object: LightSettingsPicker {
+        override suspend fun getRoomColor(room: Room) = LightSettings.Temperature(
             temperature = ColorTemperature(420),
             brightness = 75.percent,
         )
