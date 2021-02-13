@@ -38,6 +38,7 @@ class WebPlugin(
         EventSocket(client, json, logger),
         FlagListSocket(client, json),
         EventsByDaySocket(client, json),
+        OldestEventSocket(client, json),
     )
     override val staticResources: List<String> = listOf(
         "web-frontend.js",

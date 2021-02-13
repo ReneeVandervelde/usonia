@@ -1,6 +1,8 @@
 package usonia.core.state
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import usonia.foundation.Event
 import usonia.foundation.PresenceState
@@ -23,6 +25,11 @@ interface EventAccess {
     val eventsByDay: Flow<Map<LocalDate, Int>>
 
     /**
+     * Oldest recorded event, used to determine the time relevance of data.
+     */
+    val oldestEventTime: Flow<Instant?>
+
+    /**
      * Get the last known event for an item.
      */
     suspend fun <T: Event> getState(id: Identifier, type: KClass<T>): T?
@@ -35,3 +42,8 @@ suspend fun EventAccess.allAway(users: Collection<User>): Boolean {
     if (users.isEmpty()) return false
     return users.all { getState(it.id, Event.Presence::class)?.state == PresenceState.AWAY }
 }
+
+/**
+ * Oldest recorded event, used to determine the time relevance of data.
+ */
+suspend fun EventAccess.getOldestEvent(): Instant? = oldestEventTime.first()

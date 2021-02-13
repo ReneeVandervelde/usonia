@@ -37,3 +37,10 @@ count() total,
 date(timestamp/1000, "unixepoch") localdate
 FROM Event
 GROUP BY date(timestamp/1000, "unixepoch");
+
+oldestEvent:
+SELECT
+timestamp
+FROM Event
+ORDER BY timestamp ASC
+LIMIT 1;

@@ -2,10 +2,7 @@ package usonia.todoist
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
+import kotlinx.datetime.*
 import usonia.core.state.*
 import usonia.foundation.Device
 import usonia.foundation.Event
@@ -25,16 +22,20 @@ internal class AwolDeviceReporter(
     private val client: BackendClient,
     private val api: TodoistApi,
     private val logger: KimchiLogger = EmptyLogger,
+    private val clock: Clock = Clock.System,
 ): CronJob {
     override val schedule: Schedule = Schedule().withMinutes { it % 20 == 0 }
 
-    private fun isRecent(
+    private suspend fun isRecent(
         time: Instant,
         event: Event?,
         device: Device
     ): Boolean {
-        if (event == null) return false
         val duration = device.capabilities.heartbeat ?: return true
+        if (event == null) {
+            val oldest = client.getOldestEvent() ?: return true
+            return oldest >= clock.now() - duration
+        }
 
         return event.timestamp > time - duration
     }
@@ -83,12 +84,13 @@ internal class AwolDeviceReporter(
 
         val reports = api.getTasks(token, project, label)
         val new = awol
-            .filter { (device, event) -> event != null && device.id !in reports.map { it.device } }
+            .filter { (device, _) -> device.id !in reports.map { it.device } }
             .map { (device, _) -> device}
             .also { logger.debug("${it.size} devices are new reports") }
         val found = reports
-            .filter { it.device != null && it.device !in awol.map { it.first.id } }
+            .filter { it.device != null }
             .filter { it.device !in awol.map { (device, _) -> device.id } }
+            .filter { it.device in deviceHeartbeats.filter { (_, event) -> event != null }.map { it.first.id } }
             .also { logger.debug("${it.size} devices have been found") }
 
         new.forEach {

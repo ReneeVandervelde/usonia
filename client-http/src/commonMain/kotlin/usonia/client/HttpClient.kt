@@ -13,6 +13,7 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.*
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.builtins.nullable
@@ -107,6 +108,22 @@ class HttpClient(
                     emit(json.decodeFromString(DateMetricSerializer, it.readText()))
                 } catch (error: Throwable) {
                     logger.error("Failed to deserialize Date-Events", error)
+                }
+            }
+        }
+    }
+    override val oldestEventTime: Flow<Instant?> = flow {
+        httpClient.ws(
+            host = host,
+            port = port,
+            path = "events/metric-oldest"
+        ) {
+            incoming.consumeEach {
+                if (it !is Frame.Text) return@consumeEach
+                try {
+                    emit(json.decodeFromString(InstantSerializer.nullable, it.readText()))
+                } catch (error: Throwable) {
+                    logger.error("Failed to deserialize oldest event metric", error)
                 }
             }
         }

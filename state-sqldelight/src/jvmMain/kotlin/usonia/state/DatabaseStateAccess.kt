@@ -4,6 +4,7 @@ import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
 import kotlinx.coroutines.flow.*
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.Json
 import usonia.foundation.Event
@@ -30,6 +31,16 @@ internal class DatabaseStateAccess(
                 it.map {
                     LocalDate.parse(it.localdate) to it.total.toInt()
                 }.toMap()
+            }
+    }
+
+    override val oldestEventTime: Flow<Instant?> by lazy {
+        eventQueries.value
+            .oldestEvent()
+            .asFlow()
+            .mapToOneOrNull()
+            .map {
+                it?.let { Instant.fromEpochMilliseconds(it) }
             }
     }
 

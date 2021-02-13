@@ -28,6 +28,11 @@ class InMemoryEventAccess(
                 .groupBy { it.timestamp.toLocalDateTime(timeZone).date }
                 .mapValues { it.value.size }
         }
+    override val oldestEventTime = eventRecords
+        .map {
+            eventRecords.replayCache.minByOrNull { it.timestamp }?.timestamp
+        }
+        .distinctUntilChanged()
 
     override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
         return eventRecords.replayCache
