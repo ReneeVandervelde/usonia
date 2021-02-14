@@ -4,6 +4,7 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import usonia.rules.alerts.WaterMonitor
 import usonia.rules.indicator.Indicator
+import usonia.rules.lights.AwayMode
 import usonia.rules.lights.CircadianColors
 import usonia.rules.lights.CompositeLightingPicker
 import usonia.rules.lights.LightController
@@ -18,17 +19,10 @@ class RulesPlugin(
     weather: WeatherAccess,
     logger: KimchiLogger = EmptyLogger,
 ): ServerPlugin {
-    private val circadianColors = CircadianColors(
-        configurationAccess = client,
-        weather = weather,
-        logger = logger,
-    )
-    private val movieMode = MovieMode(
-        client = client,
-    )
     private val colorPicker = CompositeLightingPicker(
-        movieMode,
-        circadianColors,
+        AwayMode(client),
+        MovieMode(client),
+        CircadianColors(client, weather, logger = logger),
     )
 
     override val daemons: List<Daemon> = listOf(

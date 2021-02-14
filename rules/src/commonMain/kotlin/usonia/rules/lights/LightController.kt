@@ -5,7 +5,6 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.selects.select
-import usonia.core.state.allAway
 import usonia.core.state.publishAll
 import usonia.foundation.*
 import usonia.foundation.Room.Type.*
@@ -37,11 +36,6 @@ internal class LightController(
     }
 
     private suspend fun onMotionEvent(event: Event.Motion, site: Site) {
-        if (client.allAway(site.users)) {
-            logger.info("All ${site.users.size} users are away. Ignoring Motion Event.")
-            return
-        }
-
         val room = site.getRoom(event.source)
         when (event.state) {
             MotionState.MOTION -> onRoomMotion(room)
