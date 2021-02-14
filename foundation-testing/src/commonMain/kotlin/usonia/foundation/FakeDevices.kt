@@ -39,6 +39,7 @@ object FakeDevices {
     val HueGroup = Device(
         id = Identifier("fake-hue-group"),
         name = "Fake Hue Group",
+        fixture = Fixture.Light,
         capabilities = Capabilities(
             actions = setOf(
                 Action.Switch::class,

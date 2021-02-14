@@ -101,9 +101,23 @@ internal class LightController(
     }
 
     private suspend fun onRoomMotion(room: Room) {
-        logger.trace("Turning on lights in ${room.name}")
-        val color = lightSettingsPicker.getRoomColor(room) as? LightSettings.Temperature ?: return
+        logger.trace("Adjusting lights in ${room.name}")
+        val settings = lightSettingsPicker.getRoomSettings(room)
+
+        when (settings) {
+            is LightSettings.Temperature -> setRoomTemperature(room, settings)
+            LightSettings.Ignore -> {
+                logger.trace("Ignored action for room event: $room")
+            }
+            LightSettings.Unhandled -> {
+                logger.warn("Unhandled action for room event: $room")
+            }
+        }
+    }
+
+    private suspend fun setRoomTemperature(room: Room, color: LightSettings.Temperature) {
         val colorTemperatureDevices = room.devices
+            .filter { Fixture.Light == it.fixture }
             .filter { Action.ColorTemperatureChange::class in it.capabilities.actions }
             .map {
                 Action.ColorTemperatureChange(
@@ -114,6 +128,7 @@ internal class LightController(
                 )
             }
         val dimmingDevices = room.devices
+            .filter { Fixture.Light == it.fixture }
             .filter { Action.ColorTemperatureChange::class !in it.capabilities.actions }
             .filter { Action.Dim::class in it.capabilities.actions }
             .map {
@@ -124,6 +139,7 @@ internal class LightController(
                 )
             }
         val switchDevices = room.devices
+            .filter { Fixture.Light == it.fixture }
             .filter { Action.ColorTemperatureChange::class !in it.capabilities.actions }
             .filter { Action.Dim::class !in it.capabilities.actions }
             .filter { Action.Switch::class in it.capabilities.actions }

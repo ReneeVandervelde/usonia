@@ -14,19 +14,19 @@ class CompositeLightingPickerTest {
     @Test
     fun orderedExecution() = runBlockingTest {
         val first = object: LightSettingsPicker {
-            override suspend fun getRoomColor(room: Room): LightSettings {
+            override suspend fun getRoomSettings(room: Room): LightSettings {
                 return LightSettings.Temperature(ColorTemperature(12), 34.percent)
             }
         }
         val second = object: LightSettingsPicker {
-            override suspend fun getRoomColor(room: Room): LightSettings {
+            override suspend fun getRoomSettings(room: Room): LightSettings {
                 return LightSettings.Temperature(ColorTemperature(56), 78.percent)
             }
         }
 
         val composite = CompositeLightingPicker(first, second)
 
-        val result = composite.getRoomColor(FakeRooms.LivingRoom)
+        val result = composite.getRoomSettings(FakeRooms.LivingRoom)
 
         assertTrue(result is LightSettings.Temperature)
         assertEquals(12, result.temperature.kelvinValue)
@@ -36,19 +36,19 @@ class CompositeLightingPickerTest {
     @Test
     fun skipUnhandled() = runBlockingTest {
         val first = object: LightSettingsPicker {
-            override suspend fun getRoomColor(room: Room): LightSettings {
+            override suspend fun getRoomSettings(room: Room): LightSettings {
                 return LightSettings.Unhandled
             }
         }
         val second = object: LightSettingsPicker {
-            override suspend fun getRoomColor(room: Room): LightSettings {
+            override suspend fun getRoomSettings(room: Room): LightSettings {
                 return LightSettings.Temperature(ColorTemperature(56), 78.percent)
             }
         }
 
         val composite = CompositeLightingPicker(first, second)
 
-        val result = composite.getRoomColor(FakeRooms.LivingRoom)
+        val result = composite.getRoomSettings(FakeRooms.LivingRoom)
 
         assertTrue(result is LightSettings.Temperature)
         assertEquals(56, result.temperature.kelvinValue)
@@ -58,18 +58,18 @@ class CompositeLightingPickerTest {
     @Test(expected = IllegalStateException::class)
     fun noneHandled() = runBlockingTest {
         val first = object: LightSettingsPicker {
-            override suspend fun getRoomColor(room: Room): LightSettings {
+            override suspend fun getRoomSettings(room: Room): LightSettings {
                 return LightSettings.Unhandled
             }
         }
         val second = object: LightSettingsPicker {
-            override suspend fun getRoomColor(room: Room): LightSettings {
+            override suspend fun getRoomSettings(room: Room): LightSettings {
                 return LightSettings.Unhandled
             }
         }
 
         val composite = CompositeLightingPicker(first, second)
 
-        composite.getRoomColor(FakeRooms.LivingRoom)
+        composite.getRoomSettings(FakeRooms.LivingRoom)
     }
 }

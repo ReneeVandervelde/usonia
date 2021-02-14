@@ -36,8 +36,8 @@ class LightControllerTest {
         configurationAccess = configurationAccess,
     )
 
-    private val colorPicker = object: LightSettingsPicker {
-        override suspend fun getRoomColor(room: Room) = LightSettings.Temperature(
+    private val settingsPicker = object: LightSettingsPicker {
+        override suspend fun getRoomSettings(room: Room) = LightSettings.Temperature(
             temperature = ColorTemperature(420),
             brightness = 75.percent,
         )
@@ -52,7 +52,7 @@ class LightControllerTest {
             actionPublisher = actionPublisher,
         )
 
-        val controller = LightController(client, colorPicker, backgroundScope = this)
+        val controller = LightController(client, settingsPicker, backgroundScope = this)
         val daemonJob = launch { controller.start() }
 
         pauseDispatcher {
@@ -72,6 +72,62 @@ class LightControllerTest {
     }
 
     @Test
+    fun settingsIgnore() = runBlockingTest {
+        val eventAccess = EventAccessFake()
+        val actionPublisher = ActionPublisherSpy()
+        val client = testClient.copy(
+            eventAccess = eventAccess,
+            actionPublisher = actionPublisher,
+        )
+        val settingsPicker = object: LightSettingsPicker {
+            override suspend fun getRoomSettings(room: Room): LightSettings = LightSettings.Ignore
+        }
+
+        val controller = LightController(client, settingsPicker, backgroundScope = this)
+        val daemonJob = launch { controller.start() }
+
+        pauseDispatcher {
+            eventAccess.events.emit(Event.Motion(
+                FakeDevices.Motion.id,
+                Clock.System.now(),
+                MotionState.MOTION
+            ))
+        }
+
+        assertEquals(0, actionPublisher.actions.size, "No action taken when unhandled settings.")
+
+        daemonJob.cancelAndJoin()
+    }
+
+    @Test
+    fun settingsUnhandled() = runBlockingTest {
+        val eventAccess = EventAccessFake()
+        val actionPublisher = ActionPublisherSpy()
+        val client = testClient.copy(
+            eventAccess = eventAccess,
+            actionPublisher = actionPublisher,
+        )
+        val settingsPicker = object: LightSettingsPicker {
+            override suspend fun getRoomSettings(room: Room): LightSettings = LightSettings.Unhandled
+        }
+
+        val controller = LightController(client, settingsPicker, backgroundScope = this)
+        val daemonJob = launch { controller.start() }
+
+        pauseDispatcher {
+            eventAccess.events.emit(Event.Motion(
+                FakeDevices.Motion.id,
+                Clock.System.now(),
+                MotionState.MOTION
+            ))
+        }
+
+        assertEquals(0, actionPublisher.actions.size, "No action taken when unhandled settings.")
+
+        daemonJob.cancelAndJoin()
+    }
+
+    @Test
     fun lightsOff() = runBlockingTest {
         val eventAccess = EventAccessFake()
         val actionPublisher = ActionPublisherSpy()
@@ -80,7 +136,7 @@ class LightControllerTest {
             actionPublisher = actionPublisher,
         )
 
-        val controller = LightController(client, colorPicker, backgroundScope = this)
+        val controller = LightController(client, settingsPicker, backgroundScope = this)
         val daemonJob = launch { controller.start() }
 
         pauseDispatcher {
@@ -110,7 +166,7 @@ class LightControllerTest {
             actionPublisher = actionPublisher,
         )
 
-        val controller = LightController(client, colorPicker, backgroundScope = this)
+        val controller = LightController(client, settingsPicker, backgroundScope = this)
         val daemonJob = launch { controller.start() }
 
         eventAccess.events.emit(Event.Motion(
@@ -155,7 +211,7 @@ class LightControllerTest {
             configurationAccess = configurationAccess,
         )
 
-        val controller = LightController(client, colorPicker, backgroundScope = this)
+        val controller = LightController(client, settingsPicker, backgroundScope = this)
         val daemonJob = launch { controller.start() }
 
         pauseDispatcher {

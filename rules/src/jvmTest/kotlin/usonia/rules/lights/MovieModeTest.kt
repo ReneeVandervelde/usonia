@@ -21,22 +21,20 @@ class MovieModeTest {
         }
         val picker = MovieMode(fakeConfig)
 
-        val livingRoom = picker.getRoomColor(FakeRooms.LivingRoom)
-        assertTrue(livingRoom is LightSettings.Temperature)
-        assertEquals(0.percent, livingRoom.brightness)
-        assertEquals(2856, livingRoom.temperature.kelvinValue)
+        val livingRoom = picker.getRoomSettings(FakeRooms.LivingRoom)
+        assertTrue(livingRoom is LightSettings.Ignore)
 
-        val hallway = picker.getRoomColor(FakeRooms.FakeHallway)
+        val hallway = picker.getRoomSettings(FakeRooms.FakeHallway)
         assertTrue(hallway is LightSettings.Temperature)
         assertEquals(1.percent, hallway.brightness)
         assertEquals(2856, hallway.temperature.kelvinValue)
 
-        val bathroom = picker.getRoomColor(FakeRooms.FakeBathroom)
+        val bathroom = picker.getRoomSettings(FakeRooms.FakeBathroom)
         assertTrue(bathroom is LightSettings.Temperature)
         assertEquals(50.percent, bathroom.brightness)
         assertEquals(2856, bathroom.temperature.kelvinValue)
 
-        val bedroom = picker.getRoomColor(FakeRooms.FakeBedroom)
+        val bedroom = picker.getRoomSettings(FakeRooms.FakeBedroom)
         assertTrue(bedroom is LightSettings.Unhandled)
     }
 
@@ -49,16 +47,16 @@ class MovieModeTest {
         }
         val picker = MovieMode(fakeConfig)
 
-        val livingRoom = picker.getRoomColor(FakeRooms.LivingRoom)
+        val livingRoom = picker.getRoomSettings(FakeRooms.LivingRoom)
         assertTrue(livingRoom is LightSettings.Unhandled)
 
-        val hallway = picker.getRoomColor(FakeRooms.FakeHallway)
+        val hallway = picker.getRoomSettings(FakeRooms.FakeHallway)
         assertTrue(hallway is LightSettings.Unhandled)
 
-        val bathroom = picker.getRoomColor(FakeRooms.FakeBathroom)
+        val bathroom = picker.getRoomSettings(FakeRooms.FakeBathroom)
         assertTrue(bathroom is LightSettings.Unhandled)
 
-        val bedroom = picker.getRoomColor(FakeRooms.FakeBedroom)
+        val bedroom = picker.getRoomSettings(FakeRooms.FakeBedroom)
         assertTrue(bedroom is LightSettings.Unhandled)
     }
 
@@ -69,16 +67,16 @@ class MovieModeTest {
         }
         val picker = MovieMode(fakeConfig)
 
-        val livingRoom = picker.getRoomColor(FakeRooms.LivingRoom)
+        val livingRoom = picker.getRoomSettings(FakeRooms.LivingRoom)
         assertTrue(livingRoom is LightSettings.Unhandled)
 
-        val hallway = picker.getRoomColor(FakeRooms.FakeHallway)
+        val hallway = picker.getRoomSettings(FakeRooms.FakeHallway)
         assertTrue(hallway is LightSettings.Unhandled)
 
-        val bathroom = picker.getRoomColor(FakeRooms.FakeBathroom)
+        val bathroom = picker.getRoomSettings(FakeRooms.FakeBathroom)
         assertTrue(bathroom is LightSettings.Unhandled)
 
-        val bedroom = picker.getRoomColor(FakeRooms.FakeBedroom)
+        val bedroom = picker.getRoomSettings(FakeRooms.FakeBedroom)
         assertTrue(bedroom is LightSettings.Unhandled)
     }
 }

@@ -6,5 +6,5 @@ import usonia.foundation.Room
  * Determine light color for a room.
  */
 internal interface LightSettingsPicker {
-    suspend fun getRoomColor(room: Room): LightSettings
+    suspend fun getRoomSettings(room: Room): LightSettings
 }

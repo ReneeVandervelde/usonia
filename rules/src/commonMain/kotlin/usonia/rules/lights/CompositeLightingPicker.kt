@@ -14,9 +14,9 @@ import usonia.rules.lights.LightSettings.Unhandled
 internal class CompositeLightingPicker(
     private vararg val pickers: LightSettingsPicker,
 ): LightSettingsPicker {
-    override suspend fun getRoomColor(room: Room): LightSettings {
+    override suspend fun getRoomSettings(room: Room): LightSettings {
         pickers.forEach {
-            val result = it.getRoomColor(room)
+            val result = it.getRoomSettings(room)
             if (result != Unhandled) return result
         }
         throw IllegalStateException("No Picker handled room color!")

@@ -13,15 +13,12 @@ import usonia.kotlin.unit.percent
 internal class MovieMode(
     private val config: ConfigurationAccess,
 ): LightSettingsPicker {
-    override suspend fun getRoomColor(room: Room): LightSettings {
+    override suspend fun getRoomSettings(room: Room): LightSettings {
         if (!config.getBooleanFlag("Movie Mode")) {
             return LightSettings.Unhandled
         }
         return when(room.type) {
-            LivingRoom -> LightSettings.Temperature(
-                temperature = ColorTemperature(2856),
-                brightness = 0.percent,
-            )
+            LivingRoom -> LightSettings.Ignore
             Kitchen, Hallway, Dining -> LightSettings.Temperature(
                 temperature = ColorTemperature(2856),
                 brightness = 1.percent,

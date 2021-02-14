@@ -40,7 +40,7 @@ internal class CircadianColors(
     private val timeZone: TimeZone = TimeZone.currentSystemDefault(),
     private val logger: KimchiLogger = EmptyLogger,
 ): LightSettingsPicker {
-    override suspend fun getRoomColor(room: Room): LightSettings {
+    override suspend fun getRoomSettings(room: Room): LightSettings {
         val forecast = weather.forecast.first()
         val site = configurationAccess.getSite()
         val daylightColor = site.parameters[DAYLIGHT]
