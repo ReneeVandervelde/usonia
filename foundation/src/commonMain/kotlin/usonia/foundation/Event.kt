@@ -260,7 +260,7 @@ object EventSerializer: KSerializer<Event> {
                 z = value.z
             )
             is Event.Movement -> prototype.copy(
-                motionState = value.state.name
+                movementState = value.state.name
             )
         }
 
