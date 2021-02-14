@@ -24,7 +24,7 @@ class RulesPlugin(
         logger = logger,
     )
     private val movieMode = MovieMode(
-        config = client,
+        client = client,
     )
     private val colorPicker = CompositeLightingPicker(
         movieMode,

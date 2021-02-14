@@ -1,12 +1,18 @@
 package usonia.rules.lights
 
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
+import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
-import usonia.foundation.FakeRooms
+import usonia.foundation.*
 import usonia.kotlin.unit.percent
+import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -19,7 +25,10 @@ class MovieModeTest {
                 "Movie Mode" to "true"
             ))
         }
-        val picker = MovieMode(fakeConfig)
+        val client = DummyClient.copy(
+            configurationAccess = fakeConfig,
+        )
+        val picker = MovieMode(client)
 
         val livingRoom = picker.getRoomSettings(FakeRooms.LivingRoom)
         assertTrue(livingRoom is LightSettings.Ignore)
@@ -45,7 +54,10 @@ class MovieModeTest {
                 "Movie Mode" to "false"
             ))
         }
-        val picker = MovieMode(fakeConfig)
+        val client = DummyClient.copy(
+            configurationAccess = fakeConfig,
+        )
+        val picker = MovieMode(client)
 
         val livingRoom = picker.getRoomSettings(FakeRooms.LivingRoom)
         assertTrue(livingRoom is LightSettings.Unhandled)
@@ -65,7 +77,10 @@ class MovieModeTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
             override val flags: Flow<Map<String, String?>> = flowOf(mapOf())
         }
-        val picker = MovieMode(fakeConfig)
+        val client = DummyClient.copy(
+            configurationAccess = fakeConfig,
+        )
+        val picker = MovieMode(client)
 
         val livingRoom = picker.getRoomSettings(FakeRooms.LivingRoom)
         assertTrue(livingRoom is LightSettings.Unhandled)
@@ -78,5 +93,65 @@ class MovieModeTest {
 
         val bedroom = picker.getRoomSettings(FakeRooms.FakeBedroom)
         assertTrue(bedroom is LightSettings.Unhandled)
+    }
+
+    @Test
+    fun start() = runBlockingTest {
+        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
+            override val site: Flow<Site> = flowOf(FakeSite.copy(
+                rooms = setOf(FakeRooms.LivingRoom.copy(
+                    devices = setOf(FakeDevices.HueGroup),
+                )),
+            ))
+            override val flags = MutableSharedFlow<Map<String, String>>()
+        }
+        val publisherSpy = ActionPublisherSpy()
+        val client = DummyClient.copy(
+            configurationAccess = fakeConfig,
+            actionPublisher = publisherSpy,
+        )
+        val picker = MovieMode(client)
+
+        val daemon = launch { picker.start() }
+        fakeConfig.flags.emit(mapOf(
+            "Movie Mode" to "true"
+        ))
+
+        assertEquals(1, publisherSpy.actions.size)
+        val action = publisherSpy.actions.single()
+        assertTrue(action is Action.Switch)
+        assertEquals(SwitchState.OFF, action.state)
+
+        daemon.cancelAndJoin()
+    }
+
+    @Test
+    fun stop() = runBlockingTest {
+        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
+            override val site: Flow<Site> = flowOf(FakeSite.copy(
+                rooms = setOf(FakeRooms.LivingRoom.copy(
+                    devices = setOf(FakeDevices.HueGroup),
+                )),
+            ))
+            override val flags = MutableSharedFlow<Map<String, String>>()
+        }
+        val publisherSpy = ActionPublisherSpy()
+        val client = DummyClient.copy(
+            configurationAccess = fakeConfig,
+            actionPublisher = publisherSpy,
+        )
+        val picker = MovieMode(client)
+
+        val daemon = launch { picker.start() }
+        fakeConfig.flags.emit(mapOf(
+            "Movie Mode" to "false"
+        ))
+
+        assertEquals(1, publisherSpy.actions.size)
+        val action = publisherSpy.actions.single()
+        assertTrue(action is Action.Switch)
+        assertEquals(SwitchState.ON, action.state)
+
+        daemon.cancelAndJoin()
     }
 }
