@@ -23,6 +23,11 @@ section h3::before
     content: none;
 }
 
+button, input[type=submit], input[type=button]
+{
+    margin: .5rem 0rem;
+}
+
 #log-console
 {
     overflow-y: scroll;
