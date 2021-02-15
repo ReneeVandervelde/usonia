@@ -7,17 +7,14 @@ import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import usonia.core.state.getBooleanFlag
-import usonia.core.state.hasAdjacentType
-import usonia.core.state.setFlag
-import usonia.foundation.Event
-import usonia.foundation.LatchState
-import usonia.foundation.Room
-import usonia.foundation.getRoomContainingDevice
+import usonia.core.state.*
+import usonia.foundation.*
 import usonia.kotlin.neverEnding
 import usonia.kotlin.unit.percent
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
 private const val FLAG = "Sleep Mode"
 private const val NIGHT_START = "sleep.night.start"
@@ -28,6 +25,7 @@ private const val DEFAULT_NIGHT_END = 4 * 60
 /**
  * Keeps bedroom and adjacent rooms dim/off when sleep mode is enabled.
  */
+@OptIn(ExperimentalTime::class)
 internal class SleepMode(
     private val client: BackendClient,
     private val logger: KimchiLogger = EmptyLogger,
@@ -60,7 +58,63 @@ internal class SleepMode(
     override suspend fun start(): Nothing = neverEnding {
         coroutineScope {
             launch { autoEnable() }
+            launch { lightsOffOnEnable() }
         }
+    }
+
+    private suspend fun lightsOffOnEnable() {
+        client.site.collectLatest { site ->
+            client.flags
+                .map { it[FLAG].toBoolean() }
+                .distinctUntilChanged()
+                .filter { enabled -> enabled }
+                .collect {
+                    val bedrooms = site.rooms
+                        .filter { it.type == Room.Type.Bedroom }
+
+                    bedrooms.flatMap(::getDimActions).run { client.publishAll(this) }
+                    delay(30.seconds)
+                    bedrooms.flatMap(::getOffActions).run { client.publishAll(this) }
+                }
+        }
+    }
+
+    private fun getDimActions(room: Room): List<Action> {
+        val colorTemperatureDevices = room.devices
+            .filter { Fixture.Light == it.fixture }
+            .filter { Action.ColorTemperatureChange::class in it.capabilities.actions }
+            .map {
+                Action.ColorTemperatureChange(
+                    target = it.id,
+                    temperature = Colors.Warm,
+                    level = 2.percent,
+                    switchState = SwitchState.ON,
+                )
+            }
+        val dimmingDevices = room.devices
+            .filter { Fixture.Light == it.fixture }
+            .filter { Action.ColorTemperatureChange::class !in it.capabilities.actions }
+            .filter { Action.Dim::class in it.capabilities.actions }
+            .map {
+                Action.Dim(
+                    target = it.id,
+                    level = 2.percent,
+                    switchState = SwitchState.ON,
+                )
+            }
+
+        return colorTemperatureDevices + dimmingDevices
+    }
+
+    private fun getOffActions(room: Room): List<Action> {
+        return room.devices
+            .filter { Fixture.Light == it.fixture }
+            .map {
+                Action.Switch(
+                    target = it.id,
+                    state = SwitchState.OFF,
+                )
+            }
     }
 
     private suspend fun autoEnable() {

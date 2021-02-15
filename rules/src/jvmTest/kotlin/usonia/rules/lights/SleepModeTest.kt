@@ -2,26 +2,28 @@ package usonia.rules.lights
 
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.datetime.*
-import usonia.core.state.ConfigurationAccess
-import usonia.core.state.ConfigurationAccessStub
-import usonia.core.state.EventAccessFake
+import usonia.core.state.*
 import usonia.foundation.*
 import usonia.kotlin.unit.percent
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
+@OptIn(ExperimentalTime::class)
 class SleepModeTest {
     private val configurationDouble = object: ConfigurationAccess by ConfigurationAccessStub {
         val setFlags = mutableListOf<Pair<String, String?>>()
         override val site: Flow<Site> = flowOf(FakeSite.copy(
             rooms = setOf(FakeRooms.FakeBedroom.copy(
-                devices = setOf(FakeDevices.Latch)
+                devices = setOf(FakeDevices.Latch, FakeDevices.HueGroup)
             ))
         ))
 
@@ -198,6 +200,57 @@ class SleepModeTest {
         ))
 
         assertTrue("Sleep Mode" to "true" !in configurationDouble.setFlags, "Sleep mode not set during day")
+
+        daemon.cancelAndJoin()
+    }
+
+    @Test
+    fun lightsOffOnEnable() = runBlockingTest {
+        val fakeConfig = object: ConfigurationAccess by configurationDouble {
+            override val flags = MutableSharedFlow<Map<String, String?>>()
+        }
+        val actionSpy = ActionPublisherSpy()
+        val client = DummyClient.copy(
+            configurationAccess = fakeConfig,
+            eventAccess = EventAccessStub,
+            actionPublisher = actionSpy,
+        )
+        val picker = SleepMode(client)
+
+        val daemon = launch { picker.start() }
+        fakeConfig.flags.emit(mapOf("Sleep Mode" to "true"))
+        runCurrent()
+        assertEquals(1, actionSpy.actions.size, "Lights Dimmed immediately")
+        assertTrue(actionSpy.actions.single() is Action.ColorTemperatureChange)
+        assertEquals(FakeDevices.HueGroup.id, actionSpy.actions.single().target)
+        advanceTimeBy(31.seconds.toLongMilliseconds())
+        assertEquals(2, actionSpy.actions.size, "Lights Turned off after 30 seconds")
+        val offAction = actionSpy.actions[1]
+        assertTrue(offAction is Action.Switch)
+        assertEquals(SwitchState.OFF, offAction.state)
+
+
+        daemon.cancelAndJoin()
+    }
+
+    @Test
+    fun noopOnDisable() = runBlockingTest {
+        val fakeConfig = object: ConfigurationAccess by configurationDouble {
+            override val flags = MutableSharedFlow<Map<String, String?>>()
+        }
+        val actionSpy = ActionPublisherSpy()
+        val client = DummyClient.copy(
+            configurationAccess = fakeConfig,
+            eventAccess = EventAccessStub,
+            actionPublisher = actionSpy,
+        )
+        val picker = SleepMode(client)
+
+        val daemon = launch { picker.start() }
+        fakeConfig.flags.emit(mapOf("Sleep Mode" to "false"))
+        runCurrent()
+        advanceUntilIdle()
+        assertEquals(0, actionSpy.actions.size, "No action on disable")
 
         daemon.cancelAndJoin()
     }
