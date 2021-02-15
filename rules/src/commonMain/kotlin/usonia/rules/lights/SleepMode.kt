@@ -12,6 +12,8 @@ import usonia.core.state.*
 import usonia.foundation.*
 import usonia.kotlin.neverEnding
 import usonia.kotlin.unit.percent
+import usonia.rules.Flags
+import usonia.rules.sleepMode
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
 import usonia.server.cron.CronJob
@@ -19,7 +21,6 @@ import usonia.server.cron.Schedule
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 
-private const val FLAG = "Sleep Mode"
 private const val NIGHT_START = "sleep.night.start"
 private const val DEFAULT_NIGHT = 20 * 60
 private const val NIGHT_END = "sleep.night.end"
@@ -42,7 +43,7 @@ internal class SleepMode(
     )
 
     override suspend fun getRoomSettings(room: Room): LightSettings {
-        if (!client.getBooleanFlag(FLAG)) return LightSettings.Unhandled
+        if (!client.getBooleanFlag(Flags.SleepMode)) return LightSettings.Unhandled
 
         return when (room.type) {
             Room.Type.Bathroom -> LightSettings.Temperature(
@@ -65,7 +66,7 @@ internal class SleepMode(
     }
 
     override suspend fun run(time: LocalDateTime, timeZone: TimeZone) {
-        client.setFlag(FLAG, false)
+        client.setFlag(Flags.SleepMode, false)
     }
 
     override suspend fun start(): Nothing = neverEnding {
@@ -77,8 +78,7 @@ internal class SleepMode(
 
     private suspend fun lightsOffOnEnable() {
         client.site.collectLatest { site ->
-            client.flags
-                .map { it[FLAG].toBoolean() }
+            client.sleepMode
                 .distinctUntilChanged()
                 .filter { enabled -> enabled }
                 .collect {
@@ -145,7 +145,7 @@ internal class SleepMode(
                 .filter { it.state == LatchState.CLOSED }
                 .filter { site.getRoomContainingDevice(it.source).type == Room.Type.Bedroom }
                 .onEach { logger.info("Enabling Night Mode") }
-                .collect { client.setFlag(FLAG, true) }
+                .collect { client.setFlag(Flags.SleepMode, true) }
         }
     }
 
