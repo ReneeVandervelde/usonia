@@ -254,4 +254,15 @@ class SleepModeTest {
 
         daemon.cancelAndJoin()
     }
+
+    @Test
+    fun autoDisable() = runBlockingTest {
+        val client = DummyClient.copy(
+            configurationAccess = configurationDouble,
+        )
+        val picker = SleepMode(client)
+        picker.run(Instant.DISTANT_PAST.toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
+
+        assertTrue("Sleep Mode" to "false" in configurationDouble.setFlags, "Sleep mode is set to false on cron run")
+    }
 }

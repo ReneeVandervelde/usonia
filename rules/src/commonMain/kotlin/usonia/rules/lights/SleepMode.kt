@@ -5,6 +5,7 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import usonia.core.state.*
@@ -13,6 +14,8 @@ import usonia.kotlin.neverEnding
 import usonia.kotlin.unit.percent
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
+import usonia.server.cron.CronJob
+import usonia.server.cron.Schedule
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 
@@ -31,7 +34,13 @@ internal class SleepMode(
     private val logger: KimchiLogger = EmptyLogger,
     private val clock: Clock = Clock.System,
     private val timeZone: TimeZone = TimeZone.currentSystemDefault(),
-): LightSettingsPicker, Daemon {
+): LightSettingsPicker, Daemon, CronJob {
+
+    override val schedule: Schedule = Schedule(
+        hours = setOf(9),
+        minutes = setOf(0),
+    )
+
     override suspend fun getRoomSettings(room: Room): LightSettings {
         if (!client.getBooleanFlag(FLAG)) return LightSettings.Unhandled
 
@@ -53,6 +62,10 @@ internal class SleepMode(
             Room.Type.Bedroom -> LightSettings.Ignore
             else -> LightSettings.Unhandled
         }
+    }
+
+    override suspend fun run(time: LocalDateTime, timeZone: TimeZone) {
+        client.setFlag(FLAG, false)
     }
 
     override suspend fun start(): Nothing = neverEnding {

@@ -13,6 +13,7 @@ import usonia.rules.lights.SleepMode
 import usonia.server.Daemon
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
+import usonia.server.cron.CronJob
 import usonia.weather.WeatherAccess
 
 class RulesPlugin(
@@ -34,6 +35,11 @@ class RulesPlugin(
         WaterMonitor(client, logger),
         LightController(client, colorPicker, logger),
         Indicator(client, weather, logger),
+        sleepMode,
         movieMode,
+    )
+
+    override val crons: List<CronJob> = listOf(
+        sleepMode,
     )
 }
