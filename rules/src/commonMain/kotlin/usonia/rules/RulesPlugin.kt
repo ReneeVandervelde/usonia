@@ -21,7 +21,7 @@ class RulesPlugin(
     logger: KimchiLogger = EmptyLogger,
 ): ServerPlugin {
     private val movieMode = MovieMode(client)
-    private val sleepMode = SleepMode(client)
+    private val sleepMode = SleepMode(client, logger)
 
     private val colorPicker = CompositeLightingPicker(
         AwayMode(client),

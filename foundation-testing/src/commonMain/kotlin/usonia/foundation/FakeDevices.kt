@@ -14,6 +14,17 @@ object FakeDevices {
         )
     )
 
+    val Latch = Device(
+        id = Identifier("fake-latch"),
+        name = "Fake Latch",
+        capabilities = Capabilities(
+            actions = emptySet(),
+            events = setOf(
+                Event.Latch::class
+            )
+        )
+    )
+
     val Motion = Device(
         id = Identifier("fake-motion"),
         name = "Fake Motion Sensor",
