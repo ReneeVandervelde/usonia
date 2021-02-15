@@ -9,6 +9,7 @@ import usonia.rules.lights.CircadianColors
 import usonia.rules.lights.CompositeLightingPicker
 import usonia.rules.lights.LightController
 import usonia.rules.lights.MovieMode
+import usonia.rules.lights.SleepMode
 import usonia.server.Daemon
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
@@ -20,9 +21,11 @@ class RulesPlugin(
     logger: KimchiLogger = EmptyLogger,
 ): ServerPlugin {
     private val movieMode = MovieMode(client)
+    private val sleepMode = SleepMode(client)
 
     private val colorPicker = CompositeLightingPicker(
         AwayMode(client),
+        sleepMode,
         movieMode,
         CircadianColors(client, weather, logger = logger),
     )

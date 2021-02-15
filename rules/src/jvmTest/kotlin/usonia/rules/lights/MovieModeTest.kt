@@ -36,12 +36,12 @@ class MovieModeTest {
         val hallway = picker.getRoomSettings(FakeRooms.FakeHallway)
         assertTrue(hallway is LightSettings.Temperature)
         assertEquals(1.percent, hallway.brightness)
-        assertEquals(2856, hallway.temperature.kelvinValue)
+        assertEquals(Colors.Warm, hallway.temperature)
 
         val bathroom = picker.getRoomSettings(FakeRooms.FakeBathroom)
         assertTrue(bathroom is LightSettings.Temperature)
         assertEquals(50.percent, bathroom.brightness)
-        assertEquals(2856, bathroom.temperature.kelvinValue)
+        assertEquals(Colors.Warm, bathroom.temperature)
 
         val bedroom = picker.getRoomSettings(FakeRooms.FakeBedroom)
         assertTrue(bedroom is LightSettings.Unhandled)

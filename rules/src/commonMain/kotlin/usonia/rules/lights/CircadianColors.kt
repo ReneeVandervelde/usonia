@@ -21,9 +21,9 @@ private const val NIGHTLIGHT = "circadian.color.nightlight"
 private const val NIGHT_BRIGHTNESS = "circadian.color.night.brightness"
 private const val NIGHT_START = "circadian.color.night.start"
 private const val TRANSITION_PERIOD = "circadian.color.period"
-internal val DEFAULT_NIGHTLIGHT = ColorTemperature(2800)
-internal val DEFAULT_EVENING = ColorTemperature(4800)
-internal val DEFAULT_DAYLIGHT = ColorTemperature(6200)
+internal val DEFAULT_NIGHTLIGHT = Colors.Warm
+internal val DEFAULT_EVENING = Colors.Medium
+internal val DEFAULT_DAYLIGHT = Colors.Daylight
 internal val DEFAULT_NIGHT_BRIGHTNESS = 50.percent
 internal val DEFAULT_NIGHT_START = 20 * 60
 @ExperimentalTime

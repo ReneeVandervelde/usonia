@@ -2,7 +2,6 @@ package usonia.rules.lights
 
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
-import usonia.core.state.ConfigurationAccess
 import usonia.core.state.getBooleanFlag
 import usonia.core.state.getSite
 import usonia.core.state.publishAll
@@ -11,7 +10,6 @@ import usonia.foundation.Fixture
 import usonia.foundation.Room
 import usonia.foundation.Room.Type.*
 import usonia.foundation.SwitchState
-import usonia.foundation.unit.ColorTemperature
 import usonia.kotlin.neverEnding
 import usonia.kotlin.unit.percent
 import usonia.server.Daemon
@@ -32,11 +30,11 @@ internal class MovieMode(
         return when(room.type) {
             LivingRoom -> LightSettings.Ignore
             Kitchen, Hallway, Dining -> LightSettings.Temperature(
-                temperature = ColorTemperature(2856),
+                temperature = Colors.Warm,
                 brightness = 1.percent,
             )
             Bathroom -> LightSettings.Temperature(
-                temperature = ColorTemperature(2856),
+                temperature = Colors.Warm,
                 brightness = 50.percent,
             )
             Bedroom, Garage, Generic, Office, Storage, Utility -> LightSettings.Unhandled

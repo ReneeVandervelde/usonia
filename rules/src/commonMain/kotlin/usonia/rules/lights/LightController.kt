@@ -36,7 +36,7 @@ internal class LightController(
     }
 
     private suspend fun onMotionEvent(event: Event.Motion, site: Site) {
-        val room = site.getRoom(event.source)
+        val room = site.getRoomContainingDevice(event.source)
         when (event.state) {
             MotionState.MOTION -> onRoomMotion(room)
             MotionState.IDLE -> onRoomIdle(room)

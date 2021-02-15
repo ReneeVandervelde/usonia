@@ -46,6 +46,29 @@ suspend fun ConfigurationAccess.getSite(): Site = site.first()
 suspend fun ConfigurationAccess.findDevice(id: Identifier): Device? = site.first().findDevice(id)
 
 /**
+ * Associate all of the adjacent room ID's in a room with their Room object.
+ */
+suspend fun ConfigurationAccess.findAdjacentRooms(room: Room): Set<Room> {
+    val site = getSite()
+
+    return room.adjacentRooms
+        .map { site.findRoom(it) }
+        .filterNotNull()
+        .toSet()
+}
+
+/**
+ * Look up whether a room has a neighboring room of a specified type.
+ *
+ * @param room The room to search the adjacent rooms of.
+ * @param type The adjacent room type to look for.
+ * @return whether [room] has an adjacent room of [type]
+ */
+suspend fun ConfigurationAccess.hasAdjacentType(room: Room, type: Room.Type): Boolean {
+    return type in findAdjacentRooms(room).map { it.type }
+}
+
+/**
  * @see [Site.findDevicesBy]
  */
 suspend fun ConfigurationAccess.findDevicesBy(predicate: (Device) -> Boolean) = getSite().findDevicesBy(predicate)
