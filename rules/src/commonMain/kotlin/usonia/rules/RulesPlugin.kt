@@ -19,9 +19,11 @@ class RulesPlugin(
     weather: WeatherAccess,
     logger: KimchiLogger = EmptyLogger,
 ): ServerPlugin {
+    private val movieMode = MovieMode(client)
+
     private val colorPicker = CompositeLightingPicker(
         AwayMode(client),
-        MovieMode(client),
+        movieMode,
         CircadianColors(client, weather, logger = logger),
     )
 
@@ -29,5 +31,6 @@ class RulesPlugin(
         WaterMonitor(client, logger),
         LightController(client, colorPicker, logger),
         Indicator(client, weather, logger),
+        movieMode,
     )
 }
