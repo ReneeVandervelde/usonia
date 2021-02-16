@@ -10,15 +10,19 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import usonia.foundation.*
 import usonia.kotlin.IoScope
 import usonia.kotlin.neverEnding
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
 /**
  * Handles actions sent to Hue Group devices.
  */
+@OptIn(ExperimentalTime::class)
 internal class HueGroupHandler(
     private val client: BackendClient,
     private val shade: ShadeGroups,
@@ -67,6 +71,10 @@ internal class HueGroupHandler(
             else -> throw IllegalStateException("Impossible! Did the event filtering change without updating the modification conditions?")
         }
 
-        requestScope.launch { shade.setState(device.parent!!.id.value, modification) }
+        requestScope.launch {
+            withTimeout(5.seconds) {
+                shade.setState(device.parent!!.id.value, modification)
+            }
+        }
     }
 }
