@@ -7,6 +7,7 @@ import usonia.core.state.*
 import usonia.foundation.Device
 import usonia.foundation.Event
 import usonia.foundation.Identifier
+import usonia.kotlin.datetime.ZonedDateTime
 import usonia.server.client.BackendClient
 import usonia.server.cron.CronJob
 import usonia.server.cron.Schedule
@@ -58,7 +59,7 @@ internal class AwolDeviceReporter(
         return events.lastOrNull()
     }
 
-    override suspend fun run(time: LocalDateTime, timeZone: TimeZone) {
+    override suspend fun run(time: ZonedDateTime) {
         val bridge = client.findBridgeByServiceTag(TODOIST_SERVICE) ?: run {
             logger.warn("Todoist not configured. Configure a bridge for the service `$TODOIST_SERVICE`")
             return
@@ -69,7 +70,7 @@ internal class AwolDeviceReporter(
         }
         val project = bridge.parameters["project"]?.toLong()
         val label = bridge.parameters["label"]?.toLong()
-        val timeInstant = time.toInstant(timeZone)
+        val timeInstant = time.instant
 
         val devices = client.findDevicesBy { it.capabilities.heartbeat != null }
             .also { logger.debug("Checking ${it.size} device heartbeats") }

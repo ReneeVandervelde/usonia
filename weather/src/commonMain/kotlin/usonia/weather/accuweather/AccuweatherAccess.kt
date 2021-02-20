@@ -13,6 +13,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import usonia.core.state.findBridgeByServiceTag
 import usonia.core.state.getSite
+import usonia.kotlin.datetime.ZonedDateTime
 import usonia.kotlin.unit.percent
 import usonia.server.client.BackendClient
 import usonia.server.cron.CronJob
@@ -65,7 +66,7 @@ internal class AccuweatherAccess(
         minutes = setOf(0)
     )
 
-    override suspend fun run(time: LocalDateTime, timeZone: TimeZone) {
+    override suspend fun run(time: ZonedDateTime) {
         val (location, token) = getConfig() ?: return
 
         coroutineScope {

@@ -3,11 +3,11 @@ package usonia.server
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
-import kotlinx.datetime.TimeZone
+import usonia.kotlin.datetime.ZonedClock
+import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.server.timemachine.SecondFrequency
 import usonia.server.timemachine.minutes
 
@@ -18,7 +18,8 @@ class UsoniaServer(
     override val plugins: Set<ServerPlugin>,
     private val server: WebServer,
     private val logger: KimchiLogger = EmptyLogger,
-    private val daemonScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val daemonScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
+    private val clock: ZonedClock = ZonedSystemClock,
 ): AppConfig {
     suspend fun start() {
         logger.info("Hello World! 👋")
@@ -51,7 +52,10 @@ class UsoniaServer(
                 while (isActive) {
                     logger.debug { "Starting Daemon <${daemon::class.simpleName}>" }
                     try { daemon.start() }
-                    catch (error: Throwable) {
+                    catch (e: CancellationException) {
+                        logger.warn("Daemon <${daemon::class.simpleName}> was cancelled")
+                        throw e
+                    } catch (error: Throwable) {
                         logger.error("Daemon <${daemon::class.simpleName}> has stopped. Re-starting.", error)
                         delay(500)
                     }
@@ -68,7 +72,7 @@ class UsoniaServer(
             logger.debug { "Starting Cron <${cron::class.simpleName}>"}
             daemonScope.launch {
                 cron.start()
-                SecondFrequency.minutes
+                SecondFrequency(clock).minutes
                     .filter { it.minute in cron.schedule.minutes }
                     .filter { it.hour in cron.schedule.hours }
                     .filter { it.dayOfMonth in cron.schedule.days }
@@ -76,7 +80,10 @@ class UsoniaServer(
                     .onEach { logger.debug { "Running Cron <${cron::class.simpleName}>"} }
                     .collectLatest {
                         try {
-                            cron.run(it, TimeZone.currentSystemDefault())
+                            cron.run(it)
+                        } catch (e: CancellationException) {
+                            logger.warn("Cron <${cron::class.simpleName}> was cancelled")
+                            throw e
                         } catch (error: Throwable) {
                             logger.error("Uncaught Exception in Cron <${cron::class.simpleName}>", error)
                         }

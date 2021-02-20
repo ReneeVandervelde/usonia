@@ -3,8 +3,10 @@ package usonia.server.timemachine
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.datetime.Clock as Clock
-import kotlinx.datetime.*
+import usonia.kotlin.datetime.ZonedClock
+import usonia.kotlin.datetime.ZonedDateTime
+import usonia.kotlin.datetime.ZonedSystemClock
+import usonia.kotlin.datetime.current
 
 /**
  * A time-machine that ticks every second.
@@ -12,10 +14,12 @@ import kotlinx.datetime.*
  * Note: This does not provide second-level accuracy, but will tick roughly
  * each second.
  */
-internal object SecondFrequency: TimeMachine {
-    override val ticks: Flow<LocalDateTime> = flow {
+class SecondFrequency(
+    clock: ZonedClock = ZonedSystemClock
+): TimeMachine {
+    override val ticks: Flow<ZonedDateTime> = flow {
         while (true) {
-            emit(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
+            emit(clock.current)
             delay(1000)
         }
     }

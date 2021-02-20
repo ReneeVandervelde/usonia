@@ -1,7 +1,6 @@
 package usonia.server.cron
 
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
+import usonia.kotlin.datetime.ZonedDateTime
 
 /**
  * A job that is executed periodically on a defined schedule.
@@ -15,7 +14,7 @@ interface CronJob {
     /**
      * Job to be executed when [schedule] matches.
      */
-    suspend fun run(time: LocalDateTime, timeZone: TimeZone)
+    suspend fun run(time: ZonedDateTime)
 
     /**
      * Optional start-up procedure.

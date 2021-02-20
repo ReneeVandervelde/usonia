@@ -2,7 +2,7 @@ package usonia.server.timemachine
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.datetime.LocalDateTime
+import usonia.kotlin.datetime.ZonedDateTime
 
 /**
  * A time-repeating event system.
@@ -16,7 +16,7 @@ internal interface TimeMachine {
      * can be expected at roughly incremental times, but are not guaranteed
      * to be resumed at their exact clock mark.
      */
-    val ticks: Flow<LocalDateTime>
+    val ticks: Flow<ZonedDateTime>
 }
 
 /**

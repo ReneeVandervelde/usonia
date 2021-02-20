@@ -8,10 +8,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import usonia.core.state.*
 import usonia.foundation.*
-import usonia.kotlin.datetime.ZonedClock
-import usonia.kotlin.datetime.ZonedSystemClock
-import usonia.kotlin.datetime.current
-import usonia.kotlin.datetime.minuteOfDay
+import usonia.kotlin.datetime.*
 import usonia.kotlin.neverEnding
 import usonia.kotlin.unit.percent
 import usonia.rules.Flags
@@ -72,7 +69,7 @@ internal class SleepMode(
         }
     }
 
-    override suspend fun run(time: LocalDateTime, timeZone: TimeZone) {
+    override suspend fun run(time: ZonedDateTime) {
         client.setFlag(Flags.SleepMode, false)
     }
 

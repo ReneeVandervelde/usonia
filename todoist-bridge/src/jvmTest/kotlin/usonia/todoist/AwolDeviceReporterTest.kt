@@ -12,6 +12,8 @@ import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccess
 import usonia.core.state.EventAccessStub
 import usonia.foundation.*
+import usonia.kotlin.datetime.UtcClock
+import usonia.kotlin.datetime.current
 import usonia.kotlin.suspendedFlow
 import usonia.server.DummyClient
 import usonia.todoist.api.Task
@@ -51,9 +53,7 @@ class AwolDeviceReporterTest {
     val testClient = DummyClient.copy(
         configurationAccess = config,
     )
-    val zone = TimeZone.UTC
-    val now = Clock.System.now()
-    val time = now.toLocalDateTime(zone)
+    val time = UtcClock.current
 
     @Test
     fun correctParameters() = runBlockingTest {
@@ -77,7 +77,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time, zone)
+        AwolDeviceReporter(client, api).run(time)
 
         assertEquals("test-token", api.tokenUsed)
         assertEquals(666, api.projectUsed)
@@ -91,7 +91,7 @@ class AwolDeviceReporterTest {
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Water::class) {
                     FakeEvents.Wet.copy(
-                        timestamp = now
+                        timestamp = time.instant
                     ) as T
                 } else null
             }
@@ -107,7 +107,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time, zone)
+        AwolDeviceReporter(client, api).run(time)
 
         assertEquals(0, api.created.size)
     }
@@ -119,7 +119,7 @@ class AwolDeviceReporterTest {
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Water::class) {
                     FakeEvents.Wet.copy(
-                        timestamp = now - 2.minutes
+                        timestamp = time.instant - 2.minutes
                     ) as T
                 } else null
             }
@@ -135,7 +135,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time, zone)
+        AwolDeviceReporter(client, api).run(time)
 
         assertEquals(1, api.created.size)
         val parameters = api.created.single()
@@ -160,7 +160,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time, zone)
+        AwolDeviceReporter(client, api).run(time)
 
         assertEquals(1, api.created.size)
     }
@@ -168,7 +168,7 @@ class AwolDeviceReporterTest {
     @Test
     fun notCreatedWithoutHistory() = runBlockingTest {
         val events = object: EventAccess by EventAccessStub {
-            override val oldestEventTime: Flow<Instant?> = flowOf(now)
+            override val oldestEventTime: Flow<Instant?> = flowOf(time.instant)
         }
         val api = object: TodoistApi by ApiStub {
             val created = mutableListOf<TaskParameters>()
@@ -181,7 +181,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time, zone)
+        AwolDeviceReporter(client, api).run(time)
 
         assertEquals(0, api.created.size)
     }
@@ -193,7 +193,7 @@ class AwolDeviceReporterTest {
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Water::class) {
                     FakeEvents.Wet.copy(
-                        timestamp = now
+                        timestamp = time.instant
                     ) as T
                 } else null
             }
@@ -216,7 +216,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time, zone)
+        AwolDeviceReporter(client, api).run(time)
 
         assertEquals(1, api.closed.size)
         assertEquals(432, api.closed.single())
@@ -229,7 +229,7 @@ class AwolDeviceReporterTest {
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Water::class) {
                     FakeEvents.Wet.copy(
-                        timestamp = now - 2.minutes
+                        timestamp = time.instant - 2.minutes
                     ) as T
                 } else null
             }
@@ -259,7 +259,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time, zone)
+        AwolDeviceReporter(client, api).run(time)
 
         assertEquals(0, api.closed.size)
         assertEquals(0, api.created.size)
@@ -268,7 +268,7 @@ class AwolDeviceReporterTest {
     @Test
     fun notClosedWithoutHistory() = runBlockingTest {
         val events = object: EventAccess by EventAccessStub {
-            override val oldestEventTime: Flow<Instant?> = flowOf(now)
+            override val oldestEventTime: Flow<Instant?> = flowOf(time.instant)
         }
         val api = object: TodoistApi by ApiStub {
             val closed = mutableListOf<Long>()
@@ -288,7 +288,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time, zone)
+        AwolDeviceReporter(client, api).run(time)
 
         assertEquals(0, api.closed.size)
     }
@@ -300,7 +300,7 @@ class AwolDeviceReporterTest {
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Water::class) {
                     FakeEvents.Wet.copy(
-                        timestamp = now - 2.minutes
+                        timestamp = time.instant - 2.minutes
                     ) as T
                 } else null
             }
@@ -323,7 +323,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time, zone)
+        AwolDeviceReporter(client, api).run(time)
 
         assertEquals(0, api.closed.size)
     }

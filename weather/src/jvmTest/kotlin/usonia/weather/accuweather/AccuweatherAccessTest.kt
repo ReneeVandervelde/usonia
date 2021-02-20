@@ -13,6 +13,8 @@ import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.FakeBridge
 import usonia.foundation.FakeSite
 import usonia.foundation.Site
+import usonia.kotlin.datetime.UtcClock
+import usonia.kotlin.datetime.current
 import usonia.kotlin.unit.percent
 import usonia.server.DummyClient
 import usonia.weather.Conditions
@@ -100,7 +102,7 @@ class AccuweatherAccessTest {
 
         pauseDispatcher {
             access.start()
-            access.run(now.toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
+            access.run(UtcClock.current)
         }
 
         assertEquals(1, forecasts.size)
@@ -169,7 +171,7 @@ class AccuweatherAccessTest {
                     )
                 )
             )
-            access.run(now.toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
+            access.run(UtcClock.current)
         }
 
         assertEquals(2, forecasts.size)
@@ -220,7 +222,7 @@ class AccuweatherAccessTest {
                 )
             )
         )
-        access.run(now.toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
+        access.run(UtcClock.current)
         runCurrent()
 
         assertEquals(3, forecasts.size)
