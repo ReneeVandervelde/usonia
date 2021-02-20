@@ -60,6 +60,17 @@ object FakeDevices {
         )
     )
 
+    val TemperatureSensor = Device(
+        id = Identifier("fake-temperature-sensor"),
+        name = "Fake Temperature Sensor",
+        capabilities = Capabilities(
+            actions = emptySet(),
+            events = setOf(
+                Event.Temperature::class
+            )
+        )
+    )
+
     val HueGroup = Device(
         id = Identifier("fake-hue-group"),
         name = "Fake Hue Group",
