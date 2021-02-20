@@ -2,6 +2,7 @@ package usonia.weather.accuweather
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -125,6 +126,9 @@ internal class AccuweatherAccess(
             ).also {
                 logger.debug("New Conditions: <$it>")
             }
+        } catch (e: CancellationException) {
+            logger.warn("Conditions fetch was cancelled", e)
+            throw e
         } catch (error: Throwable) {
             logger.error("Unable to get fresh conditions.", error)
             return conditionsFlow.value
@@ -148,6 +152,9 @@ internal class AccuweatherAccess(
             ).also {
                 logger.debug("New Forecast: <$it>")
             }
+        } catch (e: CancellationException) {
+            logger.warn("Forecast fetch was cancelled", e)
+            throw e
         } catch (error: Throwable) {
             logger.error("Unable to get fresh forecast.", error)
             return forecastFlow.value

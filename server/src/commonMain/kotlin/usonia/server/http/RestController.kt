@@ -2,6 +2,7 @@ package usonia.server.http
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import usonia.foundation.Status
@@ -35,6 +36,9 @@ abstract class RestController<IN, OUT>(
                 contentType = "application/json",
                 status = response.status,
             )
+        } catch (e: CancellationException) {
+            logger.warn("Cancelled while generating response", e)
+            throw e
         } catch (error: Throwable) {
             logger.error("Failed generating response body.", error)
             return HttpResponse(

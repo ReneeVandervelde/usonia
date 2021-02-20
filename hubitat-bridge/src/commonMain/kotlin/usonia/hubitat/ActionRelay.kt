@@ -5,6 +5,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
@@ -84,6 +85,9 @@ internal class ActionRelay(
                     contentType(ContentType.parse("application/json"))
                     parameter("access_token", parameters["token"])
                 }
+            } catch (e: CancellationException) {
+                logger.warn("Publish action was cancelled", e)
+                throw e
             } catch (error: Throwable) {
                 logger.error("Failed to post action to <${name}>", error)
             }

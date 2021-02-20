@@ -13,7 +13,9 @@ inline fun <T, reified R> Collection<T>.mapArray(mapping: (T) -> R): Array<R> {
 inline fun <T> Iterable<T>.singleOrThrow(message: String, predicate: (T) -> Boolean): T {
     return try {
         single(predicate)
-    } catch (e: Throwable) {
+    } catch (e: IllegalArgumentException) {
+        throw IllegalArgumentException(message, e)
+    } catch (e: NoSuchElementException) {
         throw IllegalArgumentException(message, e)
     }
 }
