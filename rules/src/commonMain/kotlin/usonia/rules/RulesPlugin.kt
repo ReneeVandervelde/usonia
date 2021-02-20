@@ -11,6 +11,7 @@ import usonia.rules.lights.DayMode
 import usonia.rules.lights.LightController
 import usonia.rules.lights.MovieMode
 import usonia.rules.lights.SleepMode
+import usonia.rules.locks.LockOnAway
 import usonia.rules.locks.LockOnSleep
 import usonia.server.Daemon
 import usonia.server.ServerPlugin
@@ -40,7 +41,8 @@ class RulesPlugin(
         Indicator(client, weather, logger),
         sleepMode,
         movieMode,
-        LockOnSleep(client),
+        LockOnSleep(client, logger),
+        LockOnAway(client, logger)
     )
 
     override val crons: List<CronJob> = listOf(
