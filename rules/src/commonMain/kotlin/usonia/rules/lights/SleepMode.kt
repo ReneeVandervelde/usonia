@@ -4,12 +4,14 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import usonia.core.state.*
 import usonia.foundation.*
+import usonia.kotlin.datetime.ZonedClock
+import usonia.kotlin.datetime.ZonedSystemClock
+import usonia.kotlin.datetime.current
+import usonia.kotlin.datetime.minuteOfDay
 import usonia.kotlin.neverEnding
 import usonia.kotlin.unit.percent
 import usonia.rules.Flags
@@ -33,8 +35,7 @@ private const val DEFAULT_NIGHT_END = 4 * 60
 internal class SleepMode(
     private val client: BackendClient,
     private val logger: KimchiLogger = EmptyLogger,
-    private val clock: Clock = Clock.System,
-    private val timeZone: TimeZone = TimeZone.currentSystemDefault(),
+    private val clock: ZonedClock = ZonedSystemClock,
 ): LightSettingsPicker, Daemon, CronJob {
 
     override val schedule: Schedule = Schedule(
@@ -46,10 +47,16 @@ internal class SleepMode(
         if (!client.getBooleanFlag(Flags.SleepMode)) return LightSettings.Unhandled
 
         return when (room.type) {
-            Room.Type.Bathroom -> LightSettings.Temperature(
-                temperature = Colors.Warm,
-                brightness = 5.percent,
-            )
+            Room.Type.Bathroom -> {
+                if (clock.current.localDateTime.minuteOfDay > 4 * 60 && clock.current.localDateTime.minuteOfDay < 12 * 60) {
+                    LightSettings.Unhandled
+                } else {
+                    LightSettings.Temperature(
+                        temperature = Colors.Warm,
+                        brightness = 5.percent,
+                    )
+                }
+            }
             Room.Type.Hallway -> {
                 if (client.hasAdjacentType(room, Room.Type.Bedroom)) {
                     LightSettings.Temperature(
@@ -140,7 +147,7 @@ internal class SleepMode(
                 ?: DEFAULT_NIGHT_END
 
             client.events
-                .filter { clock.currentMinuteOfDay >= nightStartMinute || clock.currentMinuteOfDay <= nightEndMinute }
+                .filter { clock.current.localDateTime.minuteOfDay >= nightStartMinute || clock.current.localDateTime.minuteOfDay <= nightEndMinute }
                 .filterIsInstance<Event.Latch>()
                 .filter { it.state == LatchState.CLOSED }
                 .filter { site.getRoomContainingDevice(it.source).type == Room.Type.Bedroom }
@@ -148,6 +155,4 @@ internal class SleepMode(
                 .collect { client.setFlag(Flags.SleepMode, true) }
         }
     }
-
-    private val Clock.currentMinuteOfDay: Int get() = now().toLocalDateTime(timeZone).let { (it.hour * 60) + it.minute }
 }

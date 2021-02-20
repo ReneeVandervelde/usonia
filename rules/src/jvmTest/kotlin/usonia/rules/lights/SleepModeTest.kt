@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.datetime.*
 import usonia.core.state.*
 import usonia.foundation.*
+import usonia.kotlin.datetime.*
 import usonia.kotlin.unit.percent
 import usonia.server.DummyClient
 import kotlin.test.Test
@@ -32,6 +33,14 @@ class SleepModeTest {
         }
     }
 
+    private val night = object: ZonedClock by UtcClock {
+        override fun now(): Instant = parseLocalDateTime("2020-01-02T23:00:00").instant
+    }
+
+    private val morning = object: ZonedClock by UtcClock {
+        override fun now(): Instant = parseLocalDateTime("2020-01-02T05:00:00").instant
+    }
+
     @Test
     fun enabled() = runBlockingTest {
         val fakeConfig = object: ConfigurationAccess by configurationDouble {
@@ -42,7 +51,7 @@ class SleepModeTest {
         val client = DummyClient.copy(
             configurationAccess = fakeConfig,
         )
-        val picker = SleepMode(client)
+        val picker = SleepMode(client, clock = night)
 
         val bedroom = picker.getRoomSettings(FakeRooms.FakeBedroom)
         val livingRoom = picker.getRoomSettings(FakeRooms.LivingRoom)
@@ -58,6 +67,35 @@ class SleepModeTest {
         assertTrue(bathroom is LightSettings.Temperature)
         assertEquals(Colors.Warm, bathroom.temperature)
         assertEquals(5.percent, bathroom.brightness)
+        assertTrue(bedroom is LightSettings.Ignore)
+        assertTrue(livingRoom is LightSettings.Unhandled)
+        assertTrue(unaffectedHallwayResult is LightSettings.Unhandled)
+    }
+
+    @Test
+    fun enabledMorning() = runBlockingTest {
+        val fakeConfig = object: ConfigurationAccess by configurationDouble {
+            override val flags: Flow<Map<String, String?>> = flowOf(
+                mapOf("Sleep Mode" to "true")
+            )
+        }
+        val client = DummyClient.copy(
+            configurationAccess = fakeConfig,
+        )
+        val picker = SleepMode(client, clock = morning)
+
+        val bedroom = picker.getRoomSettings(FakeRooms.FakeBedroom)
+        val livingRoom = picker.getRoomSettings(FakeRooms.LivingRoom)
+        val tranquilHallwayResult = picker.getRoomSettings(FakeRooms.FakeHallway.copy(
+            adjacentRooms = setOf(FakeRooms.FakeBedroom.id)
+        ))
+        val unaffectedHallwayResult = picker.getRoomSettings(FakeRooms.FakeHallway)
+        val bathroom = picker.getRoomSettings(FakeRooms.FakeBathroom)
+
+        assertTrue(tranquilHallwayResult is LightSettings.Temperature)
+        assertEquals(Colors.Warm, tranquilHallwayResult.temperature)
+        assertEquals(2.percent, tranquilHallwayResult.brightness)
+        assertTrue(bathroom is LightSettings.Unhandled)
         assertTrue(bedroom is LightSettings.Ignore)
         assertTrue(livingRoom is LightSettings.Unhandled)
         assertTrue(unaffectedHallwayResult is LightSettings.Unhandled)
@@ -111,8 +149,7 @@ class SleepModeTest {
         )
         val picker = SleepMode(
             client = client,
-            clock = clock,
-            timeZone = timeZone,
+            clock = clock.withTimeZone(timeZone),
         )
 
         val daemon = launch { picker.start() }
@@ -149,8 +186,7 @@ class SleepModeTest {
         )
         val picker = SleepMode(
             client = client,
-            clock = clock,
-            timeZone = timeZone,
+            clock = clock.withTimeZone(timeZone),
         )
 
         val daemon = launch { picker.start() }
@@ -187,8 +223,7 @@ class SleepModeTest {
         )
         val picker = SleepMode(
             client = client,
-            clock = clock,
-            timeZone = timeZone,
+            clock = clock.withTimeZone(timeZone),
         )
 
         val daemon = launch { picker.start() }

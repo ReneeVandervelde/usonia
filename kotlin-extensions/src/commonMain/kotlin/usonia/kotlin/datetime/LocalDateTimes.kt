@@ -1,4 +1,4 @@
-package usonia.kotlin
+package usonia.kotlin.datetime
 
 import kotlinx.datetime.LocalDateTime
 
@@ -25,3 +25,5 @@ val LocalDateTime.timestapSentanceFormat: String get() {
 
     return "$month $dayOfMonth${suffix} at ${hour}:$minuteFormat"
 }
+
+val LocalDateTime.minuteOfDay: Int get() = (hour * 60) + minute

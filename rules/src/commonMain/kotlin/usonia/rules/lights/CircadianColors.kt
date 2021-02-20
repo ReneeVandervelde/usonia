@@ -8,6 +8,7 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.getSite
 import usonia.foundation.Room
 import usonia.foundation.unit.ColorTemperature
+import usonia.kotlin.datetime.*
 import usonia.kotlin.unit.Percentage
 import usonia.kotlin.unit.percent
 import usonia.weather.WeatherAccess
@@ -36,8 +37,7 @@ internal val DEFAULT_PERIOD = 2.hours
 internal class CircadianColors(
     private val configurationAccess: ConfigurationAccess,
     private val weather: WeatherAccess,
-    private val clock: Clock = Clock.System,
-    private val timeZone: TimeZone = TimeZone.currentSystemDefault(),
+    private val clock: ZonedClock = ZonedSystemClock,
     private val logger: KimchiLogger = EmptyLogger,
 ): LightSettingsPicker {
     override suspend fun getRoomSettings(room: Room): LightSettings {
@@ -63,21 +63,20 @@ internal class CircadianColors(
             ?.toInt()
             ?.minutes
             ?: DEFAULT_PERIOD
-        val now = clock.now()
-        val localTime = now.toLocalDateTime(timeZone)
+        val now = clock.current
         val startOfDay = LocalDateTime(
-            year = localTime.year,
-            month = localTime.month,
-            dayOfMonth = localTime.dayOfMonth,
+            year = now.localDate.year,
+            month = now.localDate.month,
+            dayOfMonth = now.localDate.dayOfMonth,
             hour = 0,
             minute = 0,
             second = 0,
             nanosecond = 0,
-        )
-        val nightStartInstant = startOfDay.toInstant(timeZone) + nightStartMinute.minutes
+        ).withZone(clock.timeZone)
+        val nightStartInstant = startOfDay + nightStartMinute.minutes
 
         when {
-            now >= forecast.sunrise.minus(period) && now <= forecast.sunrise -> {
+            now.instant >= forecast.sunrise.minus(period) && now.instant <= forecast.sunrise -> {
                 logger.trace("In morning blue hour")
                 val position = ((now - forecast.sunrise.minus(period)).inMinutes / period.inMinutes).toFloat()
                 return LightSettings.Temperature(
@@ -85,7 +84,7 @@ internal class CircadianColors(
                     brightness = (nightBrightness..100.percent).transition(position),
                 )
             }
-            now > forecast.sunrise && now < forecast.sunset -> {
+            now.instant > forecast.sunrise && now.instant < forecast.sunset -> {
                 logger.trace("In daytime")
                 return LightSettings.Temperature(
                     temperature = daylightColor,
@@ -103,9 +102,9 @@ internal class CircadianColors(
                     brightness = (100.percent..nightBrightness).transition(position),
                 )
             }
-            now < forecast.sunrise
+            now.instant < forecast.sunrise
                 || now > nightStartInstant.plus(period)
-                || localTime.dayOfYear > forecast.sunset.toLocalDateTime(timeZone).dayOfYear
+                || now.localDate.dayOfYear > forecast.sunset.toLocalDateTime(clock.timeZone).dayOfYear
             -> {
                 logger.trace("In nighttime")
                 return LightSettings.Temperature(
@@ -113,7 +112,7 @@ internal class CircadianColors(
                     brightness = nightBrightness,
                 )
             }
-            now >= forecast.sunset -> {
+            now.instant >= forecast.sunset -> {
                 logger.trace("In evening")
                 val position = ((now - forecast.sunset).inMinutes / period.inMinutes).toFloat()
                 return LightSettings.Temperature(
@@ -125,7 +124,6 @@ internal class CircadianColors(
         }
     }
 
-    private val LocalDateTime.minuteOfDay get() = (hour * 60) + minute
     private fun IntRange.transition(position: Float) = (start + ((endInclusive - start) * kotlin.math.max(0f, kotlin.math.min(1f, position)))).toInt()
     private fun ClosedRange<ColorTemperature>.transition(position: Float) = (start.kelvinValue..endInclusive.kelvinValue).transition(position).let(::ColorTemperature)
     private fun ClosedRange<Percentage>.transition(position: Float) = (start.percent..endInclusive.percent).transition(position).percent

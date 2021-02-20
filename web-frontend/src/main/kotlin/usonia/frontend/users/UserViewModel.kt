@@ -4,7 +4,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import usonia.foundation.Event
 import usonia.foundation.User
-import usonia.kotlin.timestapSentanceFormat
+import usonia.kotlin.datetime.timestapSentanceFormat
 
 data class UserViewModel(
     val id: String,

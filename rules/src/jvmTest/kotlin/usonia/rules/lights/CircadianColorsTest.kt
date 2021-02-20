@@ -9,6 +9,8 @@ import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.FakeRooms
 import usonia.foundation.FakeSite
 import usonia.foundation.Site
+import usonia.kotlin.datetime.ZonedClock
+import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.kotlin.unit.percent
 import usonia.weather.Conditions
 import usonia.weather.Forecast
@@ -46,7 +48,7 @@ class CircadianColorsTest {
 
     @Test
     fun afterMidnight() = runBlockingTest {
-        val clock = object: Clock {
+        val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = sunrise.minus(DEFAULT_PERIOD).minus(2.minutes)
         }
         val colors = CircadianColors(config, weather, clock)
@@ -60,7 +62,7 @@ class CircadianColorsTest {
 
     @Test
     fun staleForecast() = runBlockingTest {
-        val clock = object: Clock {
+        val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = startOfDay.plus(1.days)
         }
         val weather = object: WeatherAccess {
@@ -85,7 +87,7 @@ class CircadianColorsTest {
 
     @Test
     fun morningBlueHour() = runBlockingTest {
-        val clock = object: Clock {
+        val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = sunrise.minus(DEFAULT_PERIOD / 4)
         }
         val colors = CircadianColors(config, weather, clock)
@@ -104,7 +106,7 @@ class CircadianColorsTest {
 
     @Test
     fun dawn() = runBlockingTest {
-        val clock = object: Clock {
+        val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = sunrise
         }
         val colors = CircadianColors(config, weather, clock)
@@ -118,7 +120,7 @@ class CircadianColorsTest {
 
     @Test
     fun day() = runBlockingTest {
-        val clock = object: Clock {
+        val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = sunrise.plus(2.minutes)
         }
         val colors = CircadianColors(config, weather, clock)
@@ -132,7 +134,7 @@ class CircadianColorsTest {
 
     @Test
     fun sunset() = runBlockingTest {
-        val clock = object: Clock {
+        val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = sunset
         }
         val colors = CircadianColors(config, weather, clock)
@@ -146,7 +148,7 @@ class CircadianColorsTest {
 
     @Test
     fun evening() = runBlockingTest {
-        val clock = object: Clock {
+        val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = sunset.plus(DEFAULT_PERIOD)
         }
         val colors = CircadianColors(config, weather, clock)
@@ -160,7 +162,7 @@ class CircadianColorsTest {
 
     @Test
     fun twilight() = runBlockingTest {
-        val clock = object: Clock {
+        val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = nightStart.plus(DEFAULT_PERIOD / 4)
         }
         val colors = CircadianColors(config, weather, clock)
@@ -179,7 +181,7 @@ class CircadianColorsTest {
 
     @Test
     fun night() = runBlockingTest {
-        val clock = object: Clock {
+        val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = nightStart.plus(DEFAULT_PERIOD).plus(2.minutes)
         }
         val colors = CircadianColors(config, weather, clock)
@@ -203,7 +205,7 @@ class CircadianColorsTest {
             ))
             override val conditions: Flow<Conditions> get() = TODO()
         }
-        val clock = object: Clock {
+        val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = nightStart
         }
         val colors = CircadianColors(config, weather, clock)
