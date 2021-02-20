@@ -77,7 +77,7 @@ class UsoniaServer(
                     .filter { it.hour in cron.schedule.hours }
                     .filter { it.dayOfMonth in cron.schedule.days }
                     .filter { it.monthNumber in cron.schedule.months }
-                    .onEach { logger.debug { "Running Cron <${cron::class.simpleName}>"} }
+                    .onEach { logger.debug { "Running Cron <${cron::class.simpleName}> at <$it>"} }
                     .collectLatest {
                         try {
                             cron.run(it)

@@ -38,6 +38,7 @@ data class ZonedDateTime(
     operator fun minus(time: Duration) = ZonedDateTime(instant - time, zone)
     operator fun minus(other: ZonedDateTime) = instant - other.instant
     operator fun minus(other: Instant) = instant - other
+    override fun toString(): String = "$localDateTime ${zone.id}"
 }
 
 /**
