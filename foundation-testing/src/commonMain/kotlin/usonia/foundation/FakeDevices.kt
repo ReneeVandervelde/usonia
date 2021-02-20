@@ -25,6 +25,19 @@ object FakeDevices {
         )
     )
 
+    val Lock = Device(
+        id = Identifier("fake-lock"),
+        name = "Fake Lock",
+        capabilities = Capabilities(
+            actions = setOf(
+                Action.Lock::class
+            ),
+            events = setOf(
+                Event.Lock::class
+            ),
+        )
+    )
+
     val Motion = Device(
         id = Identifier("fake-motion"),
         name = "Fake Motion Sensor",

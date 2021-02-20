@@ -4,7 +4,6 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import usonia.rules.alerts.WaterMonitor
 import usonia.rules.indicator.Indicator
-import usonia.rules.lights.*
 import usonia.rules.lights.AwayMode
 import usonia.rules.lights.CircadianColors
 import usonia.rules.lights.CompositeLightingPicker
@@ -12,6 +11,7 @@ import usonia.rules.lights.DayMode
 import usonia.rules.lights.LightController
 import usonia.rules.lights.MovieMode
 import usonia.rules.lights.SleepMode
+import usonia.rules.locks.LockOnSleep
 import usonia.server.Daemon
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
@@ -40,6 +40,7 @@ class RulesPlugin(
         Indicator(client, weather, logger),
         sleepMode,
         movieMode,
+        LockOnSleep(client),
     )
 
     override val crons: List<CronJob> = listOf(
