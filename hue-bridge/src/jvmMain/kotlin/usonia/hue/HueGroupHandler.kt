@@ -7,6 +7,7 @@ import inkapplications.shade.groups.GroupStateModification
 import inkapplications.shade.groups.ShadeGroups
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -72,8 +73,15 @@ internal class HueGroupHandler(
         }
 
         requestScope.launch {
-            withTimeout(5.seconds) {
-                shade.setState(device.parent!!.id.value, modification)
+            try {
+                withTimeout(5.seconds) {
+                    shade.setState(device.parent!!.id.value, modification)
+                }
+            } catch (e: CancellationException) {
+                logger.warn("Hue Action was Cancelled", e)
+                throw e
+            } catch (e: Throwable) {
+                logger.error("Error setting hue group state.", e)
             }
         }
     }

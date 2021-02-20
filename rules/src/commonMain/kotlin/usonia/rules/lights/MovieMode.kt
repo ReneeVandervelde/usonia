@@ -1,5 +1,7 @@
 package usonia.rules.lights
 
+import kimchi.logger.EmptyLogger
+import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import usonia.core.state.getBooleanFlag
@@ -22,6 +24,7 @@ private const val FLAG = "Movie Mode"
  */
 internal class MovieMode(
     private val client: BackendClient,
+    private val logger: KimchiLogger = EmptyLogger,
 ): LightSettingsPicker, Daemon {
     override suspend fun getRoomSettings(room: Room): LightSettings {
         if (!client.getBooleanFlag(FLAG)) {
@@ -50,6 +53,7 @@ internal class MovieMode(
     }
 
     private suspend fun startMovieMode() {
+        logger.info("Adjusting Lights for Movie Mode.")
         client.getSite().rooms
             .filter { it.type in setOf(LivingRoom, Kitchen, Hallway, Dining) }
             .flatMap { it.devices }
@@ -65,6 +69,7 @@ internal class MovieMode(
     }
 
     private suspend fun stopMovieMode() {
+        logger.info("Adjusting Lights to exit Movie Mode.")
         client.getSite().rooms
             .filter { it.type == LivingRoom }
             .flatMap { it.devices }

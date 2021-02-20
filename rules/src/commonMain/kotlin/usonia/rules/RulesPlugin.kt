@@ -23,7 +23,7 @@ class RulesPlugin(
     weather: WeatherAccess,
     logger: KimchiLogger = EmptyLogger,
 ): ServerPlugin {
-    private val movieMode = MovieMode(client)
+    private val movieMode = MovieMode(client, logger)
     private val sleepMode = SleepMode(client, logger)
 
     private val colorPicker = CompositeLightingPicker(

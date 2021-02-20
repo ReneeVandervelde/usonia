@@ -4,11 +4,10 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
 import usonia.core.state.*
 import usonia.foundation.*
 import usonia.kotlin.datetime.*
+import usonia.kotlin.filterTrue
 import usonia.kotlin.neverEnding
 import usonia.kotlin.unit.percent
 import usonia.rules.Flags
@@ -70,6 +69,7 @@ internal class SleepMode(
     }
 
     override suspend fun run(time: ZonedDateTime) {
+        logger.info("Auto-Disabling Sleep Mode.")
         client.setFlag(Flags.SleepMode, false)
     }
 
@@ -84,10 +84,10 @@ internal class SleepMode(
         client.site.collectLatest { site ->
             client.sleepMode
                 .distinctUntilChanged()
-                .filter { enabled -> enabled }
+                .filterTrue()
                 .collect {
-                    val bedrooms = site.rooms
-                        .filter { it.type == Room.Type.Bedroom }
+                    logger.info("Adjusting Lights for Sleep Mode.")
+                    val bedrooms = site.rooms.filter { it.type == Room.Type.Bedroom }
 
                     bedrooms.flatMap(::getDimActions).run { client.publishAll(this) }
                     delay(30.seconds)
