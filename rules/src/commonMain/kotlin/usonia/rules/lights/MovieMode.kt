@@ -47,8 +47,8 @@ internal class MovieMode(
 
     override suspend fun start(): Nothing = neverEnding {
         client.flags
-            .drop(1)
             .map { it[FLAG].toBoolean() }
+            .drop(1)
             .collectLatest { enabled ->
                 if (enabled) startMovieMode() else stopMovieMode()
             }
