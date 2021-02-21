@@ -13,7 +13,7 @@ class EventMetricsController(
     private val client: FrontendClient,
     private val logger: KimchiLogger,
 ): ViewController {
-    private val eventsByDayChart by lazy { document.getElementById("metric-events-by-day") as HTMLCanvasElement? }
+    private val eventsByDayChart by lazy { document.getElementById("metrics-event-graph") as HTMLCanvasElement? }
 
     override suspend fun bind() {
         val canvas = eventsByDayChart ?: run {

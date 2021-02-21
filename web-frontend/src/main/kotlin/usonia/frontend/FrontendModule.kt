@@ -8,6 +8,7 @@ import usonia.frontend.config.ConfigController
 import usonia.frontend.flags.FlagController
 import usonia.frontend.logs.LogController
 import usonia.frontend.metrics.EventMetricsController
+import usonia.frontend.metrics.TemperatureMetricsController
 import usonia.frontend.users.UserListController
 import usonia.serialization.SerializationModule
 
@@ -29,5 +30,6 @@ object FrontendModule {
         UserListController(client, logger),
         EventMetricsController(client, logger),
         FlagController(client, logger),
+        TemperatureMetricsController(client, logger),
     )
 }

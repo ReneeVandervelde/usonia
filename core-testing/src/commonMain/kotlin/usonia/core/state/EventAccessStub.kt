@@ -14,4 +14,5 @@ object EventAccessStub: EventAccess {
     override val oldestEventTime: Flow<Instant?> = emptyFlow()
 
     override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = null
+    override fun temperatureHistory(devices: Collection<Identifier>): Flow<Map<Int, Float>> = emptyFlow()
 }

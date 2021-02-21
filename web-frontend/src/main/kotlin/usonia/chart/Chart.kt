@@ -44,6 +44,7 @@ data class GridLineOptions(
 )
 
 data class TickOptions(
+    var display: Boolean = true,
     var precision: Int = 0,
 )
 
@@ -58,7 +59,7 @@ data class Data(
 
 data class DataSet(
     var label: String,
-    var data: Array<Int> = emptyArray(),
+    var data: Array<Number> = emptyArray(),
     var borderColor: String? = null,
     var borderWidth: Int = 1,
     var pointRadius: Int? = null,

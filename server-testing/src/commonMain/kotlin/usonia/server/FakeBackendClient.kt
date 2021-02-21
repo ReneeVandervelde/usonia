@@ -4,10 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import usonia.core.state.*
-import usonia.foundation.Action
-import usonia.foundation.Event
-import usonia.foundation.Identifier
-import usonia.foundation.Site
+import usonia.foundation.*
 import usonia.server.client.ComposedBackendClient
 import kotlin.reflect.KClass
 
@@ -23,6 +20,7 @@ val DummyClient = ComposedBackendClient(
         override val eventsByDay: Flow<Map<LocalDate, Int>> get() = TODO()
         override val oldestEventTime: Flow<Instant?> get() = TODO()
         override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = TODO("Not yet implemented")
+        override fun temperatureHistory(devices: Collection<Identifier>): Flow<Map<Int, Float>> = TODO()
     },
     eventPublisher = object: EventPublisher {
         override suspend fun publishEvent(event: Event) = TODO("Not yet implemented")

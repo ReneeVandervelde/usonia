@@ -219,6 +219,29 @@ class HttpClient(
         }
     }
 
+    override fun temperatureHistory(devices: Collection<Identifier>): Flow<Map<Int, Float>> {
+        return flow {
+            httpClient.ws(
+                host = host,
+                port = port,
+                path = "events/metric-temperature-history",
+                request = {
+                    devices.forEach { parameter("devices", it.value) }
+                }
+            ) {
+                incoming.consumeEach {
+                    if (it !is Frame.Text) return@consumeEach
+
+                    try {
+                        emit(json.decodeFromString(RelativeHourMetricSerializer, it.readText()))
+                    } catch (error: Throwable) {
+                        logger.error("Failed to deserialize temperature metrics", error)
+                    }
+                }
+            }
+        }
+    }
+
     override suspend fun publishAction(action: Action) {
         val request = HttpRequestBuilder(
             host = host,

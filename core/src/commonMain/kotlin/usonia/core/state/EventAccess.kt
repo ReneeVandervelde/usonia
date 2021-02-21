@@ -4,10 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
-import usonia.foundation.Event
-import usonia.foundation.PresenceState
-import usonia.foundation.User
-import usonia.foundation.Identifier
+import usonia.foundation.*
 import kotlin.reflect.KClass
 
 /**
@@ -33,6 +30,16 @@ interface EventAccess {
      * Get the last known event for an item.
      */
     suspend fun <T: Event> getState(id: Identifier, type: KClass<T>): T?
+
+    /**
+     * History of hourly temperatures reported for a group of devices.
+     *
+     * Multiple reports by one or more devices are averaged into a single data point.
+     *
+     * @param devices The ID's of the devices to include in temperature averages.
+     * @return A map of temperatures grouped by the number of hours (negative) in the past they were reported.
+     */
+    fun temperatureHistory(devices: Collection<Identifier>): Flow<Map<Int, Float>>
 }
 
 /**

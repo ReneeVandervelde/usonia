@@ -44,3 +44,9 @@ timestamp
 FROM Event
 ORDER BY timestamp ASC
 LIMIT 1;
+
+eventsBySourceAndType:
+SELECT
+data
+FROM Event
+WHERE source IN ? AND type = ?;

@@ -78,11 +78,23 @@
     </div>
 </section>
 
-<section id="graph">
+<section id="metrics">
+    <template id="metrics-template-temperature">
+        <article>
+            <h2>{{name}}</h2>
+            <div class="graph-container">
+                <canvas id="metrics-temperature-canvas-{{id.value}}"></canvas>
+            </div>
+        </article>
+    </template>
+
     <h1>Events</h1>
-    <div id="graph-container">
-        <canvas id="metric-events-by-day"></canvas>
+    <div class="graph-container">
+        <canvas id="metrics-event-graph"></canvas>
     </div>
+
+    <h1>Temperatures</h1>
+    <div id="metrics-temperatures"></div>
 </section>
 
 <template id="config-template">

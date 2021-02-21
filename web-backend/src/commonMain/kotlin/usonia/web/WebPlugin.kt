@@ -39,6 +39,7 @@ class WebPlugin(
         FlagListSocket(client, json),
         EventsByDaySocket(client, json),
         OldestEventSocket(client, json),
+        TemperatureHistorySocket(client, json, logger),
     )
     override val staticResources: List<String> = listOf(
         "web-frontend.js",
