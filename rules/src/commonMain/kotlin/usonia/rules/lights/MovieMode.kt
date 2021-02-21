@@ -3,6 +3,7 @@ package usonia.rules.lights
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import usonia.core.state.getBooleanFlag
 import usonia.core.state.getSite
@@ -46,6 +47,7 @@ internal class MovieMode(
 
     override suspend fun start(): Nothing = neverEnding {
         client.flags
+            .drop(1)
             .map { it[FLAG].toBoolean() }
             .collectLatest { enabled ->
                 if (enabled) startMovieMode() else stopMovieMode()

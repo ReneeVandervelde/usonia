@@ -95,6 +95,33 @@ class MovieModeTest {
     }
 
     @Test
+    fun dropFirst() = runBlockingTest {
+        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
+            override val site: Flow<Site> = flowOf(FakeSite.copy(
+                rooms = setOf(FakeRooms.LivingRoom.copy(
+                    devices = setOf(FakeDevices.HueGroup),
+                )),
+            ))
+            override val flags = MutableSharedFlow<Map<String, String>>()
+        }
+        val publisherSpy = ActionPublisherSpy()
+        val client = DummyClient.copy(
+            configurationAccess = fakeConfig,
+            actionPublisher = publisherSpy,
+        )
+        val picker = MovieMode(client)
+
+        val daemon = launch { picker.start() }
+        fakeConfig.flags.emit(mapOf(
+            "Movie Mode" to "true"
+        ))
+
+        assertEquals(0, publisherSpy.actions.size, "No action taken on initial event at start-up")
+
+        daemon.cancelAndJoin()
+    }
+
+    @Test
     fun start() = runBlockingTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: Flow<Site> = flowOf(FakeSite.copy(
@@ -112,6 +139,9 @@ class MovieModeTest {
         val picker = MovieMode(client)
 
         val daemon = launch { picker.start() }
+        fakeConfig.flags.emit(mapOf(
+            "Movie Mode" to "false"
+        ))
         fakeConfig.flags.emit(mapOf(
             "Movie Mode" to "true"
         ))
@@ -142,6 +172,9 @@ class MovieModeTest {
         val picker = MovieMode(client)
 
         val daemon = launch { picker.start() }
+        fakeConfig.flags.emit(mapOf(
+            "Movie Mode" to "true"
+        ))
         fakeConfig.flags.emit(mapOf(
             "Movie Mode" to "false"
         ))
