@@ -59,7 +59,7 @@ internal class AwolDeviceReporter(
         return events.lastOrNull()
     }
 
-    override suspend fun run(time: ZonedDateTime) {
+    override suspend fun runCron(time: ZonedDateTime) {
         val bridge = client.findBridgeByServiceTag(TODOIST_SERVICE) ?: run {
             logger.warn("Todoist not configured. Configure a bridge for the service `$TODOIST_SERVICE`")
             return

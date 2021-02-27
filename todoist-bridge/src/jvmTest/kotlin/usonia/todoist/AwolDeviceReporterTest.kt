@@ -3,10 +3,7 @@ package usonia.todoist
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runBlockingTest
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccess
@@ -77,7 +74,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time)
+        AwolDeviceReporter(client, api).runCron(time)
 
         assertEquals("test-token", api.tokenUsed)
         assertEquals(666, api.projectUsed)
@@ -107,7 +104,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time)
+        AwolDeviceReporter(client, api).runCron(time)
 
         assertEquals(0, api.created.size)
     }
@@ -135,7 +132,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time)
+        AwolDeviceReporter(client, api).runCron(time)
 
         assertEquals(1, api.created.size)
         val parameters = api.created.single()
@@ -160,7 +157,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time)
+        AwolDeviceReporter(client, api).runCron(time)
 
         assertEquals(1, api.created.size)
     }
@@ -181,7 +178,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time)
+        AwolDeviceReporter(client, api).runCron(time)
 
         assertEquals(0, api.created.size)
     }
@@ -216,7 +213,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time)
+        AwolDeviceReporter(client, api).runCron(time)
 
         assertEquals(1, api.closed.size)
         assertEquals(432, api.closed.single())
@@ -259,7 +256,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time)
+        AwolDeviceReporter(client, api).runCron(time)
 
         assertEquals(0, api.closed.size)
         assertEquals(0, api.created.size)
@@ -288,7 +285,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time)
+        AwolDeviceReporter(client, api).runCron(time)
 
         assertEquals(0, api.closed.size)
     }
@@ -323,7 +320,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).run(time)
+        AwolDeviceReporter(client, api).runCron(time)
 
         assertEquals(0, api.closed.size)
     }

@@ -14,11 +14,11 @@ interface CronJob {
     /**
      * Job to be executed when [schedule] matches.
      */
-    suspend fun run(time: ZonedDateTime)
+    suspend fun runCron(time: ZonedDateTime)
 
     /**
      * Optional start-up procedure.
      */
-    suspend fun start() = Unit
+    suspend fun primeCron() = Unit
 }
 

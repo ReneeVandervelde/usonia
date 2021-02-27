@@ -68,7 +68,7 @@ internal class SleepMode(
         }
     }
 
-    override suspend fun run(time: ZonedDateTime) {
+    override suspend fun runCron(time: ZonedDateTime) {
         logger.info("Auto-Disabling Sleep Mode.")
         client.setFlag(Flags.SleepMode, false)
     }

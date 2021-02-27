@@ -71,7 +71,7 @@ class UsoniaServer(
         return crons.map { cron ->
             logger.debug { "Starting Cron <${cron::class.simpleName}>"}
             daemonScope.launch {
-                cron.start()
+                cron.primeCron()
                 SecondFrequency(clock).minutes
                     .filter { it.minute in cron.schedule.minutes }
                     .filter { it.hour in cron.schedule.hours }
@@ -80,7 +80,7 @@ class UsoniaServer(
                     .onEach { logger.debug { "Running Cron <${cron::class.simpleName}> at <$it>"} }
                     .collectLatest {
                         try {
-                            cron.run(it)
+                            cron.runCron(it)
                         } catch (e: CancellationException) {
                             logger.warn("Cron <${cron::class.simpleName}> was cancelled")
                             throw e

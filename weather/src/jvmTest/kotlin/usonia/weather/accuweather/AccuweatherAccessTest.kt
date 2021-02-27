@@ -101,8 +101,8 @@ class AccuweatherAccessTest {
         val conditionCollection = launch { access.conditions.collect { conditions += it } }
 
         pauseDispatcher {
-            access.start()
-            access.run(UtcClock.current)
+            access.primeCron()
+            access.runCron(UtcClock.current)
         }
 
         assertEquals(1, forecasts.size)
@@ -127,7 +127,7 @@ class AccuweatherAccessTest {
         val conditionCollection = launch { access.conditions.collect { conditions += it } }
 
         pauseDispatcher {
-            access.start()
+            access.primeCron()
         }
 
         assertEquals(2, forecasts.size)
@@ -162,7 +162,7 @@ class AccuweatherAccessTest {
         val conditionCollection = launch { access.conditions.collect { conditions += it } }
 
         pauseDispatcher {
-            access.start()
+            access.primeCron()
             fakeApi.conditions = ConditionsResponse(
                 cloudCover = 100,
                 temperature = ConditionsResponse.TemperatureTypes(
@@ -171,7 +171,7 @@ class AccuweatherAccessTest {
                     )
                 )
             )
-            access.run(UtcClock.current)
+            access.runCron(UtcClock.current)
         }
 
         assertEquals(2, forecasts.size)
@@ -205,7 +205,7 @@ class AccuweatherAccessTest {
         val forecastCollection = launch { access.forecast.collect { forecasts += it } }
         val conditionCollection = launch { access.conditions.collect { conditions += it } }
 
-        access.start()
+        access.primeCron()
         runCurrent()
         fakeClock.current = fakeClock.current + 5.hours
         fakeApi.forecast = ForecastResponse(
@@ -222,7 +222,7 @@ class AccuweatherAccessTest {
                 )
             )
         )
-        access.run(UtcClock.current)
+        access.runCron(UtcClock.current)
         runCurrent()
 
         assertEquals(3, forecasts.size)
