@@ -5,10 +5,11 @@ import kimchi.logger.KimchiLogger
 import usonia.rules.alerts.PipeMonitor
 import usonia.rules.alerts.WaterMonitor
 import usonia.rules.indicator.Indicator
-import usonia.rules.lights.AwayMode
+import usonia.rules.lights.*
 import usonia.rules.lights.CircadianColors
 import usonia.rules.lights.CompositeLightingPicker
 import usonia.rules.lights.DayMode
+import usonia.rules.lights.DisableMode
 import usonia.rules.lights.LightController
 import usonia.rules.lights.MovieMode
 import usonia.rules.lights.SleepMode
@@ -29,6 +30,7 @@ class RulesPlugin(
     private val sleepMode = SleepMode(client, logger)
 
     private val colorPicker = CompositeLightingPicker(
+        DisableMode(client),
         AwayMode(client),
         sleepMode,
         movieMode,
