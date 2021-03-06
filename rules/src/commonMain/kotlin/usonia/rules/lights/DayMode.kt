@@ -16,7 +16,7 @@ internal class DayMode(
     private val weatherAccess: WeatherAccess,
     private val clock: Clock = Clock.System,
 ): LightSettingsPicker {
-    override suspend fun getRoomSettings(room: Room): LightSettings {
+    override suspend fun getActiveSettings(room: Room): LightSettings {
         return when (room.type) {
             Room.Type.Hallway,
             Room.Type.Office,

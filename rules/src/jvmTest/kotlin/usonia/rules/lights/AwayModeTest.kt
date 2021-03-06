@@ -25,7 +25,7 @@ class AwayModeTest {
         )
         val picker = AwayMode(client)
 
-        val result = picker.getRoomSettings(FakeRooms.LivingRoom)
+        val result = picker.getActiveSettings(FakeRooms.LivingRoom)
 
         assertEquals(LightSettings.Unhandled, result)
     }
@@ -52,7 +52,7 @@ class AwayModeTest {
         )
         val picker = AwayMode(client)
 
-        val result = picker.getRoomSettings(FakeRooms.LivingRoom)
+        val result = picker.getActiveSettings(FakeRooms.LivingRoom)
 
         assertEquals(LightSettings.Ignore, result)
     }
@@ -79,7 +79,7 @@ class AwayModeTest {
         )
         val picker = AwayMode(client)
 
-        val result = picker.getRoomSettings(FakeRooms.LivingRoom)
+        val result = picker.getActiveSettings(FakeRooms.LivingRoom)
 
         assertEquals(LightSettings.Unhandled, result)
     }

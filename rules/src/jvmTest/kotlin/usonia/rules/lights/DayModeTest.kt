@@ -44,8 +44,8 @@ class DayModeTest {
         }
         val picker = DayMode(fakeWeather, fakeClock)
 
-        assertEquals(LightSettings.Ignore, picker.getRoomSettings(FakeRooms.LivingRoom))
-        assertEquals(LightSettings.Unhandled, picker.getRoomSettings(FakeRooms.FakeHallway))
+        assertEquals(LightSettings.Ignore, picker.getActiveSettings(FakeRooms.LivingRoom))
+        assertEquals(LightSettings.Unhandled, picker.getActiveSettings(FakeRooms.FakeHallway))
     }
 
     @Test
@@ -59,7 +59,7 @@ class DayModeTest {
         }
         val picker = DayMode(fakeWeather, fakeClock)
 
-        assertEquals(LightSettings.Unhandled, picker.getRoomSettings(FakeRooms.LivingRoom))
+        assertEquals(LightSettings.Unhandled, picker.getActiveSettings(FakeRooms.LivingRoom))
     }
 
     @Test
@@ -73,7 +73,7 @@ class DayModeTest {
         }
         val picker = DayMode(fakeWeather, fakeClock)
 
-        assertEquals(LightSettings.Unhandled, picker.getRoomSettings(FakeRooms.LivingRoom))
+        assertEquals(LightSettings.Unhandled, picker.getActiveSettings(FakeRooms.LivingRoom))
     }
 
     @Test
@@ -87,7 +87,7 @@ class DayModeTest {
         }
         val picker = DayMode(fakeWeather, fakeClock)
 
-        assertEquals(LightSettings.Unhandled, picker.getRoomSettings(FakeRooms.LivingRoom))
+        assertEquals(LightSettings.Unhandled, picker.getActiveSettings(FakeRooms.LivingRoom))
     }
 
     @Test
@@ -101,7 +101,7 @@ class DayModeTest {
         }
         val picker = DayMode(fakeWeather, fakeClock)
 
-        assertEquals(LightSettings.Unhandled, picker.getRoomSettings(FakeRooms.LivingRoom))
+        assertEquals(LightSettings.Unhandled, picker.getActiveSettings(FakeRooms.LivingRoom))
     }
 
     @Test
@@ -115,6 +115,6 @@ class DayModeTest {
         }
         val picker = DayMode(fakeWeather, fakeClock)
 
-        assertEquals(LightSettings.Unhandled, picker.getRoomSettings(FakeRooms.LivingRoom))
+        assertEquals(LightSettings.Unhandled, picker.getActiveSettings(FakeRooms.LivingRoom))
     }
 }

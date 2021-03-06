@@ -27,7 +27,7 @@ internal class MovieMode(
     private val client: BackendClient,
     private val logger: KimchiLogger = EmptyLogger,
 ): LightSettingsPicker, Daemon {
-    override suspend fun getRoomSettings(room: Room): LightSettings {
+    override suspend fun getActiveSettings(room: Room): LightSettings {
         if (!client.getBooleanFlag(FLAG)) {
             return LightSettings.Unhandled
         }

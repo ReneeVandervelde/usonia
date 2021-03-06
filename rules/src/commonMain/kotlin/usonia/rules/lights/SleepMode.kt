@@ -39,7 +39,7 @@ internal class SleepMode(
         minutes = setOf(0),
     )
 
-    override suspend fun getRoomSettings(room: Room): LightSettings {
+    override suspend fun getActiveSettings(room: Room): LightSettings {
         if (!client.getBooleanFlag(Flags.SleepMode)) return LightSettings.Unhandled
 
         return when (room.type) {

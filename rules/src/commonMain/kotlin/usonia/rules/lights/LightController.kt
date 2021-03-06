@@ -7,14 +7,11 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.selects.select
 import usonia.core.state.publishAll
 import usonia.foundation.*
-import usonia.foundation.Room.Type.*
 import usonia.kotlin.DefaultScope
 import usonia.kotlin.neverEnding
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
 import kotlin.time.ExperimentalTime
-import kotlin.time.minutes
-import kotlin.time.seconds
 
 /**
  * Controls the on/off state of a room's lights.
@@ -43,20 +40,6 @@ internal class LightController(
         }
     }
 
-    private val Room.idleTime get() = when(type) {
-        Bathroom -> 5.minutes
-        Bedroom -> 5.minutes
-        Dining -> 10.minutes
-        Garage -> 15.minutes
-        Generic -> 10.minutes
-        Hallway -> 5.seconds
-        Kitchen -> 10.minutes
-        LivingRoom -> 30.minutes
-        Office -> 15.minutes
-        Storage -> 1.minutes
-        Utility -> 1.minutes
-    }
-
     private suspend fun onRoomIdle(room: Room) {
         val cancellation = backgroundScope.launch {
             client.events
@@ -67,12 +50,23 @@ internal class LightController(
             logger.trace("Cancelling idle timer for ${room.name}")
         }
         val action = backgroundScope.async {
-            logger.trace("Starting ${room.idleTime} idle timer for ${room.name}")
-            delay(room.idleTime).let { room }
+            val idleConditions = lightSettingsPicker.getIdleConditions(room)
+            when (idleConditions) {
+                is IdleConditions.Timed -> {
+                    logger.trace("Starting ${idleConditions.time} idle timer for ${room.name}")
+                    delay(idleConditions.time).let { room }
+                }
+                IdleConditions.Ignored -> {
+                    logger.trace("Skipping Idle monitor for room $room")
+                }
+                IdleConditions.Unhandled -> {
+                    logger.warn("Unhandled idle action for room: $room")
+                }
+            }
         }
         val cancelled = select<Room?> {
             cancellation.onJoin { null }
-            action.onAwait { it }
+            action.onAwait { room }
         }
         cancellation.cancel()
         action.cancel()
@@ -85,7 +79,7 @@ internal class LightController(
 
     private suspend fun onRoomMotion(room: Room) {
         logger.trace("Handling lights in ${room.name}")
-        val settings = lightSettingsPicker.getRoomSettings(room)
+        val settings = lightSettingsPicker.getActiveSettings(room)
         adjustRoomLights(room, settings)
     }
     

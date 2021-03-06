@@ -16,6 +16,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 import kotlin.time.minutes
+import kotlin.time.seconds
 
 @OptIn(ExperimentalTime::class)
 class LightControllerTest {
@@ -35,7 +36,7 @@ class LightControllerTest {
     )
 
     private val settingsPicker = object: LightSettingsPicker {
-        override suspend fun getRoomSettings(room: Room) = LightSettings.Temperature(
+        override suspend fun getActiveSettings(room: Room) = LightSettings.Temperature(
             temperature = ColorTemperature(420),
             brightness = 75.percent,
         )
@@ -43,6 +44,8 @@ class LightControllerTest {
         override suspend fun getIdleSettings(room: Room): LightSettings {
             return LightSettings.Switch(SwitchState.OFF)
         }
+
+        override suspend fun getIdleConditions(room: Room): IdleConditions = IdleConditions.Timed(1.seconds)
     }
 
     @Test
@@ -82,7 +85,7 @@ class LightControllerTest {
             actionPublisher = actionPublisher,
         )
         val settingsPicker = object: LightSettingsPicker {
-            override suspend fun getRoomSettings(room: Room): LightSettings = LightSettings.Ignore
+            override suspend fun getActiveSettings(room: Room): LightSettings = LightSettings.Ignore
         }
 
         val controller = LightController(client, settingsPicker, backgroundScope = this)
@@ -110,7 +113,7 @@ class LightControllerTest {
             actionPublisher = actionPublisher,
         )
         val settingsPicker = object: LightSettingsPicker {
-            override suspend fun getRoomSettings(room: Room): LightSettings = LightSettings.Unhandled
+            override suspend fun getActiveSettings(room: Room): LightSettings = LightSettings.Unhandled
         }
 
         val controller = LightController(client, settingsPicker, backgroundScope = this)

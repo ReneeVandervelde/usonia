@@ -12,7 +12,7 @@ private const val FLAG = "Disable Lights"
 internal class DisableMode(
     private val client: BackendClient,
 ): LightSettingsPicker {
-    override suspend fun getRoomSettings(room: Room): LightSettings {
+    override suspend fun getActiveSettings(room: Room): LightSettings {
         if (client.getBooleanFlag(FLAG)) {
             return LightSettings.Ignore
         }

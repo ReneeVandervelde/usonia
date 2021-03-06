@@ -36,6 +36,7 @@ class RulesPlugin(
         movieMode,
         DayMode(weather),
         CircadianColors(client, weather, logger = logger),
+        FixedTimeouts,
         OnOffHandler,
     )
 

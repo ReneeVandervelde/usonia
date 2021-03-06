@@ -53,13 +53,13 @@ class SleepModeTest {
         )
         val picker = SleepMode(client, clock = night)
 
-        val bedroom = picker.getRoomSettings(FakeRooms.FakeBedroom)
-        val livingRoom = picker.getRoomSettings(FakeRooms.LivingRoom)
-        val tranquilHallwayResult = picker.getRoomSettings(FakeRooms.FakeHallway.copy(
+        val bedroom = picker.getActiveSettings(FakeRooms.FakeBedroom)
+        val livingRoom = picker.getActiveSettings(FakeRooms.LivingRoom)
+        val tranquilHallwayResult = picker.getActiveSettings(FakeRooms.FakeHallway.copy(
             adjacentRooms = setOf(FakeRooms.FakeBedroom.id)
         ))
-        val unaffectedHallwayResult = picker.getRoomSettings(FakeRooms.FakeHallway)
-        val bathroom = picker.getRoomSettings(FakeRooms.FakeBathroom)
+        val unaffectedHallwayResult = picker.getActiveSettings(FakeRooms.FakeHallway)
+        val bathroom = picker.getActiveSettings(FakeRooms.FakeBathroom)
 
         assertTrue(tranquilHallwayResult is LightSettings.Temperature)
         assertEquals(Colors.Warm, tranquilHallwayResult.temperature)
@@ -84,13 +84,13 @@ class SleepModeTest {
         )
         val picker = SleepMode(client, clock = morning)
 
-        val bedroom = picker.getRoomSettings(FakeRooms.FakeBedroom)
-        val livingRoom = picker.getRoomSettings(FakeRooms.LivingRoom)
-        val tranquilHallwayResult = picker.getRoomSettings(FakeRooms.FakeHallway.copy(
+        val bedroom = picker.getActiveSettings(FakeRooms.FakeBedroom)
+        val livingRoom = picker.getActiveSettings(FakeRooms.LivingRoom)
+        val tranquilHallwayResult = picker.getActiveSettings(FakeRooms.FakeHallway.copy(
             adjacentRooms = setOf(FakeRooms.FakeBedroom.id)
         ))
-        val unaffectedHallwayResult = picker.getRoomSettings(FakeRooms.FakeHallway)
-        val bathroom = picker.getRoomSettings(FakeRooms.FakeBathroom)
+        val unaffectedHallwayResult = picker.getActiveSettings(FakeRooms.FakeHallway)
+        val bathroom = picker.getActiveSettings(FakeRooms.FakeBathroom)
 
         assertTrue(tranquilHallwayResult is LightSettings.Temperature)
         assertEquals(Colors.Warm, tranquilHallwayResult.temperature)
@@ -113,13 +113,13 @@ class SleepModeTest {
         )
         val picker = SleepMode(client)
 
-        val bedroom = picker.getRoomSettings(FakeRooms.FakeBedroom)
-        val livingRoom = picker.getRoomSettings(FakeRooms.LivingRoom)
-        val tranquilHallwayResult = picker.getRoomSettings(FakeRooms.FakeHallway.copy(
+        val bedroom = picker.getActiveSettings(FakeRooms.FakeBedroom)
+        val livingRoom = picker.getActiveSettings(FakeRooms.LivingRoom)
+        val tranquilHallwayResult = picker.getActiveSettings(FakeRooms.FakeHallway.copy(
             adjacentRooms = setOf(FakeRooms.FakeBedroom.id)
         ))
-        val unaffectedHallwayResult = picker.getRoomSettings(FakeRooms.FakeHallway)
-        val bathroom = picker.getRoomSettings(FakeRooms.FakeBathroom)
+        val unaffectedHallwayResult = picker.getActiveSettings(FakeRooms.FakeHallway)
+        val bathroom = picker.getActiveSettings(FakeRooms.FakeBathroom)
 
         assertTrue(tranquilHallwayResult is LightSettings.Unhandled)
         assertTrue(bathroom is LightSettings.Unhandled)

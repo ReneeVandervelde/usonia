@@ -4,7 +4,7 @@ import usonia.foundation.Room
 import usonia.foundation.SwitchState
 
 internal object OnOffHandler: LightSettingsPicker {
-    override suspend fun getRoomSettings(room: Room): LightSettings {
+    override suspend fun getActiveSettings(room: Room): LightSettings {
         return LightSettings.Switch(SwitchState.ON)
     }
 

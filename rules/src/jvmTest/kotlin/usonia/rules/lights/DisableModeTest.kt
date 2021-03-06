@@ -2,7 +2,6 @@ package usonia.rules.lights
 
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runBlockingTest
-import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.FakeRooms
@@ -22,7 +21,7 @@ class DisableModeTest {
             configurationAccess = fakeConfig,
         )
 
-        assertEquals(LightSettings.Ignore, DisableMode(client).getRoomSettings(FakeRooms.LivingRoom))
+        assertEquals(LightSettings.Ignore, DisableMode(client).getActiveSettings(FakeRooms.LivingRoom))
     }
 
     @Test
@@ -36,7 +35,7 @@ class DisableModeTest {
             configurationAccess = fakeConfig,
         )
 
-        assertEquals(LightSettings.Unhandled, DisableMode(client).getRoomSettings(FakeRooms.LivingRoom))
+        assertEquals(LightSettings.Unhandled, DisableMode(client).getActiveSettings(FakeRooms.LivingRoom))
     }
 
     @Test
@@ -48,6 +47,6 @@ class DisableModeTest {
             configurationAccess = fakeConfig,
         )
 
-        assertEquals(LightSettings.Unhandled, DisableMode(client).getRoomSettings(FakeRooms.LivingRoom))
+        assertEquals(LightSettings.Unhandled, DisableMode(client).getActiveSettings(FakeRooms.LivingRoom))
     }
 }
