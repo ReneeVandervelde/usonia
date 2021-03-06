@@ -39,6 +39,10 @@ class LightControllerTest {
             temperature = ColorTemperature(420),
             brightness = 75.percent,
         )
+
+        override suspend fun getIdleSettings(room: Room): LightSettings {
+            return LightSettings.Switch(SwitchState.OFF)
+        }
     }
 
     @Test

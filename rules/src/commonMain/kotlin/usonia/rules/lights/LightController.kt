@@ -77,29 +77,23 @@ internal class LightController(
         cancellation.cancel()
         action.cancel()
 
-        if (cancelled != null) switchRoomOff(cancelled)
-    }
-
-    private suspend fun switchRoomOff(room: Room) {
-        logger.trace("Switching lights off in ${room.name}")
-        val actions = room.devices
-            .filter { Action.Switch::class in it.capabilities.actions }
-            .map {
-                Action.Switch(
-                    target = it.id,
-                    state = SwitchState.OFF,
-                )
-            }
-
-        client.publishAll(actions)
+        if (cancelled != null) {
+            val settings = lightSettingsPicker.getIdleSettings(room)
+            adjustRoomLights(cancelled, settings)
+        }
     }
 
     private suspend fun onRoomMotion(room: Room) {
-        logger.trace("Adjusting lights in ${room.name}")
+        logger.trace("Handling lights in ${room.name}")
         val settings = lightSettingsPicker.getRoomSettings(room)
-
+        adjustRoomLights(room, settings)
+    }
+    
+    private suspend fun adjustRoomLights(room: Room, settings: LightSettings) {
+        logger.trace("Adjusting lights in ${room.name}")
         when (settings) {
             is LightSettings.Temperature -> setRoomTemperature(room, settings)
+            is LightSettings.Switch -> switchRoomLights(room, settings.state)
             LightSettings.Ignore -> {
                 logger.trace("Ignored action for room event: $room")
             }
@@ -122,7 +116,6 @@ internal class LightController(
                 )
             }
         val dimmingDevices = room.devices
-            .filter { Fixture.Light == it.fixture }
             .filter { Action.ColorTemperatureChange::class !in it.capabilities.actions }
             .filter { Action.Dim::class in it.capabilities.actions }
             .map {
@@ -145,6 +138,21 @@ internal class LightController(
             }
 
         client.publishAll(colorTemperatureDevices + dimmingDevices + switchDevices)
+    }
+
+    private suspend fun switchRoomLights(room: Room, state: SwitchState) {
+        logger.trace("Switching lights ${state.name} in ${room.name}")
+        val actions = room.devices
+            .filter { Fixture.Light == it.fixture }
+            .filter { Action.Switch::class in it.capabilities.actions }
+            .map {
+                Action.Switch(
+                    target = it.id,
+                    state = state,
+                )
+            }
+
+        client.publishAll(actions)
     }
 }
 

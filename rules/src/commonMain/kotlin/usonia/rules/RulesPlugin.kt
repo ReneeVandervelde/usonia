@@ -36,6 +36,7 @@ class RulesPlugin(
         movieMode,
         DayMode(weather),
         CircadianColors(client, weather, logger = logger),
+        OnOffHandler,
     )
 
     override val daemons: List<Daemon> = listOf(

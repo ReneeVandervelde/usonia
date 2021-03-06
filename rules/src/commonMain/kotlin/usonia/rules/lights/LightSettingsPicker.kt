@@ -7,4 +7,5 @@ import usonia.foundation.Room
  */
 internal interface LightSettingsPicker {
     suspend fun getRoomSettings(room: Room): LightSettings
+    suspend fun getIdleSettings(room: Room): LightSettings = LightSettings.Unhandled
 }
