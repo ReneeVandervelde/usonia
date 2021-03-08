@@ -18,12 +18,12 @@ internal class DayMode(
 ): LightSettingsPicker {
     override suspend fun getActiveSettings(room: Room): LightSettings {
         return when (room.type) {
+            Room.Type.Bathroom,
             Room.Type.Hallway,
             Room.Type.Office,
             Room.Type.Utility,
             Room.Type.Storage,
             Room.Type.Garage -> LightSettings.Unhandled
-            Room.Type.Bathroom,
             Room.Type.Bedroom,
             Room.Type.Dining,
             Room.Type.Generic,
@@ -43,7 +43,5 @@ internal class DayMode(
             clock.now() > forecast.sunset - 1.hours -> LightSettings.Unhandled
             else -> LightSettings.Ignore
         }
-
-        return LightSettings.Ignore
     }
 }
