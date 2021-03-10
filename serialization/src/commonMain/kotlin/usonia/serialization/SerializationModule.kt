@@ -7,12 +7,14 @@ import usonia.foundation.DeviceSerializer
 import usonia.hue.HueArchetypes
 import usonia.schlage.SchlageArchetypes
 import usonia.smartthings.SmartThingsArchetypes
+import usonia.xiaomi.XiaomiArchetypes
 
 object SerializationModule {
     private val archetypes = setOf(
         *SmartThingsArchetypes.ALL.toTypedArray(),
         HueArchetypes.group,
         SchlageArchetypes.connectLock,
+        XiaomiArchetypes.temperature,
     )
 
     val json = Json {

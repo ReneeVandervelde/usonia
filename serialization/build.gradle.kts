@@ -16,6 +16,7 @@ kotlin {
                 implementation(project(":hue-bridge"))
                 implementation(project(":schlage"))
                 implementation(project(":smartthings"))
+                implementation(project(":xiaomi"))
             }
         }
 
