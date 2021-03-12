@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath(kotlin("gradle-plugin", version = "1.4.10"))
+        classpath(kotlin("gradle-plugin", version = "1.4.30"))
         classpath("com.squareup.sqldelight:gradle-plugin:1.4.3")
     }
 }
