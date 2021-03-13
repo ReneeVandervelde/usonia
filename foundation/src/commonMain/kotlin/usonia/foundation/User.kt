@@ -9,5 +9,6 @@ import kotlinx.serialization.Serializable
 data class User(
     val id: Identifier,
     val name: String,
+    val alertLevel: Action.Alert.Level = Action.Alert.Level.Info,
     val parameters: ParameterBag = emptyMap(),
 )

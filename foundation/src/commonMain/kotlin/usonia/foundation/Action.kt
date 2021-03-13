@@ -82,12 +82,19 @@ sealed class Action {
 
     data class Alert(
         override val target: Identifier,
-        val message: String
+        val message: String,
+        val level: Level = Level.Debug,
     ): Action() {
         override fun withTarget(target: Identifier): Action = copy(target = target)
+
+        enum class Level {
+            Debug,
+            Info,
+            Warning,
+            Emergency,
+        }
     }
 }
-
 
 object ActionSerializer: KSerializer<Action> {
     private val serializer = ActionJson.serializer()
@@ -129,7 +136,8 @@ object ActionSerializer: KSerializer<Action> {
             )
             Action.Alert::class.simpleName -> Action.Alert(
                 target = target,
-                message = json.alertMessage!!
+                message = json.alertMessage!!,
+                level = json.alertLevel?.let { Action.Alert.Level.valueOf(it) } ?: Action.Alert.Level.Info,
             )
             else -> throw IllegalArgumentException("Unknown type: ${json.type}")
         }
@@ -166,6 +174,7 @@ object ActionSerializer: KSerializer<Action> {
             )
             is Action.Alert -> prototype.copy(
                 alertMessage = value.message,
+                alertLevel = value.level.name,
             )
         }
 
@@ -185,4 +194,5 @@ internal data class ActionJson(
     val colorTemperature: Int? = null,
     val intentAction: String? = null,
     val alertMessage: String? = null,
+    val alertLevel: String? = null,
 )

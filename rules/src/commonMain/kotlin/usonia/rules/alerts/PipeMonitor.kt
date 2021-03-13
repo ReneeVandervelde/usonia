@@ -5,6 +5,7 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import usonia.core.client.alertAll
 import usonia.foundation.*
 import usonia.kotlin.neverEnding
 import usonia.server.Daemon
@@ -29,7 +30,7 @@ class PipeMonitor(
                         .map { site.findDevice(it.source) to it }
                         .filter { (device, _) -> device?.fixture == Fixture.Pipe }
                         .collect { (device, event) ->
-                            sendAlert(site, device!!, event)
+                            sendAlert(device!!, event)
                         }
                 }
                 launch {
@@ -44,20 +45,17 @@ class PipeMonitor(
         }
     }
 
-    private suspend fun sendAlert(site: Site, device: Device, event: Event.Temperature) {
+    private suspend fun sendAlert(device: Device, event: Event.Temperature) {
         if (device.id in alerted) {
             logger.trace("Duplicate alert for ${device.name}")
             return
         }
 
-        site.users
-            .also { logger.trace("Sending Water alerts to: [${it.joinToString { it.name }}]") }
-            .forEach { user ->
-                client.publishAction(Action.Alert(
-                    target = user.id,
-                    message = "${device.name} is down to ${event.temperature}º!"
-                ))
-            }
+        logger.info("Sending Water alert")
+        client.alertAll(
+            message = "${device.name} is down to ${event.temperature}º!",
+            level = Action.Alert.Level.Warning,
+        )
 
         alerted += device.id
     }

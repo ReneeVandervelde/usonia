@@ -6,10 +6,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
+import usonia.core.client.alertAll
 import usonia.core.state.*
 import usonia.foundation.Action
 import usonia.foundation.Event
-import usonia.foundation.User
 import usonia.foundation.Identifier
 import usonia.foundation.WaterState.*
 import usonia.kotlin.DefaultScope
@@ -55,24 +55,10 @@ internal class WaterMonitor(
             return
         }
         alerted.add(event.source)
-        val device = client.findDevice(event.source) ?: run {
+        val name = client.findDevice(event.source)?.name ?: "<Device: ${event.source}>".also {
             logger.error("Unable to find device with ID: <${event.source}>")
-            sendAlerts("<Device: ${event.source}>")
-            return
         }
-        sendAlerts(device.name)
-    }
-
-    private suspend fun sendAlerts(deviceName: String) {
-        client.getSite().users
-            .also { logger.trace("Sending Water alerts to: [${it.joinToString { it.name }}]") }
-            .forEach { user -> sendAlert(user, deviceName) }
-    }
-
-    private suspend fun sendAlert(user: User, deviceName: String) {
-        client.publishAction(Action.Alert(
-            target = user.id,
-            message = "Water detected by $deviceName!"
-        ))
+        logger.trace("Sending out alerts for <$name>")
+        client.alertAll("Water detected by $name!", Action.Alert.Level.Emergency)
     }
 }

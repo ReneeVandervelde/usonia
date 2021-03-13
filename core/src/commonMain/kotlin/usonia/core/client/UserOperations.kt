@@ -1,6 +1,8 @@
 package usonia.core.client
 
 import kotlinx.coroutines.flow.*
+import usonia.core.state.getSite
+import usonia.foundation.Action
 import usonia.foundation.Event
 import usonia.foundation.Identifier
 import usonia.foundation.User
@@ -25,5 +27,26 @@ val UsoniaClient.userPresenceStates: Flow<Pair<User, Event.Presence?>> get() {
             users.map { user ->
                 userPresence(user.id).map { user to it }
             }.merge()
+        }
+}
+
+/**
+ * Send an Alert to all users that meet a given level threshold.
+ *
+ * @param message The alert message to send to each user
+ * @param level The minimum threshold the user must be subscribed to to receive the alert.
+ */
+suspend fun UsoniaClient.alertAll(
+    message: String,
+    level: Action.Alert.Level,
+) {
+    getSite().users
+        .filter { level >= it.alertLevel }
+        .forEach { user ->
+            publishAction(Action.Alert(
+                target = user.id,
+                message = message,
+                level = level,
+            ))
         }
 }
