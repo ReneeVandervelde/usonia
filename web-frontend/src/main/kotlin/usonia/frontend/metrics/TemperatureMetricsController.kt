@@ -1,11 +1,12 @@
 package usonia.frontend.metrics
 
 import kimchi.logger.KimchiLogger
-import kotlinx.browser.document
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import mustache.Mustache
+import mustache.renderTemplate
+import org.w3c.dom.Element
 import org.w3c.dom.HTMLCanvasElement
 import usonia.chart.*
 import usonia.client.FrontendClient
@@ -22,29 +23,26 @@ import kotlin.time.days
 @OptIn(ExperimentalTime::class)
 class TemperatureMetricsController(
     private val client: FrontendClient,
-    private val logger: KimchiLogger,
-): ViewController {
-    private val container by lazy { document.getElementById("metrics-temperatures") }
-    private val template by lazy { document.getElementById("metrics-template-temperature")?.innerHTML }
+    logger: KimchiLogger,
+): ViewController("metrics-temperatures", logger) {
 
-    override suspend fun bind() {
+    override suspend fun onBind(element: Element) {
         client.site.collectLatest { site ->
-            container?.innerHTML = ""
+            element.innerHTML = ""
             coroutineScope {
                 site.rooms
                     .filter { it.devices.any { Event.Temperature::class in it.capabilities.events } }
                     .forEach { room ->
-                        launch { bindGraph(room) }
+                        launch { bindGraph(element, room) }
                     }
             }
         }
     }
 
-    private suspend fun bindGraph(room: Room) {
-        val graphHtml = template?.let { Mustache.render(it, room) } ?: return
+    private suspend fun bindGraph(container: Element, room: Room) {
         val chartElement = coroutineScope {
             val deferred = async { awaitElement("metrics-temperature-canvas-${room.id.value}") as HTMLCanvasElement }
-            container?.innerHTML += graphHtml
+            container.innerHTML += Mustache.renderTemplate("metrics-template-temperature", room)
             deferred.await()
         }
 

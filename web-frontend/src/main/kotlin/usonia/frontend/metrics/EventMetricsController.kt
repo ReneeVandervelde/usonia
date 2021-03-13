@@ -6,16 +6,16 @@ import kotlinx.coroutines.flow.collectLatest
 import org.w3c.dom.HTMLCanvasElement
 import usonia.chart.*
 import usonia.client.FrontendClient
-import usonia.frontend.ViewController
+import usonia.frontend.Controller
 import usonia.js.accentColor
 
 class EventMetricsController(
     private val client: FrontendClient,
     private val logger: KimchiLogger,
-): ViewController {
+): Controller {
     private val eventsByDayChart by lazy { document.getElementById("metrics-event-graph") as HTMLCanvasElement? }
 
-    override suspend fun bind() {
+    override suspend fun onReady() {
         val canvas = eventsByDayChart ?: run {
             logger.debug("No Events metric to bind to.")
             return

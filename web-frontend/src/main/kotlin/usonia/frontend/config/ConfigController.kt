@@ -2,9 +2,10 @@ package usonia.frontend.config
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.browser.document
 import kotlinx.coroutines.flow.*
 import mustache.Mustache
+import mustache.renderTemplate
+import org.w3c.dom.Element
 import usonia.client.HttpClient
 import usonia.frontend.ViewController
 
@@ -13,17 +14,14 @@ import usonia.frontend.ViewController
  */
 class ConfigController(
     private val client: HttpClient,
-    private val logger: KimchiLogger = EmptyLogger,
-): ViewController {
-    private val template by lazy { document.getElementById("config-template")?.innerHTML }
-    private val config by lazy { document.getElementById("config") }
-
-    override suspend fun bind() {
+    logger: KimchiLogger = EmptyLogger,
+): ViewController("config", logger) {
+    override suspend fun onBind(element: Element) {
         client.site
             .onEach { logger.trace("New Config Loaded") }
             .map { ConfigViewModel(it) }
             .collect { configViewModel ->
-                config?.innerHTML = template?.let { Mustache.render(it, configViewModel) }.orEmpty()
+                element.innerHTML = Mustache.renderTemplate("config-template", configViewModel)
             }
     }
 }

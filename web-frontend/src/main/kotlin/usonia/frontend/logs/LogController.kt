@@ -6,6 +6,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import mustache.Mustache
+import mustache.renderTemplate
+import org.w3c.dom.Element
 import org.w3c.dom.get
 import usonia.client.HttpClient
 import usonia.foundation.LogMessage
@@ -18,19 +20,12 @@ import usonia.kotlin.DefaultScope
  */
 class LogController(
     private val client: HttpClient,
-    private val logger: KimchiLogger,
-): ViewController, CoroutineScope by DefaultScope() {
-    private val container by lazy { document.getElementById("log") }
-    private val template by lazy { document.getElementById("log-message-template")?.innerHTML }
+    logger: KimchiLogger,
+): ViewController("log", logger), CoroutineScope by DefaultScope() {
     private val console by lazy { document.getElementById("log-console") }
     private val actions by lazy { document.getElementById("log-actions") }
 
-    override suspend fun bind() {
-        if (template == null || container == null || console == null) {
-            logger.warn("No Log Container found")
-            return
-        }
-
+    override suspend fun onBind(element: Element) {
         actions?.addElementClickListener("button[name='log-load']") {
             when (it.attributes["value"]?.value) {
                 "PART" -> launch { loadPartialLogs() }
@@ -54,6 +49,6 @@ class LogController(
     }
 
     private fun flushLog(log: LogMessage) {
-        console?.insertAdjacentHTML("afterBegin", Mustache.render(template!!, log))
+        console?.insertAdjacentHTML("afterBegin", Mustache.renderTemplate("log-message-template", log))
     }
 }

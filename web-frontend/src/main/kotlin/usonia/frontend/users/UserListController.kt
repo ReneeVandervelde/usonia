@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.datetime.Clock
 import mustache.Mustache
+import mustache.renderTemplate
 import org.w3c.dom.Element
 import org.w3c.dom.get
 import usonia.client.HttpClient
@@ -22,25 +23,23 @@ import usonia.kotlin.DefaultScope
 
 class UserListController(
     private val client: HttpClient,
-    private val logger: KimchiLogger = EmptyLogger,
-): ViewController, CoroutineScope by DefaultScope() {
-    private val template by lazy { document.getElementById("user-template")!!.innerHTML }
-    private val container by lazy { document.getElementById("users")!! }
+    logger: KimchiLogger = EmptyLogger,
+): ViewController("users", logger), CoroutineScope by DefaultScope() {
 
-    override suspend fun bind() {
-        container.addElementClickListener("button[name=\"user-state\"]") { element ->
-            onUserButtonClick(element)
+    override suspend fun onBind(element: Element) {
+        element.addElementClickListener("button[name=\"user-state\"]") { clicked ->
+            onUserButtonClick(clicked)
         }
         client.userPresenceStates
             .onEach { (user, _) -> logger.trace("Binding new User ViewModel for ${user.name}") }
             .map { (user, event) -> UserViewModel(user, event) }
             .collect { viewModel ->
-                val render = Mustache.render(template, viewModel)
-                val views = container.querySelectorAll(".user[data-user-id=\"${viewModel.id}\"]")
+                val render = Mustache.renderTemplate("user-template", viewModel)
+                val views = element.querySelectorAll(".user[data-user-id=\"${viewModel.id}\"]")
 
                 when (views.length) {
-                    0 -> container.innerHTML += render
-                    1 -> container.replaceChild(
+                    0 -> element.innerHTML += render
+                    1 -> element.replaceChild(
                         document.createElement("div").apply {
                             innerHTML = render
                         }.firstElementChild!!,

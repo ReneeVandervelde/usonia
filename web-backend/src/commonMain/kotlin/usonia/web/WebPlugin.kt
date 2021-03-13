@@ -22,7 +22,6 @@ class WebPlugin(
     private val json = SerializationModule.json
 
     override val httpControllers: List<HttpController> = listOf(
-        ControlPanelController,
         EventHttpPublisher(client, json, logger),
         EventBridgeHttpPublisher(client, json, logger),
         ActionHttpPublisher(client, json, logger),
@@ -31,6 +30,8 @@ class WebPlugin(
         SiteUpdateController(client, json, logger),
         FlagUpdateController(client, json, logger),
         FlagDeleteController(client, json),
+        HtmlPageController,
+        DefaultController,
     )
     override val socketController: List<WebSocketController> = listOf(
         LogSocket,
