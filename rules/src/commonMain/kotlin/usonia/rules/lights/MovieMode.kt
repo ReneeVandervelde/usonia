@@ -41,7 +41,7 @@ internal class MovieMode(
                 temperature = Colors.Warm,
                 brightness = 50.percent,
             )
-            Bedroom, Garage, Generic, Office, Storage, Utility -> LightSettings.Unhandled
+            Bedroom, Garage, Generic, Office, Storage, Utility, Greenhouse -> LightSettings.Unhandled
         }
     }
 

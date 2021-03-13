@@ -23,6 +23,7 @@ internal object FixedTimeouts: LightSettingsPicker {
             Room.Type.Office -> 15.minutes
             Room.Type.Storage -> 1.minutes
             Room.Type.Utility -> 1.minutes
+            Room.Type.Greenhouse -> return IdleConditions.Unhandled
         }.let(IdleConditions::Timed)
     }
 }

@@ -23,7 +23,8 @@ internal class DayMode(
             Room.Type.Office,
             Room.Type.Utility,
             Room.Type.Storage,
-            Room.Type.Garage -> LightSettings.Unhandled
+            Room.Type.Garage,
+            Room.Type.Greenhouse -> LightSettings.Unhandled
             Room.Type.Bedroom,
             Room.Type.Dining,
             Room.Type.Generic,

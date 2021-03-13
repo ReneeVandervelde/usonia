@@ -31,6 +31,7 @@ data class Room(
         Office,
         Storage,
         Utility,
+        Greenhouse,
     }
 
     operator fun contains(id: Identifier): Boolean {

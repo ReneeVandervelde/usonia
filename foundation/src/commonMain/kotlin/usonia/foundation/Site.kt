@@ -72,9 +72,22 @@ fun Site.findRoom(id: Identifier): Room? = rooms.find { it.id == id }
  * @param id The ID of the device to search for.
  * @return The room that contains the device of [id]
  */
+@Deprecated("Use find method", replaceWith = ReplaceWith("findRoomContainingDevice(id)"))
 fun Site.getRoomContainingDevice(id: Identifier): Room {
     return rooms.single {
         it.devices.singleOrNull { it.id == id } != null
+    }
+}
+
+/**
+ * Find a room by a device ID.
+ *
+ * @param id The ID of the device to search for.
+ * @return The room that contains the device of [id]
+ */
+fun Site.findRoomContainingDevice(id: Identifier): Room? {
+    return rooms.find { room ->
+        id in room.devices.map { it.id }
     }
 }
 

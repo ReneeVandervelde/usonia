@@ -11,5 +11,6 @@ enum class Fixture {
     Refrigerator,
     Freezer,
     Pipe,
-    Indicator
+    Indicator,
+    Fan,
 }

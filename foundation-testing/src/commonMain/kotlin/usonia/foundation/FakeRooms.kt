@@ -21,4 +21,9 @@ object FakeRooms {
         name = "Fake Bedroom",
         type = Room.Type.Bedroom,
     )
+    val FakeGreenhouse = Room(
+        id = Identifier("fake-greenhouse"),
+        name = "Fake Greenhouse",
+        type = Room.Type.Greenhouse,
+    )
 }

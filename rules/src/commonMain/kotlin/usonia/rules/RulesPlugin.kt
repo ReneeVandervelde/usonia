@@ -4,6 +4,7 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import usonia.rules.alerts.PipeMonitor
 import usonia.rules.alerts.WaterMonitor
+import usonia.rules.greenhouse.FanControl
 import usonia.rules.indicator.Indicator
 import usonia.rules.lights.*
 import usonia.rules.lights.CircadianColors
@@ -49,6 +50,7 @@ class RulesPlugin(
         LockOnSleep(client, logger),
         LockOnAway(client, logger),
         PipeMonitor(client, logger),
+        FanControl(client, logger),
     )
 
     override val crons: List<CronJob> = listOf(
