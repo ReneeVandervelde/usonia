@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import usonia.foundation.*
-import usonia.kotlin.suspendedFlow
+import usonia.kotlin.ongoingFlowOf
 import usonia.core.state.ActionAccessFake
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
@@ -17,7 +17,7 @@ class TelegramAlertsTest {
     @Test
     fun sendAlert() = runBlockingTest {
         val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: Flow<Site> = suspendedFlow(
+            override val site: Flow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     users = setOf(
                         FakeUsers.John.copy(
@@ -67,7 +67,7 @@ class TelegramAlertsTest {
     @Test
     fun unknownUser() = runBlockingTest {
         val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: Flow<Site> = suspendedFlow(
+            override val site: Flow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     users = setOf(
                         FakeUsers.John.copy(
@@ -117,7 +117,7 @@ class TelegramAlertsTest {
     @Test
     fun noUserConfig() = runBlockingTest {
         val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: Flow<Site> = suspendedFlow(
+            override val site: Flow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     users = setOf(
                         FakeUsers.John
@@ -163,7 +163,7 @@ class TelegramAlertsTest {
     @Test
     fun noConfig() = runBlockingTest {
         val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: Flow<Site> = suspendedFlow(
+            override val site: Flow<Site> = ongoingFlowOf(
                 FakeSite
             )
         }

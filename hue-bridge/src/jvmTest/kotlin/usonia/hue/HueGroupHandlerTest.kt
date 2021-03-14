@@ -13,7 +13,7 @@ import kotlinx.coroutines.test.runBlockingTest
 import usonia.foundation.*
 import usonia.foundation.unit.ColorTemperature
 import usonia.kotlin.unit.percent
-import usonia.kotlin.suspendedFlow
+import usonia.kotlin.ongoingFlowOf
 import usonia.core.state.ActionAccessFake
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
@@ -39,7 +39,7 @@ class HueGroupHandlerTest {
         val shadeSpy = ShadeGroupsSpy()
         val actionAccess = ActionAccessFake()
         val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: Flow<Site> = suspendedFlow(
+            override val site: Flow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     rooms = setOf(
                         FakeRooms.LivingRoom.copy(

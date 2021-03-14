@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.*
  * This is similar to [kotlinx.coroutines.flow.flowOf] but does not complete
  * after the initial item is returned, but instead suspends until cancelled.
  */
-fun <T> suspendedFlow(single: T): Flow<T> = flow {
+fun <T> ongoingFlowOf(single: T): Flow<T> = flow {
     emit(single)
     awaitCancellation()
 }

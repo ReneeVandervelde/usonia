@@ -11,7 +11,7 @@ import usonia.core.state.EventAccessStub
 import usonia.foundation.*
 import usonia.kotlin.datetime.UtcClock
 import usonia.kotlin.datetime.current
-import usonia.kotlin.suspendedFlow
+import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import usonia.todoist.api.Task
 import usonia.todoist.api.TaskParameters
@@ -25,7 +25,7 @@ import kotlin.time.minutes
 @OptIn(ExperimentalTime::class)
 class AwolDeviceReporterTest {
     val config = object: ConfigurationAccess by ConfigurationAccessStub {
-        override val site: Flow<Site> = suspendedFlow(FakeSite.copy(
+        override val site: Flow<Site> = ongoingFlowOf(FakeSite.copy(
             rooms = setOf(FakeRooms.LivingRoom.copy(
                 devices = setOf(FakeDevices.WaterSensor.copy(
                     id = Identifier("fake-sensor"),

@@ -11,7 +11,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import usonia.core.state.*
 import usonia.foundation.*
-import usonia.kotlin.suspendedFlow
+import usonia.kotlin.ongoingFlowOf
 import usonia.kotlin.unit.percent
 import usonia.server.DummyClient
 import usonia.weather.Conditions
@@ -25,7 +25,7 @@ import kotlin.test.assertTrue
 
 class IndicatorTest {
     val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-        override val site: Flow<Site> = suspendedFlow(FakeSite.copy(
+        override val site: Flow<Site> = ongoingFlowOf(FakeSite.copy(
             users = setOf(FakeUsers.John),
             rooms = setOf(
                 FakeRooms.LivingRoom.copy(
@@ -57,8 +57,8 @@ class IndicatorTest {
     )
 
     val fakeWeather = object: WeatherAccess {
-        override val forecast: Flow<Forecast> = suspendedFlow(fakeForecast)
-        override val conditions: Flow<Conditions> = suspendedFlow(fakeConditions)
+        override val forecast: Flow<Forecast> = ongoingFlowOf(fakeForecast)
+        override val conditions: Flow<Conditions> = ongoingFlowOf(fakeConditions)
     }
 
     @Test
@@ -90,7 +90,7 @@ class IndicatorTest {
             actionPublisher = spyPublisher,
         )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
-            override val conditions: Flow<Conditions> = suspendedFlow(fakeConditions.copy(
+            override val conditions: Flow<Conditions> = ongoingFlowOf(fakeConditions.copy(
                 temperature = 100,
             ))
         }
@@ -117,7 +117,7 @@ class IndicatorTest {
             actionPublisher = spyPublisher,
         )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
-            override val forecast: Flow<Forecast> = suspendedFlow(fakeForecast.copy(
+            override val forecast: Flow<Forecast> = ongoingFlowOf(fakeForecast.copy(
                 snowChance = 25.percent
             ))
         }
@@ -144,7 +144,7 @@ class IndicatorTest {
             actionPublisher = spyPublisher,
         )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
-            override val forecast: Flow<Forecast> = suspendedFlow(fakeForecast.copy(
+            override val forecast: Flow<Forecast> = ongoingFlowOf(fakeForecast.copy(
                 rainChance = 25.percent
             ))
         }
@@ -171,7 +171,7 @@ class IndicatorTest {
             actionPublisher = spyPublisher,
         )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
-            override val forecast: Flow<Forecast> = suspendedFlow(fakeForecast.copy(
+            override val forecast: Flow<Forecast> = ongoingFlowOf(fakeForecast.copy(
                 rainChance = 25.percent,
                 snowChance = 25.percent,
             ))
