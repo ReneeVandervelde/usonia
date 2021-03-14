@@ -5,6 +5,7 @@ package usonia.kotlin
  *
  * @throws IllegalStateException if the block returns.
  */
+@Deprecated("Use `collectOngoing`")
 suspend inline fun neverEnding(crossinline action: suspend () -> Unit): Nothing {
     action()
     throw IllegalStateException("Unexpected end of never-ending operation")

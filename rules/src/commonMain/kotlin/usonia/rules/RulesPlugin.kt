@@ -14,6 +14,7 @@ import usonia.rules.lights.DisableMode
 import usonia.rules.lights.LightController
 import usonia.rules.lights.MovieMode
 import usonia.rules.lights.SleepMode
+import usonia.rules.locks.LockAfterTime
 import usonia.rules.locks.LockOnAway
 import usonia.rules.locks.LockOnSleep
 import usonia.server.Daemon
@@ -49,6 +50,7 @@ class RulesPlugin(
         movieMode,
         LockOnSleep(client, logger),
         LockOnAway(client, logger),
+        LockAfterTime(client, logger),
         PipeMonitor(client, logger),
         FanControl(client, logger),
     )
