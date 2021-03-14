@@ -47,7 +47,7 @@ class FanControlTest {
 
         val daemonJob = launch { daemon.start() }
         runCurrent()
-        fakeEvents.events.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 85f))
+        fakeEvents.events.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 80f))
         assertEquals(1, actionSpy.actions.size, "Fan is switched on")
         val action = actionSpy.actions.single()
         assertTrue(action is Action.Switch)
@@ -70,9 +70,9 @@ class FanControlTest {
 
         val daemonJob = launch { daemon.start() }
         runCurrent()
-        fakeEvents.events.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 84f))
-        fakeEvents.events.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 83f))
-        fakeEvents.events.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 82f))
+        fakeEvents.events.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 79f))
+        fakeEvents.events.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 78f))
+        fakeEvents.events.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 77f))
         assertEquals(0, actionSpy.actions.size, "Fan not adjusted in buffer.")
 
         daemonJob.cancelAndJoin()
@@ -91,7 +91,7 @@ class FanControlTest {
 
         val daemonJob = launch { daemon.start() }
         runCurrent()
-        fakeEvents.events.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 81f))
+        fakeEvents.events.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 76f))
         assertEquals(1, actionSpy.actions.size, "Fan is switched off outside of buffer.")
         val action = actionSpy.actions.single()
         assertTrue(action is Action.Switch)

@@ -12,7 +12,7 @@ import usonia.kotlin.neverEnding
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
 
-const val DEFAULT_HIGH_BOUND = 85
+const val DEFAULT_HIGH_BOUND = 80
 const val DEFAULT_UPPER_BUFFER = 3
 
 /**
