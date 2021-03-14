@@ -1,6 +1,7 @@
 package usonia.frontend.metrics
 
 import kimchi.logger.KimchiLogger
+import kotlinx.browser.document
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
@@ -15,7 +16,6 @@ import usonia.foundation.Fixture
 import usonia.foundation.Room
 import usonia.frontend.ViewController
 import usonia.js.accentColor
-import usonia.js.awaitElement
 import kotlin.math.abs
 import kotlin.time.ExperimentalTime
 import kotlin.time.days
@@ -40,11 +40,12 @@ class TemperatureMetricsController(
     }
 
     private suspend fun bindGraph(container: Element, room: Room) {
-        val chartElement = coroutineScope {
-            val deferred = async { awaitElement("metrics-temperature-canvas-${room.id.value}") as HTMLCanvasElement }
-            container.innerHTML += Mustache.renderTemplate("metrics-template-temperature", room)
-            deferred.await()
-        }
+        val render = Mustache.renderTemplate("metrics-template-temperature", room)
+        val element = document.createElement("div").apply {
+            innerHTML = render
+        }.firstElementChild!!
+        container.appendChild(element)
+        val chartElement = document.getElementById("metrics-temperature-canvas-${room.id.value}") as HTMLCanvasElement
 
         val data = DataSet(
             label = "Temperature",
