@@ -13,6 +13,7 @@ object SerializationModule {
     private val archetypes = setOf(
         *SmartThingsArchetypes.ALL.toTypedArray(),
         HueArchetypes.group,
+        HueArchetypes.color,
         SchlageArchetypes.connectLock,
         XiaomiArchetypes.temperature,
     )
