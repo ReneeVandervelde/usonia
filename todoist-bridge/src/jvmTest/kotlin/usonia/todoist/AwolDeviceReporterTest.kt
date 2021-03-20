@@ -9,6 +9,7 @@ import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccess
 import usonia.core.state.EventAccessStub
 import usonia.foundation.*
+import usonia.kotlin.OngoingFlow
 import usonia.kotlin.datetime.UtcClock
 import usonia.kotlin.datetime.current
 import usonia.kotlin.ongoingFlowOf
@@ -25,7 +26,7 @@ import kotlin.time.minutes
 @OptIn(ExperimentalTime::class)
 class AwolDeviceReporterTest {
     val config = object: ConfigurationAccess by ConfigurationAccessStub {
-        override val site: Flow<Site> = ongoingFlowOf(FakeSite.copy(
+        override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
             rooms = setOf(FakeRooms.LivingRoom.copy(
                 devices = setOf(FakeDevices.WaterSensor.copy(
                     id = Identifier("fake-sensor"),
@@ -55,7 +56,7 @@ class AwolDeviceReporterTest {
     @Test
     fun correctParameters() = runBlockingTest {
         val events = object: EventAccess by EventAccessStub {
-            override val oldestEventTime: Flow<Instant?> = flowOf(null)
+            override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(null)
         }
         val api = object: TodoistApi by ApiStub {
             var tokenUsed: String? = null
@@ -84,7 +85,7 @@ class AwolDeviceReporterTest {
     @Test
     fun noAwolDevices() = runBlockingTest {
         val events = object: EventAccess by EventAccessStub {
-            override val oldestEventTime: Flow<Instant?> = flowOf(Instant.DISTANT_PAST)
+            override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Water::class) {
                     FakeEvents.Wet.copy(
@@ -112,7 +113,7 @@ class AwolDeviceReporterTest {
     @Test
     fun tasksCreated() = runBlockingTest {
         val events = object: EventAccess by EventAccessStub {
-            override val oldestEventTime: Flow<Instant?> = flowOf(Instant.DISTANT_PAST)
+            override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Water::class) {
                     FakeEvents.Wet.copy(
@@ -144,7 +145,7 @@ class AwolDeviceReporterTest {
     @Test
     fun taskCreatedWithoutHistoryWhenStale() = runBlockingTest {
         val events = object: EventAccess by EventAccessStub {
-            override val oldestEventTime: Flow<Instant?> = flowOf(Instant.DISTANT_PAST)
+            override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
         }
         val api = object: TodoistApi by ApiStub {
             val created = mutableListOf<TaskParameters>()
@@ -165,7 +166,7 @@ class AwolDeviceReporterTest {
     @Test
     fun notCreatedWithoutHistory() = runBlockingTest {
         val events = object: EventAccess by EventAccessStub {
-            override val oldestEventTime: Flow<Instant?> = flowOf(time.instant)
+            override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(time.instant)
         }
         val api = object: TodoistApi by ApiStub {
             val created = mutableListOf<TaskParameters>()
@@ -186,7 +187,7 @@ class AwolDeviceReporterTest {
     @Test
     fun taskClosed() = runBlockingTest {
         val events = object: EventAccess by EventAccessStub {
-            override val oldestEventTime: Flow<Instant?> = flowOf(Instant.DISTANT_PAST)
+            override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Water::class) {
                     FakeEvents.Wet.copy(
@@ -222,7 +223,7 @@ class AwolDeviceReporterTest {
     @Test
     fun stillAwol() = runBlockingTest {
         val events = object: EventAccess by EventAccessStub {
-            override val oldestEventTime: Flow<Instant?> = flowOf(Instant.DISTANT_PAST)
+            override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Water::class) {
                     FakeEvents.Wet.copy(
@@ -265,7 +266,7 @@ class AwolDeviceReporterTest {
     @Test
     fun notClosedWithoutHistory() = runBlockingTest {
         val events = object: EventAccess by EventAccessStub {
-            override val oldestEventTime: Flow<Instant?> = flowOf(time.instant)
+            override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(time.instant)
         }
         val api = object: TodoistApi by ApiStub {
             val closed = mutableListOf<Long>()
@@ -293,7 +294,7 @@ class AwolDeviceReporterTest {
     @Test
     fun noClosableTask() = runBlockingTest {
         val events = object: EventAccess by EventAccessStub {
-            override val oldestEventTime: Flow<Instant?> = flowOf(Instant.DISTANT_PAST)
+            override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Water::class) {
                     FakeEvents.Wet.copy(

@@ -10,6 +10,8 @@ import kotlinx.serialization.json.Json
 import usonia.foundation.*
 import usonia.foundation.Event
 import usonia.foundation.Site
+import usonia.kotlin.OngoingFlow
+import usonia.kotlin.asOngoing
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.kotlin.mapEach
@@ -28,8 +30,8 @@ internal class DatabaseStateAccess(
     private val zonedClock: ZonedClock = ZonedSystemClock,
 ): DatabaseServices {
     private val eventsFlow = MutableSharedFlow<Event>()
-    override val events: Flow<Event> = eventsFlow
-    override val eventsByDay: Flow<Map<LocalDate, Int>> by lazy {
+    override val events: OngoingFlow<Event> = eventsFlow.asOngoing()
+    override val eventsByDay: OngoingFlow<Map<LocalDate, Int>> by lazy {
         eventQueries.value.eventsByDay()
             .asFlow()
             .mapToList()
@@ -38,9 +40,10 @@ internal class DatabaseStateAccess(
                     LocalDate.parse(it.localdate) to it.total.toInt()
                 }.toMap()
             }
+            .asOngoing()
     }
 
-    override val oldestEventTime: Flow<Instant?> by lazy {
+    override val oldestEventTime: OngoingFlow<Instant?> by lazy {
         eventQueries.value
             .oldestEvent()
             .asFlow()
@@ -48,9 +51,10 @@ internal class DatabaseStateAccess(
             .map {
                 it?.let { Instant.fromEpochMilliseconds(it) }
             }
+            .asOngoing()
     }
 
-    override val site: Flow<Site> by lazy {
+    override val site: OngoingFlow<Site> by lazy {
         siteQueries.value
             .latest()
             .asFlow()
@@ -59,9 +63,10 @@ internal class DatabaseStateAccess(
             .map {
                 it.data.let(::String).let { json.decodeFromString(Site.serializer(), it) }
             }
+            .asOngoing()
     }
 
-    override val flags: Flow<Map<String, String?>> by lazy {
+    override val flags: OngoingFlow<Map<String, String?>> by lazy {
         flagQueries.value
             .list()
             .asFlow()
@@ -71,6 +76,7 @@ internal class DatabaseStateAccess(
                     it.id to it.data
                 }.toMap()
             }
+            .asOngoing()
     }
 
     override suspend fun publishEvent(event: Event) {
@@ -89,7 +95,7 @@ internal class DatabaseStateAccess(
         }.executeAsOneOrNull() as T?
     }
 
-    override fun temperatureHistory(devices: Collection<Identifier>): Flow<Map<Int, Float>> {
+    override fun temperatureHistory(devices: Collection<Identifier>): OngoingFlow<Map<Int, Float>> {
          return devices
              .map { it.value }
              .let { eventQueries.value.eventsBySourceAndType(it, Event.Temperature::class.simpleName!!) }
@@ -103,6 +109,7 @@ internal class DatabaseStateAccess(
                      }
                      .toMap()
              }
+             .asOngoing()
     }
 
     override suspend fun updateSite(site: Site) {

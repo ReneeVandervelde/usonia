@@ -3,7 +3,6 @@ package usonia.frontend.logs
 import kimchi.logger.KimchiLogger
 import kotlinx.browser.document
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import mustache.Mustache
 import mustache.renderTemplate
@@ -14,6 +13,7 @@ import usonia.foundation.LogMessage
 import usonia.frontend.ViewController
 import usonia.js.addElementClickListener
 import usonia.kotlin.DefaultScope
+import usonia.kotlin.collect
 
 /**
  * Displays live server logs.

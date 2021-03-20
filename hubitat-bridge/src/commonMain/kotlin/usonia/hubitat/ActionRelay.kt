@@ -1,6 +1,7 @@
 package usonia.hubitat
 
 import io.ktor.client.*
+import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kimchi.logger.EmptyLogger
@@ -8,27 +9,33 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import usonia.foundation.*
 import usonia.kotlin.IoScope
-import usonia.kotlin.neverEnding
+import usonia.kotlin.collectLatest
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
 /**
  * Forwards Action events to a hubitat bridge.
  */
+@OptIn(ExperimentalTime::class)
 internal class ActionRelay(
     private val client: BackendClient,
     private val json: Json = Json,
     private val logger: KimchiLogger = EmptyLogger,
     private val requestScope: CoroutineScope = IoScope()
 ): Daemon {
-    private val httpClient = HttpClient {}
+    private val httpClient = HttpClient {
+        install(HttpTimeout) {
+            requestTimeoutMillis = 10.seconds.toLongMilliseconds()
+        }
+    }
 
-    override suspend fun start() = neverEnding {
+    override suspend fun start(): Nothing {
         client.site.collectLatest { site ->
             client.actions.collect { action ->
                 onAction(site, action)

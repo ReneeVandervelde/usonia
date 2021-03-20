@@ -1,20 +1,20 @@
 package usonia.weather.accuweather
 
 import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.FakeBridge
 import usonia.foundation.FakeSite
 import usonia.foundation.Site
+import usonia.kotlin.OngoingFlow
+import usonia.kotlin.collect
 import usonia.kotlin.datetime.UtcClock
 import usonia.kotlin.datetime.current
+import usonia.kotlin.ongoingFlowOf
 import usonia.kotlin.unit.percent
 import usonia.server.DummyClient
 import usonia.weather.Conditions
@@ -61,7 +61,7 @@ class AccuweatherAccessTest {
     }
     private val testClient = DummyClient.copy(
         configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: Flow<Site> = flowOf(FakeSite.copy(
+            override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
                 bridges = setOf(
                     FakeBridge.copy(
                         service = "accuweather",
@@ -84,7 +84,7 @@ class AccuweatherAccessTest {
     @Test
     fun noConfig() = runBlockingTest {
         val config = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: Flow<Site> = flowOf(FakeSite)
+            override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite)
         }
         val client = testClient.copy(
             configurationAccess = config,

@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import usonia.foundation.*
 import usonia.kotlin.IoScope
-import usonia.kotlin.neverEnding
+import usonia.kotlin.collectLatest
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
 import kotlin.time.ExperimentalTime
@@ -30,7 +30,7 @@ internal class HueGroupHandler(
     private val logger: KimchiLogger = EmptyLogger,
     private val requestScope: CoroutineScope = IoScope()
 ): Daemon {
-    override suspend fun start() = neverEnding {
+    override suspend fun start(): Nothing {
         client.site.collectLatest { site -> onSiteUpdate(site) }
     }
 

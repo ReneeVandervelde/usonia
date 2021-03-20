@@ -1,14 +1,14 @@
 package usonia.client
 
-import kotlinx.coroutines.flow.Flow
 import usonia.core.client.UsoniaClient
 import usonia.foundation.LogMessage
+import usonia.kotlin.OngoingFlow
 
 interface FrontendClient: UsoniaClient {
     /**
      * Ongoing flow of log statements being recorded in the server.
      */
-    val logs: Flow<LogMessage>
+    val logs: OngoingFlow<LogMessage>
 
     /**
      * Ongoing flow of log statements, starting with a buffer of previous logs.
@@ -18,5 +18,5 @@ interface FrontendClient: UsoniaClient {
      *
      * @param limit The maximum number of historical log messages to load.
      */
-    fun bufferedLogs(limit: Int = Int.MAX_VALUE): Flow<LogMessage>
+    fun bufferedLogs(limit: Int = Int.MAX_VALUE): OngoingFlow<LogMessage>
 }

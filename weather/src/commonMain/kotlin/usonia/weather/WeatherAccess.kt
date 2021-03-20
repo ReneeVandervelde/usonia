@@ -1,17 +1,17 @@
 package usonia.weather
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
+import usonia.kotlin.OngoingFlow
+import usonia.kotlin.combineToPair
 
 /**
  * Provides access to weather information updates.
  */
 interface WeatherAccess {
-    val forecast: Flow<Forecast>
-    val conditions: Flow<Conditions>
+    val forecast: OngoingFlow<Forecast>
+    val conditions: OngoingFlow<Conditions>
 }
 
 /**
  * Combine current conditions with forecast data.
  */
-val WeatherAccess.combinedData get() = conditions.combine(forecast) { conditions, forecast -> conditions to forecast }
+val WeatherAccess.combinedData get() = conditions.combineToPair(forecast)

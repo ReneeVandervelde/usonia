@@ -2,12 +2,12 @@ package usonia.frontend.metrics
 
 import kimchi.logger.KimchiLogger
 import kotlinx.browser.document
-import kotlinx.coroutines.flow.collectLatest
 import org.w3c.dom.HTMLCanvasElement
 import usonia.chart.*
 import usonia.client.FrontendClient
 import usonia.frontend.Controller
 import usonia.js.accentColor
+import usonia.kotlin.collectLatest
 
 class EventMetricsController(
     private val client: FrontendClient,

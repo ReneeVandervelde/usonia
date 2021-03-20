@@ -1,12 +1,12 @@
 package usonia.core.state
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import usonia.foundation.Site
+import usonia.kotlin.OngoingFlow
+import usonia.kotlin.ongoingFlowOf
 
 object ConfigurationAccessStub: ConfigurationAccess {
-    override val site: Flow<Site> get() = emptyFlow()
-    override val flags: Flow<Map<String, String?>> = emptyFlow()
+    override val site: OngoingFlow<Site> get() = ongoingFlowOf()
+    override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf()
     override suspend fun updateSite(site: Site) = Unit
     override suspend fun setFlag(key: String, value: String?) = Unit
     override suspend fun removeFlag(key: String) = Unit

@@ -3,8 +3,6 @@ package usonia.frontend.metrics
 import kimchi.logger.KimchiLogger
 import kotlinx.browser.document
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
 import mustache.Mustache
 import mustache.renderTemplate
 import org.w3c.dom.Element
@@ -16,6 +14,8 @@ import usonia.foundation.Fixture
 import usonia.foundation.Room
 import usonia.frontend.ViewController
 import usonia.js.accentColor
+import usonia.kotlin.collectLatest
+import usonia.kotlin.map
 import kotlin.math.abs
 import kotlin.time.ExperimentalTime
 import kotlin.time.days

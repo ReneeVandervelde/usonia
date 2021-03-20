@@ -3,9 +3,6 @@ package usonia.rules.alerts
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.launch
 import usonia.core.client.alertAll
 import usonia.core.state.*
 import usonia.foundation.Action
@@ -13,7 +10,8 @@ import usonia.foundation.Event
 import usonia.foundation.Identifier
 import usonia.foundation.WaterState.*
 import usonia.kotlin.DefaultScope
-import usonia.kotlin.neverEnding
+import usonia.kotlin.collectOn
+import usonia.kotlin.filterIsInstance
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
 
@@ -26,16 +24,13 @@ internal class WaterMonitor(
     private val backgroundScope: CoroutineScope = DefaultScope(),
 ): Daemon {
     private val alerted = mutableSetOf<Identifier>()
-
-    override suspend fun start() = neverEnding {
+    override suspend fun start(): Nothing {
         client.events
             .filterIsInstance<Event.Water>()
-            .collect {
-                backgroundScope.launch {
-                    when (it.state) {
-                        WET -> onWet(it)
-                        DRY -> onDry(it)
-                    }
+            .collectOn(backgroundScope) {
+                when (it.state) {
+                    WET -> onWet(it)
+                    DRY -> onDry(it)
                 }
             }
     }

@@ -1,7 +1,6 @@
 package usonia.rules.alerts
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Test
 import usonia.foundation.*
@@ -9,13 +8,15 @@ import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessFake
+import usonia.kotlin.OngoingFlow
+import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class WaterMonitorTest {
     private val standardConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-        override val site: Flow<Site> = flowOf(FakeSite.copy(
+        override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
             users = setOf(FakeUsers.John),
             rooms = setOf(
                 FakeRooms.LivingRoom.copy(
@@ -42,7 +43,7 @@ class WaterMonitorTest {
         val monitorJob = launch { monitor.start() }
 
         pauseDispatcher {
-            events.events.emit(FakeEvents.Wet)
+            events.mutableEvents.emit(FakeEvents.Wet)
         }
         val action = actionPublisherSpy.actions.single()
 
@@ -64,8 +65,8 @@ class WaterMonitorTest {
         val monitorJob = launch { monitor.start() }
 
         pauseDispatcher {
-            events.events.emit(FakeEvents.Wet)
-            events.events.emit(FakeEvents.Wet)
+            events.mutableEvents.emit(FakeEvents.Wet)
+            events.mutableEvents.emit(FakeEvents.Wet)
         }
 
 
@@ -86,9 +87,9 @@ class WaterMonitorTest {
         val monitorJob = launch { monitor.start() }
 
         pauseDispatcher {
-            events.events.emit(FakeEvents.Wet)
-            events.events.emit(FakeEvents.Dry)
-            events.events.emit(FakeEvents.Wet)
+            events.mutableEvents.emit(FakeEvents.Wet)
+            events.mutableEvents.emit(FakeEvents.Dry)
+            events.mutableEvents.emit(FakeEvents.Wet)
         }
 
         assertEquals(2, actionPublisherSpy.actions.size, "Alerts resume after dry")
@@ -108,7 +109,7 @@ class WaterMonitorTest {
         val monitorJob = launch { monitor.start() }
 
         pauseDispatcher {
-            events.events.emit(FakeEvents.Dry)
+            events.mutableEvents.emit(FakeEvents.Dry)
         }
 
         assertEquals(0, actionPublisherSpy.actions.size, "No alerts sent")
@@ -128,7 +129,7 @@ class WaterMonitorTest {
         val monitorJob = launch { monitor.start() }
 
         pauseDispatcher {
-            events.events.emit(FakeEvents.SwitchOff)
+            events.mutableEvents.emit(FakeEvents.SwitchOff)
         }
 
         assertEquals(0, actionPublisherSpy.actions.size, "No alerts sent")

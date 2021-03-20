@@ -8,6 +8,7 @@ import usonia.core.state.EventAccess
 import usonia.core.state.EventPublisher
 import usonia.foundation.Event
 import usonia.foundation.Identifier
+import usonia.kotlin.*
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
 import kotlin.reflect.KClass
@@ -23,9 +24,9 @@ class InMemoryEventAccess(
 ): EventAccess, EventPublisher {
     private val eventRecords = MutableSharedFlow<Event>(replay = capacity, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     private val currentEvents = MutableSharedFlow<Event>()
-    override val events: Flow<Event> = currentEvents
-    override val eventsByDay: Flow<Map<LocalDate, Int>> = events
-        .onStart { eventRecords.replayCache.firstOrNull()?.run { emit(this) } }
+    override val events: OngoingFlow<Event> = currentEvents.asOngoing()
+    override val eventsByDay: OngoingFlow<Map<LocalDate, Int>> = events
+        .startWithIfNotNull(eventRecords.replayCache.firstOrNull())
         .map {
             eventRecords.replayCache
                 .groupBy { it.timestamp.toLocalDateTime(clock.timeZone).date }
@@ -36,15 +37,16 @@ class InMemoryEventAccess(
             eventRecords.replayCache.minByOrNull { it.timestamp }?.timestamp
         }
         .distinctUntilChanged()
+        .asOngoing()
 
     override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
         return eventRecords.replayCache
             .lastOrNull { it.source == id && it::class == type } as T?
     }
 
-    override fun temperatureHistory(devices: Collection<Identifier>): Flow<Map<Int, Float>> {
+    override fun temperatureHistory(devices: Collection<Identifier>): OngoingFlow<Map<Int, Float>> {
         return events
-            .onStart { eventRecords.replayCache.firstOrNull()?.run { emit(this) } }
+            .startWithIfNotNull(eventRecords.replayCache.firstOrNull())
             .map {
                 eventRecords.replayCache
                     .filterIsInstance<Event.Temperature>()

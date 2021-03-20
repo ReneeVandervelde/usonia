@@ -5,13 +5,11 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 import usonia.core.state.publishAll
 import usonia.foundation.*
-import usonia.kotlin.DefaultScope
-import usonia.kotlin.collectLatestOngoing
-import usonia.kotlin.collectOngoing
+import usonia.kotlin.*
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
 import kotlin.time.ExperimentalTime
@@ -27,14 +25,16 @@ class LockAfterTime(
     private val backgroundScope: CoroutineScope = DefaultScope(),
 ): Daemon {
     override suspend fun start(): Nothing {
-        client.site.collectLatestOngoing { site ->
+        client.site.collectLatest { site ->
             client.events
                 .filterIsInstance<Event.Latch>()
                 .filter { it.state == LatchState.CLOSED }
                 .map { site.findDevice(it.source) }
                 .filterNotNull()
                 .filter { it.fixture == Fixture.EntryPoint }
-                .collectOngoing { onEntrypointClosed(site, it) }
+                .collect {
+                    backgroundScope.launch { onEntrypointClosed(site, it) }
+                }
         }
     }
 

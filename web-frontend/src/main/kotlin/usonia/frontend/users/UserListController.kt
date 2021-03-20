@@ -4,9 +4,6 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.browser.document
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.datetime.Clock
 import mustache.Mustache
 import mustache.renderTemplate
@@ -19,7 +16,7 @@ import usonia.foundation.Identifier
 import usonia.foundation.PresenceState
 import usonia.frontend.ViewController
 import usonia.js.addElementClickListener
-import usonia.kotlin.DefaultScope
+import usonia.kotlin.*
 
 class UserListController(
     private val client: HttpClient,

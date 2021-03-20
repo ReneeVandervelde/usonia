@@ -3,7 +3,6 @@ package usonia.frontend.flags
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mustache.Mustache
 import mustache.renderTemplate
@@ -12,6 +11,7 @@ import org.w3c.xhr.FormData
 import usonia.client.HttpClient
 import usonia.frontend.ViewController
 import usonia.js.addFormSubmitListener
+import usonia.kotlin.collectLatest
 
 class FlagController(
     private val client: HttpClient,

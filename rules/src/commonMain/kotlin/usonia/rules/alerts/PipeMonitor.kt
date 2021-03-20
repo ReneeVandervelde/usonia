@@ -2,12 +2,12 @@ package usonia.rules.alerts
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import usonia.core.client.alertAll
 import usonia.foundation.*
-import usonia.kotlin.neverEnding
+import usonia.kotlin.*
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
 
@@ -17,10 +17,11 @@ import usonia.server.client.BackendClient
 class PipeMonitor(
     private val client: BackendClient,
     private val logger: KimchiLogger = EmptyLogger,
+    private val backgroundScope: CoroutineScope = DefaultScope(),
 ): Daemon {
     private val alerted = mutableSetOf<Identifier>()
 
-    override suspend fun start(): Nothing = neverEnding {
+    override suspend fun start(): Nothing {
         client.site.collectLatest { site ->
             coroutineScope {
                 launch {
@@ -29,7 +30,7 @@ class PipeMonitor(
                         .filter { it.temperature < 38 }
                         .map { site.findDevice(it.source) to it }
                         .filter { (device, _) -> device?.fixture == Fixture.Pipe }
-                        .collect { (device, event) ->
+                        .collectOn(backgroundScope) { (device, event) ->
                             sendAlert(device!!, event)
                         }
                 }

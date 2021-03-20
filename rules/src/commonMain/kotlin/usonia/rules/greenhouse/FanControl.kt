@@ -2,13 +2,10 @@ package usonia.rules.greenhouse
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.CoroutineScope
 import usonia.core.state.publishAll
 import usonia.foundation.*
-import usonia.kotlin.neverEnding
+import usonia.kotlin.*
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
 
@@ -21,13 +18,14 @@ const val DEFAULT_UPPER_BUFFER = 3
 class FanControl(
     private val client: BackendClient,
     private val logger: KimchiLogger = EmptyLogger,
+    private val backgroundScope: CoroutineScope = DefaultScope(),
 ): Daemon {
-    override suspend fun start(): Nothing = neverEnding {
+    override suspend fun start(): Nothing {
         client.site.collectLatest { site ->
             client.events
                 .filterIsInstance<Event.Temperature>()
                 .filter { event -> site.findRoomContainingDevice(event.source)?.type == Room.Type.Greenhouse }
-                .collect { event -> onTemperature(site, event) }
+                .collectOn(backgroundScope) { event -> onTemperature(site, event) }
         }
     }
 

@@ -1,12 +1,11 @@
 package usonia.core.state.memory
 
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runBlockingTest
 import usonia.foundation.Event
 import usonia.foundation.FakeDevices
 import usonia.foundation.FakeEvents
-import usonia.core.state.ConfigurationAccessStub
+import usonia.kotlin.first
 import kotlin.test.Test
 import kotlin.test.*
 

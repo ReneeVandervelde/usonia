@@ -1,10 +1,10 @@
 package usonia.core.state
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import usonia.foundation.*
+import usonia.kotlin.OngoingFlow
+import usonia.kotlin.first
 import kotlin.reflect.KClass
 
 /**
@@ -14,17 +14,17 @@ interface EventAccess {
     /**
      * A firehose of all events.
      */
-    val events: Flow<Event>
+    val events: OngoingFlow<Event>
 
     /**
      * The number of events that occurred on each day.
      */
-    val eventsByDay: Flow<Map<LocalDate, Int>>
+    val eventsByDay: OngoingFlow<Map<LocalDate, Int>>
 
     /**
      * Oldest recorded event, used to determine the time relevance of data.
      */
-    val oldestEventTime: Flow<Instant?>
+    val oldestEventTime: OngoingFlow<Instant?>
 
     /**
      * Get the last known event for an item.
@@ -39,7 +39,7 @@ interface EventAccess {
      * @param devices The ID's of the devices to include in temperature averages.
      * @return A map of temperatures grouped by the number of hours (negative) in the past they were reported.
      */
-    fun temperatureHistory(devices: Collection<Identifier>): Flow<Map<Int, Float>>
+    fun temperatureHistory(devices: Collection<Identifier>): OngoingFlow<Map<Int, Float>>
 }
 
 /**

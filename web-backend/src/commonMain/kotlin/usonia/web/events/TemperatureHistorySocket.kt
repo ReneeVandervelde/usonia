@@ -4,10 +4,10 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.serialization.json.Json
 import usonia.foundation.Identifier
 import usonia.foundation.RelativeHourMetricSerializer
+import usonia.kotlin.collectLatest
 import usonia.server.client.BackendClient
 import usonia.server.http.WebSocketController
 

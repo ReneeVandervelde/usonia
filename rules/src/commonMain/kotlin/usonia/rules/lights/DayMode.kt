@@ -1,8 +1,8 @@
 package usonia.rules.lights
 
-import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
 import usonia.foundation.Room
+import usonia.kotlin.first
 import usonia.kotlin.unit.percent
 import usonia.weather.WeatherAccess
 import kotlin.time.ExperimentalTime

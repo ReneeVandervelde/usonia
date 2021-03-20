@@ -9,6 +9,8 @@ import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccess
 import usonia.core.state.EventAccessStub
 import usonia.foundation.*
+import usonia.kotlin.OngoingFlow
+import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.reflect.KClass
 import kotlin.test.Test
@@ -18,7 +20,7 @@ class AwayModeTest {
     @Test
     fun default() = runBlockingTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: Flow<Site> = flowOf(FakeSite)
+            override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite)
         }
         val client = DummyClient.copy(
             configurationAccess = fakeConfig,
@@ -33,7 +35,7 @@ class AwayModeTest {
     @Test
     fun away() = runBlockingTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: Flow<Site> = flowOf(FakeSite.copy(
+            override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
                 users = setOf(FakeUsers.John)
             ))
         }
@@ -60,7 +62,7 @@ class AwayModeTest {
     @Test
     fun home() = runBlockingTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: Flow<Site> = flowOf(FakeSite.copy(
+            override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
                 users = setOf(FakeUsers.John)
             ))
         }

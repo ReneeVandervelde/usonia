@@ -1,17 +1,25 @@
 package usonia.todoist.api
 
 import io.ktor.client.*
+import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
+@OptIn(ExperimentalTime::class)
 internal class TodoistApiClient: TodoistApi {
     private val json = kotlinx.serialization.json.Json {
         ignoreUnknownKeys = true
     }
+
     private val httpClient = HttpClient {
+        install(HttpTimeout) {
+            requestTimeoutMillis = 20.seconds.toLongMilliseconds()
+        }
         install(JsonFeature) {
             serializer = KotlinxSerializer(json)
         }

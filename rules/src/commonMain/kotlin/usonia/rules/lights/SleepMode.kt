@@ -3,12 +3,10 @@ package usonia.rules.lights
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
 import usonia.core.state.*
 import usonia.foundation.*
+import usonia.kotlin.*
 import usonia.kotlin.datetime.*
-import usonia.kotlin.filterTrue
-import usonia.kotlin.neverEnding
 import usonia.kotlin.unit.percent
 import usonia.rules.Flags
 import usonia.rules.sleepMode
@@ -73,27 +71,27 @@ internal class SleepMode(
         client.setFlag(Flags.SleepMode, false)
     }
 
-    override suspend fun start(): Nothing = neverEnding {
-        coroutineScope {
-            launch { autoEnable() }
-            launch { lightsOffOnEnable() }
+    override suspend fun start(): Nothing {
+        client.site.collectLatest { site ->
+            coroutineScope {
+                launch { autoEnable(site) }
+                launch { lightsOffOnEnable(site) }
+            }
         }
     }
 
-    private suspend fun lightsOffOnEnable() {
-        client.site.collectLatest { site ->
-            client.sleepMode
-                .distinctUntilChanged()
-                .filterTrue()
-                .collect {
-                    logger.info("Adjusting Lights for Sleep Mode.")
-                    val bedrooms = site.rooms.filter { it.type == Room.Type.Bedroom }
+    private suspend fun lightsOffOnEnable(site: Site) {
+        client.sleepMode
+            .distinctUntilChanged()
+            .filterTrue()
+            .collectLatest {
+                logger.info("Adjusting Lights for Sleep Mode.")
+                val bedrooms = site.rooms.filter { it.type == Room.Type.Bedroom }
 
-                    bedrooms.flatMap(::getDimActions).run { client.publishAll(this) }
-                    delay(30.seconds)
-                    bedrooms.flatMap(::getOffActions).run { client.publishAll(this) }
-                }
-        }
+                bedrooms.flatMap(::getDimActions).run { client.publishAll(this) }
+                delay(30.seconds)
+                bedrooms.flatMap(::getOffActions).run { client.publishAll(this) }
+            }
     }
 
     private fun getDimActions(room: Room): List<Action> {
@@ -134,22 +132,20 @@ internal class SleepMode(
             }
     }
 
-    private suspend fun autoEnable() {
-        client.site.collectLatest { site ->
-            val nightStartMinute = site.parameters[NIGHT_START]
-                ?.toInt()
-                ?: DEFAULT_NIGHT
-            val nightEndMinute = site.parameters[NIGHT_END]
-                ?.toInt()
-                ?: DEFAULT_NIGHT_END
+    private suspend fun autoEnable(site: Site) {
+        val nightStartMinute = site.parameters[NIGHT_START]
+            ?.toInt()
+            ?: DEFAULT_NIGHT
+        val nightEndMinute = site.parameters[NIGHT_END]
+            ?.toInt()
+            ?: DEFAULT_NIGHT_END
 
-            client.events
-                .filter { clock.current.localDateTime.minuteOfDay >= nightStartMinute || clock.current.localDateTime.minuteOfDay <= nightEndMinute }
-                .filterIsInstance<Event.Latch>()
-                .filter { it.state == LatchState.CLOSED }
-                .filter { site.getRoomContainingDevice(it.source).type == Room.Type.Bedroom }
-                .onEach { logger.info("Enabling Night Mode") }
-                .collect { client.setFlag(Flags.SleepMode, true) }
-        }
+        client.events
+            .filter { clock.current.localDateTime.minuteOfDay >= nightStartMinute || clock.current.localDateTime.minuteOfDay <= nightEndMinute }
+            .filterIsInstance<Event.Latch>()
+            .filter { it.state == LatchState.CLOSED }
+            .filter { site.findRoomContainingDevice(it.source)?.type == Room.Type.Bedroom }
+            .onEach { logger.info("Enabling Night Mode") }
+            .collectLatest { client.setFlag(Flags.SleepMode, true) }
     }
 }

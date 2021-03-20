@@ -11,6 +11,8 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import usonia.core.state.*
 import usonia.foundation.*
+import usonia.kotlin.OngoingFlow
+import usonia.kotlin.asOngoing
 import usonia.kotlin.ongoingFlowOf
 import usonia.kotlin.unit.percent
 import usonia.server.DummyClient
@@ -25,7 +27,7 @@ import kotlin.test.assertTrue
 
 class IndicatorTest {
     val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-        override val site: Flow<Site> = ongoingFlowOf(FakeSite.copy(
+        override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
             users = setOf(FakeUsers.John),
             rooms = setOf(
                 FakeRooms.LivingRoom.copy(
@@ -57,8 +59,8 @@ class IndicatorTest {
     )
 
     val fakeWeather = object: WeatherAccess {
-        override val forecast: Flow<Forecast> = ongoingFlowOf(fakeForecast)
-        override val conditions: Flow<Conditions> = ongoingFlowOf(fakeConditions)
+        override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(fakeForecast)
+        override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(fakeConditions)
     }
 
     @Test
@@ -90,7 +92,7 @@ class IndicatorTest {
             actionPublisher = spyPublisher,
         )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
-            override val conditions: Flow<Conditions> = ongoingFlowOf(fakeConditions.copy(
+            override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(fakeConditions.copy(
                 temperature = 100,
             ))
         }
@@ -117,7 +119,7 @@ class IndicatorTest {
             actionPublisher = spyPublisher,
         )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
-            override val forecast: Flow<Forecast> = ongoingFlowOf(fakeForecast.copy(
+            override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(fakeForecast.copy(
                 snowChance = 25.percent
             ))
         }
@@ -144,7 +146,7 @@ class IndicatorTest {
             actionPublisher = spyPublisher,
         )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
-            override val forecast: Flow<Forecast> = ongoingFlowOf(fakeForecast.copy(
+            override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(fakeForecast.copy(
                 rainChance = 25.percent
             ))
         }
@@ -171,7 +173,7 @@ class IndicatorTest {
             actionPublisher = spyPublisher,
         )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
-            override val forecast: Flow<Forecast> = ongoingFlowOf(fakeForecast.copy(
+            override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(fakeForecast.copy(
                 rainChance = 25.percent,
                 snowChance = 25.percent,
             ))
@@ -200,8 +202,7 @@ class IndicatorTest {
             timestamp = Clock.System.now(),
             state = PresenceState.AWAY,
         )
-        val eventAccess = object: EventAccess by EventAccessStub {
-            override val events = MutableSharedFlow<Event>()
+        val eventAccess = object: EventAccessFake() {
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = when (type) {
                 Event.Presence::class -> presence as T
                 else -> TODO()
@@ -212,14 +213,14 @@ class IndicatorTest {
             eventAccess = eventAccess,
         )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
-            override val forecast: Flow<Forecast> = flow {}
-            override val conditions: Flow<Conditions> = flow {}
+            override val forecast: OngoingFlow<Forecast> = ongoingFlowOf()
+            override val conditions: OngoingFlow<Conditions> = ongoingFlowOf()
         }
 
         val indicator = Indicator(client, fakeWeather)
 
         val indicatorJob = launch { indicator.start() }
-        eventAccess.events.emit(presence)
+        eventAccess.mutableEvents.emit(presence)
 
         runCurrent()
         assertEquals(1, spyPublisher.actions.size)
@@ -239,8 +240,7 @@ class IndicatorTest {
             timestamp = Clock.System.now(),
             state = PresenceState.HOME,
         )
-        val eventAccess = object: EventAccess by EventAccessStub {
-            override val events = MutableSharedFlow<Event>()
+        val eventAccess = object: EventAccessFake() {
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = when (type) {
                 Event.Presence::class -> presence as T
                 else -> TODO()
@@ -251,14 +251,14 @@ class IndicatorTest {
             eventAccess = eventAccess,
         )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
-            override val forecast: Flow<Forecast> = flow {}
-            override val conditions: Flow<Conditions> = flow {}
+            override val forecast: OngoingFlow<Forecast> = ongoingFlowOf()
+            override val conditions: OngoingFlow<Conditions> = ongoingFlowOf()
         }
 
         val indicator = Indicator(client, fakeWeather)
 
         val indicatorJob = launch { indicator.start() }
-        eventAccess.events.emit(presence)
+        eventAccess.mutableEvents.emit(presence)
 
         runCurrent()
         assertEquals(1, spyPublisher.actions.size)

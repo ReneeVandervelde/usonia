@@ -11,6 +11,9 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessStub
 import usonia.foundation.*
+import usonia.kotlin.OngoingFlow
+import usonia.kotlin.asOngoing
+import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -18,8 +21,9 @@ import kotlin.test.assertTrue
 
 class LockOnSleepTest {
     private val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-        override val flags = MutableSharedFlow<Map<String, String?>>()
-        override val site: Flow<Site> = flowOf(FakeSite.copy(
+        val mutableFlags = MutableSharedFlow<Map<String, String?>>()
+        override val flags = mutableFlags.asOngoing()
+        override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
             rooms = setOf(FakeRooms.FakeBedroom.copy(
                 devices = setOf(FakeDevices.Lock)
             ))
@@ -37,7 +41,7 @@ class LockOnSleepTest {
         val picker = LockOnSleep(client)
 
         val daemon = launch { picker.start() }
-        fakeConfig.flags.emit(mapOf("Sleep Mode" to "true"))
+        fakeConfig.mutableFlags.emit(mapOf("Sleep Mode" to "true"))
         runCurrent()
         assertEquals(1, actionSpy.actions.size, "Locks are locked immediately")
         val action = actionSpy.actions.single()
@@ -59,7 +63,7 @@ class LockOnSleepTest {
         val picker = LockOnSleep(client)
 
         val daemon = launch { picker.start() }
-        fakeConfig.flags.emit(mapOf("Sleep Mode" to "false"))
+        fakeConfig.mutableFlags.emit(mapOf("Sleep Mode" to "false"))
         runCurrent()
         assertEquals(0, actionSpy.actions.size, "Locks not locked if not entering sleep mode")
 

@@ -9,6 +9,8 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import usonia.core.state.*
 import usonia.foundation.*
+import usonia.kotlin.OngoingFlow
+import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.reflect.KClass
 import kotlin.test.Test
@@ -17,7 +19,7 @@ import kotlin.test.assertTrue
 
 class LockOnAwayTest {
     private val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-        override val site: Flow<Site> = flowOf(FakeSite.copy(
+        override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
             users = setOf(FakeUsers.John),
             rooms = setOf(FakeRooms.FakeBedroom.copy(
                 devices = setOf(FakeDevices.Lock)
@@ -44,7 +46,7 @@ class LockOnAwayTest {
 
         val daemonJob = launch { daemon.start() }
         runCurrent()
-        fakeEvents.events.emit(Event.Presence(FakeUsers.John.id, Clock.System.now(), PresenceState.AWAY))
+        fakeEvents.mutableEvents.emit(Event.Presence(FakeUsers.John.id, Clock.System.now(), PresenceState.AWAY))
         assertEquals(1, actionSpy.actions.size, "Locks are locked immediately")
         val action = actionSpy.actions.single()
         assertTrue(action is Action.Lock)
@@ -73,7 +75,7 @@ class LockOnAwayTest {
 
         val daemonJob = launch { daemon.start() }
         runCurrent()
-        fakeEvents.events.emit(Event.Presence(FakeUsers.John.id, Clock.System.now(), PresenceState.HOME))
+        fakeEvents.mutableEvents.emit(Event.Presence(FakeUsers.John.id, Clock.System.now(), PresenceState.HOME))
         assertEquals(0, actionSpy.actions.size, "Not locked if home")
 
         daemonJob.cancelAndJoin()
@@ -98,7 +100,7 @@ class LockOnAwayTest {
 
         val daemonJob = launch { daemon.start() }
         runCurrent()
-        fakeEvents.events.emit(Event.Presence(FakeUsers.John.id, Clock.System.now(), PresenceState.AWAY))
+        fakeEvents.mutableEvents.emit(Event.Presence(FakeUsers.John.id, Clock.System.now(), PresenceState.AWAY))
         assertEquals(0, actionSpy.actions.size, "Not locked if some user is home")
 
         daemonJob.cancelAndJoin()

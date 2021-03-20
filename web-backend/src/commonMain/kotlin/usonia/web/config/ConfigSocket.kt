@@ -2,9 +2,9 @@ package usonia.web.config
 
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import usonia.kotlin.collectLatest
 import usonia.server.client.BackendClient
 import usonia.server.http.WebSocketController
 

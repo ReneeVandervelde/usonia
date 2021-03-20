@@ -1,7 +1,6 @@
 package usonia.rules.alerts
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.datetime.Instant
 import org.junit.Test
@@ -10,13 +9,15 @@ import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessFake
+import usonia.kotlin.OngoingFlow
+import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class PipeMonitorTest {
     private val standardConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-        override val site: Flow<Site> = flowOf(FakeSite.copy(
+        override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
             users = setOf(FakeUsers.John),
             rooms = setOf(
                 FakeRooms.LivingRoom.copy(
@@ -38,12 +39,12 @@ class PipeMonitorTest {
             eventAccess = events,
             actionPublisher = actionPublisherSpy,
         )
-        val monitor = PipeMonitor(client)
+        val monitor = PipeMonitor(client, backgroundScope = this)
 
         val monitorJob = launch { monitor.start() }
 
         pauseDispatcher {
-            events.events.emit(Event.Temperature(
+            events.mutableEvents.emit(Event.Temperature(
                 source = FakeDevices.TemperatureSensor.id,
                 timestamp = Instant.DISTANT_PAST,
                 temperature = 20f,
@@ -66,17 +67,17 @@ class PipeMonitorTest {
             eventAccess = events,
             actionPublisher = actionPublisherSpy,
         )
-        val monitor = PipeMonitor(client)
+        val monitor = PipeMonitor(client, backgroundScope = this)
 
         val monitorJob = launch { monitor.start() }
 
         pauseDispatcher {
-            events.events.emit(Event.Temperature(
+            events.mutableEvents.emit(Event.Temperature(
                 source = FakeDevices.TemperatureSensor.id,
                 timestamp = Instant.DISTANT_PAST,
                 temperature = 20f,
             ))
-            events.events.emit(Event.Temperature(
+            events.mutableEvents.emit(Event.Temperature(
                 source = FakeDevices.TemperatureSensor.id,
                 timestamp = Instant.DISTANT_PAST,
                 temperature = 20f,
@@ -95,22 +96,22 @@ class PipeMonitorTest {
             eventAccess = events,
             actionPublisher = actionPublisherSpy,
         )
-        val monitor = PipeMonitor(client)
+        val monitor = PipeMonitor(client, backgroundScope = this)
 
         val monitorJob = launch { monitor.start() }
 
         pauseDispatcher {
-            events.events.emit(Event.Temperature(
+            events.mutableEvents.emit(Event.Temperature(
                 source = FakeDevices.TemperatureSensor.id,
                 timestamp = Instant.DISTANT_PAST,
                 temperature = 20f,
             ))
-            events.events.emit(Event.Temperature(
+            events.mutableEvents.emit(Event.Temperature(
                 source = FakeDevices.TemperatureSensor.id,
                 timestamp = Instant.DISTANT_PAST,
                 temperature = 45f,
             ))
-            events.events.emit(Event.Temperature(
+            events.mutableEvents.emit(Event.Temperature(
                 source = FakeDevices.TemperatureSensor.id,
                 timestamp = Instant.DISTANT_PAST,
                 temperature = 20f,

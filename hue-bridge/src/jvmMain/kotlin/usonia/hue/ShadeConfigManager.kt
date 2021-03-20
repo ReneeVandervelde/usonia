@@ -3,10 +3,9 @@ package usonia.hue
 import inkapplications.shade.Shade
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.coroutines.flow.collect
 import usonia.core.state.ConfigurationAccess
 import usonia.foundation.Site
-import usonia.kotlin.neverEnding
+import usonia.kotlin.collect
 import usonia.server.Daemon
 
 /**
@@ -17,7 +16,7 @@ internal class ShadeConfigManager(
     private val shade: Shade,
     private val logger: KimchiLogger = EmptyLogger,
 ): Daemon {
-    override suspend fun start() = neverEnding {
+    override suspend fun start(): Nothing {
         configurationAccess.site.collect { configure(it) }
     }
 

@@ -2,9 +2,6 @@ package usonia.rules.lights
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.map
 import usonia.core.state.getBooleanFlag
 import usonia.core.state.getSite
 import usonia.core.state.publishAll
@@ -13,7 +10,9 @@ import usonia.foundation.Fixture
 import usonia.foundation.Room
 import usonia.foundation.Room.Type.*
 import usonia.foundation.SwitchState
-import usonia.kotlin.neverEnding
+import usonia.kotlin.collectLatest
+import usonia.kotlin.drop
+import usonia.kotlin.map
 import usonia.kotlin.unit.percent
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
@@ -45,7 +44,7 @@ internal class MovieMode(
         }
     }
 
-    override suspend fun start(): Nothing = neverEnding {
+    override suspend fun start(): Nothing {
         client.flags
             .map { it[FLAG].toBoolean() }
             .drop(1)

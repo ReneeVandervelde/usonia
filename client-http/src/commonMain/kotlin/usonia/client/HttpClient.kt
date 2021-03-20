@@ -12,7 +12,6 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -21,6 +20,8 @@ import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import usonia.foundation.*
+import usonia.kotlin.OngoingFlow
+import usonia.kotlin.ongoingFlow
 import kotlin.reflect.KClass
 
 /**
@@ -40,7 +41,7 @@ class HttpClient(
         }
     }
 
-    override val logs: Flow<LogMessage> = flow {
+    override val logs: OngoingFlow<LogMessage> = ongoingFlow {
         httpClient.ws(
             host = host,
             port = port,
@@ -58,7 +59,7 @@ class HttpClient(
         }
     }
 
-    override fun bufferedLogs(limit: Int): Flow<LogMessage> = flow {
+    override fun bufferedLogs(limit: Int): OngoingFlow<LogMessage> = ongoingFlow {
         httpClient.ws(
             host = host,
             port = port,
@@ -79,7 +80,7 @@ class HttpClient(
         }
     }
 
-    override val events: Flow<Event> = flow {
+    override val events: OngoingFlow<Event> = ongoingFlow {
         httpClient.ws(
             host = host,
             port = port,
@@ -96,7 +97,7 @@ class HttpClient(
         }
     }
 
-    override val eventsByDay: Flow<Map<LocalDate, Int>> = flow {
+    override val eventsByDay: OngoingFlow<Map<LocalDate, Int>> = ongoingFlow {
         httpClient.ws(
             host = host,
             port = port,
@@ -112,7 +113,7 @@ class HttpClient(
             }
         }
     }
-    override val oldestEventTime: Flow<Instant?> = flow {
+    override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlow {
         httpClient.ws(
             host = host,
             port = port,
@@ -129,7 +130,7 @@ class HttpClient(
         }
     }
 
-    override val site: Flow<Site> = flow {
+    override val site: OngoingFlow<Site> = ongoingFlow {
         httpClient.ws(
             host = host,
             port = port,
@@ -147,7 +148,7 @@ class HttpClient(
         }
     }
 
-    override val flags: Flow<Map<String, String?>> = flow {
+    override val flags: OngoingFlow<Map<String, String?>> = ongoingFlow {
         httpClient.ws(
             host = host,
             port = port,
@@ -219,8 +220,8 @@ class HttpClient(
         }
     }
 
-    override fun temperatureHistory(devices: Collection<Identifier>): Flow<Map<Int, Float>> {
-        return flow {
+    override fun temperatureHistory(devices: Collection<Identifier>): OngoingFlow<Map<Int, Float>> {
+        return ongoingFlow {
             httpClient.ws(
                 host = host,
                 port = port,

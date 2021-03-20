@@ -1,7 +1,7 @@
 package usonia.cli.client
 
-import kotlinx.coroutines.flow.collect
 import usonia.cli.CliComponent
+import usonia.kotlin.collect
 import javax.inject.Inject
 
 class ClientEventsCommand @Inject constructor(

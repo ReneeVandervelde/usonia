@@ -9,8 +9,10 @@ import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.FakeRooms
 import usonia.foundation.FakeSite
 import usonia.foundation.Site
+import usonia.kotlin.OngoingFlow
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
+import usonia.kotlin.ongoingFlowOf
 import usonia.kotlin.unit.percent
 import usonia.weather.Conditions
 import usonia.weather.Forecast
@@ -32,18 +34,18 @@ class CircadianColorsTest {
     private val nightStart = startOfDay.plus(DEFAULT_NIGHT_START.minutes)
 
     val weather = object: WeatherAccess {
-        override val forecast: Flow<Forecast> = flowOf(Forecast(
+        override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(Forecast(
             timestamp = Instant.DISTANT_PAST,
             sunrise = sunrise,
             sunset = sunset,
             rainChance = 0.percent,
             snowChance = 0.percent,
         ))
-        override val conditions: Flow<Conditions> get() = TODO()
+        override val conditions: OngoingFlow<Conditions> get() = TODO()
     }
 
     val config = object: ConfigurationAccess by ConfigurationAccessStub {
-        override val site: Flow<Site> = flowOf(FakeSite)
+        override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite)
     }
 
     @Test
@@ -66,14 +68,14 @@ class CircadianColorsTest {
             override fun now(): Instant = startOfDay.plus(1.days)
         }
         val weather = object: WeatherAccess {
-            override val forecast: Flow<Forecast> = flowOf(Forecast(
+            override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(Forecast(
                 timestamp = Instant.DISTANT_PAST,
                 sunrise = sunrise,
                 sunset = sunset,
                 rainChance = 0.percent,
                 snowChance = 0.percent,
             ))
-            override val conditions: Flow<Conditions> get() = TODO()
+            override val conditions: OngoingFlow<Conditions> get() = TODO()
         }
         val colors = CircadianColors(config, weather, clock)
 
@@ -196,14 +198,14 @@ class CircadianColorsTest {
     @Test
     fun overlapStart() = runBlockingTest {
         val weather = object: WeatherAccess {
-            override val forecast: Flow<Forecast> = flowOf(Forecast(
+            override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(Forecast(
                 timestamp = Instant.DISTANT_PAST,
                 sunrise = sunrise,
                 sunset = nightStart,
                 rainChance = 0.percent,
                 snowChance = 0.percent,
             ))
-            override val conditions: Flow<Conditions> get() = TODO()
+            override val conditions: OngoingFlow<Conditions> get() = TODO()
         }
         val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = nightStart

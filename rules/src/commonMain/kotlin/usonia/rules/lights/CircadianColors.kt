@@ -2,13 +2,13 @@ package usonia.rules.lights
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.coroutines.flow.first
 import kotlinx.datetime.*
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.getSite
 import usonia.foundation.Room
 import usonia.foundation.unit.ColorTemperature
 import usonia.kotlin.datetime.*
+import usonia.kotlin.first
 import usonia.kotlin.unit.Percentage
 import usonia.kotlin.unit.percent
 import usonia.weather.WeatherAccess

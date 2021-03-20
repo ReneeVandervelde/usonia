@@ -11,7 +11,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import usonia.core.state.findBridgeByServiceTag
+import usonia.kotlin.OngoingFlow
+import usonia.kotlin.asOngoing
 import usonia.kotlin.datetime.ZonedDateTime
+import usonia.kotlin.first
 import usonia.kotlin.unit.percent
 import usonia.server.client.BackendClient
 import usonia.server.cron.CronJob
@@ -57,8 +60,8 @@ internal class AccuweatherAccess(
             temperature = 32,
         )
     )
-    override val forecast: Flow<Forecast> = forecastFlow
-    override val conditions: Flow<Conditions> = conditionsFlow
+    override val forecast: OngoingFlow<Forecast> = forecastFlow.asOngoing()
+    override val conditions: OngoingFlow<Conditions> = conditionsFlow.asOngoing()
 
     override val schedule: Schedule = Schedule(
         minutes = setOf(0)

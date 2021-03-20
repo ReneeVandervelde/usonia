@@ -1,8 +1,6 @@
 package usonia.rules.locks
 
 import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.datetime.Instant
@@ -11,6 +9,8 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessFake
 import usonia.foundation.*
+import usonia.kotlin.OngoingFlow
+import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -34,7 +34,7 @@ class LockAfterTimeTest {
 
     val testClient = DummyClient.copy(
         configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: Flow<Site> = flowOf(testSite)
+            override val site: OngoingFlow<Site> = ongoingFlowOf(testSite)
         }
     )
 
@@ -50,7 +50,7 @@ class LockAfterTimeTest {
 
         val daemonJob = launch { daemon.start() }
 
-        eventAccess.events.emit(Event.Latch(
+        eventAccess.mutableEvents.emit(Event.Latch(
             source = FakeDevices.Latch.id,
             timestamp = Instant.DISTANT_PAST,
             state = LatchState.CLOSED,
@@ -77,13 +77,13 @@ class LockAfterTimeTest {
 
         val daemonJob = launch { daemon.start() }
 
-        eventAccess.events.emit(Event.Latch(
+        eventAccess.mutableEvents.emit(Event.Latch(
             source = FakeDevices.Latch.id,
             timestamp = Instant.DISTANT_PAST,
             state = LatchState.CLOSED,
         ))
         advanceTimeBy(5.minutes.toLongMilliseconds())
-        eventAccess.events.emit(Event.Latch(
+        eventAccess.mutableEvents.emit(Event.Latch(
             source = FakeDevices.Latch.id,
             timestamp = Instant.DISTANT_PAST,
             state = LatchState.OPEN,
@@ -107,7 +107,7 @@ class LockAfterTimeTest {
 
         val daemonJob = launch { daemon.start() }
 
-        eventAccess.events.emit(Event.Latch(
+        eventAccess.mutableEvents.emit(Event.Latch(
             source = FakeDevices.Latch.id,
             timestamp = Instant.DISTANT_PAST,
             state = LatchState.OPEN,

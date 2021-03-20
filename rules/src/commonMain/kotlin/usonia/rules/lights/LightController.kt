@@ -3,12 +3,10 @@ package usonia.rules.lights
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.selects.select
 import usonia.core.state.publishAll
 import usonia.foundation.*
-import usonia.kotlin.DefaultScope
-import usonia.kotlin.neverEnding
+import usonia.kotlin.*
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
 import kotlin.time.ExperimentalTime
@@ -24,11 +22,11 @@ internal class LightController(
     private val backgroundScope: CoroutineScope = DefaultScope(),
 ): Daemon {
 
-    override suspend fun start(): Nothing = neverEnding {
+    override suspend fun start(): Nothing {
         client.site.collectLatest { site ->
-            client.events.filterIsInstance<Event.Motion>().collect { event ->
-                backgroundScope.launch { onMotionEvent(event, site) }
-            }
+            client.events
+                .filterIsInstance<Event.Motion>()
+                .collectOn(backgroundScope) { event -> onMotionEvent(event, site) }
         }
     }
 

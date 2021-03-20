@@ -1,7 +1,10 @@
 package usonia.telegram
 
 import io.ktor.client.*
+import io.ktor.client.features.*
 import io.ktor.client.request.*
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
 private const val HOST = "api.telegram.org"
 
@@ -14,8 +17,13 @@ internal interface TelegramApi {
     )
 }
 
+@OptIn(ExperimentalTime::class)
 internal object TelegramClient: TelegramApi {
-    private val client = HttpClient {}
+    private val client = HttpClient {
+        install(HttpTimeout) {
+            requestTimeoutMillis = 30.seconds.toLongMilliseconds()
+        }
+    }
 
     override suspend fun sendMessage(
         bot: String,

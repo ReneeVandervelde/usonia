@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import usonia.core.state.*
 import usonia.foundation.*
-import usonia.kotlin.neverEnding
+import usonia.kotlin.*
 import usonia.kotlin.unit.percent
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
@@ -32,7 +32,7 @@ internal class Indicator(
     private val snowColor = RGB(255, 255 , 255)
     private val rainColor = RGB(0, 255 , 255)
 
-    override suspend fun start(): Nothing = neverEnding {
+    override suspend fun start(): Nothing {
         client.site.collectLatest { site ->
             coroutineScope {
                 launch { bindColorUpdates(site) }
@@ -53,7 +53,7 @@ internal class Indicator(
                 }
             }
             .onEach { logger.debug("Mapped Indicator update to ${it.size} device actions") }
-            .collect { actions ->
+            .collectLatest { actions ->
                 actions.forEach {
                     client.publishAction(it)
                 }

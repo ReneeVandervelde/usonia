@@ -9,6 +9,8 @@ import kotlinx.datetime.Clock
 import usonia.core.state.*
 import usonia.foundation.*
 import usonia.foundation.unit.ColorTemperature
+import usonia.kotlin.OngoingFlow
+import usonia.kotlin.ongoingFlowOf
 import usonia.kotlin.unit.percent
 import usonia.server.DummyClient
 import kotlin.test.Test
@@ -29,7 +31,7 @@ class LightControllerTest {
         ))
     )
     val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
-        override val site: Flow<Site> = flowOf(testSite)
+        override val site: OngoingFlow<Site> = ongoingFlowOf(testSite)
     }
     val testClient = DummyClient.copy(
         configurationAccess = configurationAccess,
@@ -61,7 +63,7 @@ class LightControllerTest {
         val daemonJob = launch { controller.start() }
 
         pauseDispatcher {
-            eventAccess.events.emit(Event.Motion(
+            eventAccess.mutableEvents.emit(Event.Motion(
                 FakeDevices.Motion.id,
                 Clock.System.now(),
                 MotionState.MOTION
@@ -92,7 +94,7 @@ class LightControllerTest {
         val daemonJob = launch { controller.start() }
 
         pauseDispatcher {
-            eventAccess.events.emit(Event.Motion(
+            eventAccess.mutableEvents.emit(Event.Motion(
                 FakeDevices.Motion.id,
                 Clock.System.now(),
                 MotionState.MOTION
@@ -120,7 +122,7 @@ class LightControllerTest {
         val daemonJob = launch { controller.start() }
 
         pauseDispatcher {
-            eventAccess.events.emit(Event.Motion(
+            eventAccess.mutableEvents.emit(Event.Motion(
                 FakeDevices.Motion.id,
                 Clock.System.now(),
                 MotionState.MOTION
@@ -145,7 +147,7 @@ class LightControllerTest {
         val daemonJob = launch { controller.start() }
 
         pauseDispatcher {
-            eventAccess.events.emit(Event.Motion(
+            eventAccess.mutableEvents.emit(Event.Motion(
                 FakeDevices.Motion.id,
                 Clock.System.now(),
                 MotionState.IDLE
@@ -174,12 +176,12 @@ class LightControllerTest {
         val controller = LightController(client, settingsPicker, backgroundScope = this)
         val daemonJob = launch { controller.start() }
 
-        eventAccess.events.emit(Event.Motion(
+        eventAccess.mutableEvents.emit(Event.Motion(
             FakeDevices.Motion.id,
             Clock.System.now(),
             MotionState.IDLE
         ))
-        eventAccess.events.emit(Event.Motion(
+        eventAccess.mutableEvents.emit(Event.Motion(
             FakeDevices.Motion.id,
             Clock.System.now(),
             MotionState.MOTION

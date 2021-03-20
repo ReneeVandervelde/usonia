@@ -6,6 +6,8 @@ import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import usonia.foundation.FakeRooms
+import usonia.kotlin.OngoingFlow
+import usonia.kotlin.ongoingFlowOf
 import usonia.kotlin.unit.percent
 import usonia.weather.Conditions
 import usonia.weather.Forecast
@@ -38,8 +40,8 @@ class DayModeTest {
     @Test
     fun dayModeTest() = runBlockingTest {
         val fakeWeather = object: WeatherAccess {
-            override val forecast: Flow<Forecast> = flowOf(idealForecast)
-            override val conditions: Flow<Conditions> = flowOf(idealConditions)
+            override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast)
+            override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions)
 
         }
         val picker = DayMode(fakeWeather, fakeClock)
@@ -51,10 +53,10 @@ class DayModeTest {
     @Test
     fun rainy() = runBlockingTest {
         val fakeWeather = object: WeatherAccess {
-            override val forecast: Flow<Forecast> = flowOf(idealForecast.copy(
+            override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast.copy(
                 rainChance = 20.percent,
             ))
-            override val conditions: Flow<Conditions> = flowOf(idealConditions)
+            override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions)
 
         }
         val picker = DayMode(fakeWeather, fakeClock)
@@ -65,10 +67,10 @@ class DayModeTest {
     @Test
     fun snowy() = runBlockingTest {
         val fakeWeather = object: WeatherAccess {
-            override val forecast: Flow<Forecast> = flowOf(idealForecast.copy(
+            override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast.copy(
                 snowChance = 20.percent,
             ))
-            override val conditions: Flow<Conditions> = flowOf(idealConditions)
+            override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions)
 
         }
         val picker = DayMode(fakeWeather, fakeClock)
@@ -79,8 +81,8 @@ class DayModeTest {
     @Test
     fun cloudy() = runBlockingTest {
         val fakeWeather = object: WeatherAccess {
-            override val forecast: Flow<Forecast> = flowOf(idealForecast)
-            override val conditions: Flow<Conditions> = flowOf(idealConditions.copy(
+            override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast)
+            override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions.copy(
                 cloudCover = 69.percent
             ))
 
@@ -93,10 +95,10 @@ class DayModeTest {
     @Test
     fun evening() = runBlockingTest {
         val fakeWeather = object: WeatherAccess {
-            override val forecast: Flow<Forecast> = flowOf(idealForecast.copy(
+            override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast.copy(
                 sunset = now + 40.minutes
             ))
-            override val conditions: Flow<Conditions> = flowOf(idealConditions)
+            override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions)
 
         }
         val picker = DayMode(fakeWeather, fakeClock)
@@ -107,10 +109,10 @@ class DayModeTest {
     @Test
     fun morning() = runBlockingTest {
         val fakeWeather = object: WeatherAccess {
-            override val forecast: Flow<Forecast> = flowOf(idealForecast.copy(
+            override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast.copy(
                 sunrise = now - 40.minutes
             ))
-            override val conditions: Flow<Conditions> = flowOf(idealConditions)
+            override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions)
 
         }
         val picker = DayMode(fakeWeather, fakeClock)

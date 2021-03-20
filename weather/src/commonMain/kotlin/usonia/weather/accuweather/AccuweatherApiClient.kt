@@ -1,15 +1,22 @@
 package usonia.weather.accuweather
 
 import io.ktor.client.*
+import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
 /**
  * Ktor client implementation of the accuweather API.
  */
+@OptIn(ExperimentalTime::class)
 internal class AccuweatherApiClient: AccuweatherApi {
     private val client = HttpClient {
+        install(HttpTimeout) {
+            requestTimeoutMillis = 20.seconds.toLongMilliseconds()
+        }
         install(JsonFeature) {
             serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
                 ignoreUnknownKeys = true

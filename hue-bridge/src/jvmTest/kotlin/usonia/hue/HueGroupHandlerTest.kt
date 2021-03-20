@@ -17,6 +17,7 @@ import usonia.kotlin.ongoingFlowOf
 import usonia.core.state.ActionAccessFake
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
+import usonia.kotlin.OngoingFlow
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -39,7 +40,7 @@ class HueGroupHandlerTest {
         val shadeSpy = ShadeGroupsSpy()
         val actionAccess = ActionAccessFake()
         val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: Flow<Site> = ongoingFlowOf(
+            override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     rooms = setOf(
                         FakeRooms.LivingRoom.copy(
@@ -76,7 +77,7 @@ class HueGroupHandlerTest {
         val shadeSpy = ShadeGroupsSpy()
         val actionAccess = ActionAccessFake()
         val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: Flow<Site> = flowOf(
+            override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     rooms = setOf(
                         FakeRooms.LivingRoom.copy(
@@ -113,7 +114,7 @@ class HueGroupHandlerTest {
         val shadeSpy = ShadeGroupsSpy()
         val actionAccess = ActionAccessFake()
         val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: Flow<Site> = flowOf(
+            override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     rooms = setOf(
                         FakeRooms.LivingRoom.copy(
@@ -173,7 +174,7 @@ class HueGroupHandlerTest {
         val shadeSpy = ShadeGroupsSpy()
         val actionAccess = ActionAccessFake()
         val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: Flow<Site> = flowOf(
+            override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     rooms = setOf(
                         FakeRooms.LivingRoom.copy(
