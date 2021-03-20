@@ -13,6 +13,7 @@ class DatabaseModule(
         val database = lazy {
             JdbcSqliteDriver(url)
                 .also { Database.Schema.create(it) }
+                .also { Database.Schema.migrate(it, 1, 2)}
                 .let { Database(it) }
         }
         return DatabaseStateAccess(
