@@ -77,6 +77,21 @@ button, input[type=submit], input[type=button]
     display: inline-block;
 }
 
+#metrics-temperatures
+{
+    display: grid;
+    grid-gap: 2rem;
+    grid-template-columns: 50% 50%;
+}
+
+@media(max-width: 1600px) {
+    #metrics-temperatures
+    {
+        grid-gap: unset;
+        grid-template-columns: 100%;
+    }
+}
+
 .user .user-state
 {
     color: var(--color-error);
