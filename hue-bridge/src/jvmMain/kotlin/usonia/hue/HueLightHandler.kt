@@ -5,6 +5,8 @@ import inkapplications.shade.constructs.asPercentage
 import inkapplications.shade.constructs.mireds
 import inkapplications.shade.groups.GroupStateModification
 import inkapplications.shade.groups.ShadeGroups
+import inkapplications.shade.lights.LightStateModification
+import inkapplications.shade.lights.ShadeLights
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CancellationException
@@ -22,9 +24,9 @@ import kotlin.time.seconds
  * Handles actions sent to Hue Group devices.
  */
 @OptIn(ExperimentalTime::class)
-internal class HueGroupHandler(
+internal class HueLightHandler(
     private val client: BackendClient,
-    private val shade: ShadeGroups,
+    private val shade: ShadeLights,
     private val logger: KimchiLogger = EmptyLogger,
     private val requestScope: CoroutineScope = IoScope()
 ): Daemon {
@@ -32,10 +34,10 @@ internal class HueGroupHandler(
         client.site.collectLatest { site ->
             client.actions
                 .asOngoing()
-                .filter { it::class in HueArchetypes.group.actions }
+                .filter { it::class in HueArchetypes.color.actions }
                 .map { action -> site.getDevice(action.target) to action }
                 .filter { (device, _) -> site.findAssociatedBridge(device)?.service == HUE_SERVICE }
-                .filter { (device, _) -> device.capabilities.archetypeId == HueArchetypes.group.archetypeId }
+                .filter { (device, _) -> device.capabilities.archetypeId == HueArchetypes.color.archetypeId }
                 .collectOn(requestScope) { (device, action) ->
                     handleAction(action, device)
                 }
@@ -46,19 +48,19 @@ internal class HueGroupHandler(
         logger.trace { "Handling ${action::class.simpleName} for ${device.name}" }
 
         val modification = when (action) {
-            is Action.Switch -> GroupStateModification(
+            is Action.Switch -> LightStateModification(
                 on = action.state == SwitchState.ON,
             )
-            is Action.Dim -> GroupStateModification(
+            is Action.Dim -> LightStateModification(
                 brightness = action.level.fraction.asPercentage,
                 on = action.switchState?.equals(SwitchState.ON),
             )
-            is Action.ColorTemperatureChange -> GroupStateModification(
+            is Action.ColorTemperatureChange -> LightStateModification(
                 colorTemperature = action.temperature.miredValue.mireds,
                 brightness = action.level?.fraction?.asPercentage,
                 on = action.switchState?.equals(SwitchState.ON),
             )
-            is Action.ColorChange -> GroupStateModification(
+            is Action.ColorChange -> LightStateModification(
                 cieColorCoordinates = action.color.let { Coordinates(it) },
                 brightness = action.level?.fraction?.asPercentage,
                 on = action.switchState?.equals(SwitchState.ON),

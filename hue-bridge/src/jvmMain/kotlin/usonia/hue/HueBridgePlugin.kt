@@ -16,6 +16,7 @@ class HueBridgePlugin(
     )
     override val daemons = listOf(
         HueGroupHandler(client, shade.groups, logger),
+        HueLightHandler(client, shade.lights, logger),
         ShadeConfigManager(client, shade),
     )
 }

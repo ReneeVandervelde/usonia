@@ -17,4 +17,17 @@ object HueArchetypes {
             Event.Switch::class,
         )
     )
+
+    val color = Capabilities(
+        archetypeId = "usonia.hue.color",
+        actions = setOf(
+            Action.Switch::class,
+            Action.Dim::class,
+            Action.ColorTemperatureChange::class,
+            Action.ColorChange::class,
+        ),
+        events = setOf(
+            Event.Switch::class,
+        )
+    )
 }

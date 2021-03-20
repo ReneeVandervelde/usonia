@@ -76,6 +76,23 @@ object FakeDevices {
         name = "Fake Hue Group",
         fixture = Fixture.Light,
         capabilities = Capabilities(
+            archetypeId = "usonia.hue.group",
+            actions = setOf(
+                Action.Switch::class,
+                Action.Dim::class,
+                Action.ColorChange::class,
+                Action.ColorTemperatureChange::class,
+            ),
+            events = emptySet()
+        )
+    )
+
+    val HueColorLight = Device(
+        id = Identifier("fake-hue-color-light"),
+        name = "Fake Hue Color Light",
+        fixture = Fixture.Light,
+        capabilities = Capabilities(
+            archetypeId = "usonia.hue.color",
             actions = setOf(
                 Action.Switch::class,
                 Action.Dim::class,
