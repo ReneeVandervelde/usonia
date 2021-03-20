@@ -1,6 +1,5 @@
 package usonia.server
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import usonia.core.state.*
@@ -14,7 +13,7 @@ import kotlin.reflect.KClass
 
 val DummyClient = ComposedBackendClient(
     actionAccess = object: ActionAccess {
-        override val actions: Flow<Action> get() = TODO("Not yet implemented")
+        override val actions: OngoingFlow<Action> get() = TODO("Not yet implemented")
     },
     actionPublisher = object: ActionPublisher {
         override suspend fun publishAction(action: Action) = TODO("Not yet implemented")

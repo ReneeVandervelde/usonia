@@ -59,7 +59,7 @@ class HueGroupHandlerTest {
         val handlerJob = launch { handler.start() }
 
         pauseDispatcher {
-            actionAccess.actions.emit(Action.Switch(
+            actionAccess.mutableActions.emit(Action.Switch(
                 target = FakeDevices.HueGroup.id,
                 state = SwitchState.ON,
             ))
@@ -96,7 +96,7 @@ class HueGroupHandlerTest {
         val handlerJob = launch { handler.start() }
 
         pauseDispatcher {
-            actionAccess.actions.emit(Action.Switch(
+            actionAccess.mutableActions.emit(Action.Switch(
                 target = FakeDevices.HueGroup.id,
                 state = SwitchState.ON,
             ))
@@ -133,7 +133,7 @@ class HueGroupHandlerTest {
         val handlerJob = launch { handler.start() }
 
         pauseDispatcher {
-            actionAccess.actions.emit(Action.Lock(
+            actionAccess.mutableActions.emit(Action.Lock(
                 target = FakeDevices.HueGroup.id,
                 state = LockState.LOCKED,
             ))
@@ -193,7 +193,7 @@ class HueGroupHandlerTest {
         val handlerJob = launch { handler.start() }
 
         pauseDispatcher {
-            actionAccess.actions.emit(action)
+            actionAccess.mutableActions.emit(action)
         }
 
         assertEquals("fake-hue-id", shadeSpy.groupsUpdated.single())

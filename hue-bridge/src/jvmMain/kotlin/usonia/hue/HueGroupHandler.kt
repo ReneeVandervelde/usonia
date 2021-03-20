@@ -31,7 +31,6 @@ internal class HueGroupHandler(
     override suspend fun start(): Nothing {
         client.site.collectLatest { site ->
             client.actions
-                .asOngoing()
                 .filter { it::class in HueArchetypes.group.actions }
                 .map { action -> site.getDevice(action.target) to action }
                 .filter { (device, _) -> site.findAssociatedBridge(device)?.service == HUE_SERVICE }

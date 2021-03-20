@@ -53,7 +53,7 @@ class TelegramAlertsTest {
         val job = launch { alerts.start() }
 
         pauseDispatcher {
-            fakeActions.actions.emit(Action.Alert(
+            fakeActions.mutableActions.emit(Action.Alert(
                 target = FakeUsers.John.id,
                 message = "test"
             ))
@@ -103,7 +103,7 @@ class TelegramAlertsTest {
         val job = launch { alerts.start() }
 
         pauseDispatcher {
-            fakeActions.actions.emit(Action.Alert(
+            fakeActions.mutableActions.emit(Action.Alert(
                 target = Identifier("nobody"),
                 message = "test"
             ))
@@ -149,7 +149,7 @@ class TelegramAlertsTest {
         val job = launch { alerts.start() }
 
         pauseDispatcher {
-            fakeActions.actions.emit(Action.Alert(
+            fakeActions.mutableActions.emit(Action.Alert(
                 target = FakeUsers.John.id,
                 message = "test"
             ))
@@ -182,7 +182,7 @@ class TelegramAlertsTest {
         val job = launch { alerts.start() }
 
         pauseDispatcher {
-            fakeActions.actions.emit(Action.Alert(
+            fakeActions.mutableActions.emit(Action.Alert(
                 target = FakeUsers.John.id,
                 message = "test"
             ))
