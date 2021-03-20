@@ -2,6 +2,7 @@ package usonia.rules
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import usonia.rules.alerts.DoorAlert
 import usonia.rules.alerts.PipeMonitor
 import usonia.rules.alerts.WaterMonitor
 import usonia.rules.greenhouse.FanControl
@@ -46,6 +47,7 @@ class RulesPlugin(
         LockAfterTime(client, logger),
         PipeMonitor(client, logger),
         FanControl(client, logger),
+        DoorAlert(client, logger),
     )
 
     override val crons: List<CronJob> = listOf(

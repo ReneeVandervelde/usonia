@@ -6,4 +6,9 @@ object FakeUsers {
         name = "John Doe",
         parameters = emptyMap()
     )
+    val Jane = User(
+        id = Identifier("fake-user-jane"),
+        name = "Jane Doe",
+        parameters = emptyMap()
+    )
 }
