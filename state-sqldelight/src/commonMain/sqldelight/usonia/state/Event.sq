@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS Event (
 CREATE UNIQUE INDEX IF NOT EXISTS StateLookup
 ON Event (timestamp, type, source);
 
-CREATE UNIQUE INDEX IF NOT EXISTS Ordered
+CREATE INDEX IF NOT EXISTS OrderedEvents
 ON Event (timestamp);
 
 CREATE TRIGGER IF NOT EXISTS EventRecordLimit AFTER INSERT ON Event

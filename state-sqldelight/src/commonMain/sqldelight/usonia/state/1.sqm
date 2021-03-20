@@ -1,0 +1,3 @@
+
+DROP INDEX Ordered;
+CREATE INDEX OrderedEvents ON Event (timestamp);
