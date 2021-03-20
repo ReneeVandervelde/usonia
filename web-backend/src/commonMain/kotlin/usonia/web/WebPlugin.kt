@@ -9,11 +9,7 @@ import usonia.server.http.WebSocketController
 import usonia.web.actions.ActionBridgeHttpPublisher
 import usonia.web.actions.ActionHttpPublisher
 import usonia.web.config.*
-import usonia.web.config.ConfigSocket
 import usonia.web.events.*
-import usonia.web.events.EventBridgeHttpPublisher
-import usonia.web.events.EventHttpPublisher
-import usonia.web.events.EventSocket
 
 class WebPlugin(
     client: BackendClient,

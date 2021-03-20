@@ -7,7 +7,9 @@ import usonia.core.state.ConfigurationAccess
 import usonia.foundation.Site
 import usonia.foundation.Status
 import usonia.foundation.Statuses
-import usonia.server.http.*
+import usonia.server.http.HttpRequest
+import usonia.server.http.RestController
+import usonia.server.http.RestResponse
 
 class SiteUpdateController(
     private val config: ConfigurationAccess,

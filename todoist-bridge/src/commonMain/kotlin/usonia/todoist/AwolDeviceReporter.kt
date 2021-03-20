@@ -2,8 +2,11 @@ package usonia.todoist
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.datetime.*
-import usonia.core.state.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import usonia.core.state.findBridgeByServiceTag
+import usonia.core.state.findDevicesBy
+import usonia.core.state.getOldestEvent
 import usonia.foundation.Device
 import usonia.foundation.Event
 import usonia.foundation.Identifier

@@ -2,7 +2,10 @@ package usonia.core.state
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
-import usonia.foundation.*
+import usonia.foundation.Event
+import usonia.foundation.Identifier
+import usonia.foundation.PresenceState
+import usonia.foundation.User
 import usonia.kotlin.OngoingFlow
 import usonia.kotlin.first
 import kotlin.reflect.KClass

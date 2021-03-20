@@ -2,9 +2,6 @@ package usonia.rules.indicator
 
 import com.github.ajalt.colormath.RGB
 import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.datetime.Clock
@@ -12,7 +9,6 @@ import kotlinx.datetime.Instant
 import usonia.core.state.*
 import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
-import usonia.kotlin.asOngoing
 import usonia.kotlin.ongoingFlowOf
 import usonia.kotlin.unit.percent
 import usonia.server.DummyClient

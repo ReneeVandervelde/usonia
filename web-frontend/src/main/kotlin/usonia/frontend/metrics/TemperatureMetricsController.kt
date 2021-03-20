@@ -2,7 +2,8 @@ package usonia.frontend.metrics
 
 import kimchi.logger.KimchiLogger
 import kotlinx.browser.document
-import kotlinx.coroutines.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import mustache.Mustache
 import mustache.renderTemplate
 import org.w3c.dom.Element

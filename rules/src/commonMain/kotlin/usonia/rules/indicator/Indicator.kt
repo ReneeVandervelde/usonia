@@ -4,9 +4,8 @@ import com.github.ajalt.colormath.RGB
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import usonia.core.state.*
+import usonia.core.state.allAway
 import usonia.foundation.*
 import usonia.kotlin.*
 import usonia.kotlin.unit.percent
