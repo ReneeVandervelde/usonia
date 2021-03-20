@@ -5,11 +5,8 @@ import kimchi.logger.KimchiLogger
 import usonia.core.state.getBooleanFlag
 import usonia.core.state.getSite
 import usonia.core.state.publishAll
-import usonia.foundation.Action
-import usonia.foundation.Fixture
-import usonia.foundation.Room
+import usonia.foundation.*
 import usonia.foundation.Room.Type.*
-import usonia.foundation.SwitchState
 import usonia.kotlin.collectLatest
 import usonia.kotlin.drop
 import usonia.kotlin.map
@@ -55,7 +52,7 @@ internal class MovieMode(
 
     private suspend fun startMovieMode() {
         logger.info("Adjusting Lights for Movie Mode.")
-        client.getSite().rooms
+        val switchActions = client.getSite().rooms
             .filter { it.type in setOf(LivingRoom, Kitchen, Hallway, Dining) }
             .flatMap { it.devices }
             .filter { it.fixture == Fixture.Light }
@@ -66,12 +63,20 @@ internal class MovieMode(
                     state = SwitchState.OFF,
                 )
             }
-            .run { client.publishAll(this) }
+        val indicatorActions = client.getSite().indicators
+            .map {
+                Action.Dim(
+                    target = it.id,
+                    level = 1.percent,
+                )
+            }
+
+        client.publishAll(switchActions + indicatorActions)
     }
 
     private suspend fun stopMovieMode() {
         logger.info("Adjusting Lights to exit Movie Mode.")
-        client.getSite().rooms
+        val lightActions = client.getSite().rooms
             .filter { it.type == LivingRoom }
             .flatMap { it.devices }
             .filter { it.fixture == Fixture.Light }
@@ -84,6 +89,19 @@ internal class MovieMode(
                     switchState = SwitchState.ON,
                 )
             }
-            .run { client.publishAll(this) }
+        val indicatorActions = client.getSite().indicators
+            .map {
+                Action.Dim(
+                    target = it.id,
+                    level = 50.percent,
+                )
+            }
+        client.publishAll(lightActions + indicatorActions)
     }
+
+    private val Site.indicators get() = rooms
+        .filter { it.type == LivingRoom }
+        .flatMap { it.devices }
+        .filter { it.fixture == Fixture.Indicator }
+        .filter { Action.Dim::class in it.capabilities.actions }
 }
