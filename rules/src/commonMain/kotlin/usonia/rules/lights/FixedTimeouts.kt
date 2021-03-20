@@ -18,7 +18,7 @@ internal object FixedTimeouts: LightSettingsPicker {
             Room.Type.Garage -> 15.minutes
             Room.Type.Generic -> 10.minutes
             Room.Type.Hallway -> 5.seconds
-            Room.Type.Kitchen -> 10.minutes
+            Room.Type.Kitchen -> 2.minutes
             Room.Type.LivingRoom -> 30.minutes
             Room.Type.Office -> 15.minutes
             Room.Type.Storage -> 1.minutes
