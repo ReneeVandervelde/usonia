@@ -185,8 +185,10 @@ class MovieModeTest {
 
         assertEquals(1, publisherSpy.actions.size)
         val action = publisherSpy.actions.single()
-        assertTrue(action is Action.Switch)
-        assertEquals(SwitchState.ON, action.state)
+        assertTrue(action is Action.ColorTemperatureChange)
+        assertEquals(SwitchState.ON, action.switchState)
+        assertEquals(10.percent, action.level)
+        assertEquals(Colors.Warm, action.temperature)
 
         daemon.cancelAndJoin()
     }

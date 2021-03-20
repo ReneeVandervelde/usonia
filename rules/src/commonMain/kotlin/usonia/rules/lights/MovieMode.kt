@@ -77,9 +77,11 @@ internal class MovieMode(
             .filter { it.fixture == Fixture.Light }
             .filter { Action.Switch::class in it.capabilities.actions }
             .map {
-                Action.Switch(
+                Action.ColorTemperatureChange(
                     target = it.id,
-                    state = SwitchState.ON,
+                    temperature = Colors.Warm,
+                    level = 10.percent,
+                    switchState = SwitchState.ON,
                 )
             }
             .run { client.publishAll(this) }
