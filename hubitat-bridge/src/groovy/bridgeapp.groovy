@@ -107,6 +107,8 @@ def cannonicalType(event) {
             return "Tilt"
         case "water":
             return "Water"
+        case "pressure":
+            return "Pressure"
         default:
             log.error "Unknown Type ${event.value}"
             return event.name
@@ -157,6 +159,9 @@ def onEvent(event) {
             eventJson.x = 0
             eventJson.y = 0
             eventJson.z = 0
+            break;
+        case "pressure":
+            eventJson.pressure = event.value;
             break;
         case "acceleration":
             eventJson.movementState = event.value == "active" ? "MOVING" : "IDLE"

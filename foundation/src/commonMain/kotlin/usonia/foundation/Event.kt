@@ -145,6 +145,15 @@ sealed class Event {
     ): Event() {
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
+
+    @Serializable(with = EventSerializer::class)
+    data class Pressure(
+        override val source: Identifier,
+        override val timestamp: Instant,
+        val pressure: Float,
+    ): Event() {
+        override fun withSource(source: Identifier): Event = copy(source = source)
+    }
 }
 
 object EventSerializer: KSerializer<Event> {
@@ -216,6 +225,11 @@ object EventSerializer: KSerializer<Event> {
                 json.y!!,
                 json.z!!
             )
+            Event.Pressure::class.simpleName -> Event.Pressure(
+                id,
+                timestamp,
+                json.pressure!!,
+            )
             else -> throw IllegalArgumentException("Unknown type: ${json.type}")
         }
     }
@@ -262,6 +276,9 @@ object EventSerializer: KSerializer<Event> {
             is Event.Movement -> prototype.copy(
                 movementState = value.state.name
             )
+            is Event.Pressure -> prototype.copy(
+                pressure = value.pressure
+            )
         }
 
         encoder.encodeSerializableValue(serializer, json)
@@ -290,5 +307,6 @@ internal data class EventJson(
     val x: Float? = null,
     val y: Float? = null,
     val z: Float? = null,
-    val movementState: String? = null
+    val movementState: String? = null,
+    val pressure: Float? = null,
 )
