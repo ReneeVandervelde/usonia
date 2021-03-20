@@ -6,9 +6,12 @@ import kotlinx.serialization.json.Json
 class DatabaseModule(
     private val json: Json,
 ) {
-    fun database(databasePath: String): DatabaseServices {
+    fun database(databasePath: String): DatabaseServices = create("jdbc:sqlite:$databasePath")
+    fun inMemoryDatabase(): DatabaseServices = create(JdbcSqliteDriver.IN_MEMORY)
+
+    private fun create(url: String): DatabaseServices {
         val database = lazy {
-            JdbcSqliteDriver("jdbc:sqlite:$databasePath")
+            JdbcSqliteDriver(url)
                 .also { Database.Schema.create(it) }
                 .let { Database(it) }
         }
