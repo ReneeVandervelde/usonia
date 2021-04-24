@@ -8,6 +8,7 @@ import usonia.core.state.publishAll
 import usonia.foundation.*
 import usonia.foundation.Room.Type.*
 import usonia.kotlin.collectLatest
+import usonia.kotlin.distinctUntilChanged
 import usonia.kotlin.drop
 import usonia.kotlin.map
 import usonia.kotlin.unit.percent
@@ -45,6 +46,7 @@ internal class MovieMode(
         client.flags
             .map { it[FLAG].toBoolean() }
             .drop(1)
+            .distinctUntilChanged()
             .collectLatest { enabled ->
                 if (enabled) startMovieMode() else stopMovieMode()
             }
