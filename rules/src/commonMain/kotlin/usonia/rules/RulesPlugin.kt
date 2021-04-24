@@ -5,6 +5,7 @@ import kimchi.logger.KimchiLogger
 import usonia.rules.alerts.DoorAlert
 import usonia.rules.alerts.PipeMonitor
 import usonia.rules.alerts.WaterMonitor
+import usonia.rules.charging.PowerLimitCharge
 import usonia.rules.greenhouse.FanControl
 import usonia.rules.indicator.Indicator
 import usonia.rules.lights.*
@@ -47,6 +48,7 @@ class RulesPlugin(
         LockAfterTime(client, logger),
         PipeMonitor(client, logger),
         FanControl(client, logger),
+        PowerLimitCharge(client, logger),
         DoorAlert(client, logger),
     )
 

@@ -13,4 +13,5 @@ enum class Fixture {
     Pipe,
     Indicator,
     Fan,
+    Charger,
 }

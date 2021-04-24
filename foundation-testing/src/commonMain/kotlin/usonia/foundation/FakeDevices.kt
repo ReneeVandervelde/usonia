@@ -9,7 +9,8 @@ object FakeDevices {
                 Action.Switch::class
             ),
             events = setOf(
-                Event.Switch::class
+                Event.Switch::class,
+                Event.Power::class,
             )
         )
     )

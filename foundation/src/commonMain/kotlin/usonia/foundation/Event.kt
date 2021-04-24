@@ -1,5 +1,7 @@
 package usonia.foundation
 
+import inkapplications.spondee.measures.watts
+import inkapplications.spondee.measures.Power as PowerUnit
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -154,6 +156,15 @@ sealed class Event {
     ): Event() {
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
+
+    @Serializable(with = EventSerializer::class)
+    data class Power(
+        override val source: Identifier,
+        override val timestamp: Instant,
+        val power: PowerUnit,
+    ): Event() {
+        override fun withSource(source: Identifier): Event = copy(source = source)
+    }
 }
 
 object EventSerializer: KSerializer<Event> {
@@ -230,6 +241,11 @@ object EventSerializer: KSerializer<Event> {
                 timestamp,
                 json.pressure!!,
             )
+            Event.Power::class.simpleName -> Event.Power(
+                id,
+                timestamp,
+                json.power!!.watts,
+            )
             else -> throw IllegalArgumentException("Unknown type: ${json.type}")
         }
     }
@@ -279,6 +295,9 @@ object EventSerializer: KSerializer<Event> {
             is Event.Pressure -> prototype.copy(
                 pressure = value.pressure
             )
+            is Event.Power -> prototype.copy(
+                power = value.power.inWatts.toInt(),
+            )
         }
 
         encoder.encodeSerializableValue(serializer, json)
@@ -309,4 +328,5 @@ internal data class EventJson(
     val z: Float? = null,
     val movementState: String? = null,
     val pressure: Float? = null,
+    val power: Int? = null,
 )

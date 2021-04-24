@@ -17,6 +17,8 @@ kotlin {
                 api(KotlinX.dateTime)
                 api(Kimchi.logger)
                 implementation(KotlinX.serialization)
+                api("com.github.inkapplications.spondee:math:f1d6f9b")
+                api("com.github.inkapplications.spondee:measures:f1d6f9b")
             }
         }
 

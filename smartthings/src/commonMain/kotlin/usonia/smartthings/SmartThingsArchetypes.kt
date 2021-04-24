@@ -66,6 +66,7 @@ object SmartThingsArchetypes {
         ),
         events = setOf(
             Event.Switch::class,
+            Event.Power::class,
         ),
     )
 }
