@@ -1,0 +1,35 @@
+[versions]
+kotlin = "1.4.32"
+coroutines = "1.4.1"
+
+[libraries.kotlin-gradle]
+version.ref = "kotlin"
+module = "org.jetbrains.kotlin:kotlin-gradle-plugin"
+
+[libraries.kotlin-test-junit]
+version.ref = "kotlin"
+module = "org.jetbrains.kotlin:kotlin-test-junit"
+
+[libraries.coroutines-core]
+version.ref = "coroutines"
+module = "org.jetbrains.kotlinx:kotlinx-coroutines-core"
+
+[libraries.coroutines-test]
+version.ref = "coroutines"
+module = "org.jetbrains.kotlinx:kotlinx-coroutines-test"
+
+[libraries.coroutines-js]
+version.ref = "coroutines"
+module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-js"
+
+[libraries.kotlinx-datetime]
+version = "0.1.0"
+module = "org.jetbrains.kotlinx:kotlinx-datetime"
+
+[libraries.kotlinx-serialization-json]
+version = "1.0.1"
+module = "org.jetbrains.kotlinx:kotlinx-serialization-json"
+
+[libraries.kotlinx-serialization-gradle]
+version.ref = "kotlin"
+module = "org.jetbrains.kotlin:kotlin-serialization"

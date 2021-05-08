@@ -1,29 +1,24 @@
 plugins {
-    kotlin("multiplatform")
+    multiplatformLibrary()
 }
 
 kotlin {
-    jvm()
-    js {
-        browser()
-    }
-
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":foundation"))
-                api(KotlinX.serialization)
-                implementation(project(":hue-bridge"))
-                implementation(project(":schlage"))
-                implementation(project(":smartthings"))
-                implementation(project(":xiaomi"))
+                api(projects.foundation)
+                api(libraries.kotlinx.serialization.json)
+                implementation(projects.hueBridge)
+                implementation(projects.schlage)
+                implementation(projects.smartthings)
+                implementation(projects.xiaomi)
             }
         }
 
         val jvmTest by getting {
             dependencies {
-                implementation(kotlin("test-junit"))
-                implementation(JUnit.core)
+                implementation(libraries.kotlin.test.junit)
+                implementation(libraries.junit)
             }
         }
     }

@@ -1,0 +1,10 @@
+[versions]
+kimchi = "991aa06d88dd3"
+
+[libraries.kimchi-core]
+version.ref = "kimchi"
+module = "com.github.inkapplications.kimchi:kimchi"
+
+[libraries.kimchi-logger]
+version.ref = "kimchi"
+module = "com.github.inkapplications.kimchi:logger"

@@ -1,33 +1,31 @@
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.4.10"
+    backendlibrary()
+    kotlin("plugin.serialization")
 }
 
 kotlin {
-    jvm()
-
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":kotlin-extensions"))
-                api(project(":core"))
-                api(project(":server"))
-                api(project(":foundation"))
-                api(Coroutines.core)
-                implementation(Ktor.client)
-                implementation(Ktor.clientJson)
-                implementation(Ktor.clientSerialization)
-                implementation(KotlinX.dateTime)
-                implementation(KotlinX.serialization)
+                api(projects.kotlinExtensions)
+                api(projects.core)
+                api(projects.server)
+                api(projects.foundation)
+                api(libraries.coroutines.core)
+                implementation(libraries.ktor.client.core)
+                implementation(libraries.ktor.client.json)
+                implementation(libraries.ktor.client.serialization)
+                implementation(libraries.kotlinx.datetime)
+                implementation(libraries.kotlinx.serialization.json)
             }
         }
 
         val jvmTest by getting {
             dependencies {
-                implementation(project(":core-testing"))
-                implementation(project(":server-testing"))
-                implementation(kotlin("test-junit"))
-                implementation(Coroutines.test)
+                implementation(projects.coreTesting)
+                implementation(projects.serverTesting)
+                implementation(libraries.kotlin.test.junit)
+                implementation(libraries.coroutines.test)
             }
         }
     }

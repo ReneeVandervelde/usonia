@@ -1,18 +1,13 @@
 plugins {
-    kotlin("multiplatform")
+    multiplatformLibrary()
 }
 
 kotlin {
-    jvm()
-    js {
-        browser()
-    }
-
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":foundation"))
-                api(Coroutines.core)
+                api(projects.foundation)
+                api(libraries.coroutines.core)
             }
         }
     }

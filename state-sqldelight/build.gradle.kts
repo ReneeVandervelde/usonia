@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform")
+    backendlibrary()
     id("com.squareup.sqldelight")
 }
 
@@ -10,32 +10,29 @@ sqldelight {
 }
 
 kotlin {
-    jvm()
-
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":core"))
-                api(project(":foundation"))
-                api(Coroutines.core)
-                api(KotlinX.serialization)
+                api(projects.core)
+                api(projects.foundation)
+                api(libraries.coroutines.core)
+                api(libraries.kotlinx.serialization.json)
             }
         }
 
         val jvmMain by getting {
             dependencies {
-                implementation("com.squareup.sqldelight:sqlite-driver:1.4.3")
-                implementation("com.squareup.sqldelight:coroutines-extensions:1.4.3")
+                implementation(libraries.bundles.sqldelight)
             }
         }
 
         val jvmTest by getting {
             dependencies {
-                implementation(Coroutines.test)
-                implementation(project(":foundation-testing"))
-                implementation(project(":core-testing"))
-                implementation(kotlin("test-junit"))
-                implementation(JUnit.core)
+                implementation(libraries.coroutines.test)
+                implementation(projects.foundationTesting)
+                implementation(projects.coreTesting)
+                implementation(libraries.kotlin.test.junit)
+                implementation(libraries.junit)
             }
         }
     }

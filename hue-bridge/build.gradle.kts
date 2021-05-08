@@ -1,26 +1,21 @@
 plugins {
-    kotlin("multiplatform")
+    multiplatformLibrary()
 }
 
 kotlin {
-    jvm()
-    js {
-        browser()
-    }
-
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":kotlin-extensions"))
-                implementation(project(":foundation"))
-                api(Coroutines.core)
+                api(projects.kotlinExtensions)
+                implementation(projects.foundation)
+                api(libraries.coroutines.core)
             }
         }
 
         val jvmMain by getting {
             dependencies {
-                api(project(":core"))
-                api(project(":server"))
+                api(projects.core)
+                api(projects.server)
                 implementation("com.github.inkapplications.Shade:shade:1.2.0")
             }
         }
@@ -28,10 +23,10 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
-                implementation(Coroutines.test)
-                implementation(project(":core-testing"))
-                implementation(project(":server-testing"))
-                implementation(project(":foundation-testing"))
+                implementation(libraries.coroutines.test)
+                implementation(projects.coreTesting)
+                implementation(projects.serverTesting)
+                implementation(projects.foundationTesting)
             }
         }
     }

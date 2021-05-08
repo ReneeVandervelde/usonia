@@ -20,11 +20,11 @@ artifacts {
 }
 
 dependencies {
-    implementation(Coroutines.js)
-    implementation(Kimchi.core)
-    implementation(project(":kotlin-extensions"))
-    implementation(project(":client-http"))
-    implementation(project(":serialization"))
+    implementation(libraries.coroutines.js)
+    implementation(libraries.kimchi.core)
+    implementation(projects.kotlinExtensions)
+    implementation(projects.clientHttp)
+    implementation(projects.serialization)
     implementation(npm("mustache", "3.1.0"))
     implementation(npm("chart.js", "2.9.4"))
 }

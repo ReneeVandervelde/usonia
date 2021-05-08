@@ -1,0 +1,17 @@
+[versions]
+sqldelight = "1.4.3"
+
+[libraries.sqldelight-gradle]
+version.ref = "sqldelight"
+module = "com.squareup.sqldelight:gradle-plugin"
+
+[libraries.sqldelight-driver]
+version.ref = "sqldelight"
+module = "com.squareup.sqldelight:sqlite-driver"
+
+[libraries.sqldelight-coroutines]
+version.ref = "sqldelight"
+module = "com.squareup.sqldelight:coroutines-extensions"
+
+[bundles]
+sqldelight = ["sqldelight-driver", "sqldelight-coroutines"]

@@ -1,42 +1,37 @@
 plugins {
-    kotlin("multiplatform")
+    multiplatformLibrary()
 }
 
 kotlin {
-    jvm()
-    js {
-        browser()
-    }
-
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":foundation"))
-                api(project(":core"))
-                api(KotlinX.serialization)
-                api(Coroutines.core)
-                implementation(Ktor.client)
-                implementation(Ktor.clientSerialization)
+                api(projects.foundation)
+                api(projects.core)
+                api(libraries.kotlinx.serialization.json)
+                api(libraries.coroutines.core)
+                implementation(libraries.ktor.client.core)
+                implementation(libraries.ktor.client.serialization)
             }
         }
 
         val jvmMain by getting {
             dependencies {
-                implementation(Ktor.clientOkHttp)
+                implementation(libraries.ktor.client.okhttp)
             }
         }
 
         val jvmTest by getting {
             dependencies {
-                implementation(kotlin("test-junit"))
-                implementation(JUnit.core)
+                implementation(libraries.kotlin.test.junit)
+                implementation(libraries.junit)
             }
         }
 
         val jsMain by getting {
             dependencies {
-                implementation(Ktor.clientJs)
-                implementation(Ktor.clientJsonJs)
+                implementation(libraries.ktor.client.js.core)
+                implementation(libraries.ktor.client.js.json)
             }
         }
     }

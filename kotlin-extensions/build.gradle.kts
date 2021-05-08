@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform")
+    multiplatformLibrary()
 }
 
 kotlin {
@@ -11,15 +11,15 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(Coroutines.core)
-                api(KotlinX.dateTime)
+                api(libraries.coroutines.core)
+                api(libraries.kotlinx.datetime)
             }
         }
 
         val jvmTest by getting {
             dependencies {
-                implementation(kotlin("test-junit"))
-                implementation(JUnit.core)
+                implementation(libraries.kotlin.test.junit)
+                implementation(libraries.junit)
             }
         }
     }

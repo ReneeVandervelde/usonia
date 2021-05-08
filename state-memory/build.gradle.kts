@@ -1,26 +1,24 @@
 plugins {
-    kotlin("multiplatform")
+    backendlibrary()
 }
 
 kotlin {
-    jvm()
-
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":core"))
-                api(project(":foundation"))
-                api(Coroutines.core)
+                api(projects.core)
+                api(projects.foundation)
+                api(libraries.coroutines.core)
             }
         }
 
         val jvmTest by getting {
             dependencies {
-                implementation(Coroutines.test)
-                implementation(project(":foundation-testing"))
-                implementation(project(":core-testing"))
-                implementation(kotlin("test-junit"))
-                implementation(JUnit.core)
+                implementation(libraries.coroutines.test)
+                implementation(projects.foundationTesting)
+                implementation(projects.coreTesting)
+                implementation(libraries.kotlin.test.junit)
+                implementation(libraries.junit)
             }
         }
     }

@@ -1,0 +1,34 @@
+[versions]
+ktor = "1.4.1"
+
+[libraries.ktor-client-core]
+version.ref = "ktor"
+module="io.ktor:ktor-client-core"
+
+[libraries.ktor-client-json]
+version.ref = "ktor"
+module="io.ktor:ktor-client-json"
+
+[libraries.ktor-client-serialization]
+version.ref = "ktor"
+module="io.ktor:ktor-client-serialization"
+
+[libraries.ktor-client-okhttp]
+version.ref = "ktor"
+module="io.ktor:ktor-client-okhttp"
+
+[libraries.ktor-client-js-core]
+version.ref = "ktor"
+module="io.ktor:ktor-client-js"
+
+[libraries.ktor-client-js-json]
+version.ref = "ktor"
+module="io.ktor:ktor-client-json-js"
+
+[libraries.ktor-server-netty]
+version.ref = "ktor"
+module="io.ktor:ktor-server-netty"
+
+[libraries.ktor-websockets]
+version.ref = "ktor"
+module="io.ktor:ktor-websockets"

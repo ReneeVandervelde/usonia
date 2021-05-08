@@ -1,19 +1,17 @@
 plugins {
-    kotlin("multiplatform")
+    backendlibrary()
 }
 
 kotlin {
-    jvm()
-
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":kotlin-extensions"))
-                implementation(project(":foundation"))
-                implementation(project(":core"))
-                api(KotlinX.dateTime)
-                api(KotlinX.serialization)
-                api(Kimchi.logger)
+                implementation(projects.kotlinExtensions)
+                implementation(projects.foundation)
+                implementation(projects.core)
+                api(libraries.kotlinx.datetime)
+                api(libraries.kotlinx.serialization.json)
+                api(libraries.kimchi.logger)
             }
         }
     }

@@ -1,3 +1,20 @@
+enableFeaturePreview("VERSION_CATALOGS")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("libraries") {
+            from(files(
+                "gradle/ink.versions.toml",
+                "gradle/kotlin.versions.toml",
+                "gradle/ktor.versions.toml",
+                "gradle/misc.versions.toml",
+                "gradle/square.versions.toml"
+            ))
+        }
+    }
+}
+
 include("cli")
 include("client-http")
 include("core")

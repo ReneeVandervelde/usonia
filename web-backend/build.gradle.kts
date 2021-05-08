@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform")
+    backendlibrary()
 }
 
 configurations {
@@ -8,24 +8,22 @@ configurations {
 
 tasks {
     create("collectImportResources", Sync::class) {
-        dependsOn(":web-frontend:assemble")
+        dependsOn(":${project.projects.webFrontend.name}:assemble")
         into(temporaryDir).from(configurations.getByName("importResources"))
     }
 }
 
 kotlin {
-    jvm()
-
     sourceSets {
         val commonMain by getting {
             resources.srcDirs(tasks.getByName("collectImportResources"))
 
             dependencies {
-                api(project(":core"))
-                api(project(":server"))
-                api(project(":serialization"))
-                dependencies.add("importResources", project(":web-frontend", "dist"))
-                api(Kimchi.logger)
+                api(projects.core)
+                api(projects.server)
+                api(projects.serialization)
+                dependencies.add("importResources", project(":${projects.webFrontend.name}", "dist"))
+                api(libraries.kimchi.logger)
             }
         }
     }
