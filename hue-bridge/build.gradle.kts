@@ -17,6 +17,11 @@ kotlin {
                 api(projects.core)
                 api(projects.server)
                 implementation("com.github.inkapplications.Shade:shade:1.2.0")
+                implementation("org.jetbrains.kotlinx:atomicfu-common") {
+                    version {
+                        strictly("0.13.1")
+                    }
+                }
             }
         }
 
