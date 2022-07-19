@@ -96,6 +96,7 @@ internal class ActionRelay(
                         this.parameters.append("access_token", token)
                     }
                     contentType(ContentType.Application.Json)
+                    setBody(json.encodeToString(ActionSerializer, action.withTarget(parent.id)))
                 }
             } catch (e: CancellationException) {
                 logger.warn("Publish action was cancelled", e)
