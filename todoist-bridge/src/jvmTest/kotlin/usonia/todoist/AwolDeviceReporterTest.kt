@@ -1,6 +1,6 @@
 package usonia.todoist
 
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
@@ -52,7 +52,7 @@ class AwolDeviceReporterTest {
     val time = UtcClock.current
 
     @Test
-    fun correctParameters() = runBlockingTest {
+    fun correctParameters() = runTest {
         val events = object: EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(null)
         }
@@ -81,7 +81,7 @@ class AwolDeviceReporterTest {
     }
 
     @Test
-    fun noAwolDevices() = runBlockingTest {
+    fun noAwolDevices() = runTest {
         val events = object: EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
@@ -109,7 +109,7 @@ class AwolDeviceReporterTest {
     }
 
     @Test
-    fun tasksCreated() = runBlockingTest {
+    fun tasksCreated() = runTest {
         val events = object: EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
@@ -141,7 +141,7 @@ class AwolDeviceReporterTest {
     }
 
     @Test
-    fun taskCreatedWithoutHistoryWhenStale() = runBlockingTest {
+    fun taskCreatedWithoutHistoryWhenStale() = runTest {
         val events = object: EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
         }
@@ -162,7 +162,7 @@ class AwolDeviceReporterTest {
     }
 
     @Test
-    fun notCreatedWithoutHistory() = runBlockingTest {
+    fun notCreatedWithoutHistory() = runTest {
         val events = object: EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(time.instant)
         }
@@ -183,7 +183,7 @@ class AwolDeviceReporterTest {
     }
 
     @Test
-    fun taskClosed() = runBlockingTest {
+    fun taskClosed() = runTest {
         val events = object: EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
@@ -219,7 +219,7 @@ class AwolDeviceReporterTest {
     }
 
     @Test
-    fun stillAwol() = runBlockingTest {
+    fun stillAwol() = runTest {
         val events = object: EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
@@ -262,7 +262,7 @@ class AwolDeviceReporterTest {
     }
 
     @Test
-    fun notClosedWithoutHistory() = runBlockingTest {
+    fun notClosedWithoutHistory() = runTest {
         val events = object: EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(time.instant)
         }
@@ -290,7 +290,7 @@ class AwolDeviceReporterTest {
     }
 
     @Test
-    fun noClosableTask() = runBlockingTest {
+    fun noClosableTask() = runTest {
         val events = object: EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {

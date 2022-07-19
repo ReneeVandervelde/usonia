@@ -3,7 +3,8 @@ package usonia.rules.locks
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
@@ -29,7 +30,7 @@ class LockOnSleepTest {
     }
 
     @Test
-    fun lock() = runBlockingTest {
+    fun lock() = runTest {
         val actionSpy = ActionPublisherSpy()
         val client = DummyClient.copy(
             configurationAccess = fakeConfig,
@@ -39,6 +40,7 @@ class LockOnSleepTest {
         val picker = LockOnSleep(client)
 
         val daemon = launch { picker.start() }
+        runCurrent()
         fakeConfig.mutableFlags.emit(mapOf("Sleep Mode" to "true"))
         runCurrent()
         assertEquals(1, actionSpy.actions.size, "Locks are locked immediately")
@@ -51,7 +53,7 @@ class LockOnSleepTest {
     }
 
     @Test
-    fun noop() = runBlockingTest {
+    fun noop() = runTest {
         val actionSpy = ActionPublisherSpy()
         val client = DummyClient.copy(
             configurationAccess = fakeConfig,

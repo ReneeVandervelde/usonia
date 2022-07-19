@@ -7,7 +7,8 @@ import inkapplications.shade.lights.LightStateModification
 import inkapplications.shade.lights.ShadeLights
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import usonia.core.state.ActionAccessFake
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
@@ -34,7 +35,7 @@ class HueLightHandlerTest {
     )
 
     @Test
-    fun notConfigured() = runBlockingTest {
+    fun notConfigured() = runTest {
         val shadeSpy = ShadeLightsSpy()
         val actionAccess = ActionAccessFake()
         val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
@@ -57,13 +58,12 @@ class HueLightHandlerTest {
         val handler = HueLightHandler(client, shadeSpy, requestScope = this)
 
         val handlerJob = launch { handler.start() }
-
-        pauseDispatcher {
-            actionAccess.mutableActions.emit(Action.Switch(
-                target = FakeDevices.HueColorLight.id,
-                state = SwitchState.ON,
-            ))
-        }
+        runCurrent()
+        actionAccess.mutableActions.emit(Action.Switch(
+            target = FakeDevices.HueColorLight.id,
+            state = SwitchState.ON,
+        ))
+        runCurrent()
 
         assertTrue(shadeSpy.updated.isEmpty(), "No actions taken when not configured.")
 
@@ -71,7 +71,7 @@ class HueLightHandlerTest {
     }
 
     @Test
-    fun nonHueLight() = runBlockingTest {
+    fun nonHueLight() = runTest {
         val shadeSpy = ShadeLightsSpy()
         val actionAccess = ActionAccessFake()
         val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
@@ -94,13 +94,13 @@ class HueLightHandlerTest {
         val handler = HueLightHandler(client, shadeSpy, requestScope = this)
 
         val handlerJob = launch { handler.start() }
+        runCurrent()
 
-        pauseDispatcher {
-            actionAccess.mutableActions.emit(Action.Switch(
-                target = FakeDevices.HueColorLight.id,
-                state = SwitchState.ON,
-            ))
-        }
+        actionAccess.mutableActions.emit(Action.Switch(
+            target = FakeDevices.HueColorLight.id,
+            state = SwitchState.ON,
+        ))
+        runCurrent()
 
         assertTrue(shadeSpy.updated.isEmpty(), "Non lights should not be updated.")
 
@@ -108,7 +108,7 @@ class HueLightHandlerTest {
     }
 
     @Test
-    fun nonLightAction() = runBlockingTest {
+    fun nonLightAction() = runTest {
         val shadeSpy = ShadeLightsSpy()
         val actionAccess = ActionAccessFake()
         val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
@@ -131,13 +131,13 @@ class HueLightHandlerTest {
         val handler = HueLightHandler(client, shadeSpy, requestScope = this)
 
         val handlerJob = launch { handler.start() }
+        runCurrent()
 
-        pauseDispatcher {
-            actionAccess.mutableActions.emit(Action.Lock(
-                target = FakeDevices.HueColorLight.id,
-                state = LockState.LOCKED,
-            ))
-        }
+        actionAccess.mutableActions.emit(Action.Lock(
+            target = FakeDevices.HueColorLight.id,
+            state = LockState.LOCKED,
+        ))
+        runCurrent()
 
         assertTrue(shadeSpy.updated.isEmpty(), "Should Not handle non-light actions.")
 
@@ -168,7 +168,7 @@ class HueLightHandlerTest {
         color = RGB(1, 2, 3)
     ))
 
-    private fun handlesAction(action: Action) = runBlockingTest {
+    private fun handlesAction(action: Action) = runTest {
         val shadeSpy = ShadeLightsSpy()
         val actionAccess = ActionAccessFake()
         val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
@@ -191,10 +191,10 @@ class HueLightHandlerTest {
         val handler = HueLightHandler(client, shadeSpy, requestScope = this)
 
         val handlerJob = launch { handler.start() }
+        runCurrent()
 
-        pauseDispatcher {
-            actionAccess.mutableActions.emit(action)
-        }
+        actionAccess.mutableActions.emit(action)
+        runCurrent()
 
         assertEquals("fake-hue-id", shadeSpy.updated.single())
 

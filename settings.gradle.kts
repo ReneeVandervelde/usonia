@@ -17,6 +17,7 @@ dependencyResolutionManagement {
 
 include("cli")
 include("client-http")
+include("client-ktor")
 include("core")
 include("core-testing")
 include("foundation")

@@ -2,7 +2,8 @@ package usonia.rules.locks
 
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import usonia.core.state.ActionPublisherSpy
@@ -29,7 +30,7 @@ class LockOnAwayTest {
     }
 
     @Test
-    fun lock() = runBlockingTest {
+    fun lock() = runTest {
         val actionSpy = ActionPublisherSpy()
         val fakeEvents = object: EventAccessFake() {
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = Event.Presence(
@@ -48,6 +49,8 @@ class LockOnAwayTest {
         val daemonJob = launch { daemon.start() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Presence(FakeUsers.John.id, Clock.System.now(), PresenceState.AWAY))
+        runCurrent()
+
         assertEquals(1, actionSpy.actions.size, "Locks are locked immediately")
         val action = actionSpy.actions.single()
         assertTrue(action is Action.Lock)
@@ -58,7 +61,7 @@ class LockOnAwayTest {
     }
 
     @Test
-    fun noopOnHome() = runBlockingTest {
+    fun noopOnHome() = runTest {
         val actionSpy = ActionPublisherSpy()
         val fakeEvents = object: EventAccessFake() {
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = Event.Presence(
@@ -83,7 +86,7 @@ class LockOnAwayTest {
     }
 
     @Test
-    fun noopOnPartial() = runBlockingTest {
+    fun noopOnPartial() = runTest {
         val actionSpy = ActionPublisherSpy()
         val fakeEvents = object: EventAccessFake() {
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = Event.Presence(

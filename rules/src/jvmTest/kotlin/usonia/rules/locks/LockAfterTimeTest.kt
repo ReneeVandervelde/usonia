@@ -2,7 +2,10 @@ package usonia.rules.locks
 
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
@@ -39,7 +42,7 @@ class LockAfterTimeTest {
     )
 
     @Test
-    fun lock() = runBlockingTest {
+    fun lock() = runTest {
         val eventAccess = EventAccessFake()
         val actionPublisher = ActionPublisherSpy()
         val fakeClient = testClient.copy(
@@ -49,6 +52,7 @@ class LockAfterTimeTest {
         val daemon = LockAfterTime(fakeClient, backgroundScope = this)
 
         val daemonJob = launch { daemon.start() }
+        runCurrent()
 
         eventAccess.mutableEvents.emit(Event.Latch(
             source = FakeDevices.Latch.id,
@@ -66,7 +70,7 @@ class LockAfterTimeTest {
     }
 
     @Test
-    fun cancelled() = runBlockingTest {
+    fun cancelled() = runTest {
         val eventAccess = EventAccessFake()
         val actionPublisher = ActionPublisherSpy()
         val fakeClient = testClient.copy(
@@ -96,7 +100,7 @@ class LockAfterTimeTest {
     }
 
     @Test
-    fun noAction() = runBlockingTest {
+    fun noAction() = runTest {
         val eventAccess = EventAccessFake()
         val actionPublisher = ActionPublisherSpy()
         val fakeClient = testClient.copy(

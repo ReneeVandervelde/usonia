@@ -3,7 +3,8 @@ package usonia.rules.charging
 import inkapplications.spondee.measures.watts
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
@@ -12,7 +13,6 @@ import usonia.core.state.EventAccessFake
 import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
 import usonia.kotlin.ongoingFlowOf
-import usonia.rules.greenhouse.FanControl
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -31,7 +31,7 @@ class PowerLimitChargeTest {
     }
 
     @Test
-    fun turnsOff() = runBlockingTest {
+    fun turnsOff() = runTest {
         val actionSpy = ActionPublisherSpy()
         val fakeEvents = EventAccessFake()
         val client = DummyClient.copy(
@@ -42,6 +42,7 @@ class PowerLimitChargeTest {
         val daemon = PowerLimitCharge(client)
 
         val daemonJob = launch { daemon.start() }
+        runCurrent()
 
         fakeEvents.mutableEvents.emit(Event.Power(
             source = FakeDevices.Switch.id,
@@ -74,7 +75,7 @@ class PowerLimitChargeTest {
     }
 
     @Test
-    fun flat() = runBlockingTest {
+    fun flat() = runTest {
         val actionSpy = ActionPublisherSpy()
         val fakeEvents = EventAccessFake()
         val client = DummyClient.copy(
@@ -113,7 +114,7 @@ class PowerLimitChargeTest {
     }
 
     @Test
-    fun rising() = runBlockingTest {
+    fun rising() = runTest {
         val actionSpy = ActionPublisherSpy()
         val fakeEvents = EventAccessFake()
         val client = DummyClient.copy(
@@ -152,7 +153,7 @@ class PowerLimitChargeTest {
     }
 
     @Test
-    fun mixed() = runBlockingTest {
+    fun mixed() = runTest {
         val actionSpy = ActionPublisherSpy()
         val fakeEvents = EventAccessFake()
         val client = DummyClient.copy(

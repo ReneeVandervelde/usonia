@@ -2,7 +2,8 @@ package usonia.rules.greenhouse
 
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
@@ -34,7 +35,7 @@ class FanControlTest {
     }
 
     @Test
-    fun turnOn() = runBlockingTest {
+    fun turnOn() = runTest {
         val actionSpy = ActionPublisherSpy()
         val fakeEvents = EventAccessFake()
         val client = DummyClient.copy(
@@ -47,6 +48,7 @@ class FanControlTest {
         val daemonJob = launch { daemon.start() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 80f))
+        runCurrent()
         assertEquals(1, actionSpy.actions.size, "Fan is switched on")
         val action = actionSpy.actions.single()
         assertTrue(action is Action.Switch)
@@ -57,7 +59,7 @@ class FanControlTest {
     }
 
     @Test
-    fun inBuffer() = runBlockingTest {
+    fun inBuffer() = runTest {
         val actionSpy = ActionPublisherSpy()
         val fakeEvents = EventAccessFake()
         val client = DummyClient.copy(
@@ -78,7 +80,7 @@ class FanControlTest {
     }
 
     @Test
-    fun turnOff() = runBlockingTest {
+    fun turnOff() = runTest {
         val actionSpy = ActionPublisherSpy()
         val fakeEvents = EventAccessFake()
         val client = DummyClient.copy(
@@ -91,6 +93,7 @@ class FanControlTest {
         val daemonJob = launch { daemon.start() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 76f))
+        runCurrent()
         assertEquals(1, actionSpy.actions.size, "Fan is switched off outside of buffer.")
         val action = actionSpy.actions.single()
         assertTrue(action is Action.Switch)
@@ -101,7 +104,7 @@ class FanControlTest {
     }
 
     @Test
-    fun unrelated() = runBlockingTest {
+    fun unrelated() = runTest {
         val actionSpy = ActionPublisherSpy()
         val fakeEvents = EventAccessFake()
         val client = DummyClient.copy(

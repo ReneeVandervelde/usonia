@@ -1,15 +1,15 @@
 package usonia.telegram
 
+import com.inkapplications.telegram.client.TelegramBotClient
+import com.inkapplications.telegram.structures.ChatReference
+import com.inkapplications.telegram.structures.MessageParameters
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import usonia.foundation.Action
 import usonia.foundation.Site
-import usonia.kotlin.IoScope
-import usonia.kotlin.collect
-import usonia.kotlin.collectLatest
-import usonia.kotlin.filterIsInstance
+import usonia.kotlin.*
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
 
@@ -26,15 +26,22 @@ private const val CHAT_ID_KEY = "telegram.chat"
  */
 internal class TelegramAlerts(
     private val client: BackendClient,
-    private val telegramApi: TelegramApi,
+    private val clientFactory: ClientFactory,
     private val logger: KimchiLogger = EmptyLogger,
     private val requestScope: CoroutineScope = IoScope()
 ): Daemon {
+    private var telegram: TelegramBotClient? = null
+
     override suspend fun start(): Nothing {
-        client.site.collectLatest { site -> onSiteUpdate(site) }
+        client.site.collectLatest { site ->
+            onSiteUpdate(site)
+            client.actions.filterIsInstance<Action.Alert>().collect {
+                send(site, it)
+            }
+        }
     }
 
-    private suspend fun onSiteUpdate(site: Site) {
+    private fun onSiteUpdate(site: Site) {
         val bridge = site.bridges.singleOrNull { it.service == "telegram" } ?: run {
             logger.warn("Telegram not configured. Not enabling alerts.")
             return
@@ -50,21 +57,22 @@ internal class TelegramAlerts(
             return
         }
 
-        client.actions.filterIsInstance<Action.Alert>().collect {
-            send(bot, token, site, it)
-        }
+        telegram = clientFactory.create(bot, token)
     }
 
-    private fun send(bot: String, token: String, site: Site, alert: Action.Alert) {
+    private fun send(site: Site, alert: Action.Alert) {
         val user = site.users.find { it.id == alert.target } ?: run {
             logger.warn("Unable to find user for alert: <${alert.target}>")
             return
         }
-        val chatId = user.parameters[CHAT_ID_KEY] ?: run {
+        val chatId = user.parameters[CHAT_ID_KEY]?.toLongOrNull() ?: run {
             logger.debug("Skipping alert for <${user.name}> with no `${CHAT_ID_KEY}` parameter.")
             return
         }
         logger.trace("Sending alerts to <${user.name}>")
-        requestScope.launch { telegramApi.sendMessage(bot, token, chatId, alert.message) }
+        requestScope.launch { telegram?.sendMessage(MessageParameters(
+            chatId = ChatReference.Id(chatId),
+            text = alert.message,
+        )) }
     }
 }

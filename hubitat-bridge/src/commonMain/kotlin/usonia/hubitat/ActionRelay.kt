@@ -1,7 +1,7 @@
 package usonia.hubitat
 
 import io.ktor.client.*
-import io.ktor.client.features.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kimchi.logger.EmptyLogger
@@ -10,6 +10,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import usonia.client.ktor.PlatformEngine
 import usonia.foundation.*
 import usonia.kotlin.IoScope
 import usonia.kotlin.collect
@@ -29,7 +30,7 @@ internal class ActionRelay(
     private val logger: KimchiLogger = EmptyLogger,
     private val requestScope: CoroutineScope = IoScope()
 ): Daemon {
-    private val httpClient = HttpClient {
+    private val httpClient = HttpClient(PlatformEngine) {
         install(HttpTimeout) {
             requestTimeoutMillis = 10.seconds.toLongMilliseconds()
         }
@@ -80,17 +81,21 @@ internal class ActionRelay(
             logger.error("`actionsPath` not configured for bridge <${id}>. Skipping action.")
             return
         }
+        val token = parameters["token"] ?: run {
+            logger.error("`token` not configured for bridge <${id}>. Skipping action.")
+            return
+        }
 
         requestScope.launch {
             try {
-                httpClient.post(
-                    host = host,
-                    port = port,
-                    path = path,
-                    body = json.encodeToString(ActionSerializer, action.withTarget(parent.id)),
-                ) {
-                    contentType(ContentType.parse("application/json"))
-                    parameter("access_token", parameters["token"])
+                httpClient.post {
+                    url {
+                        this.host = host
+                        this.port = port
+                        this.path(path)
+                        this.parameters.append("access_token", token)
+                    }
+                    contentType(ContentType.Application.Json)
                 }
             } catch (e: CancellationException) {
                 logger.warn("Publish action was cancelled", e)

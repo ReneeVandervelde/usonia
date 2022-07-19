@@ -12,6 +12,7 @@ kotlin {
                 implementation(projects.foundation)
                 api(libraries.coroutines.core)
                 implementation(libraries.ktor.client.core)
+                implementation("com.inkapplications.telegram:client:0.2.2")
             }
         }
 

@@ -1,6 +1,6 @@
 package usonia.rules.lights
 
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -50,7 +50,7 @@ class CircadianColorsTest {
     }
 
     @Test
-    fun afterMidnight() = runBlockingTest {
+    fun afterMidnight() = runTest {
         val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = sunrise.minus(DEFAULT_PERIOD).minus(2.minutes)
         }
@@ -64,7 +64,7 @@ class CircadianColorsTest {
     }
 
     @Test
-    fun staleForecast() = runBlockingTest {
+    fun staleForecast() = runTest {
         val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = startOfDay.plus(1.days)
         }
@@ -89,7 +89,7 @@ class CircadianColorsTest {
 
 
     @Test
-    fun morningBlueHour() = runBlockingTest {
+    fun morningBlueHour() = runTest {
         val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = sunrise.minus(DEFAULT_PERIOD / 4)
         }
@@ -108,7 +108,7 @@ class CircadianColorsTest {
     }
 
     @Test
-    fun dawn() = runBlockingTest {
+    fun dawn() = runTest {
         val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = sunrise
         }
@@ -122,7 +122,7 @@ class CircadianColorsTest {
     }
 
     @Test
-    fun day() = runBlockingTest {
+    fun day() = runTest {
         val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = sunrise.plus(2.minutes)
         }
@@ -136,7 +136,7 @@ class CircadianColorsTest {
     }
 
     @Test
-    fun sunset() = runBlockingTest {
+    fun sunset() = runTest {
         val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = sunset
         }
@@ -150,7 +150,7 @@ class CircadianColorsTest {
     }
 
     @Test
-    fun evening() = runBlockingTest {
+    fun evening() = runTest {
         val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = sunset.plus(DEFAULT_PERIOD)
         }
@@ -164,7 +164,7 @@ class CircadianColorsTest {
     }
 
     @Test
-    fun twilight() = runBlockingTest {
+    fun twilight() = runTest {
         val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = nightStart.plus(DEFAULT_PERIOD / 4)
         }
@@ -183,7 +183,7 @@ class CircadianColorsTest {
     }
 
     @Test
-    fun night() = runBlockingTest {
+    fun night() = runTest {
         val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = nightStart.plus(DEFAULT_PERIOD).plus(2.minutes)
         }
@@ -197,7 +197,7 @@ class CircadianColorsTest {
     }
 
     @Test
-    fun overlapStart() = runBlockingTest {
+    fun overlapStart() = runTest {
         val weather = object: WeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(Forecast(
                 timestamp = Instant.DISTANT_PAST,

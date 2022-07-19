@@ -1,6 +1,6 @@
 package usonia.rules.lights
 
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import usonia.foundation.FakeRooms
 import usonia.foundation.Room
 import usonia.foundation.SwitchState
@@ -15,7 +15,7 @@ import kotlin.time.minutes
 @OptIn(ExperimentalTime::class)
 class CompositeLightingPickerTest {
     @Test
-    fun orderedExecution() = runBlockingTest {
+    fun orderedExecution() = runTest {
         val first = object: LightSettingsPicker {
             override suspend fun getActiveSettings(room: Room): LightSettings {
                 return LightSettings.Temperature(ColorTemperature(12), 34.percent)
@@ -47,7 +47,7 @@ class CompositeLightingPickerTest {
     }
 
     @Test
-    fun skipUnhandled() = runBlockingTest {
+    fun skipUnhandled() = runTest {
         val first = object: LightSettingsPicker {
             override suspend fun getActiveSettings(room: Room): LightSettings = LightSettings.Unhandled
             override suspend fun getIdleSettings(room: Room): LightSettings = LightSettings.Unhandled
@@ -76,7 +76,7 @@ class CompositeLightingPickerTest {
         assertEquals(2.minutes, idleConditions.time)
     }
 
-    fun noneHandled() = runBlockingTest {
+    fun noneHandled() = runTest {
         val first = object: LightSettingsPicker {
             override suspend fun getActiveSettings(room: Room): LightSettings = LightSettings.Unhandled
             override suspend fun getIdleSettings(room: Room): LightSettings = LightSettings.Unhandled

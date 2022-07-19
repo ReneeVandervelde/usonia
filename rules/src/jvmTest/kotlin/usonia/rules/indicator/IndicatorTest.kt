@@ -3,7 +3,8 @@ package usonia.rules.indicator
 import com.github.ajalt.colormath.RGB
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import usonia.core.state.*
@@ -60,7 +61,7 @@ class IndicatorTest {
     }
 
     @Test
-    fun initialCold() = runBlockingTest {
+    fun initialCold() = runTest {
         val spyPublisher = ActionPublisherSpy()
         val client = testClient.copy(
             actionPublisher = spyPublisher,
@@ -82,7 +83,7 @@ class IndicatorTest {
     }
 
     @Test
-    fun hot() = runBlockingTest {
+    fun hot() = runTest {
         val spyPublisher = ActionPublisherSpy()
         val client = testClient.copy(
             actionPublisher = spyPublisher,
@@ -109,7 +110,7 @@ class IndicatorTest {
     }
 
     @Test
-    fun snow() = runBlockingTest {
+    fun snow() = runTest {
         val spyPublisher = ActionPublisherSpy()
         val client = testClient.copy(
             actionPublisher = spyPublisher,
@@ -136,7 +137,7 @@ class IndicatorTest {
     }
 
     @Test
-    fun rain() = runBlockingTest {
+    fun rain() = runTest {
         val spyPublisher = ActionPublisherSpy()
         val client = testClient.copy(
             actionPublisher = spyPublisher,
@@ -163,7 +164,7 @@ class IndicatorTest {
     }
 
     @Test
-    fun rainAndSnow() = runBlockingTest {
+    fun rainAndSnow() = runTest {
         val spyPublisher = ActionPublisherSpy()
         val client = testClient.copy(
             actionPublisher = spyPublisher,
@@ -191,7 +192,7 @@ class IndicatorTest {
     }
 
     @Test
-    fun awayBrightness() = runBlockingTest {
+    fun awayBrightness() = runTest {
         val spyPublisher = ActionPublisherSpy()
         val presence = Event.Presence(
             source = FakeUsers.John.id,
@@ -216,9 +217,10 @@ class IndicatorTest {
         val indicator = Indicator(client, fakeWeather)
 
         val indicatorJob = launch { indicator.start() }
-        eventAccess.mutableEvents.emit(presence)
-
         runCurrent()
+        eventAccess.mutableEvents.emit(presence)
+        runCurrent()
+
         assertEquals(1, spyPublisher.actions.size)
         val action = spyPublisher.actions.single()
         assertTrue(action is Action.Dim)
@@ -229,7 +231,7 @@ class IndicatorTest {
     }
 
     @Test
-    fun presentBrightness() = runBlockingTest {
+    fun presentBrightness() = runTest {
         val spyPublisher = ActionPublisherSpy()
         val presence = Event.Presence(
             source = FakeUsers.John.id,
@@ -254,9 +256,10 @@ class IndicatorTest {
         val indicator = Indicator(client, fakeWeather)
 
         val indicatorJob = launch { indicator.start() }
-        eventAccess.mutableEvents.emit(presence)
-
         runCurrent()
+        eventAccess.mutableEvents.emit(presence)
+        runCurrent()
+
         assertEquals(1, spyPublisher.actions.size)
         val action = spyPublisher.actions.single()
         assertTrue(action is Action.Dim)

@@ -38,6 +38,6 @@ dependencies {
     implementation(libraries.coroutines.core)
     implementation(libraries.kimchi.core)
     implementation("com.github.ajalt.clikt:clikt:3.0.1")
-    implementation("com.google.dagger:dagger:2.30")
-    kapt("com.google.dagger:dagger-compiler:2.30")
+    implementation("com.google.dagger:dagger:2.42")
+    kapt("com.google.dagger:dagger-compiler:2.42")
 }

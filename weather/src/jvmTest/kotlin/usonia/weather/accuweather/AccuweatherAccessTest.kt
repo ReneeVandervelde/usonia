@@ -2,7 +2,8 @@ package usonia.weather.accuweather
 
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import usonia.core.state.ConfigurationAccess
@@ -82,7 +83,7 @@ class AccuweatherAccessTest {
     }
 
     @Test
-    fun noConfig() = runBlockingTest {
+    fun noConfig() = runTest {
         val config = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite)
         }
@@ -99,11 +100,11 @@ class AccuweatherAccessTest {
 
         val forecastCollection = launch { access.forecast.collect { forecasts += it } }
         val conditionCollection = launch { access.conditions.collect { conditions += it } }
+        runCurrent()
 
-        pauseDispatcher {
-            access.primeCron()
-            access.runCron(UtcClock.current)
-        }
+        access.primeCron()
+        access.runCron(UtcClock.current)
+        runCurrent()
 
         assertEquals(1, forecasts.size)
         assertEquals(1, conditions.size)
@@ -113,7 +114,7 @@ class AccuweatherAccessTest {
     }
 
     @Test
-    fun startConfig() = runBlockingTest {
+    fun startConfig() = runTest {
         val access = AccuweatherAccess(
             api = fakeApi,
             client = testClient,
@@ -125,10 +126,10 @@ class AccuweatherAccessTest {
 
         val forecastCollection = launch { access.forecast.collect { forecasts += it } }
         val conditionCollection = launch { access.conditions.collect { conditions += it } }
+        runCurrent()
 
-        pauseDispatcher {
-            access.primeCron()
-        }
+        access.primeCron()
+        runCurrent()
 
         assertEquals(2, forecasts.size)
         assertEquals(2, conditions.size)
@@ -148,7 +149,7 @@ class AccuweatherAccessTest {
     }
 
     @Test
-    fun updatedConditions() = runBlockingTest {
+    fun updatedConditions() = runTest {
         val access = AccuweatherAccess(
             api = fakeApi,
             client = testClient,
@@ -160,19 +161,19 @@ class AccuweatherAccessTest {
 
         val forecastCollection = launch { access.forecast.collect { forecasts += it } }
         val conditionCollection = launch { access.conditions.collect { conditions += it } }
+        runCurrent()
 
-        pauseDispatcher {
-            access.primeCron()
-            fakeApi.conditions = ConditionsResponse(
-                cloudCover = 100,
-                temperature = ConditionsResponse.TemperatureTypes(
-                    imperial = ConditionsResponse.TemperatureTypes.TemperatureData(
-                        temperature = 99f
-                    )
+        access.primeCron()
+        fakeApi.conditions = ConditionsResponse(
+            cloudCover = 100,
+            temperature = ConditionsResponse.TemperatureTypes(
+                imperial = ConditionsResponse.TemperatureTypes.TemperatureData(
+                    temperature = 99f
                 )
             )
-            access.runCron(UtcClock.current)
-        }
+        )
+        access.runCron(UtcClock.current)
+        runCurrent()
 
         assertEquals(2, forecasts.size)
         assertEquals(3, conditions.size)
@@ -188,7 +189,7 @@ class AccuweatherAccessTest {
     }
 
     @Test
-    fun updateForecast() = runBlockingTest {
+    fun updateForecast() = runTest {
         val fakeClock = object: Clock {
             var current = this@AccuweatherAccessTest.now
             override fun now(): Instant = current

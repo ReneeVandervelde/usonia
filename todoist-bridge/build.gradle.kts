@@ -12,6 +12,9 @@ kotlin {
                 api(projects.server)
                 implementation(projects.foundation)
                 api(libraries.coroutines.core)
+                implementation(projects.clientKtor)
+                implementation(libraries.ktor.client.contentnegotiation)
+                implementation(libraries.ktor.serialization.json)
                 implementation(libraries.ktor.client.core)
                 implementation(libraries.ktor.client.serialization)
             }

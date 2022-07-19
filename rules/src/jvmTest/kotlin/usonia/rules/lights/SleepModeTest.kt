@@ -3,7 +3,9 @@ package usonia.rules.lights
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.*
 import usonia.core.state.*
 import usonia.foundation.*
@@ -43,7 +45,7 @@ class SleepModeTest {
     }
 
     @Test
-    fun enabled() = runBlockingTest {
+    fun enabled() = runTest {
         val fakeConfig = object: ConfigurationAccess by configurationDouble {
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(
                 mapOf("Sleep Mode" to "true")
@@ -74,7 +76,7 @@ class SleepModeTest {
     }
 
     @Test
-    fun enabledMorning() = runBlockingTest {
+    fun enabledMorning() = runTest {
         val fakeConfig = object: ConfigurationAccess by configurationDouble {
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(
                 mapOf("Sleep Mode" to "true")
@@ -103,7 +105,7 @@ class SleepModeTest {
     }
 
     @Test
-    fun disabled() = runBlockingTest {
+    fun disabled() = runTest {
         val fakeConfig = object: ConfigurationAccess by configurationDouble {
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(
                 mapOf("Sleep Mode" to "false")
@@ -130,7 +132,7 @@ class SleepModeTest {
     }
 
     @Test
-    fun autoEnable() = runBlockingTest {
+    fun autoEnable() = runTest {
         val timeZone = TimeZone.UTC
         val clock = object: Clock {
             override fun now(): Instant = LocalDateTime(
@@ -154,12 +156,14 @@ class SleepModeTest {
         )
 
         val daemon = launch { picker.start() }
+        runCurrent()
 
         fakeEvents.mutableEvents.emit(Event.Latch(
             source = FakeDevices.Latch.id,
             timestamp = Instant.DISTANT_PAST,
             state = LatchState.CLOSED,
         ))
+        runCurrent()
 
         assertTrue("Sleep Mode" to "true" in configurationDouble.setFlags, "Sleep mode is set on bedroom door close")
 
@@ -167,7 +171,7 @@ class SleepModeTest {
     }
 
     @Test
-    fun autoEnableAfterMidnight() = runBlockingTest {
+    fun autoEnableAfterMidnight() = runTest {
         val timeZone = TimeZone.UTC
         val clock = object: Clock {
             override fun now(): Instant = LocalDateTime(
@@ -191,12 +195,14 @@ class SleepModeTest {
         )
 
         val daemon = launch { picker.start() }
+        runCurrent()
 
         fakeEvents.mutableEvents.emit(Event.Latch(
             source = FakeDevices.Latch.id,
             timestamp = Instant.DISTANT_PAST,
             state = LatchState.CLOSED,
         ))
+        runCurrent()
 
         assertTrue("Sleep Mode" to "true" in configurationDouble.setFlags, "Sleep mode is set on bedroom door close")
 
@@ -204,7 +210,7 @@ class SleepModeTest {
     }
 
     @Test
-    fun skipEnableBeforeNight() = runBlockingTest {
+    fun skipEnableBeforeNight() = runTest {
         val timeZone = TimeZone.UTC
         val clock = object: Clock {
             override fun now(): Instant = LocalDateTime(
@@ -241,7 +247,7 @@ class SleepModeTest {
     }
 
     @Test
-    fun lightsOffOnEnable() = runBlockingTest {
+    fun lightsOffOnEnable() = runTest {
         val fakeConfig = object: ConfigurationAccess by configurationDouble {
             val mutableFlags = MutableSharedFlow<Map<String, String?>>()
             override val flags = mutableFlags.asOngoing()
@@ -255,6 +261,7 @@ class SleepModeTest {
         val picker = SleepMode(client)
 
         val daemon = launch { picker.start() }
+        runCurrent()
         fakeConfig.mutableFlags.emit(mapOf("Sleep Mode" to "true"))
         runCurrent()
         assertEquals(1, actionSpy.actions.size, "Lights Dimmed immediately")
@@ -271,7 +278,7 @@ class SleepModeTest {
     }
 
     @Test
-    fun noopOnDisable() = runBlockingTest {
+    fun noopOnDisable() = runTest {
         val fakeConfig = object: ConfigurationAccess by configurationDouble {
             val mutableFlags = MutableSharedFlow<Map<String, String?>>()
             override val flags = mutableFlags.asOngoing()
@@ -285,16 +292,16 @@ class SleepModeTest {
         val picker = SleepMode(client)
 
         val daemon = launch { picker.start() }
+        runCurrent()
         fakeConfig.mutableFlags.emit(mapOf("Sleep Mode" to "false"))
         runCurrent()
-        advanceUntilIdle()
         assertEquals(0, actionSpy.actions.size, "No action on disable")
 
         daemon.cancelAndJoin()
     }
 
     @Test
-    fun autoDisable() = runBlockingTest {
+    fun autoDisable() = runTest {
         val client = DummyClient.copy(
             configurationAccess = configurationDouble,
         )

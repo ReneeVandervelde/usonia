@@ -1,24 +1,24 @@
 package usonia.client
 
 import io.ktor.client.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.features.websocket.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.http.cio.websocket.*
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.websocket.*
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import usonia.client.ktor.PlatformEngine
 import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
 import usonia.kotlin.ongoingFlow
@@ -27,17 +27,16 @@ import kotlin.reflect.KClass
 /**
  * HTTP Client for interacting with a Usonia server.
  */
-@OptIn(ExperimentalSerializationApi::class, ExperimentalCoroutinesApi::class)
 class HttpClient(
     private val host: String,
     private val port: Int = 80,
     private val json: Json,
     private val logger: KimchiLogger = EmptyLogger,
 ): FrontendClient {
-    private val httpClient = HttpClient {
+    private val httpClient = HttpClient(PlatformEngine) {
         install(WebSockets)
-        install(JsonFeature) {
-            serializer = KotlinxSerializer(json)
+        install(ContentNegotiation) {
+            json(json)
         }
     }
 
@@ -173,10 +172,10 @@ class HttpClient(
             path = "/site",
         ).apply {
             accept(ContentType.Application.Json)
-            body = json.encodeToString(Site.serializer(), site)
+            setBody(json.encodeToString(Site.serializer(), site))
         }
 
-        httpClient.post<Status>(request)
+        httpClient.post(request)
     }
 
     override suspend fun setFlag(key: String, value: String?) {
@@ -186,10 +185,10 @@ class HttpClient(
             path = "/flags/$key",
         ).apply {
             accept(ContentType.Application.Json)
-            body = json.encodeToString(String.serializer().nullable, value)
+            setBody(json.encodeToString(String.serializer().nullable, value))
         }
 
-        httpClient.put<Status>(request)
+        httpClient.put(request)
     }
 
     override suspend fun removeFlag(key: String) {
@@ -201,7 +200,8 @@ class HttpClient(
             accept(ContentType.Application.Json)
         }
 
-        httpClient.delete<Status>(request)
+        httpClient.delete(request)
+        // TODO: Check status returns
     }
 
     override suspend fun <T: Event> getState(id: Identifier, type: KClass<T>): T? {
@@ -214,7 +214,7 @@ class HttpClient(
         }
 
         return try {
-            httpClient.get<String>(request).let { json.decodeFromString(EventSerializer, it) as T }
+            httpClient.get(request).bodyAsText().let { json.decodeFromString(EventSerializer, it) as T }
         } catch (error: ClientRequestException) {
             if (error.response.status.value == 404) null else throw error
         }
@@ -250,10 +250,10 @@ class HttpClient(
             path = "/actions",
         ).apply {
             accept(ContentType.Application.Json)
-            body = json.encodeToString(ActionSerializer, action)
+            setBody(json.encodeToString(ActionSerializer, action))
         }
 
-        httpClient.post<Status>(request)
+        httpClient.post(request)
     }
 
     override suspend fun publishEvent(event: Event) {
@@ -263,9 +263,9 @@ class HttpClient(
             path = "/events",
         ).apply {
             accept(ContentType.Application.Json)
-            body = json.encodeToString(EventSerializer, event)
+            setBody(json.encodeToString(EventSerializer, event))
         }
 
-        httpClient.post<Status>(request)
+        httpClient.post(request)
     }
 }

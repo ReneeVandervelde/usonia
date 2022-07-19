@@ -1,7 +1,9 @@
 package usonia.rules.alerts
 
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
@@ -29,7 +31,7 @@ class DoorAlertTest {
     }
 
     @Test
-    fun sendAlert() = runBlockingTest {
+    fun sendAlert() = runTest {
         val fakeEvents = object: EventAccessFake() {
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return Event.Presence(id, Instant.DISTANT_PAST, PresenceState.AWAY) as T
@@ -43,8 +45,10 @@ class DoorAlertTest {
         )
 
         val daemon = launch { DoorAlert(client).start() }
+        advanceUntilIdle()
 
         fakeEvents.mutableEvents.emit(Event.Latch(FakeDevices.Latch.id, Instant.DISTANT_PAST, LatchState.OPEN))
+        advanceUntilIdle()
 
         assertEquals(2, actionSpy.actions.size, "Alert sent for each user.")
         assertTrue(actionSpy.actions.all { it is Action.Alert }, "All actions are alerts.")
@@ -53,7 +57,7 @@ class DoorAlertTest {
     }
 
     @Test
-    fun home() = runBlockingTest {
+    fun home() = runTest {
         val fakeEvents = object: EventAccessFake() {
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return when (id) {
@@ -71,8 +75,10 @@ class DoorAlertTest {
         )
 
         val daemon = launch { DoorAlert(client).start() }
+        advanceUntilIdle()
 
         fakeEvents.mutableEvents.emit(Event.Latch(FakeDevices.Latch.id, Instant.DISTANT_PAST, LatchState.OPEN))
+        advanceUntilIdle()
 
         assertEquals(0, actionSpy.actions.size, "No alert sent when a user is home.")
 
@@ -80,7 +86,7 @@ class DoorAlertTest {
     }
 
     @Test
-    fun nonEntryPoint() = runBlockingTest {
+    fun nonEntryPoint() = runTest {
         val fakeEvents = object: EventAccessFake() {
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return Event.Presence(id, Instant.DISTANT_PAST, PresenceState.AWAY) as T
@@ -102,8 +108,10 @@ class DoorAlertTest {
         )
 
         val daemon = launch { DoorAlert(client).start() }
+        advanceUntilIdle()
 
         fakeEvents.mutableEvents.emit(Event.Latch(FakeDevices.Latch.id, Instant.DISTANT_PAST, LatchState.OPEN))
+        advanceUntilIdle()
 
         assertEquals(0, actionSpy.actions.size, "No alert sent for non-entrypoint.")
 
@@ -111,7 +119,7 @@ class DoorAlertTest {
     }
 
     @Test
-    fun closed() = runBlockingTest {
+    fun closed() = runTest {
         val fakeEvents = object: EventAccessFake() {
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return Event.Presence(id, Instant.DISTANT_PAST, PresenceState.AWAY) as T
@@ -125,8 +133,10 @@ class DoorAlertTest {
         )
 
         val daemon = launch { DoorAlert(client).start() }
+        advanceUntilIdle()
 
         fakeEvents.mutableEvents.emit(Event.Latch(FakeDevices.Latch.id, Instant.DISTANT_PAST, LatchState.CLOSED))
+        advanceUntilIdle()
 
         assertEquals(0, actionSpy.actions.size, "No alert sent for close event.")
 

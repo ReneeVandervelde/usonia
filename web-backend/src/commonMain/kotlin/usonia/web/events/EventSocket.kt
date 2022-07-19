@@ -5,6 +5,7 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.serialization.json.Json
 import usonia.foundation.EventSerializer
 import usonia.kotlin.collect
@@ -28,7 +29,7 @@ internal class EventSocket(
     ) {
         client.events.collect {
             try {
-                output.offer(json.encodeToString(EventSerializer, it))
+                output.trySend(json.encodeToString(EventSerializer, it))
             } catch (cancel: CancellationException) {
                 throw cancel
             } catch (error: Throwable) {

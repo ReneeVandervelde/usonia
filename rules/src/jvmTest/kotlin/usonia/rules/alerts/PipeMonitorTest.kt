@@ -2,7 +2,8 @@ package usonia.rules.alerts
 
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import org.junit.Test
 import usonia.core.state.ActionPublisherSpy
@@ -33,7 +34,7 @@ class PipeMonitorTest {
     )
 
     @Test
-    fun sendAlert() = runBlockingTest {
+    fun sendAlert() = runTest {
         val events = EventAccessFake()
         val actionPublisherSpy = ActionPublisherSpy()
         val client = testClient.copy(
@@ -43,14 +44,14 @@ class PipeMonitorTest {
         val monitor = PipeMonitor(client, backgroundScope = this)
 
         val monitorJob = launch { monitor.start() }
+        advanceUntilIdle()
 
-        pauseDispatcher {
-            events.mutableEvents.emit(Event.Temperature(
-                source = FakeDevices.TemperatureSensor.id,
-                timestamp = Instant.DISTANT_PAST,
-                temperature = 20f,
-            ))
-        }
+        events.mutableEvents.emit(Event.Temperature(
+            source = FakeDevices.TemperatureSensor.id,
+            timestamp = Instant.DISTANT_PAST,
+            temperature = 20f,
+        ))
+        advanceUntilIdle()
 
         assertEquals(1, actionPublisherSpy.actions.size, "Single Alert is sent.")
         val action = actionPublisherSpy.actions.single()
@@ -61,7 +62,7 @@ class PipeMonitorTest {
     }
 
     @Test
-    fun noDuplicates() = runBlockingTest {
+    fun noDuplicates() = runTest {
         val events = EventAccessFake()
         val actionPublisherSpy = ActionPublisherSpy()
         val client = testClient.copy(
@@ -71,26 +72,26 @@ class PipeMonitorTest {
         val monitor = PipeMonitor(client, backgroundScope = this)
 
         val monitorJob = launch { monitor.start() }
+        advanceUntilIdle()
 
-        pauseDispatcher {
-            events.mutableEvents.emit(Event.Temperature(
-                source = FakeDevices.TemperatureSensor.id,
-                timestamp = Instant.DISTANT_PAST,
-                temperature = 20f,
-            ))
-            events.mutableEvents.emit(Event.Temperature(
-                source = FakeDevices.TemperatureSensor.id,
-                timestamp = Instant.DISTANT_PAST,
-                temperature = 20f,
-            ))
-        }
+        events.mutableEvents.emit(Event.Temperature(
+            source = FakeDevices.TemperatureSensor.id,
+            timestamp = Instant.DISTANT_PAST,
+            temperature = 20f,
+        ))
+        events.mutableEvents.emit(Event.Temperature(
+            source = FakeDevices.TemperatureSensor.id,
+            timestamp = Instant.DISTANT_PAST,
+            temperature = 20f,
+        ))
+        advanceUntilIdle()
 
         assertEquals(1, actionPublisherSpy.actions.size, "Only a single Alert is sent.")
         monitorJob.cancelAndJoin()
     }
 
     @Test
-    fun resetAfterThreshold() = runBlockingTest {
+    fun resetAfterThreshold() = runTest {
         val events = EventAccessFake()
         val actionPublisherSpy = ActionPublisherSpy()
         val client = testClient.copy(
@@ -100,24 +101,24 @@ class PipeMonitorTest {
         val monitor = PipeMonitor(client, backgroundScope = this)
 
         val monitorJob = launch { monitor.start() }
+        advanceUntilIdle()
 
-        pauseDispatcher {
-            events.mutableEvents.emit(Event.Temperature(
-                source = FakeDevices.TemperatureSensor.id,
-                timestamp = Instant.DISTANT_PAST,
-                temperature = 20f,
-            ))
-            events.mutableEvents.emit(Event.Temperature(
-                source = FakeDevices.TemperatureSensor.id,
-                timestamp = Instant.DISTANT_PAST,
-                temperature = 45f,
-            ))
-            events.mutableEvents.emit(Event.Temperature(
-                source = FakeDevices.TemperatureSensor.id,
-                timestamp = Instant.DISTANT_PAST,
-                temperature = 20f,
-            ))
-        }
+        events.mutableEvents.emit(Event.Temperature(
+            source = FakeDevices.TemperatureSensor.id,
+            timestamp = Instant.DISTANT_PAST,
+            temperature = 20f,
+        ))
+        events.mutableEvents.emit(Event.Temperature(
+            source = FakeDevices.TemperatureSensor.id,
+            timestamp = Instant.DISTANT_PAST,
+            temperature = 45f,
+        ))
+        events.mutableEvents.emit(Event.Temperature(
+            source = FakeDevices.TemperatureSensor.id,
+            timestamp = Instant.DISTANT_PAST,
+            temperature = 20f,
+        ))
+        advanceUntilIdle()
 
         assertEquals(2, actionPublisherSpy.actions.size, "New alerts sent after reset.")
         monitorJob.cancelAndJoin()

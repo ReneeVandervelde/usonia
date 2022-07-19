@@ -3,7 +3,8 @@ package usonia.rules.lights
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
@@ -19,7 +20,7 @@ import kotlin.test.assertTrue
 
 class MovieModeTest {
     @Test
-    fun enabled() = runBlockingTest {
+    fun enabled() = runTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(mapOf(
                 "Movie Mode" to "true"
@@ -48,7 +49,7 @@ class MovieModeTest {
     }
 
     @Test
-    fun disabled() = runBlockingTest {
+    fun disabled() = runTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(mapOf(
                 "Movie Mode" to "false"
@@ -73,7 +74,7 @@ class MovieModeTest {
     }
 
     @Test
-    fun unspecified() = runBlockingTest {
+    fun unspecified() = runTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(mapOf())
         }
@@ -96,7 +97,7 @@ class MovieModeTest {
     }
 
     @Test
-    fun dropFirst() = runBlockingTest {
+    fun dropFirst() = runTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
                 rooms = setOf(FakeRooms.LivingRoom.copy(
@@ -124,7 +125,7 @@ class MovieModeTest {
     }
 
     @Test
-    fun start() = runBlockingTest {
+    fun start() = runTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
                 rooms = setOf(FakeRooms.LivingRoom.copy(
@@ -142,12 +143,14 @@ class MovieModeTest {
         val picker = MovieMode(client)
 
         val daemon = launch { picker.start() }
+        runCurrent()
         fakeConfig.mutableFlags.emit(mapOf(
             "Movie Mode" to "false"
         ))
         fakeConfig.mutableFlags.emit(mapOf(
             "Movie Mode" to "true"
         ))
+        runCurrent()
 
         assertEquals(1, publisherSpy.actions.size)
         val action = publisherSpy.actions.single()
@@ -158,7 +161,7 @@ class MovieModeTest {
     }
 
     @Test
-    fun stop() = runBlockingTest {
+    fun stop() = runTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
                 rooms = setOf(FakeRooms.LivingRoom.copy(
@@ -176,12 +179,14 @@ class MovieModeTest {
         val picker = MovieMode(client)
 
         val daemon = launch { picker.start() }
+        runCurrent()
         fakeConfig.mutableFlags.emit(mapOf(
             "Movie Mode" to "true"
         ))
         fakeConfig.mutableFlags.emit(mapOf(
             "Movie Mode" to "false"
         ))
+        runCurrent()
 
         assertEquals(1, publisherSpy.actions.size)
         val action = publisherSpy.actions.single()

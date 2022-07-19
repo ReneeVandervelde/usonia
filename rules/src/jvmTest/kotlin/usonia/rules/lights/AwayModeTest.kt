@@ -1,6 +1,6 @@
 package usonia.rules.lights
 
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
@@ -16,7 +16,7 @@ import kotlin.test.assertEquals
 
 class AwayModeTest {
     @Test
-    fun default() = runBlockingTest {
+    fun default() = runTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite)
         }
@@ -31,7 +31,7 @@ class AwayModeTest {
     }
 
     @Test
-    fun away() = runBlockingTest {
+    fun away() = runTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
                 users = setOf(FakeUsers.John)
@@ -58,7 +58,7 @@ class AwayModeTest {
     }
 
     @Test
-    fun home() = runBlockingTest {
+    fun home() = runTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
                 users = setOf(FakeUsers.John)

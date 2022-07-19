@@ -1,8 +1,11 @@
 package usonia.telegram
 
+import com.inkapplications.telegram.structures.ChatReference
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import usonia.core.state.ActionAccessFake
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
@@ -15,14 +18,14 @@ import kotlin.test.assertEquals
 
 class TelegramAlertsTest {
     @Test
-    fun sendAlert() = runBlockingTest {
+    fun sendAlert() = runTest {
         val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     users = setOf(
                         FakeUsers.John.copy(
                             parameters = mapOf(
-                                "telegram.chat" to "fake-chat"
+                                "telegram.chat" to "123"
                             ),
                         )
                     ),
@@ -43,29 +46,30 @@ class TelegramAlertsTest {
             actionAccess = fakeActions,
             configurationAccess = fakeConfigAccess,
         )
-        val telegramSpy = TelegramSpy()
+        val telegramSpy = MessageSpy()
         val alerts = TelegramAlerts(
             client,
-            telegramSpy,
+            DummyFactory(telegramSpy),
             requestScope = this
         )
 
         val job = launch { alerts.start() }
+        advanceUntilIdle()
 
-        pauseDispatcher {
-            fakeActions.mutableActions.emit(Action.Alert(
-                target = FakeUsers.John.id,
-                message = "test"
-            ))
-        }
+        fakeActions.mutableActions.emit(Action.Alert(
+            target = FakeUsers.John.id,
+            message = "test"
+        ))
+        advanceUntilIdle()
 
         assertEquals(1, telegramSpy.messages.size)
-        assertEquals("test", telegramSpy.messages.first())
+        assertEquals(123L, (telegramSpy.messages.first().chatId as? ChatReference.Id)?.value)
+        assertEquals("test", telegramSpy.messages.first().text)
 
         job.cancelAndJoin()
     }
     @Test
-    fun unknownUser() = runBlockingTest {
+    fun unknownUser() = runTest {
         val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
@@ -89,25 +93,25 @@ class TelegramAlertsTest {
             )
         }
         val fakeActions = ActionAccessFake()
-        val telegramSpy = TelegramSpy()
+        val telegramSpy = MessageSpy()
         val client = DummyClient.copy(
             actionAccess = fakeActions,
             configurationAccess = fakeConfigAccess,
         )
         val alerts = TelegramAlerts(
             client,
-            telegramSpy,
+            DummyFactory(telegramSpy),
             requestScope = this
         )
 
         val job = launch { alerts.start() }
+        advanceUntilIdle()
 
-        pauseDispatcher {
-            fakeActions.mutableActions.emit(Action.Alert(
-                target = Identifier("nobody"),
-                message = "test"
-            ))
-        }
+        fakeActions.mutableActions.emit(Action.Alert(
+            target = Identifier("nobody"),
+            message = "test"
+        ))
+        advanceUntilIdle()
 
         assertEquals(0, telegramSpy.messages.size)
 
@@ -115,7 +119,7 @@ class TelegramAlertsTest {
     }
 
     @Test
-    fun noUserConfig() = runBlockingTest {
+    fun noUserConfig() = runTest {
         val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
@@ -135,25 +139,25 @@ class TelegramAlertsTest {
             )
         }
         val fakeActions = ActionAccessFake()
-        val telegramSpy = TelegramSpy()
+        val telegramSpy = MessageSpy()
         val client = DummyClient.copy(
             actionAccess = fakeActions,
             configurationAccess = fakeConfigAccess,
         )
         val alerts = TelegramAlerts(
             client,
-            telegramSpy,
+            DummyFactory(telegramSpy),
             requestScope = this
         )
 
         val job = launch { alerts.start() }
+        advanceUntilIdle()
 
-        pauseDispatcher {
-            fakeActions.mutableActions.emit(Action.Alert(
-                target = FakeUsers.John.id,
-                message = "test"
-            ))
-        }
+        fakeActions.mutableActions.emit(Action.Alert(
+            target = FakeUsers.John.id,
+            message = "test"
+        ))
+        advanceUntilIdle()
 
         assertEquals(0, telegramSpy.messages.size)
 
@@ -168,35 +172,28 @@ class TelegramAlertsTest {
             )
         }
         val fakeActions = ActionAccessFake()
-        val telegramSpy = TelegramSpy()
+        val telegramSpy = MessageSpy()
         val client = DummyClient.copy(
             actionAccess = fakeActions,
             configurationAccess = fakeConfigAccess,
         )
         val alerts = TelegramAlerts(
             client,
-            telegramSpy,
+            DummyFactory(telegramSpy),
             requestScope = this
         )
 
         val job = launch { alerts.start() }
+        advanceUntilIdle()
 
-        pauseDispatcher {
-            fakeActions.mutableActions.emit(Action.Alert(
-                target = FakeUsers.John.id,
-                message = "test"
-            ))
-        }
+        fakeActions.mutableActions.emit(Action.Alert(
+            target = FakeUsers.John.id,
+            message = "test"
+        ))
+        advanceUntilIdle()
 
         assertEquals(0, telegramSpy.messages.size)
 
         job.cancelAndJoin()
-    }
-
-    class TelegramSpy: TelegramApi {
-        var messages = mutableListOf<String>()
-        override suspend fun sendMessage(bot: String, token: String, chatId: String, message: String) {
-            messages.add(message)
-        }
     }
 }

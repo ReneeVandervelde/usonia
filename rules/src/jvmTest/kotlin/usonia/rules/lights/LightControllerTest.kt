@@ -2,7 +2,10 @@ package usonia.rules.lights
 
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
@@ -52,7 +55,7 @@ class LightControllerTest {
     }
 
     @Test
-    fun lightsOn() = runBlockingTest {
+    fun lightsOn() = runTest {
         val eventAccess = EventAccessFake()
         val actionPublisher = ActionPublisherSpy()
         val client = testClient.copy(
@@ -62,14 +65,14 @@ class LightControllerTest {
 
         val controller = LightController(client, settingsPicker, backgroundScope = this)
         val daemonJob = launch { controller.start() }
+        runCurrent()
 
-        pauseDispatcher {
-            eventAccess.mutableEvents.emit(Event.Motion(
-                FakeDevices.Motion.id,
-                Clock.System.now(),
-                MotionState.MOTION
-            ))
-        }
+        eventAccess.mutableEvents.emit(Event.Motion(
+            FakeDevices.Motion.id,
+            Clock.System.now(),
+            MotionState.MOTION
+        ))
+        runCurrent()
 
         assertEquals(1, actionPublisher.actions.size, "One light action should be published.")
         val action = actionPublisher.actions.single()
@@ -80,7 +83,7 @@ class LightControllerTest {
     }
 
     @Test
-    fun settingsIgnore() = runBlockingTest {
+    fun settingsIgnore() = runTest {
         val eventAccess = EventAccessFake()
         val actionPublisher = ActionPublisherSpy()
         val client = testClient.copy(
@@ -94,13 +97,12 @@ class LightControllerTest {
         val controller = LightController(client, settingsPicker, backgroundScope = this)
         val daemonJob = launch { controller.start() }
 
-        pauseDispatcher {
-            eventAccess.mutableEvents.emit(Event.Motion(
-                FakeDevices.Motion.id,
-                Clock.System.now(),
-                MotionState.MOTION
-            ))
-        }
+        eventAccess.mutableEvents.emit(Event.Motion(
+            FakeDevices.Motion.id,
+            Clock.System.now(),
+            MotionState.MOTION
+        ))
+        runCurrent()
 
         assertEquals(0, actionPublisher.actions.size, "No action taken when unhandled settings.")
 
@@ -108,7 +110,7 @@ class LightControllerTest {
     }
 
     @Test
-    fun settingsUnhandled() = runBlockingTest {
+    fun settingsUnhandled() = runTest {
         val eventAccess = EventAccessFake()
         val actionPublisher = ActionPublisherSpy()
         val client = testClient.copy(
@@ -121,14 +123,14 @@ class LightControllerTest {
 
         val controller = LightController(client, settingsPicker, backgroundScope = this)
         val daemonJob = launch { controller.start() }
+        runCurrent()
 
-        pauseDispatcher {
-            eventAccess.mutableEvents.emit(Event.Motion(
-                FakeDevices.Motion.id,
-                Clock.System.now(),
-                MotionState.MOTION
-            ))
-        }
+        eventAccess.mutableEvents.emit(Event.Motion(
+            FakeDevices.Motion.id,
+            Clock.System.now(),
+            MotionState.MOTION
+        ))
+        runCurrent()
 
         assertEquals(0, actionPublisher.actions.size, "No action taken when unhandled settings.")
 
@@ -136,7 +138,7 @@ class LightControllerTest {
     }
 
     @Test
-    fun lightsOff() = runBlockingTest {
+    fun lightsOff() = runTest {
         val eventAccess = EventAccessFake()
         val actionPublisher = ActionPublisherSpy()
         val client = testClient.copy(
@@ -146,16 +148,16 @@ class LightControllerTest {
 
         val controller = LightController(client, settingsPicker, backgroundScope = this)
         val daemonJob = launch { controller.start() }
+        runCurrent()
 
-        pauseDispatcher {
-            eventAccess.mutableEvents.emit(Event.Motion(
-                FakeDevices.Motion.id,
-                Clock.System.now(),
-                MotionState.IDLE
-            ))
-            advanceUntilIdle()
-            advanceTimeBy(31.minutes.inMilliseconds.toLong())
-        }
+        eventAccess.mutableEvents.emit(Event.Motion(
+            FakeDevices.Motion.id,
+            Clock.System.now(),
+            MotionState.IDLE
+        ))
+        advanceUntilIdle()
+        advanceTimeBy(31.minutes.inMilliseconds.toLong())
+        runCurrent()
 
         assertEquals(1, actionPublisher.actions.size, "One light action should be published.")
         val action = actionPublisher.actions.single()
@@ -166,7 +168,7 @@ class LightControllerTest {
     }
 
     @Test
-    fun cancelled() = runBlockingTest {
+    fun cancelled() = runTest {
         val eventAccess = EventAccessFake()
         val actionPublisher = ActionPublisherSpy()
         val client = testClient.copy(
@@ -176,6 +178,7 @@ class LightControllerTest {
 
         val controller = LightController(client, settingsPicker, backgroundScope = this)
         val daemonJob = launch { controller.start() }
+        runCurrent()
 
         eventAccess.mutableEvents.emit(Event.Motion(
             FakeDevices.Motion.id,
@@ -188,7 +191,6 @@ class LightControllerTest {
             MotionState.MOTION
         ))
         runCurrent()
-        advanceUntilIdle()
 
         assertEquals(1, actionPublisher.actions.size, "One light action should be published.")
         val action = actionPublisher.actions.single()

@@ -18,7 +18,7 @@ object FrontendModule {
     }
 
     val client = HttpClient(
-        host = window.location.host,
+        host = window.location.hostname,
         port = window.location.port.takeIf { it.isNotEmpty() }?.toInt() ?: 80,
         json = SerializationModule.json,
         logger = logger,

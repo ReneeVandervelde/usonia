@@ -1,10 +1,12 @@
 package usonia.weather.accuweather
 
 import io.ktor.client.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
+import io.ktor.client.call.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 
@@ -17,8 +19,8 @@ internal class AccuweatherApiClient: AccuweatherApi {
         install(HttpTimeout) {
             requestTimeoutMillis = 20.seconds.toLongMilliseconds()
         }
-        install(JsonFeature) {
-            serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+        install(ContentNegotiation) {
+            json(Json {
                 ignoreUnknownKeys = true
             })
         }
@@ -28,10 +30,10 @@ internal class AccuweatherApiClient: AccuweatherApi {
         locationId: String,
         apiKey: String,
     ): ConditionsResponse {
-        return client.get<List<ConditionsResponse>>("https://dataservice.accuweather.com/currentconditions/v1/$locationId") {
+        return client.get("https://dataservice.accuweather.com/currentconditions/v1/$locationId") {
             parameter("apikey", apiKey)
             parameter("details", true)
-        }.single()
+        }.body<List<ConditionsResponse>>().single()
     }
 
     override suspend fun getForecast(
@@ -41,6 +43,6 @@ internal class AccuweatherApiClient: AccuweatherApi {
         return client.get("http://dataservice.accuweather.com/forecasts/v1/daily/1day/$locationId") {
             parameter("apikey", apiKey)
             parameter("details", true)
-        }
+        }.body()
     }
 }

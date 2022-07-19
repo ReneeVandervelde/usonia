@@ -2,7 +2,9 @@ package usonia.rules.alerts
 
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
@@ -32,7 +34,7 @@ class WaterMonitorTest {
     )
 
     @Test
-    fun sendAlert() = runBlockingTest {
+    fun sendAlert() = runTest {
         val events = EventAccessFake()
         val actionPublisherSpy = ActionPublisherSpy()
         val client = testClient.copy(
@@ -42,10 +44,10 @@ class WaterMonitorTest {
         val monitor = WaterMonitor(client, backgroundScope = this)
 
         val monitorJob = launch { monitor.start() }
+        advanceUntilIdle()
 
-        pauseDispatcher {
-            events.mutableEvents.emit(FakeEvents.Wet)
-        }
+        events.mutableEvents.emit(FakeEvents.Wet)
+        advanceUntilIdle()
         val action = actionPublisherSpy.actions.single()
 
         assertTrue(action is Action.Alert, "Alert is sent")
@@ -54,7 +56,7 @@ class WaterMonitorTest {
     }
 
     @Test
-    fun noDuplicateEvents() = runBlockingTest {
+    fun noDuplicateEvents() = runTest {
         val events = EventAccessFake()
         val actionPublisherSpy = ActionPublisherSpy()
         val client = testClient.copy(
@@ -64,11 +66,11 @@ class WaterMonitorTest {
         val monitor = WaterMonitor(client, backgroundScope = this)
 
         val monitorJob = launch { monitor.start() }
+        advanceUntilIdle()
 
-        pauseDispatcher {
-            events.mutableEvents.emit(FakeEvents.Wet)
-            events.mutableEvents.emit(FakeEvents.Wet)
-        }
+        events.mutableEvents.emit(FakeEvents.Wet)
+        events.mutableEvents.emit(FakeEvents.Wet)
+        advanceUntilIdle()
 
 
         assertEquals(1, actionPublisherSpy.actions.size, "Only one alert sent per wet event")
@@ -76,7 +78,7 @@ class WaterMonitorTest {
     }
 
     @Test
-    fun resetAfterDry() = runBlockingTest {
+    fun resetAfterDry() = runTest {
         val events = EventAccessFake()
         val actionPublisherSpy = ActionPublisherSpy()
         val client = testClient.copy(
@@ -86,19 +88,19 @@ class WaterMonitorTest {
         val monitor = WaterMonitor(client, backgroundScope = this)
 
         val monitorJob = launch { monitor.start() }
+        advanceUntilIdle()
 
-        pauseDispatcher {
-            events.mutableEvents.emit(FakeEvents.Wet)
-            events.mutableEvents.emit(FakeEvents.Dry)
-            events.mutableEvents.emit(FakeEvents.Wet)
-        }
+        events.mutableEvents.emit(FakeEvents.Wet)
+        events.mutableEvents.emit(FakeEvents.Dry)
+        events.mutableEvents.emit(FakeEvents.Wet)
+        advanceUntilIdle()
 
         assertEquals(2, actionPublisherSpy.actions.size, "Alerts resume after dry")
         monitorJob.cancelAndJoin()
     }
 
     @Test
-    fun loneDryEvent() = runBlockingTest {
+    fun loneDryEvent() = runTest {
         val events = EventAccessFake()
         val actionPublisherSpy = ActionPublisherSpy()
         val client = testClient.copy(
@@ -108,17 +110,17 @@ class WaterMonitorTest {
         val monitor = WaterMonitor(client, backgroundScope = this)
 
         val monitorJob = launch { monitor.start() }
+        advanceUntilIdle()
 
-        pauseDispatcher {
-            events.mutableEvents.emit(FakeEvents.Dry)
-        }
+        events.mutableEvents.emit(FakeEvents.Dry)
+        advanceUntilIdle()
 
         assertEquals(0, actionPublisherSpy.actions.size, "No alerts sent")
         monitorJob.cancelAndJoin()
     }
 
     @Test
-    fun unrelatedEvent() = runBlockingTest {
+    fun unrelatedEvent() = runTest {
         val events = EventAccessFake()
         val actionPublisherSpy = ActionPublisherSpy()
         val client = testClient.copy(
@@ -128,10 +130,10 @@ class WaterMonitorTest {
         val monitor = WaterMonitor(client, backgroundScope = this)
 
         val monitorJob = launch { monitor.start() }
+        advanceUntilIdle()
 
-        pauseDispatcher {
-            events.mutableEvents.emit(FakeEvents.SwitchOff)
-        }
+        events.mutableEvents.emit(FakeEvents.SwitchOff)
+        advanceUntilIdle()
 
         assertEquals(0, actionPublisherSpy.actions.size, "No alerts sent")
         monitorJob.cancelAndJoin()

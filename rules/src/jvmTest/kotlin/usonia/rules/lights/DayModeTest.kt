@@ -1,6 +1,6 @@
 package usonia.rules.lights
 
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import usonia.foundation.FakeRooms
@@ -36,7 +36,7 @@ class DayModeTest {
     )
 
     @Test
-    fun dayModeTest() = runBlockingTest {
+    fun dayModeTest() = runTest {
         val fakeWeather = object: WeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast)
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions)
@@ -49,7 +49,7 @@ class DayModeTest {
     }
 
     @Test
-    fun rainy() = runBlockingTest {
+    fun rainy() = runTest {
         val fakeWeather = object: WeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast.copy(
                 rainChance = 20.percent,
@@ -63,7 +63,7 @@ class DayModeTest {
     }
 
     @Test
-    fun snowy() = runBlockingTest {
+    fun snowy() = runTest {
         val fakeWeather = object: WeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast.copy(
                 snowChance = 20.percent,
@@ -77,7 +77,7 @@ class DayModeTest {
     }
 
     @Test
-    fun cloudy() = runBlockingTest {
+    fun cloudy() = runTest {
         val fakeWeather = object: WeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast)
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions.copy(
@@ -91,7 +91,7 @@ class DayModeTest {
     }
 
     @Test
-    fun evening() = runBlockingTest {
+    fun evening() = runTest {
         val fakeWeather = object: WeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast.copy(
                 sunset = now + 40.minutes
@@ -105,7 +105,7 @@ class DayModeTest {
     }
 
     @Test
-    fun morning() = runBlockingTest {
+    fun morning() = runTest {
         val fakeWeather = object: WeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast.copy(
                 sunrise = now - 40.minutes

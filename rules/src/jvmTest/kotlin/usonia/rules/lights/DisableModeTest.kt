@@ -1,6 +1,6 @@
 package usonia.rules.lights
 
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.FakeRooms
@@ -12,7 +12,7 @@ import kotlin.test.assertEquals
 
 class DisableModeTest {
     @Test
-    fun enabled() = runBlockingTest {
+    fun enabled() = runTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(mapOf(
                 "Disable Lights" to "true"
@@ -26,7 +26,7 @@ class DisableModeTest {
     }
 
     @Test
-    fun disabled() = runBlockingTest {
+    fun disabled() = runTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(mapOf(
                 "Disable Lights" to "false"
@@ -40,7 +40,7 @@ class DisableModeTest {
     }
 
     @Test
-    fun unspecified() = runBlockingTest {
+    fun unspecified() = runTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(emptyMap<String, String>())
         }
