@@ -1,14 +1,14 @@
 import groovy.json.JsonSlurper
 
 definition(
-        name: "Usonia Bridge",
-        namespace: "usonia.hubitat",
-        author: "Renee Vandervelde",
-        description: "Bridge devices to a Usonia Application",
-        category: "My Apps",
-        iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
-        iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
-        oauth: true
+    name: "Usonia Bridge",
+    namespace: "usonia.hubitat",
+    author: "Renee Vandervelde",
+    description: "Bridge devices to a Usonia Application",
+    category: "My Apps",
+    iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
+    iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
+    oauth: true
 )
 
 preferences {
@@ -19,6 +19,7 @@ preferences {
         input "switches", "capability.switch", title: "Choose Switches", multiple: true, required: false
         input "water", "capability.waterSensor", title: "Choose Water Sensors", multiple: true, required: false
         input "doors", "capability.contactSensor", title: "Choose Door Sensors", multiple: true, required: false
+        input "power", "capability.powerMeter", title: "Power Meters", multiple: true, required: true
     }
     section("Config") {
         input "bridgeUrl", "text", title: "Bridge URL"
@@ -43,11 +44,8 @@ def initToken() {
 }
 
 mappings {
-    path("/test") {
-        action: [GET: "test"]
-    }
-    path("/proxyActions") {
-        action: [POST: "proxyActions"]
+    path("/telegram") {
+        action: [POST: "telegram"]
     }
     path("/actions") {
         action: [POST: "actions"]
@@ -109,6 +107,8 @@ def cannonicalType(event) {
             return "Water"
         case "pressure":
             return "Pressure"
+        case "power":
+            return "Power"
         default:
             log.error "Unknown Type ${event.value}"
             return event.name
@@ -166,6 +166,9 @@ def onEvent(event) {
         case "acceleration":
             eventJson.movementState = event.value == "active" ? "MOVING" : "IDLE"
             break;
+        case "power":
+            eventJson.power = event.value
+            break;
     }
 
     def requestParams = [
@@ -181,31 +184,26 @@ def onEvent(event) {
     }
 }
 
-def test() {
-    return [test: true]
-}
-
 def devices() {
     return motion + temp + locks + switches + water + doors
 }
 
-def proxyActions() {
-    def action = request.JSON
-    if (action.timestamp == null) {
-        action.timestamp = new Date().getTime()
-    }
+def telegram() {
+    def data = request.JSON
 
     def requestParams = [
-        "uri": "$bridgeUrl/actions",
+        "uri": "$bridgeUrl/telegram-bridge",
         "query": null,
         "requestContentType": "application/json",
-        "body": action
+        "body": data
     ]
 
     log.debug "Sending event with params: $requestParams"
     httpPost(requestParams)  { resp ->
         log.debug "Request sent, response ${resp?.status}"
     }
+
+    log.debug "Telegram: $data"
 
     return [success: true]
 }
@@ -227,8 +225,8 @@ def actions() {
             }
             break
         case "Lock":
-        if (action.lockState == "LOCKED") device.lock()
-        else if (action.lockState == "UNLOCKED") device.unlock()
+            if (action.lockState == "LOCKED") device.lock()
+            else if (action.lockState == "UNLOCKED") device.unlock()
             else log.error "Unknown State ${action.type}"
             break
     }

@@ -13,10 +13,6 @@ import usonia.kotlin.*
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
 
-private const val BOT_KEY = "bot"
-private const val BOT_TOKEN = "token"
-private const val CHAT_ID_KEY = "telegram.chat"
-
 /**
  * Sends alerts to users configured to use telegram.
  *
@@ -26,38 +22,16 @@ private const val CHAT_ID_KEY = "telegram.chat"
  */
 internal class TelegramAlerts(
     private val client: BackendClient,
-    private val clientFactory: ClientFactory,
+    private val telegram: TelegramBotClient,
     private val logger: KimchiLogger = EmptyLogger,
     private val requestScope: CoroutineScope = IoScope()
 ): Daemon {
-    private var telegram: TelegramBotClient? = null
-
     override suspend fun start(): Nothing {
         client.site.collectLatest { site ->
-            onSiteUpdate(site)
             client.actions.filterIsInstance<Action.Alert>().collect {
                 send(site, it)
             }
         }
-    }
-
-    private fun onSiteUpdate(site: Site) {
-        val bridge = site.bridges.singleOrNull { it.service == "telegram" } ?: run {
-            logger.warn("Telegram not configured. Not enabling alerts.")
-            return
-        }
-
-        val bot = bridge.parameters[BOT_KEY] ?: run {
-            logger.error("Telegram bridge config does not contain a bot key. Set it in parameters: <${BOT_KEY}>")
-            return
-        }
-
-        val token = bridge.parameters[BOT_TOKEN] ?: run {
-            logger.error("Telegram bridge config does not contain a bot token. Set it in parameters: <${BOT_TOKEN}>")
-            return
-        }
-
-        telegram = clientFactory.create(bot, token)
     }
 
     private fun send(site: Site, alert: Action.Alert) {
@@ -70,7 +44,7 @@ internal class TelegramAlerts(
             return
         }
         logger.trace("Sending alerts to <${user.name}>")
-        requestScope.launch { telegram?.sendMessage(MessageParameters(
+        requestScope.launch { telegram.sendMessage(MessageParameters(
             chatId = ChatReference.Id(chatId),
             text = alert.message,
         )) }

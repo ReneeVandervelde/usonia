@@ -49,7 +49,7 @@ class TelegramAlertsTest {
         val telegramSpy = MessageSpy()
         val alerts = TelegramAlerts(
             client,
-            DummyFactory(telegramSpy),
+            telegramSpy,
             requestScope = this
         )
 
@@ -100,7 +100,7 @@ class TelegramAlertsTest {
         )
         val alerts = TelegramAlerts(
             client,
-            DummyFactory(telegramSpy),
+            telegramSpy,
             requestScope = this
         )
 
@@ -146,7 +146,7 @@ class TelegramAlertsTest {
         )
         val alerts = TelegramAlerts(
             client,
-            DummyFactory(telegramSpy),
+            telegramSpy,
             requestScope = this
         )
 
@@ -179,7 +179,7 @@ class TelegramAlertsTest {
         )
         val alerts = TelegramAlerts(
             client,
-            DummyFactory(telegramSpy),
+            telegramSpy,
             requestScope = this
         )
 

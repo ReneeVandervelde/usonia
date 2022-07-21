@@ -10,9 +10,11 @@ kotlin {
                 api(projects.core)
                 api(projects.server)
                 implementation(projects.foundation)
+                implementation(projects.serialization)
+                implementation(projects.rules)
                 api(libraries.coroutines.core)
                 implementation(libraries.ktor.client.core)
-                implementation("com.inkapplications.telegram:client:0.2.2")
+                implementation("com.inkapplications.telegram:client:0.3.1")
             }
         }
 

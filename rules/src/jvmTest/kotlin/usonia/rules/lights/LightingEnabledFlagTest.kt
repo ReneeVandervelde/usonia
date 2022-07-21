@@ -10,33 +10,33 @@ import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class DisableModeTest {
+class LightingEnabledFlagTest {
     @Test
     fun enabled() = runTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(mapOf(
-                "Disable Lights" to "true"
+                "Motion Lighting" to "true"
             ))
         }
         val client = DummyClient.copy(
             configurationAccess = fakeConfig,
         )
 
-        assertEquals(LightSettings.Ignore, DisableMode(client).getActiveSettings(FakeRooms.LivingRoom))
+        assertEquals(LightSettings.Unhandled, LightingEnabledFlag(client).getActiveSettings(FakeRooms.LivingRoom))
     }
 
     @Test
     fun disabled() = runTest {
         val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(mapOf(
-                "Disable Lights" to "false"
+                "Motion Lighting" to "false"
             ))
         }
         val client = DummyClient.copy(
             configurationAccess = fakeConfig,
         )
 
-        assertEquals(LightSettings.Unhandled, DisableMode(client).getActiveSettings(FakeRooms.LivingRoom))
+        assertEquals(LightSettings.Ignore, LightingEnabledFlag(client).getActiveSettings(FakeRooms.LivingRoom))
     }
 
     @Test
@@ -48,6 +48,6 @@ class DisableModeTest {
             configurationAccess = fakeConfig,
         )
 
-        assertEquals(LightSettings.Unhandled, DisableMode(client).getActiveSettings(FakeRooms.LivingRoom))
+        assertEquals(LightSettings.Unhandled, LightingEnabledFlag(client).getActiveSettings(FakeRooms.LivingRoom))
     }
 }

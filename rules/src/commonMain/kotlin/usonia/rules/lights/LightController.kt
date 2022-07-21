@@ -17,7 +17,6 @@ import kotlin.time.ExperimentalTime
 /**
  * Controls the on/off state of a room's lights.
  */
-@OptIn(ExperimentalTime::class)
 internal class LightController(
     private val client: BackendClient,
     private val lightSettingsPicker: LightSettingsPicker,

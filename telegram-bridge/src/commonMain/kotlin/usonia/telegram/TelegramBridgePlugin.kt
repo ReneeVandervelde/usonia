@@ -1,29 +1,36 @@
 package usonia.telegram
 
-import com.inkapplications.telegram.client.TelegramBotClient
-import com.inkapplications.telegram.client.TelegramClientModule
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.serialization.json.Json
+import usonia.serialization.SerializationModule
 import usonia.server.Daemon
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
+import usonia.server.http.HttpController
 
 class TelegramBridgePlugin(
     client: BackendClient,
     logger: KimchiLogger = EmptyLogger,
 ): ServerPlugin {
-    private val clientModule = TelegramClientModule()
-    private val clientFactory = object: ClientFactory {
-        override fun create(key: String, token: String): TelegramBotClient {
-            return clientModule.createClient("$key:$token")
-        }
+    private val telegram = TelegramClientProxy()
+    private val json = Json(SerializationModule.json) {
+        ignoreUnknownKeys = true
     }
 
     override val daemons: List<Daemon> = listOf(
+        TelegramTokenUpdater(
+            client,
+            telegram,
+            logger,
+        ),
         TelegramAlerts(
             client = client,
-            clientFactory = clientFactory,
-            logger = logger
+            telegram = telegram,
+            logger = logger,
         )
+    )
+    override val httpControllers: List<HttpController> = listOf(
+        TelegramBot(client, telegram, json, logger),
     )
 }

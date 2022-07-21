@@ -12,10 +12,9 @@ import usonia.kotlin.distinctUntilChanged
 import usonia.kotlin.drop
 import usonia.kotlin.map
 import usonia.kotlin.unit.percent
+import usonia.rules.Flags
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
-
-private const val FLAG = "Movie Mode"
 
 /**
  * Dims lights during when a flag is set.
@@ -25,7 +24,7 @@ internal class MovieMode(
     private val logger: KimchiLogger = EmptyLogger,
 ): LightSettingsPicker, Daemon {
     override suspend fun getActiveSettings(room: Room): LightSettings {
-        if (!client.getBooleanFlag(FLAG)) {
+        if (!client.getBooleanFlag(Flags.MovieMode)) {
             return LightSettings.Unhandled
         }
         return when(room.type) {
@@ -44,7 +43,7 @@ internal class MovieMode(
 
     override suspend fun start(): Nothing {
         client.flags
-            .map { it[FLAG].toBoolean() }
+            .map { it[Flags.MovieMode].toBoolean() }
             .drop(1)
             .distinctUntilChanged()
             .collectLatest { enabled ->

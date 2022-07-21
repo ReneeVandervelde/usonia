@@ -27,7 +27,7 @@ class RulesPlugin(
     private val sleepMode = SleepMode(client, logger)
 
     private val colorPicker = CompositeLightingPicker(
-        DisableMode(client),
+        LightingEnabledFlag(client),
         AwayMode(client),
         sleepMode,
         movieMode,
