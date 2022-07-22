@@ -7,6 +7,6 @@ import usonia.foundation.unit.ColorTemperature
  */
 internal object Colors {
     val Warm = ColorTemperature(2800)
-    val Medium = ColorTemperature(4800)
+    val Medium = ColorTemperature(4152)
     val Daylight = ColorTemperature(6200)
 }

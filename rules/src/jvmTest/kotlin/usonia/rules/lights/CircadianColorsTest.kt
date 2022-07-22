@@ -183,6 +183,20 @@ class CircadianColorsTest {
     }
 
     @Test
+    fun twilightExempt() = runTest {
+        val clock = object: ZonedClock by ZonedSystemClock {
+            override fun now(): Instant = nightStart.plus(DEFAULT_PERIOD / 4)
+        }
+        val colors = CircadianColors(config, weather, clock)
+
+        val result = colors.getActiveSettings(FakeRooms.Office)
+
+        assertTrue(result is LightSettings.Temperature)
+        assertEquals(DEFAULT_EVENING, result.temperature)
+        assertEquals(100.percent, result.brightness)
+    }
+
+    @Test
     fun night() = runTest {
         val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = nightStart.plus(DEFAULT_PERIOD).plus(2.minutes)
@@ -194,6 +208,20 @@ class CircadianColorsTest {
         assertTrue(result is LightSettings.Temperature)
         assertEquals(DEFAULT_NIGHTLIGHT, result.temperature)
         assertEquals(DEFAULT_NIGHT_BRIGHTNESS, result.brightness)
+    }
+
+    @Test
+    fun nightExempt() = runTest {
+        val clock = object: ZonedClock by ZonedSystemClock {
+            override fun now(): Instant = nightStart.plus(DEFAULT_PERIOD).plus(2.minutes)
+        }
+        val colors = CircadianColors(config, weather, clock)
+
+        val result = colors.getActiveSettings(FakeRooms.Office)
+
+        assertTrue(result is LightSettings.Temperature)
+        assertEquals(DEFAULT_EVENING, result.temperature)
+        assertEquals(100.percent, result.brightness)
     }
 
     @Test

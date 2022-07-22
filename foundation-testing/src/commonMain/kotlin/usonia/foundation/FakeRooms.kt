@@ -6,6 +6,11 @@ object FakeRooms {
         name = "Fake Living Room",
         type = Room.Type.LivingRoom,
     )
+    val Office = Room(
+        id = Identifier("fake-living-room"),
+        name = "Fake Living Room",
+        type = Room.Type.Office,
+    )
     val FakeHallway = Room(
         id = Identifier("fake-hallway"),
         name = "Fake Hallway",

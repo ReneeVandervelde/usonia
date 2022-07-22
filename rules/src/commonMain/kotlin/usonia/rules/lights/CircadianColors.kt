@@ -78,14 +78,17 @@ internal class CircadianColors(
             nanosecond = 0,
         ).withZone(clock.timeZone)
         val nightStartInstant = startOfDay + nightStartMinute.minutes
+        val nightExemptRooms = setOf(Room.Type.Office, Room.Type.Storage, Room.Type.Utility)
+        val modifiedNightColor = if (room.type in nightExemptRooms) eveningColor else nightColor
+        val modifiedNightBrightness = if (room.type in nightExemptRooms) 100.percent else nightBrightness
 
         when {
             now.instant >= forecast.sunrise.minus(period) && now.instant <= forecast.sunrise -> {
                 logger.trace("In morning blue hour")
                 val position = ((now - forecast.sunrise.minus(period)).inMinutes / period.inMinutes).toFloat()
                 return LightSettings.Temperature(
-                    temperature = (nightColor..daylightColor).transition(position),
-                    brightness = (nightBrightness..100.percent).transition(position),
+                    temperature = (modifiedNightColor..daylightColor).transition(position),
+                    brightness = (modifiedNightBrightness..100.percent).transition(position),
                 )
             }
             now.instant > forecast.sunrise && now.instant < forecast.sunset -> {
@@ -102,8 +105,8 @@ internal class CircadianColors(
                 val eveningTransitionColor = (daylightColor..eveningColor).transition(eveningTransitionPosition)
                 val position = ((now - nightStartInstant).inMinutes / period.inMinutes).toFloat()
                 return LightSettings.Temperature(
-                    temperature = (eveningTransitionColor..nightColor).transition(position),
-                    brightness = (100.percent..nightBrightness).transition(position),
+                    temperature = (eveningTransitionColor..modifiedNightColor).transition(position),
+                    brightness = (100.percent..modifiedNightBrightness).transition(position),
                 )
             }
             now.instant < forecast.sunrise
@@ -112,8 +115,8 @@ internal class CircadianColors(
             -> {
                 logger.trace("In nighttime")
                 return LightSettings.Temperature(
-                    temperature = nightColor,
-                    brightness = nightBrightness,
+                    temperature = modifiedNightColor,
+                    brightness = modifiedNightBrightness,
                 )
             }
             now.instant >= forecast.sunset -> {
