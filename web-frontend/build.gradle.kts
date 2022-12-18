@@ -20,8 +20,8 @@ artifacts {
 }
 
 dependencies {
-    implementation(libraries.coroutines.js)
-    implementation(libraries.kimchi.core)
+    implementation(kotlinLibraries.coroutines.js)
+    implementation(inkLibraries.kimchi.core)
     implementation(projects.kotlinExtensions)
     implementation(projects.clientHttp)
     implementation(projects.serialization)

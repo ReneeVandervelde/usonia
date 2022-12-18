@@ -23,7 +23,7 @@ kotlin {
                 api(projects.server)
                 api(projects.serialization)
                 dependencies.add("importResources", project(":${projects.webFrontend.name}", "dist"))
-                api(libraries.kimchi.logger)
+                api(inkLibraries.kimchi.logger)
             }
         }
     }

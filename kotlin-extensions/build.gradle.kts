@@ -11,14 +11,14 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(libraries.coroutines.core)
-                api(libraries.kotlinx.datetime)
+                api(kotlinLibraries.coroutines.core)
+                api(kotlinLibraries.datetime)
             }
         }
 
         val jvmTest by getting {
             dependencies {
-                implementation(libraries.kotlin.test.junit)
+                implementation(kotlinLibraries.test.junit)
                 implementation(libraries.junit)
             }
         }

@@ -8,7 +8,7 @@ kotlin {
             dependencies {
                 api(projects.foundationTesting)
                 api(projects.core)
-                api(libraries.coroutines.core)
+                api(kotlinLibraries.coroutines.core)
             }
         }
     }

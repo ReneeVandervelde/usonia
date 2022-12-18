@@ -1,3 +1,0 @@
-[libraries.junit]
-version = "4.12"
-module = "junit:junit"

@@ -1,0 +1,10 @@
+[versions]
+kimchi = "2.0.0"
+
+[libraries.kimchi-core]
+version.ref = "kimchi"
+module = "com.inkapplications.kimchi:core"
+
+[libraries.kimchi-logger]
+version.ref = "kimchi"
+module = "com.inkapplications.kimchi:logger"

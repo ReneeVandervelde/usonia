@@ -1,46 +1,46 @@
 [versions]
-ktor = "2.0.3"
+ktor = "2.2.1"
 
-[libraries.ktor-client-core]
+[libraries.client-core]
 version.ref = "ktor"
 module="io.ktor:ktor-client-core"
 
-[libraries.ktor-serialization-json]
+[libraries.serialization-json]
 version.ref = "ktor"
 module = "io.ktor:ktor-serialization-kotlinx-json"
 
-[libraries.ktor-client-serialization]
+[libraries.client-serialization]
 version.ref = "ktor"
 module="io.ktor:ktor-client-serialization"
 
-[libraries.ktor-client-okhttp]
+[libraries.client-okhttp]
 version.ref = "ktor"
 module="io.ktor:ktor-client-okhttp"
 
-[libraries.ktor-client-cio]
+[libraries.client-cio]
 version.ref = "ktor"
 module="io.ktor:ktor-client-cio"
 
-[libraries.ktor-client-js-core]
+[libraries.client-js-core]
 version.ref = "ktor"
 module="io.ktor:ktor-client-js"
 
-[libraries.ktor-client-js-json]
+[libraries.client-js-json]
 version.ref = "ktor"
 module="io.ktor:ktor-client-json-js"
 
-[libraries.ktor-server-netty]
+[libraries.server-netty]
 version.ref = "ktor"
 module="io.ktor:ktor-server-netty"
 
-[libraries.ktor-server-websockets]
+[libraries.server-websockets]
 version.ref = "ktor"
 module="io.ktor:ktor-server-websockets"
 
-[libraries.ktor-client-websockets]
+[libraries.client-websockets]
 version.ref = "ktor"
 module="io.ktor:ktor-client-websockets"
 
-[libraries.ktor-client-contentnegotiation]
+[libraries.client-contentnegotiation]
 version.ref = "ktor"
 module="io.ktor:ktor-client-content-negotiation"

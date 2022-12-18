@@ -11,19 +11,19 @@ kotlin {
                 api(projects.core)
                 api(projects.server)
                 implementation(projects.foundation)
-                api(libraries.coroutines.core)
+                api(kotlinLibraries.coroutines.core)
                 implementation(projects.clientKtor)
-                implementation(libraries.ktor.client.contentnegotiation)
-                implementation(libraries.ktor.serialization.json)
-                implementation(libraries.ktor.client.core)
-                implementation(libraries.ktor.client.serialization)
+                implementation(ktorLibraries.client.contentnegotiation)
+                implementation(ktorLibraries.serialization.json)
+                implementation(ktorLibraries.client.core)
+                implementation(ktorLibraries.client.serialization)
             }
         }
 
         val jvmTest by getting {
             dependencies {
-                implementation(libraries.kotlin.test.junit)
-                implementation(libraries.coroutines.test)
+                implementation(kotlinLibraries.test.junit)
+                implementation(kotlinLibraries.coroutines.test)
                 implementation(projects.coreTesting)
                 implementation(projects.foundationTesting)
                 implementation(projects.serverTesting)

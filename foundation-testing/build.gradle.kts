@@ -7,7 +7,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(projects.foundation)
-                api(libraries.coroutines.core)
+                api(kotlinLibraries.coroutines.core)
             }
         }
     }

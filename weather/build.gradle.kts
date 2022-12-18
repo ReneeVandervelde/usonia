@@ -11,14 +11,14 @@ kotlin {
                 api(projects.core)
                 api(projects.server)
                 api(projects.foundation)
-                api(libraries.coroutines.core)
-                implementation(libraries.ktor.client.core)
+                api(kotlinLibraries.coroutines.core)
+                implementation(ktorLibraries.client.core)
                 implementation(projects.clientKtor)
-                implementation(libraries.ktor.client.contentnegotiation)
-                implementation(libraries.ktor.serialization.json)
-                implementation(libraries.ktor.client.serialization)
-                implementation(libraries.kotlinx.datetime)
-                implementation(libraries.kotlinx.serialization.json)
+                implementation(ktorLibraries.client.contentnegotiation)
+                implementation(ktorLibraries.serialization.json)
+                implementation(ktorLibraries.client.serialization)
+                implementation(kotlinLibraries.datetime)
+                implementation(kotlinLibraries.serialization.json)
             }
         }
 
@@ -26,8 +26,8 @@ kotlin {
             dependencies {
                 implementation(projects.coreTesting)
                 implementation(projects.serverTesting)
-                implementation(libraries.kotlin.test.junit)
-                implementation(libraries.coroutines.test)
+                implementation(kotlinLibraries.test.junit)
+                implementation(kotlinLibraries.coroutines.test)
             }
         }
     }

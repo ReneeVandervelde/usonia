@@ -15,8 +15,8 @@ kotlin {
             dependencies {
                 api(projects.core)
                 api(projects.foundation)
-                api(libraries.coroutines.core)
-                api(libraries.kotlinx.serialization.json)
+                api(kotlinLibraries.coroutines.core)
+                api(kotlinLibraries.serialization.json)
             }
         }
 
@@ -28,10 +28,10 @@ kotlin {
 
         val jvmTest by getting {
             dependencies {
-                implementation(libraries.coroutines.test)
+                implementation(kotlinLibraries.coroutines.test)
                 implementation(projects.foundationTesting)
                 implementation(projects.coreTesting)
-                implementation(libraries.kotlin.test.junit)
+                implementation(kotlinLibraries.test.junit)
                 implementation(libraries.junit)
             }
         }

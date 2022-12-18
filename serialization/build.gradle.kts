@@ -7,7 +7,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(projects.foundation)
-                api(libraries.kotlinx.serialization.json)
+                api(kotlinLibraries.serialization.json)
                 implementation(projects.hueBridge)
                 implementation(projects.schlage)
                 implementation(projects.smartthings)
@@ -17,7 +17,7 @@ kotlin {
 
         val jvmTest by getting {
             dependencies {
-                implementation(libraries.kotlin.test.junit)
+                implementation(kotlinLibraries.test.junit)
                 implementation(libraries.junit)
             }
         }

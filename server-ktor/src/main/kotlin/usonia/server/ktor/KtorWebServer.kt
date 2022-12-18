@@ -58,6 +58,7 @@ class KtorWebServer(
                                             controllerJob.cancel()
                                             close()
                                         }
+                                        else -> logger.debug("Unhandled frame type: ${it::class.simpleName}")
                                     }
                                 }
                             }

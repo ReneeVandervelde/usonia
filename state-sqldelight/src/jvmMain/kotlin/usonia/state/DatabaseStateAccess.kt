@@ -64,7 +64,7 @@ internal class DatabaseStateAccess(
             .mapToOneOrNull()
             .filterNotNull()
             .map {
-                it.data.let(::String).let { json.decodeFromString(Site.serializer(), it) }
+                it.data_.let(::String).let { json.decodeFromString(Site.serializer(), it) }
             }
             .asOngoing()
     }
@@ -76,7 +76,7 @@ internal class DatabaseStateAccess(
             .mapToList()
             .map {
                 it.map {
-                    it.id to it.data
+                    it.id to it.data_
                 }.toMap()
             }
             .asOngoing()
@@ -88,7 +88,7 @@ internal class DatabaseStateAccess(
             timestamp = event.timestamp.toEpochMilliseconds(),
             source = event.source.value,
             type = event::class.simpleName!!,
-            data = json.encodeToString(Event.serializer(), event).toByteArray(),
+            data_ = json.encodeToString(Event.serializer(), event).toByteArray(),
         )
     }
 

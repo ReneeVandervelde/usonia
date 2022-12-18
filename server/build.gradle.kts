@@ -9,9 +9,9 @@ kotlin {
                 implementation(projects.kotlinExtensions)
                 implementation(projects.foundation)
                 implementation(projects.core)
-                api(libraries.kotlinx.datetime)
-                api(libraries.kotlinx.serialization.json)
-                api(libraries.kimchi.logger)
+                api(kotlinLibraries.datetime)
+                api(kotlinLibraries.serialization.json)
+                api(inkLibraries.kimchi.logger)
             }
         }
     }

@@ -11,17 +11,17 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(libraries.ktor.client.core)
+                api(ktorLibraries.client.core)
             }
         }
         val jvmMain by getting {
             dependencies {
-                implementation(libraries.ktor.client.okhttp)
+                implementation(ktorLibraries.client.okhttp)
             }
         }
         val jsMain by getting {
             dependencies {
-                implementation(libraries.ktor.client.js.core)
+                implementation(ktorLibraries.client.js.core)
             }
         }
     }

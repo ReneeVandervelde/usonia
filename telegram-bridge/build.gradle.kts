@@ -12,16 +12,16 @@ kotlin {
                 implementation(projects.foundation)
                 implementation(projects.serialization)
                 implementation(projects.rules)
-                api(libraries.coroutines.core)
-                implementation(libraries.ktor.client.core)
+                api(kotlinLibraries.coroutines.core)
+                implementation(ktorLibraries.client.core)
                 implementation("com.inkapplications.telegram:client:0.3.1")
             }
         }
 
         val jvmTest by getting {
             dependencies {
-                implementation(libraries.kotlin.test.junit)
-                implementation(libraries.coroutines.test)
+                implementation(kotlinLibraries.test.junit)
+                implementation(kotlinLibraries.coroutines.test)
                 implementation(projects.coreTesting)
                 implementation(projects.foundationTesting)
                 implementation(projects.serverTesting)
