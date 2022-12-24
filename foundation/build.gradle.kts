@@ -7,13 +7,12 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api("com.github.ajalt.colormath:colormath:2.0.0")
+                api("com.github.ajalt.colormath:colormath:3.2.0")
                 api(projects.kotlinExtensions)
                 api(kotlinLibraries.datetime)
                 api(inkLibraries.kimchi.logger)
                 implementation(kotlinLibraries.serialization.json)
-                api("com.inkapplications.spondee:math:0.0.0")
-                api("com.inkapplications.spondee:measures:0.0.0")
+                api("com.inkapplications.spondee:units:1.0.0")
             }
         }
 

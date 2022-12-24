@@ -1,8 +1,8 @@
 package usonia.rules.lights
 
+import inkapplications.spondee.measure.ColorTemperature
+import inkapplications.spondee.scalar.Percentage
 import usonia.foundation.SwitchState
-import usonia.foundation.unit.ColorTemperature
-import usonia.kotlin.unit.Percentage
 
 internal sealed class LightSettings {
     /**

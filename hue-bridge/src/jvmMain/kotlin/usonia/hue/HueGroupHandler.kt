@@ -1,10 +1,14 @@
 package usonia.hue
 
-import inkapplications.shade.constructs.Coordinates
-import inkapplications.shade.constructs.asPercentage
-import inkapplications.shade.constructs.mireds
-import inkapplications.shade.groups.GroupStateModification
-import inkapplications.shade.groups.ShadeGroups
+import inkapplications.shade.groupedlights.GroupedLightControls
+import inkapplications.shade.groupedlights.parameters.GroupedLightUpdateParameters
+import inkapplications.shade.lights.parameters.ColorParameters
+import inkapplications.shade.lights.parameters.ColorTemperatureParameters
+import inkapplications.shade.lights.parameters.DimmingParameters
+import inkapplications.shade.structures.ResourceId
+import inkapplications.shade.structures.parameters.PowerParameters
+import inkapplications.spondee.measure.mireds
+import inkapplications.spondee.scalar.decimalPercentage
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CancellationException
@@ -24,7 +28,7 @@ import kotlin.time.seconds
 @OptIn(ExperimentalTime::class)
 internal class HueGroupHandler(
     private val client: BackendClient,
-    private val shade: ShadeGroups,
+    private val groups: GroupedLightControls,
     private val logger: KimchiLogger = EmptyLogger,
     private val requestScope: CoroutineScope = IoScope()
 ): Daemon {
@@ -45,22 +49,46 @@ internal class HueGroupHandler(
         logger.trace { "Handling ${action::class.simpleName} for ${device.name}" }
 
         val modification = when (action) {
-            is Action.Switch -> GroupStateModification(
-                on = action.state == SwitchState.ON,
+            is Action.Switch -> GroupedLightUpdateParameters(
+                power = PowerParameters(
+                    on = action.state == SwitchState.ON,
+                ),
             )
-            is Action.Dim -> GroupStateModification(
-                brightness = action.level.fraction.asPercentage,
-                on = action.switchState?.equals(SwitchState.ON),
+            is Action.Dim -> GroupedLightUpdateParameters(
+                dimming = DimmingParameters(
+                    brightness = action.level,
+                ),
+                power =  action.switchState?.equals(SwitchState.ON)?.let {
+                    PowerParameters(
+                        on = it,
+                    )
+                },
             )
-            is Action.ColorTemperatureChange -> GroupStateModification(
-                colorTemperature = action.temperature.miredValue.mireds,
-                brightness = action.level?.fraction?.asPercentage,
-                on = action.switchState?.equals(SwitchState.ON),
+            is Action.ColorTemperatureChange -> GroupedLightUpdateParameters(
+                colorTemperature = ColorTemperatureParameters(
+                    temperature = action.temperature,
+                ),
+                dimming = action.level?.let {
+                    DimmingParameters(brightness = it)
+                },
+                power = action.switchState?.equals(SwitchState.ON)?.let {
+                    PowerParameters(
+                        on = it,
+                    )
+                },
             )
-            is Action.ColorChange -> GroupStateModification(
-                cieColorCoordinates = action.color.let { Coordinates(it) },
-                brightness = action.level?.fraction?.asPercentage,
-                on = action.switchState?.equals(SwitchState.ON),
+            is Action.ColorChange -> GroupedLightUpdateParameters(
+                color = ColorParameters(
+                    color = action.color,
+                ),
+                dimming = action.level?.let {
+                    DimmingParameters(brightness = it)
+                },
+                power = action.switchState?.equals(SwitchState.ON)?.let {
+                    PowerParameters(
+                        on = it,
+                    )
+                },
             )
             else -> throw IllegalStateException("Impossible! Did the event filtering change without updating the modification conditions?")
         }
@@ -68,7 +96,7 @@ internal class HueGroupHandler(
         requestScope.launch {
             try {
                 withTimeout(5.seconds) {
-                    shade.setState(device.parent!!.id.value, modification)
+                    groups.updateGroup(device.parent!!.id.value.let(::ResourceId), modification)
                 }
             } catch (e: CancellationException) {
                 logger.warn("Hue Action was Cancelled", e)

@@ -1,7 +1,7 @@
 package usonia.weather
 
+import inkapplications.spondee.scalar.Percentage
 import kotlinx.datetime.Instant
-import usonia.kotlin.unit.Percentage
 
 /**
  * Provides forecasted weather conditions.

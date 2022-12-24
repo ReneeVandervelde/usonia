@@ -1,5 +1,12 @@
 package usonia.rules.lights
 
+import inkapplications.spondee.measure.metric.kelvin
+import inkapplications.spondee.scalar.percent
+import inkapplications.spondee.scalar.toWholePercentage
+import inkapplications.spondee.structure.convert
+import inkapplications.spondee.structure.div
+import inkapplications.spondee.structure.minus
+import inkapplications.spondee.structure.plus
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
@@ -14,7 +21,6 @@ import usonia.kotlin.OngoingFlow
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.kotlin.ongoingFlowOf
-import usonia.kotlin.unit.percent
 import usonia.weather.Conditions
 import usonia.weather.Forecast
 import usonia.weather.WeatherAccess
@@ -99,11 +105,11 @@ class CircadianColorsTest {
 
         assertTrue(result is LightSettings.Temperature)
         assertEquals(
-            DEFAULT_DAYLIGHT.kelvinValue - ((DEFAULT_DAYLIGHT.kelvinValue - DEFAULT_NIGHTLIGHT.kelvinValue) / 4),
-            result.temperature.kelvinValue
+            (DEFAULT_DAYLIGHT.toKelvin() - ((DEFAULT_DAYLIGHT.toKelvin() - DEFAULT_NIGHTLIGHT.toKelvin()) / 4)).value.toInt(),
+            result.temperature.toKelvin().value.toInt(),
         )
         assertTrue(
-            (100f - ((100 - DEFAULT_NIGHT_BRIGHTNESS.percent) / 4)).toInt() - result.brightness.percent <= 1
+            (100f - ((100 - DEFAULT_NIGHT_BRIGHTNESS.toWholePercentage().value.toInt()) / 4)).toInt() - result.brightness.toWholePercentage().value.toInt() <= 1
         )
     }
 
@@ -174,11 +180,11 @@ class CircadianColorsTest {
 
         assertTrue(result is LightSettings.Temperature)
         assertEquals(
-            DEFAULT_EVENING.kelvinValue + ((DEFAULT_NIGHTLIGHT.kelvinValue - DEFAULT_EVENING.kelvinValue) / 4),
-            result.temperature.kelvinValue
+            (DEFAULT_EVENING.toKelvin() + ((DEFAULT_NIGHTLIGHT.toKelvin() - DEFAULT_EVENING.toKelvin()) / 4)).value.toInt(),
+            result.temperature.toKelvin().value.toInt(),
         )
         assertTrue(
-            (100f - ((100 - DEFAULT_NIGHT_BRIGHTNESS.percent) / 4)).toInt() - result.brightness.percent <= 1
+            (100f - ((100 - DEFAULT_NIGHT_BRIGHTNESS.toWholePercentage().value.toInt()) / 4)).toInt() - result.brightness.toWholePercentage().value.toInt() <= 1
         )
     }
 
@@ -249,7 +255,7 @@ class CircadianColorsTest {
             result.temperature
         )
         assertTrue(
-            (100f - ((100 - DEFAULT_NIGHT_BRIGHTNESS.percent) / 4)).toInt() - result.brightness.percent <= 1
+            (100f - ((100 - DEFAULT_NIGHT_BRIGHTNESS.toWholePercentage().value.toInt()) / 4)).toInt() - result.brightness.toWholePercentage().value.toInt() <= 1
         )
     }
 }

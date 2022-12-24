@@ -1,5 +1,6 @@
 package usonia.rules.lights
 
+import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import usonia.core.state.getBooleanFlag
@@ -11,7 +12,6 @@ import usonia.kotlin.collectLatest
 import usonia.kotlin.distinctUntilChanged
 import usonia.kotlin.drop
 import usonia.kotlin.map
-import usonia.kotlin.unit.percent
 import usonia.rules.Flags
 import usonia.server.Daemon
 import usonia.server.client.BackendClient

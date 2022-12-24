@@ -1,14 +1,16 @@
 package usonia.foundation
 
 import com.github.ajalt.colormath.Color
-import com.github.ajalt.colormath.RGB
+import com.github.ajalt.colormath.model.RGB
+import inkapplications.spondee.measure.ColorTemperature
+import inkapplications.spondee.measure.metric.kelvin
+import inkapplications.spondee.scalar.Percentage
+import inkapplications.spondee.scalar.decimalPercentage
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import usonia.foundation.unit.ColorTemperature
-import usonia.kotlin.unit.Percentage
 
 /**
  * Instructions for devices to do something or change state.
@@ -111,19 +113,19 @@ object ActionSerializer: KSerializer<Action> {
             )
             Action.Dim::class.simpleName -> Action.Dim(
                 target = target,
-                level = json.dimLevel!!.let(::Percentage),
+                level = json.dimLevel!!.decimalPercentage,
                 switchState = json.switchState?.let { SwitchState.valueOf(it) },
             )
             Action.ColorTemperatureChange::class.simpleName -> Action.ColorTemperatureChange(
                 target = target,
-                temperature = json.colorTemperature!!.let(::ColorTemperature),
-                level = json.dimLevel!!.let(::Percentage),
+                temperature = json.colorTemperature!!.kelvin,
+                level = json.dimLevel!!.decimalPercentage,
                 switchState = json.switchState?.let { SwitchState.valueOf(it) },
             )
             Action.ColorChange::class.simpleName -> Action.ColorChange(
                 target = target,
                 color = RGB(json.color!![0], json.color[1], json.color[2]),
-                level = json.dimLevel!!.let(::Percentage),
+                level = json.dimLevel!!.decimalPercentage,
                 switchState = json.switchState?.let { SwitchState.valueOf(it) },
             )
             Action.Lock::class.simpleName -> Action.Lock(
@@ -153,18 +155,18 @@ object ActionSerializer: KSerializer<Action> {
                 switchState = value.state.name,
             )
             is Action.Dim -> prototype.copy(
-                dimLevel = value.level.fraction,
+                dimLevel = value.level.toDecimal().value.toFloat(),
                 switchState = value.switchState?.name,
             )
             is Action.ColorTemperatureChange -> prototype.copy(
-                colorTemperature = value.temperature.kelvinValue,
+                colorTemperature = value.temperature.toKelvin().value.toInt(),
                 switchState = value.switchState?.name,
-                dimLevel = value.level?.fraction,
+                dimLevel = value.level?.toDecimal()?.value?.toFloat(),
             )
             is Action.ColorChange -> prototype.copy(
-                color = value.color.toRGB().let { listOf(it.r, it.g, it.b) },
+                color = value.color.toSRGB().let { listOf(it.r.toInt(), it.g.toInt(), it.b.toInt()) },
                 switchState = value.switchState?.name,
-                dimLevel = value.level?.fraction,
+                dimLevel = value.level?.toDecimal()?.value?.toFloat(),
             )
             is Action.Lock -> prototype.copy(
                 lockState = value.state.name,

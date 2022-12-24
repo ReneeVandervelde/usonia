@@ -1,11 +1,12 @@
 package usonia.rules.lights
 
+import inkapplications.spondee.measure.metric.kelvin
+import inkapplications.spondee.scalar.percent
+import inkapplications.spondee.scalar.toWholePercentage
 import kotlinx.coroutines.test.runTest
 import usonia.foundation.FakeRooms
 import usonia.foundation.Room
 import usonia.foundation.SwitchState
-import usonia.foundation.unit.ColorTemperature
-import usonia.kotlin.unit.percent
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -18,14 +19,14 @@ class CompositeLightingPickerTest {
     fun orderedExecution() = runTest {
         val first = object: LightSettingsPicker {
             override suspend fun getActiveSettings(room: Room): LightSettings {
-                return LightSettings.Temperature(ColorTemperature(12), 34.percent)
+                return LightSettings.Temperature(12.kelvin, 34.percent)
             }
             override suspend fun getIdleSettings(room: Room): LightSettings = LightSettings.Switch(SwitchState.OFF)
             override suspend fun getIdleConditions(room: Room): IdleConditions = IdleConditions.Timed(1.minutes)
         }
         val second = object: LightSettingsPicker {
             override suspend fun getActiveSettings(room: Room): LightSettings {
-                return LightSettings.Temperature(ColorTemperature(56), 78.percent)
+                return LightSettings.Temperature(56.kelvin, 78.percent)
             }
             override suspend fun getIdleSettings(room: Room): LightSettings = LightSettings.Switch(SwitchState.ON)
             override suspend fun getIdleConditions(room: Room): IdleConditions = IdleConditions.Timed(2.minutes)
@@ -38,8 +39,8 @@ class CompositeLightingPickerTest {
         val idleConditions = composite.getIdleConditions(FakeRooms.LivingRoom)
 
         assertTrue(active is LightSettings.Temperature)
-        assertEquals(12, active.temperature.kelvinValue)
-        assertEquals(34, active.brightness.percent)
+        assertEquals(12, active.temperature.toKelvin().value.toInt())
+        assertEquals(34, active.brightness.toWholePercentage().value.toInt())
         assertTrue(idle is LightSettings.Switch)
         assertEquals(SwitchState.OFF, idle.state)
         assertTrue(idleConditions is IdleConditions.Timed)
@@ -55,7 +56,7 @@ class CompositeLightingPickerTest {
         }
         val second = object: LightSettingsPicker {
             override suspend fun getActiveSettings(room: Room): LightSettings {
-                return LightSettings.Temperature(ColorTemperature(56), 78.percent)
+                return LightSettings.Temperature(56.kelvin, 78.percent)
             }
             override suspend fun getIdleSettings(room: Room): LightSettings = LightSettings.Switch(SwitchState.ON)
             override suspend fun getIdleConditions(room: Room): IdleConditions = IdleConditions.Timed(2.minutes)
@@ -68,8 +69,8 @@ class CompositeLightingPickerTest {
         val idleConditions = composite.getIdleConditions(FakeRooms.LivingRoom)
 
         assertTrue(active is LightSettings.Temperature)
-        assertEquals(56, active.temperature.kelvinValue)
-        assertEquals(78, active.brightness.percent)
+        assertEquals(56, active.temperature.toKelvin().value.toInt())
+        assertEquals(78, active.brightness.toWholePercentage().value.toInt())
         assertTrue(idle is LightSettings.Switch)
         assertEquals(SwitchState.ON, idle.state)
         assertTrue(idleConditions is IdleConditions.Timed)

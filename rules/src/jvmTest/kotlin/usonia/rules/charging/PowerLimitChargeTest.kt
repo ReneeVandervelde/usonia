@@ -1,6 +1,6 @@
 package usonia.rules.charging
 
-import inkapplications.spondee.measures.watts
+import inkapplications.spondee.measure.metric.watts
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent

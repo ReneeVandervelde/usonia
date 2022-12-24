@@ -1,12 +1,12 @@
 package usonia.rules.lights
 
-import usonia.foundation.unit.ColorTemperature
+import inkapplications.spondee.measure.metric.kelvin
 
 /**
  * Standard colors used throughout the lighting plugins.
  */
 internal object Colors {
-    val Warm = ColorTemperature(2800)
-    val Medium = ColorTemperature(4152)
-    val Daylight = ColorTemperature(6200)
+    val Warm = 2800.kelvin
+    val Medium = 4152.kelvin
+    val Daylight = 6200.kelvin
 }

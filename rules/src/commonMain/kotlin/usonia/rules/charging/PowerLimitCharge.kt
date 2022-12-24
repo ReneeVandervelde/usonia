@@ -1,7 +1,7 @@
 package usonia.rules.charging
 
-import inkapplications.spondee.measures.Power
-import inkapplications.spondee.measures.watts
+import inkapplications.spondee.measure.Power
+import inkapplications.spondee.measure.metric.watts
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import usonia.foundation.*
@@ -39,7 +39,7 @@ class PowerLimitCharge(
         events
             .map { it.power }
             .scan(null as Power?) { last, next ->
-                if (last != null && last <= next) return
+                if (last != null && last.toWatts().value.toDouble() <= next.toWatts().value.toDouble()) return
                 next
             }
 

@@ -1,12 +1,12 @@
 package usonia.rules.lights
 
+import inkapplications.spondee.scalar.percent
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import usonia.foundation.FakeRooms
 import usonia.kotlin.OngoingFlow
 import usonia.kotlin.ongoingFlowOf
-import usonia.kotlin.unit.percent
 import usonia.weather.Conditions
 import usonia.weather.Forecast
 import usonia.weather.WeatherAccess

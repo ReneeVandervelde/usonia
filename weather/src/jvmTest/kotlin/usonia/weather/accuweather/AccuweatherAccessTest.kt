@@ -1,5 +1,6 @@
 package usonia.weather.accuweather
 
+import inkapplications.spondee.scalar.percent
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
@@ -16,7 +17,6 @@ import usonia.kotlin.collect
 import usonia.kotlin.datetime.UtcClock
 import usonia.kotlin.datetime.current
 import usonia.kotlin.ongoingFlowOf
-import usonia.kotlin.unit.percent
 import usonia.server.DummyClient
 import usonia.weather.Conditions
 import usonia.weather.Forecast

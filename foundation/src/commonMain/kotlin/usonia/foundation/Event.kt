@@ -1,14 +1,15 @@
 package usonia.foundation
 
-import inkapplications.spondee.measures.watts
-import inkapplications.spondee.measures.Power as PowerUnit
+import inkapplications.spondee.measure.metric.watts
+import inkapplications.spondee.measure.Power as PowerUnit
+import inkapplications.spondee.scalar.Percentage
+import inkapplications.spondee.scalar.decimalPercentage
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import usonia.kotlin.unit.Percentage
 
 /**
  * State changes that have already happened.
@@ -202,7 +203,7 @@ object EventSerializer: KSerializer<Event> {
             Event.Humidity::class.simpleName -> Event.Humidity(
                 id,
                 timestamp,
-                json.humidity!!.let(::Percentage)
+                json.humidity!!.decimalPercentage,
             )
             Event.Presence::class.simpleName -> Event.Presence(
                 id,
@@ -222,7 +223,7 @@ object EventSerializer: KSerializer<Event> {
             Event.Battery::class.simpleName -> Event.Battery(
                 id,
                 timestamp,
-                json.battery!!.let(::Percentage)
+                json.battery!!.decimalPercentage,
             )
             Event.Movement::class.simpleName -> Event.Movement(
                 id,
@@ -267,7 +268,7 @@ object EventSerializer: KSerializer<Event> {
                 temperature = value.temperature
             )
             is Event.Humidity -> prototype.copy(
-                humidity = value.humidity.fraction
+                humidity = value.humidity.toDecimal().value.toFloat(),
             )
             is Event.Lock -> prototype.copy(
                 lockState = value.state.name
@@ -282,7 +283,7 @@ object EventSerializer: KSerializer<Event> {
                 presenceState = value.state.name
             )
             is Event.Battery -> prototype.copy(
-                battery = value.percentage.fraction
+                battery = value.percentage.toDecimal().value.toFloat(),
             )
             is Event.Tilt -> prototype.copy(
                 x = value.x,
@@ -296,7 +297,7 @@ object EventSerializer: KSerializer<Event> {
                 pressure = value.pressure
             )
             is Event.Power -> prototype.copy(
-                power = value.power.inWatts.toInt(),
+                power = value.power.toWatts().value.toInt(),
             )
         }
 

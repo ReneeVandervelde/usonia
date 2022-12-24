@@ -1,5 +1,6 @@
 package usonia.weather.accuweather
 
+import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CancellationException
@@ -13,7 +14,6 @@ import usonia.kotlin.OngoingFlow
 import usonia.kotlin.asOngoing
 import usonia.kotlin.datetime.ZonedDateTime
 import usonia.kotlin.first
-import usonia.kotlin.unit.percent
 import usonia.server.client.BackendClient
 import usonia.server.cron.CronJob
 import usonia.server.cron.Schedule

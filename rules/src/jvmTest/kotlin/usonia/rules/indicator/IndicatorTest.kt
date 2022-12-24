@@ -1,6 +1,7 @@
 package usonia.rules.indicator
 
-import com.github.ajalt.colormath.RGB
+import com.github.ajalt.colormath.model.RGB
+import inkapplications.spondee.scalar.percent
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
@@ -11,7 +12,6 @@ import usonia.core.state.*
 import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
 import usonia.kotlin.ongoingFlowOf
-import usonia.kotlin.unit.percent
 import usonia.server.DummyClient
 import usonia.weather.Conditions
 import usonia.weather.Forecast

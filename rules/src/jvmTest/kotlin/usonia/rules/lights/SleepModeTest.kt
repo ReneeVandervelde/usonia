@@ -1,5 +1,6 @@
 package usonia.rules.lights
 
+import inkapplications.spondee.scalar.percent
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -13,7 +14,6 @@ import usonia.kotlin.OngoingFlow
 import usonia.kotlin.asOngoing
 import usonia.kotlin.datetime.*
 import usonia.kotlin.ongoingFlowOf
-import usonia.kotlin.unit.percent
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals

@@ -1,5 +1,7 @@
 package usonia.rules.lights
 
+import inkapplications.spondee.measure.metric.kelvin
+import inkapplications.spondee.scalar.percent
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
@@ -12,10 +14,8 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessFake
 import usonia.foundation.*
-import usonia.foundation.unit.ColorTemperature
 import usonia.kotlin.OngoingFlow
 import usonia.kotlin.ongoingFlowOf
-import usonia.kotlin.unit.percent
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -43,7 +43,7 @@ class LightControllerTest {
 
     private val settingsPicker = object: LightSettingsPicker {
         override suspend fun getActiveSettings(room: Room) = LightSettings.Temperature(
-            temperature = ColorTemperature(420),
+            temperature = 420.kelvin,
             brightness = 75.percent,
         )
 

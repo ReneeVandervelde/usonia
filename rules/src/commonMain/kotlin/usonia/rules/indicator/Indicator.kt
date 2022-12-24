@@ -1,14 +1,15 @@
 package usonia.rules.indicator
 
-import com.github.ajalt.colormath.RGB
+import com.github.ajalt.colormath.model.RGB
+import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import usonia.core.state.allAway
 import usonia.foundation.*
+import usonia.foundation.unit.compareTo
 import usonia.kotlin.*
-import usonia.kotlin.unit.percent
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
 import usonia.weather.Conditions

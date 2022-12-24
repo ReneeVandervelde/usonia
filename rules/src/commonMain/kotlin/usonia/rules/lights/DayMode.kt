@@ -1,9 +1,10 @@
 package usonia.rules.lights
 
+import inkapplications.spondee.scalar.percent
 import kotlinx.datetime.Clock
 import usonia.foundation.Room
+import usonia.foundation.unit.compareTo
 import usonia.kotlin.first
-import usonia.kotlin.unit.percent
 import usonia.weather.WeatherAccess
 import kotlin.time.ExperimentalTime
 import kotlin.time.hours

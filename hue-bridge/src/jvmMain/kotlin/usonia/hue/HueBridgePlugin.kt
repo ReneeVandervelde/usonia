@@ -1,8 +1,9 @@
 package usonia.hue
 
-import inkapplications.shade.Shade
+import inkapplications.shade.core.Shade
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import usonia.kotlin.IoScope
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
 
@@ -11,12 +12,15 @@ class HueBridgePlugin(
     logger: KimchiLogger = EmptyLogger,
 ): ServerPlugin {
     private val shade = Shade(
-        appId = "usonia#bridge",
-        storage = ConfigurationTokenStorage(client, logger),
+        configuration = LiveConfigContainer(
+            client,
+            IoScope(),
+            logger,
+        )
     )
+
     override val daemons = listOf(
-        HueGroupHandler(client, shade.groups, logger),
+        HueGroupHandler(client, shade.groupedLights, logger),
         HueLightHandler(client, shade.lights, logger),
-        ShadeConfigManager(client, shade),
     )
 }
