@@ -2,6 +2,7 @@ package usonia.telegram
 
 import com.inkapplications.telegram.structures.*
 import kimchi.logger.EmptyLogger
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
@@ -17,6 +18,7 @@ import usonia.server.http.HttpRequest
 import usonia.server.http.RestResponse
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class TelegramBotTest {
     @Test
     fun unhandled() = runTest {

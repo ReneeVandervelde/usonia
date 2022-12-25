@@ -57,14 +57,14 @@ internal class LiveConfigContainer(
         .stateIn(scope, SharingStarted.Eagerly, SecurityStrategy.PlatformTrust)
 
     override suspend fun setAuthToken(token: AuthToken?) {
-        logger.error("Modifying Auth Token Not implemented")
+        throw NotImplementedError("Modifying Auth Token Not implemented")
     }
 
     override suspend fun setHostname(hostname: String?) {
-        logger.error("Modifying hostname Not implemented")
+        throw NotImplementedError("Modifying hostname Not implemented")
     }
 
     override suspend fun setSecurityStrategy(securityStrategy: SecurityStrategy) {
-        logger.error("Modifying Security Not implemented")
+        throw NotImplementedError("Modifying Security Not implemented")
     }
 }
