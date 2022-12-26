@@ -5,7 +5,6 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.serialization.json.Json
 import usonia.foundation.EventSerializer
 import usonia.kotlin.collect

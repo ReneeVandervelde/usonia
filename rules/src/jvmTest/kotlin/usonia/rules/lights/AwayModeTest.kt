@@ -1,5 +1,6 @@
 package usonia.rules.lights
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import usonia.core.state.ConfigurationAccess
@@ -14,6 +15,7 @@ import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AwayModeTest {
     @Test
     fun default() = runTest {

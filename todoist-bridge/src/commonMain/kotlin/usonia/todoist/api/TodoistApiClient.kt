@@ -8,8 +8,8 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import usonia.client.ktor.PlatformEngine
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 @OptIn(ExperimentalTime::class)
 internal class TodoistApiClient: TodoistApi {
@@ -19,7 +19,7 @@ internal class TodoistApiClient: TodoistApi {
 
     private val httpClient = HttpClient(PlatformEngine) {
         install(HttpTimeout) {
-            requestTimeoutMillis = 20.seconds.toLongMilliseconds()
+            requestTimeoutMillis = 20.seconds.inWholeMilliseconds
         }
         install(ContentNegotiation) {
             json(json)

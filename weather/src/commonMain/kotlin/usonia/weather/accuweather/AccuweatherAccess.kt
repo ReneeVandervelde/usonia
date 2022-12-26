@@ -20,8 +20,8 @@ import usonia.server.cron.Schedule
 import usonia.weather.Conditions
 import usonia.weather.Forecast
 import usonia.weather.WeatherAccess
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
-import kotlin.time.hours
 
 private const val SERVICE = "accuweather"
 private const val LOCATION = "location"

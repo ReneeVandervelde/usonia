@@ -7,8 +7,8 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import usonia.kotlin.mapSet
 import usonia.kotlin.singleOrThrow
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
 
 data class Device(
     val id: Identifier,
@@ -63,7 +63,7 @@ class DeviceSerializer(
             capabilitiesArchetype = value.capabilities.archetypeId,
             actionTypes = value.capabilities.actions.mapSet { it.simpleName!! },
             eventTypes = value.capabilities.events.mapSet { it.simpleName!! },
-            heartbeat = value.capabilities.heartbeat?.inMilliseconds?.toLong(),
+            heartbeat = value.capabilities.heartbeat?.inWholeMilliseconds,
             fixture = value.fixture?.name,
             siblings = value.siblings.mapSet(Identifier::value),
             parentContext = value.parent?.context?.value,

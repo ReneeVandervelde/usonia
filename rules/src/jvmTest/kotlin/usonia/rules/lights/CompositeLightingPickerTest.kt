@@ -3,6 +3,7 @@ package usonia.rules.lights
 import inkapplications.spondee.measure.metric.kelvin
 import inkapplications.spondee.scalar.percent
 import inkapplications.spondee.scalar.toWholePercentage
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import usonia.foundation.FakeRooms
 import usonia.foundation.Room
@@ -10,10 +11,10 @@ import usonia.foundation.SwitchState
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
-import kotlin.time.minutes
 
-@OptIn(ExperimentalTime::class)
+@OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
 class CompositeLightingPickerTest {
     @Test
     fun orderedExecution() = runTest {

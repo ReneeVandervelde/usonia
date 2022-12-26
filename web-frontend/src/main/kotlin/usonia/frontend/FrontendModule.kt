@@ -10,9 +10,12 @@ import usonia.frontend.logs.LogController
 import usonia.frontend.metrics.EventMetricsController
 import usonia.frontend.metrics.TemperatureMetricsController
 import usonia.frontend.users.UserListController
+import usonia.kotlin.DefaultScope
 import usonia.serialization.SerializationModule
 
 object FrontendModule {
+    val jobScope = DefaultScope()
+
     val logger = Kimchi.apply {
         addLog(defaultWriter)
     }
@@ -29,7 +32,7 @@ object FrontendModule {
         LogController(client, logger),
         UserListController(client, logger),
         EventMetricsController(client, logger),
-        FlagController(client, logger),
+        FlagController(client, jobScope, logger),
         TemperatureMetricsController(client, logger),
     )
 }

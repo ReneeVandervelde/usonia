@@ -1,12 +1,11 @@
 package usonia.rules.lights
 
-import inkapplications.spondee.measure.metric.kelvin
 import inkapplications.spondee.scalar.percent
 import inkapplications.spondee.scalar.toWholePercentage
-import inkapplications.spondee.structure.convert
 import inkapplications.spondee.structure.div
 import inkapplications.spondee.structure.minus
 import inkapplications.spondee.structure.plus
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
@@ -27,12 +26,12 @@ import usonia.weather.WeatherAccess
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
-import kotlin.time.days
-import kotlin.time.hours
-import kotlin.time.minutes
 
-@OptIn(ExperimentalTime::class)
+@OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
 class CircadianColorsTest {
     private val startOfDay = LocalDateTime(0, 1, 1, 0, 0, 0)
         .toInstant(TimeZone.currentSystemDefault())

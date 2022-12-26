@@ -1,6 +1,7 @@
 package usonia.rules.lights
 
 import inkapplications.spondee.scalar.percent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -18,10 +19,10 @@ import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
-@OptIn(ExperimentalTime::class)
+@OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
 class SleepModeTest {
     private val configurationDouble = object: ConfigurationAccess by ConfigurationAccessStub {
         val setFlags = mutableListOf<Pair<String, String?>>()
@@ -267,7 +268,7 @@ class SleepModeTest {
         assertEquals(1, actionSpy.actions.size, "Lights Dimmed immediately")
         assertTrue(actionSpy.actions.single() is Action.ColorTemperatureChange)
         assertEquals(FakeDevices.HueGroup.id, actionSpy.actions.single().target)
-        advanceTimeBy(31.seconds.toLongMilliseconds())
+        advanceTimeBy(31.seconds.inWholeMilliseconds)
         assertEquals(2, actionSpy.actions.size, "Lights Turned off after 30 seconds")
         val offAction = actionSpy.actions[1]
         assertTrue(offAction is Action.Switch)

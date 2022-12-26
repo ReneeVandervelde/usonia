@@ -1,8 +1,8 @@
 package usonia.rules.alerts
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import usonia.core.state.ActionPublisherSpy
@@ -18,6 +18,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DoorAlertTest {
     private val entryConfig = object: ConfigurationAccess by ConfigurationAccessStub {
         override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(

@@ -1,10 +1,10 @@
 package usonia.telegram
 
 import com.inkapplications.telegram.structures.ChatReference
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
 import usonia.core.state.ActionAccessFake
 import usonia.core.state.ConfigurationAccess
@@ -16,6 +16,7 @@ import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class TelegramAlertsTest {
     @Test
     fun sendAlert() = runTest {
@@ -165,7 +166,7 @@ class TelegramAlertsTest {
     }
 
     @Test
-    fun noConfig() = runBlockingTest {
+    fun noConfig() = runTest {
         val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite

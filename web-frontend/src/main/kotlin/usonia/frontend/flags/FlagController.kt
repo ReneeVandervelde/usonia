@@ -2,7 +2,7 @@ package usonia.frontend.flags
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mustache.Mustache
 import mustache.renderTemplate
@@ -15,6 +15,7 @@ import usonia.kotlin.collectLatest
 
 class FlagController(
     private val client: HttpClient,
+    private val backgroundScope: CoroutineScope,
     logger: KimchiLogger = EmptyLogger,
 ): ViewController("flag-container", logger) {
     override suspend fun onBind(element: Element) {
@@ -39,8 +40,8 @@ class FlagController(
     }
 
     private fun onFlagSave(data: FormData) {
-        GlobalScope.launch {
-            client.setFlag(data.get("flag-key"), data.get("flag-value"))
+        backgroundScope.launch {
+            client.setFlag(data.get("flag-key") as String, data.get("flag-value") as? String)
         }
     }
 }

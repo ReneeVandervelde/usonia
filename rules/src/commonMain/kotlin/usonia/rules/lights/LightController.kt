@@ -12,7 +12,6 @@ import usonia.foundation.*
 import usonia.kotlin.*
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
-import kotlin.time.ExperimentalTime
 
 /**
  * Controls the on/off state of a room's lights.
@@ -33,7 +32,10 @@ internal class LightController(
     }
 
     private suspend fun onMotionEvent(event: Event.Motion, site: Site) {
-        val room = site.getRoomContainingDevice(event.source)
+        val room = site.findRoomContainingDevice(event.source) ?: run {
+            logger.error("Unable to find a room containing ${event.source}")
+            return
+        }
         when (event.state) {
             MotionState.MOTION -> onRoomMotion(room)
             MotionState.IDLE -> onRoomIdle(room)

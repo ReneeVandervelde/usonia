@@ -6,8 +6,8 @@ import usonia.foundation.Room
 import usonia.foundation.unit.compareTo
 import usonia.kotlin.first
 import usonia.weather.WeatherAccess
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
-import kotlin.time.hours
 
 /**
  * Keeps lights off in the daytime.

@@ -18,8 +18,9 @@ import usonia.js.accentColor
 import usonia.kotlin.collectLatest
 import usonia.kotlin.map
 import kotlin.math.abs
+import kotlin.time.Duration.Companion.days
+import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
-import kotlin.time.days
 
 @OptIn(ExperimentalTime::class)
 class TemperatureMetricsController(
@@ -83,7 +84,7 @@ class TemperatureMetricsController(
             .map { it.id }
 
         client.temperatureHistory(devices)
-            .map { it.filter { abs(it.key) < 7.days.inHours.toInt() } }
+            .map { it.filter { abs(it.key) < 7.days.toInt(DurationUnit.HOURS) } }
             .collectLatest { metrics ->
                 logger.debug("Binding ${metrics.size} temperature points to ${room.name}")
                 chart.data.labels = metrics.keys

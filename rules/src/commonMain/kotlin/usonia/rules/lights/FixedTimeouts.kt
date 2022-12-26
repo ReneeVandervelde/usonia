@@ -1,9 +1,9 @@
 package usonia.rules.lights
 
 import usonia.foundation.Room
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.minutes
-import kotlin.time.seconds
 
 /**
  * Hardcodes a fixed time for rooms to idle based on their type.

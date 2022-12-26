@@ -2,6 +2,7 @@ package usonia.rules.indicator
 
 import com.github.ajalt.colormath.model.RGB
 import inkapplications.spondee.scalar.percent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
@@ -22,6 +23,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class IndicatorTest {
     val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
         override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(

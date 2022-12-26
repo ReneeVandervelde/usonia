@@ -17,11 +17,9 @@ import usonia.server.cron.Schedule
 import usonia.todoist.api.Task
 import usonia.todoist.api.TaskParameters
 import usonia.todoist.api.TodoistApi
-import kotlin.time.ExperimentalTime
 
 private const val TODOIST_SERVICE = "todoist"
 
-@OptIn(ExperimentalTime::class)
 internal class AwolDeviceReporter(
     private val client: BackendClient,
     private val api: TodoistApi,

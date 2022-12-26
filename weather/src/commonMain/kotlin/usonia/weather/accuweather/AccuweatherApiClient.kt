@@ -7,8 +7,8 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 /**
  * Ktor client implementation of the accuweather API.
@@ -17,7 +17,7 @@ import kotlin.time.seconds
 internal class AccuweatherApiClient: AccuweatherApi {
     private val client = HttpClient {
         install(HttpTimeout) {
-            requestTimeoutMillis = 20.seconds.toLongMilliseconds()
+            requestTimeoutMillis = 20.seconds.inWholeMilliseconds
         }
         install(ContentNegotiation) {
             json(Json {

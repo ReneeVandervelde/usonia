@@ -1,5 +1,6 @@
 package usonia.rules.lights
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
@@ -10,6 +11,7 @@ import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class LightingEnabledFlagTest {
     @Test
     fun enabled() = runTest {

@@ -1,6 +1,7 @@
 package usonia.rules.lights
 
 import inkapplications.spondee.scalar.percent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -12,11 +13,11 @@ import usonia.weather.Forecast
 import usonia.weather.WeatherAccess
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
-import kotlin.time.hours
-import kotlin.time.minutes
 
-@OptIn(ExperimentalTime::class)
+@OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
 class DayModeTest {
     private val now = Instant.fromEpochMilliseconds(1234567)
     private val fakeClock = object: Clock {

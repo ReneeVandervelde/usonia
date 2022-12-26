@@ -23,8 +23,8 @@ import usonia.weather.Conditions
 import usonia.weather.Forecast
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
-import kotlin.time.hours
 
 @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
 class AccuweatherAccessTest {

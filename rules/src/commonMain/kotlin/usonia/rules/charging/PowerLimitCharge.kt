@@ -5,7 +5,10 @@ import inkapplications.spondee.measure.metric.watts
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import usonia.foundation.*
-import usonia.kotlin.*
+import usonia.kotlin.collectLatest
+import usonia.kotlin.filter
+import usonia.kotlin.filterIsInstance
+import usonia.kotlin.rollingWindow
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
 

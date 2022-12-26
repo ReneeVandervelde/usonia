@@ -7,8 +7,6 @@ import inkapplications.shade.lights.parameters.ColorTemperatureParameters
 import inkapplications.shade.lights.parameters.DimmingParameters
 import inkapplications.shade.structures.ResourceId
 import inkapplications.shade.structures.parameters.PowerParameters
-import inkapplications.spondee.measure.mireds
-import inkapplications.spondee.scalar.decimalPercentage
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CancellationException
@@ -19,8 +17,8 @@ import usonia.foundation.*
 import usonia.kotlin.*
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 /**
  * Handles actions sent to Hue Group devices.

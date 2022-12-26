@@ -1,7 +1,6 @@
 package usonia.foundation
 
 import inkapplications.spondee.measure.metric.watts
-import inkapplications.spondee.measure.Power as PowerUnit
 import inkapplications.spondee.scalar.Percentage
 import inkapplications.spondee.scalar.decimalPercentage
 import kotlinx.datetime.Instant
@@ -10,6 +9,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import inkapplications.spondee.measure.Power as PowerUnit
 
 /**
  * State changes that have already happened.

@@ -1,6 +1,7 @@
 package usonia.kotlin
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -85,11 +86,13 @@ inline fun <T, R> OngoingFlow<T>.map(crossinline mapper:  (T) -> R) = unsafeModi
 /**
  * @see Flow.mapLatest
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 inline fun <T, R> OngoingFlow<T>.mapLatest(crossinline mapper: suspend (T) -> R) = unsafeModify { mapLatest { mapper(it) } }
 
 /**
  * @see Flow.flatMapLatest
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 inline fun <T, R> OngoingFlow<T>.flatMapLatest(crossinline mapper:  (T) -> Flow<R>) = unsafeModify { flatMapLatest { mapper(it) } }
 
 /**

@@ -1,5 +1,6 @@
 package usonia.rules.locks
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -18,6 +19,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class LockOnSleepTest {
     private val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
         val mutableFlags = MutableSharedFlow<Map<String, String?>>()

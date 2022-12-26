@@ -2,6 +2,7 @@ package usonia.rules.lights
 
 import inkapplications.spondee.measure.metric.kelvin
 import inkapplications.spondee.scalar.percent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
@@ -20,11 +21,11 @@ import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.minutes
-import kotlin.time.seconds
 
-@OptIn(ExperimentalTime::class)
+@OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
 class LightControllerTest {
     val testSite = FakeSite.copy(
         rooms = setOf(FakeRooms.LivingRoom.copy(
@@ -156,7 +157,7 @@ class LightControllerTest {
             MotionState.IDLE
         ))
         advanceUntilIdle()
-        advanceTimeBy(31.minutes.inMilliseconds.toLong())
+        advanceTimeBy(31.minutes.inWholeMilliseconds)
         runCurrent()
 
         assertEquals(1, actionPublisher.actions.size, "One light action should be published.")

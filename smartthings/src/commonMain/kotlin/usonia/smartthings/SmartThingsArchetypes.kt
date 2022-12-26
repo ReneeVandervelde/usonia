@@ -3,10 +3,8 @@ package usonia.smartthings
 import usonia.foundation.Action
 import usonia.foundation.Capabilities
 import usonia.foundation.Event
-import kotlin.time.ExperimentalTime
-import kotlin.time.days
+import kotlin.time.Duration.Companion.days
 
-@OptIn(ExperimentalTime::class)
 object SmartThingsArchetypes {
     val ALL get() = setOf(
         motion,

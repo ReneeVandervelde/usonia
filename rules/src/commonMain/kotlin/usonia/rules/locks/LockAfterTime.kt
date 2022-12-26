@@ -12,8 +12,8 @@ import usonia.foundation.*
 import usonia.kotlin.*
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
-import kotlin.time.minutes
 
 /**
  * Locks entry-point doors after they've been closed for a given amount of time.

@@ -19,8 +19,8 @@ import usonia.server.Daemon
 import usonia.server.client.BackendClient
 import usonia.server.cron.CronJob
 import usonia.server.cron.Schedule
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 private const val NIGHT_START = "sleep.night.start"
 private const val DEFAULT_NIGHT = 20 * 60

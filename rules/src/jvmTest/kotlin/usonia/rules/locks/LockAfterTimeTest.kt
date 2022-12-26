@@ -1,5 +1,6 @@
 package usonia.rules.locks
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
@@ -18,10 +19,10 @@ import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
-import kotlin.time.minutes
 
-@OptIn(ExperimentalTime::class)
+@OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
 class LockAfterTimeTest {
     val testSite = FakeSite.copy(
         rooms = setOf(FakeRooms.LivingRoom.copy(
@@ -86,7 +87,7 @@ class LockAfterTimeTest {
             timestamp = Instant.DISTANT_PAST,
             state = LatchState.CLOSED,
         ))
-        advanceTimeBy(5.minutes.toLongMilliseconds())
+        advanceTimeBy(5.minutes.inWholeMilliseconds)
         eventAccess.mutableEvents.emit(Event.Latch(
             source = FakeDevices.Latch.id,
             timestamp = Instant.DISTANT_PAST,

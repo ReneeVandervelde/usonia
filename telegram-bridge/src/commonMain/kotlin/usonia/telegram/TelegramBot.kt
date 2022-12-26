@@ -13,7 +13,9 @@ import usonia.foundation.Status
 import usonia.foundation.Statuses
 import usonia.rules.Flags
 import usonia.server.client.BackendClient
-import usonia.server.http.*
+import usonia.server.http.HttpRequest
+import usonia.server.http.RestController
+import usonia.server.http.RestResponse
 
 private const val USERNAME_KEY = "telegram.username"
 

@@ -19,8 +19,8 @@ import usonia.todoist.api.TodoistApi
 import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
-import kotlin.time.minutes
 
 @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
 class AwolDeviceReporterTest {

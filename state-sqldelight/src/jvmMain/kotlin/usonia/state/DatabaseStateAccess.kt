@@ -19,6 +19,7 @@ import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.kotlin.mapEach
 import kotlin.reflect.KClass
+import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 
 /**
@@ -106,7 +107,7 @@ internal class DatabaseStateAccess(
              .mapToList()
              .mapEach { json.decodeFromString(EventSerializer, String(it)) as Event.Temperature }
              .map {
-                 it.groupBy { (it.timestamp - zonedClock.now()).inHours.toInt() }
+                 it.groupBy { (it.timestamp - zonedClock.now()).toInt(DurationUnit.HOURS) }
                      .map { (hoursAgo, events) ->
                          hoursAgo to events.map { it.temperature }.average().toFloat()
                      }

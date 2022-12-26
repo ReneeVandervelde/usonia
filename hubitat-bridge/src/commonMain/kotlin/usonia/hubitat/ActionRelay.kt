@@ -17,8 +17,8 @@ import usonia.kotlin.collect
 import usonia.kotlin.collectLatest
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 /**
  * Forwards Action events to a hubitat bridge.
@@ -32,7 +32,7 @@ internal class ActionRelay(
 ): Daemon {
     private val httpClient = HttpClient(PlatformEngine) {
         install(HttpTimeout) {
-            requestTimeoutMillis = 10.seconds.toLongMilliseconds()
+            requestTimeoutMillis = 10.seconds.inWholeMilliseconds
         }
     }
 
