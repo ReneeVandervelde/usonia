@@ -26,7 +26,10 @@ class WebPlugin(
         SiteUpdateController(client, json, logger),
         FlagUpdateController(client, json, logger),
         FlagDeleteController(client, json),
-        HtmlPageController,
+        StaticResourceController("html", "text/html"),
+        StaticResourceController("js", "application/javascript"),
+        StaticResourceController("js.map", "application/javascript"),
+        StaticResourceController("css", "text/css"),
         DefaultController,
     )
     override val socketController: List<WebSocketController> = listOf(
@@ -37,10 +40,5 @@ class WebPlugin(
         EventsByDaySocket(client, json),
         OldestEventSocket(client, json),
         TemperatureHistorySocket(client, json, logger),
-    )
-    override val staticResources: List<String> = listOf(
-        "web-frontend.js",
-        "web-frontend.js.map",
-        "main.css",
     )
 }

@@ -12,7 +12,7 @@ kotlin {
                 api(kotlinLibraries.datetime)
                 api(inkLibraries.kimchi.logger)
                 implementation(kotlinLibraries.serialization.json)
-                api("com.inkapplications.spondee:units:1.0.0")
+                api(inkLibraries.spondee)
             }
         }
 

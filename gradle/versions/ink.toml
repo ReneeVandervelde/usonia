@@ -1,5 +1,5 @@
 [versions]
-kimchi = "2.0.0"
+kimchi = "2.0.3"
 
 [libraries.kimchi-core]
 version.ref = "kimchi"
@@ -8,3 +8,7 @@ module = "com.inkapplications.kimchi:core"
 [libraries.kimchi-logger]
 version.ref = "kimchi"
 module = "com.inkapplications.kimchi:logger"
+
+[libraries.spondee]
+version = "1.3.0"
+module = "com.inkapplications.spondee:units"

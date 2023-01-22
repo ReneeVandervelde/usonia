@@ -7,8 +7,8 @@ configurations {
 }
 
 tasks {
-    create("collectImportResources", Sync::class) {
-        dependsOn(":${project.projects.webFrontend.name}:assemble")
+    create("collectDistributions", Sync::class) {
+        dependsOn(":${project.projects.webFrontendCompose.name}:jsBrowserDistribution")
         into(temporaryDir).from(configurations.getByName("importResources"))
     }
 }
@@ -16,13 +16,13 @@ tasks {
 kotlin {
     sourceSets {
         val commonMain by getting {
-            resources.srcDirs(tasks.getByName("collectImportResources"))
+            resources.srcDirs(tasks.getByName("collectDistributions"))
 
             dependencies {
                 api(projects.core)
                 api(projects.server)
                 api(projects.serialization)
-                dependencies.add("importResources", project(":${projects.webFrontend.name}", "dist"))
+                dependencies.add("importResources", project(":${projects.webFrontendCompose.name}", "dist"))
                 api(inkLibraries.kimchi.logger)
             }
         }

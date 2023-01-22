@@ -10,7 +10,7 @@ object DefaultController: HttpController {
 
     override suspend fun getResponse(request: HttpRequest): HttpResponse {
         return HttpResponse(
-            body = getResourceContents("ControlPanel.html"),
+            body = getResourceContents("index.html"),
             contentType = "text/html"
         )
     }

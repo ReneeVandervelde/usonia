@@ -1,0 +1,93 @@
+
+@import url("https://assets.inkapplications.com/css/main-v1.css");
+
+:root
+{
+    --color-magenta: #9e6efe;
+    --color-green: #43B593;
+    --color-blue: #3495CC;
+    --color-orange: #fe9720;
+    --color-red: #f92772;
+
+    --color-accent: var(--color-green);
+
+    --color-positive: var(--color-green);
+    --color-danger: var(--color-orange);
+    --color-nominal: var(--color-blue);
+    --color-error: var(--color-red);
+}
+
+body
+{
+    line-height: 1.5rem;
+}
+
+.logs-console
+{
+    overflow: scroll;
+    height: 500px;
+    display: flex;
+    flex-direction: column-reverse;
+    border: 1px solid var(--color-accent);
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: .25rem;
+}
+
+body.sectioned > section,
+.content-break
+{
+    max-width: 1200px;
+}
+
+.log-message[data-level="TRACE"] .log-level-label
+{
+    color: var(--color-magenta);
+}
+.log-message[data-level="DEBUG"] .log-level-label
+{
+    color: var(--color-green);
+}
+.log-message[data-level="INFO"] .log-level-label
+{
+    color: var(--color-blue);
+}
+.log-message[data-level="WARNING"] .log-level-label
+{
+    color: var(--color-orange);
+}
+.log-message[data-level="ERROR"] .log-level-label
+{
+    color: var(--color-red);
+}
+.log-message-stacktrace
+{
+    white-space: pre;
+}
+
+body > header > a
+{
+    margin: 0 .5rem;
+    font-size: 1.25rem;
+}
+
+body > header > a:first-of-type
+{
+    margin-left: 0;
+}
+
+form.inline
+{
+    margin: .5rem 0;
+}
+
+form.inline > label
+{
+    display: inline;
+}
+
+form.inline > input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"])
+{
+    display: inline-block;
+    margin: .25rem .25rem .25rem 0;
+}
