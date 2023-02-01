@@ -21,6 +21,11 @@ sourceSets {
     }
 }
 
+java {
+    sourceCompatibility = org.gradle.api.JavaVersion.VERSION_15
+    targetCompatibility = org.gradle.api.JavaVersion.VERSION_15
+}
+
 dependencies {
     implementation(projects.clientHttp)
     implementation(projects.core)
