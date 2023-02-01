@@ -41,4 +41,8 @@ interface CommandModule {
     @Binds
     @IntoSet
     fun removeFlag(command: RemoveFlagCommand): CliktCommand
+
+    @Binds
+    @IntoSet
+    fun configDump(command: ConfigurationDumpCommand): CliktCommand
 }
