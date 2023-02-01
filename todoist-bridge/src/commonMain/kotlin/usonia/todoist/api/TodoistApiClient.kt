@@ -11,7 +11,6 @@ import usonia.client.ktor.PlatformEngine
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
 internal class TodoistApiClient: TodoistApi {
     private val json = kotlinx.serialization.json.Json {
         ignoreUnknownKeys = true
@@ -28,15 +27,15 @@ internal class TodoistApiClient: TodoistApi {
 
     override suspend fun getTasks(
         token: String,
-        projectId: Long?,
-        labelId: Long?,
+        projectId: String?,
+        label: String?,
     ): List<Task> {
-        return httpClient.get("https://api.todoist.com/rest/v1/tasks") {
+        return httpClient.get("https://api.todoist.com/rest/v2/tasks") {
             accept(ContentType.Application.Json)
             contentType(ContentType.Application.Json)
             header("Authorization", "Bearer $token")
             if (projectId != null) parameter("project_id", projectId)
-            if (labelId != null) parameter("label_id", labelId)
+            if (label != null) parameter("label", label)
         }.body()
     }
 
@@ -44,7 +43,7 @@ internal class TodoistApiClient: TodoistApi {
         token: String,
         task: TaskParameters,
     ): Task {
-        return httpClient.post("https://api.todoist.com/rest/v1/tasks") {
+        return httpClient.post("https://api.todoist.com/rest/v2/tasks") {
             accept(ContentType.Application.Json)
             contentType(ContentType.Application.Json)
             header("Authorization", "Bearer $token")
@@ -52,8 +51,8 @@ internal class TodoistApiClient: TodoistApi {
         }.body()
     }
 
-    override suspend fun close(token: String, taskId: Long) {
-        httpClient.post("https://api.todoist.com/rest/v1/tasks/$taskId/close") {
+    override suspend fun close(token: String, taskId: String) {
+        httpClient.post("https://api.todoist.com/rest/v2/tasks/$taskId/close") {
             header("Authorization", "Bearer $token")
         }
     }

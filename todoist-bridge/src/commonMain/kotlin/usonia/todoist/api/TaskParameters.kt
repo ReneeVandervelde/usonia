@@ -7,7 +7,11 @@ import kotlinx.serialization.Serializable
 internal data class TaskParameters(
     val content: String,
     @SerialName("project_id")
-    val projectId: Long? = null,
-    @SerialName("label_ids")
-    val labels: List<Long>? = null,
+    val projectId: String? = null,
+    @SerialName("labels")
+    val labels: List<String>? = null,
+    @SerialName("due_string")
+    val dueString: String? = null,
+    @SerialName("description")
+    val description: String? = null,
 )

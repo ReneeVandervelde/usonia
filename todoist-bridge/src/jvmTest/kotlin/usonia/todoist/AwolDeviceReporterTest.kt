@@ -41,7 +41,7 @@ class AwolDeviceReporterTest {
                     parameters = mapOf(
                         "token" to "test-token",
                         "project" to "666",
-                        "label" to "420",
+                        "label" to "Nice",
                     )
                 )
             )
@@ -59,10 +59,10 @@ class AwolDeviceReporterTest {
         }
         val api = object: TodoistApi by ApiStub {
             var tokenUsed: String? = null
-            var projectUsed: Long? = null
-            var labelUsed: Long? = null
+            var projectUsed: String? = null
+            var labelUsed: String? = null
 
-            override suspend fun getTasks(token: String, projectId: Long?, labelId: Long?): List<Task> {
+            override suspend fun getTasks(token: String, projectId: String?, labelId: String?): List<Task> {
                 tokenUsed = token
                 projectUsed = projectId
                 labelUsed = labelId
@@ -77,8 +77,8 @@ class AwolDeviceReporterTest {
         AwolDeviceReporter(client, api).runCron(time)
 
         assertEquals("test-token", api.tokenUsed)
-        assertEquals(666, api.projectUsed)
-        assertEquals(420, api.labelUsed)
+        assertEquals("666", api.projectUsed)
+        assertEquals("Nice", api.labelUsed)
     }
 
     @Test
@@ -136,9 +136,11 @@ class AwolDeviceReporterTest {
 
         assertEquals(1, api.created.size)
         val parameters = api.created.single()
-        assertEquals("Replace Batteries in Fake Sensor (id: fake-sensor)", parameters.content)
-        assertEquals(666L, parameters.projectId)
-        assertEquals(listOf(420L), parameters.labels)
+        assertEquals("Replace Batteries in Fake Sensor", parameters.content)
+        assertEquals("(id: fake-sensor)", parameters.description)
+        assertEquals("Today", parameters.dueString)
+        assertEquals("666", parameters.projectId)
+        assertEquals(listOf("Nice"), parameters.labels)
     }
 
     @Test
@@ -196,16 +198,17 @@ class AwolDeviceReporterTest {
             }
         }
         val api = object: TodoistApi by ApiStub {
-            val closed = mutableListOf<Long>()
-            override suspend fun getTasks(token: String, projectId: Long?, labelId: Long?): List<Task> {
+            val closed = mutableListOf<String>()
+            override suspend fun getTasks(token: String, projectId: String?, labelId: String?): List<Task> {
                 return listOf(Task(
-                    id = 432,
-                    content = "Test Task (id: fake-sensor)",
+                    id = "432",
+                    content = "Test Task",
+                    description = "(id: fake-sensor)",
                     completed = false,
                 ))
             }
 
-            override suspend fun close(token: String, taskId: Long) {
+            override suspend fun close(token: String, taskId: String) {
                 closed += taskId
             }
         }
@@ -216,7 +219,7 @@ class AwolDeviceReporterTest {
         AwolDeviceReporter(client, api).runCron(time)
 
         assertEquals(1, api.closed.size)
-        assertEquals(432, api.closed.single())
+        assertEquals("432", api.closed.single())
     }
 
     @Test
@@ -232,7 +235,7 @@ class AwolDeviceReporterTest {
             }
         }
         val api = object: TodoistApi by ApiStub {
-            val closed = mutableListOf<Long>()
+            val closed = mutableListOf<String>()
             val created = mutableListOf<TaskParameters>()
 
             override suspend fun create(token: String, task: TaskParameters): Task {
@@ -240,15 +243,16 @@ class AwolDeviceReporterTest {
                 return ApiStub.create(token, task)
             }
 
-            override suspend fun getTasks(token: String, projectId: Long?, labelId: Long?): List<Task> {
+            override suspend fun getTasks(token: String, projectId: String?, labelId: String?): List<Task> {
                 return listOf(Task(
-                    id = 432,
-                    content = "Test Task (id: fake-sensor)",
+                    id = "432",
+                    content = "Test Task",
+                    description = "(id: fake-sensor)",
                     completed = false,
                 ))
             }
 
-            override suspend fun close(token: String, taskId: Long) {
+            override suspend fun close(token: String, taskId: String) {
                 closed += taskId
             }
         }
@@ -268,16 +272,17 @@ class AwolDeviceReporterTest {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(time.instant)
         }
         val api = object: TodoistApi by ApiStub {
-            val closed = mutableListOf<Long>()
-            override suspend fun getTasks(token: String, projectId: Long?, labelId: Long?): List<Task> {
+            val closed = mutableListOf<String>()
+            override suspend fun getTasks(token: String, projectId: String?, labelId: String?): List<Task> {
                 return listOf(Task(
-                    id = 432,
-                    content = "Test Task (id: fake-sensor)",
+                    id = "432",
+                    content = "Test Task",
+                    description = "(id: fake-sensor)",
                     completed = false,
                 ))
             }
 
-            override suspend fun close(token: String, taskId: Long) {
+            override suspend fun close(token: String, taskId: String) {
                 closed += taskId
             }
         }
@@ -303,16 +308,17 @@ class AwolDeviceReporterTest {
             }
         }
         val api = object: TodoistApi by ApiStub {
-            val closed = mutableListOf<Long>()
-            override suspend fun getTasks(token: String, projectId: Long?, labelId: Long?): List<Task> {
+            val closed = mutableListOf<String>()
+            override suspend fun getTasks(token: String, projectId: String?, labelId: String?): List<Task> {
                 return listOf(Task(
-                    id = 432,
-                    content = "Test Task (id: fake-sensor)",
+                    id = "432",
+                    content = "Test Task",
+                    description = "(id: fake-sensor)",
                     completed = false,
                 ))
             }
 
-            override suspend fun close(token: String, taskId: Long) {
+            override suspend fun close(token: String, taskId: String) {
                 closed += taskId
             }
         }
@@ -328,18 +334,18 @@ class AwolDeviceReporterTest {
 
 
 private object ApiStub: TodoistApi {
-    override suspend fun getTasks(token: String, projectId: Long?, labelId: Long?): List<Task> {
+    override suspend fun getTasks(token: String, projectId: String?, labelId: String?): List<Task> {
         return emptyList()
     }
 
     override suspend fun create(token: String, task: TaskParameters): Task {
         return Task(
-            id = 123,
+            id = "123",
             projectId = task.projectId,
             content = task.content,
             completed = false,
         )
     }
 
-    override suspend fun close(token: String, taskId: Long) {}
+    override suspend fun close(token: String, taskId: String) {}
 }

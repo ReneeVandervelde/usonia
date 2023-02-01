@@ -69,8 +69,8 @@ internal class AwolDeviceReporter(
             logger.warn("Todoist token not set. Configure `token` parameter for `$TODOIST_SERVICE`")
             return
         }
-        val project = bridge.parameters["project"]?.toLong()
-        val label = bridge.parameters["label"]?.toLong()
+        val project = bridge.parameters["project"]
+        val label = bridge.parameters["label"]
         val timeInstant = time.instant
 
         val devices = client.findDevicesBy { it.capabilities.heartbeat != null }
@@ -97,9 +97,11 @@ internal class AwolDeviceReporter(
 
         new.forEach {
             val parameters = TaskParameters(
-                content = "Replace Batteries in ${it.name} (id: ${it.id.value})",
+                content = "Replace Batteries in ${it.name}",
                 projectId = project,
                 labels = label?.let { listOf(it) },
+                dueString = "Today",
+                description = "(id: ${it.id.value})"
             )
             api.create(token, parameters)
         }
@@ -110,7 +112,7 @@ internal class AwolDeviceReporter(
     }
 
     private val Task.device: Identifier? get() = Regex("""\(id: (.+)\)""")
-        .find(content)
+        .find(description.orEmpty())
         ?.groupValues
         ?.get(1)
         ?.let { Identifier(it) }

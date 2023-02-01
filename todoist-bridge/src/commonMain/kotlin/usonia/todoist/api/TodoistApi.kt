@@ -3,8 +3,8 @@ package usonia.todoist.api
 internal interface TodoistApi {
     suspend fun getTasks(
         token: String,
-        projectId: Long? = null,
-        labelId: Long? = null,
+        projectId: String? = null,
+        label: String? = null,
     ): List<Task>
 
     suspend fun create(
@@ -14,6 +14,6 @@ internal interface TodoistApi {
 
     suspend fun close(
         token: String,
-        taskId: Long,
+        taskId: String,
     )
 }
