@@ -15,4 +15,5 @@ object EventAccessStub: EventAccess {
 
     override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = null
     override fun temperatureHistory(devices: Collection<Identifier>): OngoingFlow<Map<Int, Float>> = ongoingFlowOf()
+    override fun getLatestEvent(id: Identifier): OngoingFlow<Event> = ongoingFlowOf()
 }

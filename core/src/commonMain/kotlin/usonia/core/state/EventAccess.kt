@@ -43,6 +43,13 @@ interface EventAccess {
      * @return A map of temperatures grouped by the number of hours (negative) in the past they were reported.
      */
     fun temperatureHistory(devices: Collection<Identifier>): OngoingFlow<Map<Int, Float>>
+
+    /**
+     * Get the most recent event, of any type, for a particular device.
+     *
+     * @param id The ID of the device to fetch an event for.
+     */
+    fun getLatestEvent(id: Identifier): OngoingFlow<Event>
 }
 
 /**

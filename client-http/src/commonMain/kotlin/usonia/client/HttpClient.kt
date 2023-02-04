@@ -243,6 +243,26 @@ class HttpClient(
         }
     }
 
+    override fun getLatestEvent(id: Identifier): OngoingFlow<Event> {
+        return ongoingFlow {
+            httpClient.ws(
+                host = host,
+                port = port,
+                path = "events/latest/${id.value}",
+            ) {
+                incoming.consumeEach {
+                    if (it !is Frame.Text) return@consumeEach
+
+                    try {
+                        emit(json.decodeFromString(EventSerializer, it.readText()))
+                    } catch (error: Throwable) {
+                        logger.error("Failed to deserialize device event", error)
+                    }
+                }
+            }
+        }
+    }
+
     override suspend fun publishAction(action: Action) {
         val request = HttpRequestBuilder(
             host = host,

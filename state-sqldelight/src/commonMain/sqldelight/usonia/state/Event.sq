@@ -50,3 +50,10 @@ SELECT
 data
 FROM Event
 WHERE source IN ? AND type = ?;
+
+eventsBySource:
+SELECT data
+FROM Event
+WHERE source IN ?
+ORDER BY timestamp DESC
+LIMIT ?;

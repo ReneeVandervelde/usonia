@@ -4,6 +4,7 @@ import kimchi.Kimchi
 import kimchi.logger.defaultWriter
 import kotlinx.browser.window
 import usonia.client.HttpClient
+import usonia.frontend.configuration.ConfigurationSection
 import usonia.frontend.flags.FlagsSection
 import usonia.frontend.logs.LogsSection
 import usonia.frontend.metrics.MetricsSection
@@ -31,7 +32,8 @@ class MainModule {
     val sections: List<NavigationSection> = listOf(
         FlagsSection(client, networkScope),
         LogsSection(client),
-        MetricsSection(client, logger)
+        MetricsSection(client, logger),
+        ConfigurationSection(client),
     )
 
     val mainController = MainController(

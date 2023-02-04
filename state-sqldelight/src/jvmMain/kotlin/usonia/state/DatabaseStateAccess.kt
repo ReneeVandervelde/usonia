@@ -116,6 +116,15 @@ internal class DatabaseStateAccess(
              .asOngoing()
     }
 
+    override fun getLatestEvent(id: Identifier): OngoingFlow<Event> {
+        return eventQueries.value.eventsBySource(setOf(id.value), 1)
+            .asFlow()
+            .mapToOneOrNull()
+            .map { it?.let { json.decodeFromString(EventSerializer, String(it)) } }
+            .filterNotNull()
+            .asOngoing()
+    }
+
     override suspend fun updateSite(site: Site) {
         siteQueries.value.update(json.encodeToString(Site.serializer(), site).toByteArray())
     }

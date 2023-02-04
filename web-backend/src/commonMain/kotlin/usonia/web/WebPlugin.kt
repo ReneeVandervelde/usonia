@@ -40,5 +40,6 @@ class WebPlugin(
         EventsByDaySocket(client, json),
         OldestEventSocket(client, json),
         TemperatureHistorySocket(client, json, logger),
+        LatestEventSocket(client, json, logger),
     )
 }
