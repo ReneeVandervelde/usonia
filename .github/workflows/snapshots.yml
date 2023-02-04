@@ -10,6 +10,12 @@ jobs:
                 name: Checkout
                 uses: actions/checkout@v2.3.4
             -
+                name: Setup Java
+                uses: actions/setup-java@v3
+                with:
+                    distribution: adopt
+                    java-version: '15'
+            -
                 name: JVM Tests
                 run: ./gradlew jvmTest
             -
