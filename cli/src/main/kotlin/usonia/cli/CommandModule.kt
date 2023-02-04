@@ -20,15 +20,15 @@ interface CommandModule {
 
     @Binds
     @IntoSet
-    fun clientLogs(command: ClientLogsCommand): CliktCommand
+    fun clientLogs(command: LogsCommand): CliktCommand
 
     @Binds
     @IntoSet
-    fun clientEvents(command: ClientEventsCommand): CliktCommand
+    fun clientEvents(command: EventsListenCommand): CliktCommand
 
     @Binds
     @IntoSet
-    fun intentSend(command: ClientIntentSendCommand): CliktCommand
+    fun intentSend(command: IntentSendCommand): CliktCommand
 
     @Binds
     @IntoSet
@@ -36,11 +36,11 @@ interface CommandModule {
 
     @Binds
     @IntoSet
-    fun setFlag(command: SetFlagCommand): CliktCommand
+    fun setFlag(command: FlagSetCommand): CliktCommand
 
     @Binds
     @IntoSet
-    fun removeFlag(command: RemoveFlagCommand): CliktCommand
+    fun removeFlag(command: FlagRemoveCommand): CliktCommand
 
     @Binds
     @IntoSet

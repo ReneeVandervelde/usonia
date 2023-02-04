@@ -15,7 +15,6 @@ class SiteUpdateCommand @Inject constructor(
     private val json: Json,
 ): ClientCommand(
     component = component,
-    name = "site:update",
     help = "Update a server's site configuration",
 ) {
     private val configFile by argument(

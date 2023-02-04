@@ -6,11 +6,10 @@ import usonia.foundation.Action
 import usonia.foundation.Identifier
 import javax.inject.Inject
 
-class ClientIntentSendCommand @Inject constructor(
+class IntentSendCommand @Inject constructor(
     component: CliComponent,
 ): ClientCommand(
     component = component,
-    name = "intent",
     help = "Sends an intent Action to the server to be broadcast."
 ) {
     private val target by argument()

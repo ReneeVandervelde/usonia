@@ -15,10 +15,8 @@ import usonia.cli.CliComponent
  */
 abstract class ClientCommand(
     private val component: CliComponent,
-    name: String,
     help: String,
 ): CliktCommand(
-    name = "client:$name",
     help = help,
 ) {
     private val host by option().default("localhost")

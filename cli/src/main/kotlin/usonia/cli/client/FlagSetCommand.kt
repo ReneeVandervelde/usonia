@@ -5,11 +5,10 @@ import com.github.ajalt.clikt.parameters.arguments.optional
 import usonia.cli.CliComponent
 import javax.inject.Inject
 
-class SetFlagCommand @Inject constructor(
+class FlagSetCommand @Inject constructor(
     component: CliComponent,
 ): ClientCommand(
     component = component,
-    name = "flags:set",
     help = "Set a configuration flag on a server"
 ) {
     private val key by argument()

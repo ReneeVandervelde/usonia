@@ -13,7 +13,6 @@ class ConfigurationDumpCommand @Inject constructor(
     component: CliComponent,
 ): ClientCommand(
     component = component,
-    name = "dump:site",
     help = "Dump site json from a database file."
 ) {
     private val database by argument().file(canBeDir = false)

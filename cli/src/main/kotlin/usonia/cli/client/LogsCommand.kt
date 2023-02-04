@@ -8,11 +8,10 @@ import usonia.cli.ColorWriter
 import usonia.kotlin.collect
 import javax.inject.Inject
 
-class ClientLogsCommand @Inject constructor(
+class LogsCommand @Inject constructor(
     component: CliComponent,
 ): ClientCommand(
     component = component,
-    name = "logs",
     help = "Listen to log statements being recorded on the server."
 ) {
     private val buffer by option(
