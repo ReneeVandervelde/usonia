@@ -7,13 +7,12 @@ import inkapplications.shade.structures.PowerInfo
 import inkapplications.shade.structures.UndocumentedApi
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.EventPublisher
 import usonia.foundation.*
-import usonia.kotlin.asOngoing
-import usonia.kotlin.collectLatest
-import usonia.kotlin.combineToPair
+import usonia.kotlin.*
 import usonia.server.Daemon
 
 @OptIn(UndocumentedApi::class)
@@ -25,8 +24,11 @@ class HueEventPublisher(
     private val logger: KimchiLogger = EmptyLogger,
 ): Daemon {
     override suspend fun start(): Nothing {
-        events.bridgeEvents().asOngoing()
-            .combineToPair(configurationAccess.site)
+        configurationAccess.site
+            .filter { it.findBridgeByServiceTag(HUE_SERVICE) != null }
+            .flatMapLatest { site ->
+                events.bridgeEvents().map { it to site }
+            }
             .collectLatest { (events, site) ->
                 events.forEach { event ->
                     when (event) {
