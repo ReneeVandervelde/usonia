@@ -96,6 +96,12 @@ inline fun <T, R> OngoingFlow<T>.mapLatest(crossinline mapper: suspend (T) -> R)
 inline fun <T, R> OngoingFlow<T>.flatMapLatest(crossinline mapper:  (T) -> Flow<R>) = unsafeModify { flatMapLatest { mapper(it) } }
 
 /**
+ * @see Flow.flatMapConcat
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
+inline fun <T, R> OngoingFlow<T>.flatMapConcat(crossinline mapper:  (T) -> Flow<R>) = unsafeModify { flatMapConcat { mapper(it) } }
+
+/**
  * @see Flow.onEach
  */
 inline fun <T> OngoingFlow<T>.onEach(crossinline action: (T) -> Unit) = unsafeModify { onEach { action(it) } }

@@ -9,7 +9,6 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import usonia.client.ktor.PlatformEngine
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 
 internal class TodoistApiClient: TodoistApi {
     private val json = kotlinx.serialization.json.Json {
@@ -41,7 +40,7 @@ internal class TodoistApiClient: TodoistApi {
 
     override suspend fun create(
         token: String,
-        task: TaskParameters,
+        task: TaskCreateParameters,
     ): Task {
         return httpClient.post("https://api.todoist.com/rest/v2/tasks") {
             accept(ContentType.Application.Json)
@@ -55,5 +54,11 @@ internal class TodoistApiClient: TodoistApi {
         httpClient.post("https://api.todoist.com/rest/v2/tasks/$taskId/close") {
             header("Authorization", "Bearer $token")
         }
+    }
+
+    override suspend fun update(token: String, taskId: String, paramters: TaskUpdateParameters): Task {
+        return httpClient.post("https://api.todoist.com/rest/v2/tasks/$taskId") {
+            header("Authorization", "Bearer $token")
+        }.body()
     }
 }

@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class TaskParameters(
+internal data class TaskCreateParameters(
     val content: String,
     @SerialName("project_id")
     val projectId: String? = null,
@@ -15,3 +15,4 @@ internal data class TaskParameters(
     @SerialName("description")
     val description: String? = null,
 )
+

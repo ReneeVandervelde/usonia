@@ -9,11 +9,17 @@ internal interface TodoistApi {
 
     suspend fun create(
         token: String,
-        task: TaskParameters
+        task: TaskCreateParameters,
     ): Task
 
     suspend fun close(
         token: String,
         taskId: String,
     )
+
+    suspend fun update(
+        token: String,
+        taskId: String,
+        paramters: TaskUpdateParameters,
+    ): Task
 }

@@ -1,6 +1,8 @@
 package usonia.todoist
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import usonia.core.state.ConfigurationAccess
@@ -13,16 +15,16 @@ import usonia.kotlin.datetime.UtcClock
 import usonia.kotlin.datetime.current
 import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
+import usonia.todoist.ApiStub.StubTask
 import usonia.todoist.api.Task
-import usonia.todoist.api.TaskParameters
+import usonia.todoist.api.TaskCreateParameters
 import usonia.todoist.api.TodoistApi
 import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class AwolDeviceReporterTest {
     val config = object: ConfigurationAccess by ConfigurationAccessStub {
         override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
@@ -32,6 +34,10 @@ class AwolDeviceReporterTest {
                     name = "Fake Sensor",
                     capabilities = FakeDevices.WaterSensor.capabilities.copy(
                         heartbeat = 1.minutes,
+                        events = setOf(
+                            Event.Water::class,
+                            Event.Battery::class,
+                        )
                     )
                 ))
             )),
@@ -62,10 +68,10 @@ class AwolDeviceReporterTest {
             var projectUsed: String? = null
             var labelUsed: String? = null
 
-            override suspend fun getTasks(token: String, projectId: String?, labelId: String?): List<Task> {
+            override suspend fun getTasks(token: String, projectId: String?, label: String?): List<Task> {
                 tokenUsed = token
                 projectUsed = projectId
-                labelUsed = labelId
+                labelUsed = label
 
                 return emptyList()
             }
@@ -93,20 +99,16 @@ class AwolDeviceReporterTest {
                 } else null
             }
         }
-        val api = object: TodoistApi by ApiStub {
-            val created = mutableListOf<TaskParameters>()
-            override suspend fun create(token: String, task: TaskParameters): Task {
-                created += task
-                return ApiStub.create(token, task)
-            }
-        }
+        val api = ApiSpy()
         val client = testClient.copy(
             eventAccess = events,
         )
 
         AwolDeviceReporter(client, api).runCron(time)
 
-        assertEquals(0, api.created.size)
+        assertEquals(0, api.closed.size, "closed")
+        assertEquals(0, api.updated.size, "updated")
+        assertEquals(0, api.created.size, "created")
     }
 
     @Test
@@ -121,20 +123,16 @@ class AwolDeviceReporterTest {
                 } else null
             }
         }
-        val api = object: TodoistApi by ApiStub {
-            val created = mutableListOf<TaskParameters>()
-            override suspend fun create(token: String, task: TaskParameters): Task {
-                created += task
-                return ApiStub.create(token, task)
-            }
-        }
+        val api = ApiSpy()
         val client = testClient.copy(
             eventAccess = events,
         )
 
         AwolDeviceReporter(client, api).runCron(time)
 
-        assertEquals(1, api.created.size)
+        assertEquals(0, api.closed.size, "closed")
+        assertEquals(0, api.updated.size, "updated")
+        assertEquals(1, api.created.size, "created")
         val parameters = api.created.single()
         assertEquals("Replace Batteries in Fake Sensor", parameters.content)
         assertEquals("(id: fake-sensor)", parameters.description)
@@ -148,20 +146,16 @@ class AwolDeviceReporterTest {
         val events = object: EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
         }
-        val api = object: TodoistApi by ApiStub {
-            val created = mutableListOf<TaskParameters>()
-            override suspend fun create(token: String, task: TaskParameters): Task {
-                created += task
-                return ApiStub.create(token, task)
-            }
-        }
+        val api = ApiSpy()
         val client = testClient.copy(
             eventAccess = events,
         )
 
         AwolDeviceReporter(client, api).runCron(time)
 
-        assertEquals(1, api.created.size)
+        assertEquals(0, api.closed.size, "closed")
+        assertEquals(0, api.updated.size, "updated")
+        assertEquals(1, api.created.size, "created")
     }
 
     @Test
@@ -169,20 +163,16 @@ class AwolDeviceReporterTest {
         val events = object: EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(time.instant)
         }
-        val api = object: TodoistApi by ApiStub {
-            val created = mutableListOf<TaskParameters>()
-            override suspend fun create(token: String, task: TaskParameters): Task {
-                created += task
-                return ApiStub.create(token, task)
-            }
-        }
+        val api = ApiSpy()
         val client = testClient.copy(
             eventAccess = events,
         )
 
         AwolDeviceReporter(client, api).runCron(time)
 
-        assertEquals(0, api.created.size)
+        assertEquals(0, api.closed.size, "closed")
+        assertEquals(0, api.updated.size, "updated")
+        assertEquals(0, api.created.size, "created")
     }
 
     @Test
@@ -197,19 +187,14 @@ class AwolDeviceReporterTest {
                 } else null
             }
         }
-        val api = object: TodoistApi by ApiStub {
-            val closed = mutableListOf<String>()
-            override suspend fun getTasks(token: String, projectId: String?, labelId: String?): List<Task> {
+        val api = object: ApiSpy() {
+            override suspend fun getTasks(token: String, projectId: String?, label: String?): List<Task> {
                 return listOf(Task(
                     id = "432",
                     content = "Test Task",
                     description = "(id: fake-sensor)",
                     completed = false,
                 ))
-            }
-
-            override suspend fun close(token: String, taskId: String) {
-                closed += taskId
             }
         }
         val client = testClient.copy(
@@ -218,7 +203,9 @@ class AwolDeviceReporterTest {
 
         AwolDeviceReporter(client, api).runCron(time)
 
-        assertEquals(1, api.closed.size)
+        assertEquals(1, api.closed.size, "closed")
+        assertEquals(0, api.updated.size, "updated")
+        assertEquals(0, api.created.size, "created")
         assertEquals("432", api.closed.single())
     }
 
@@ -234,26 +221,14 @@ class AwolDeviceReporterTest {
                 } else null
             }
         }
-        val api = object: TodoistApi by ApiStub {
-            val closed = mutableListOf<String>()
-            val created = mutableListOf<TaskParameters>()
-
-            override suspend fun create(token: String, task: TaskParameters): Task {
-                created += task
-                return ApiStub.create(token, task)
-            }
-
-            override suspend fun getTasks(token: String, projectId: String?, labelId: String?): List<Task> {
+        val api = object: ApiSpy() {
+            override suspend fun getTasks(token: String, projectId: String?, label: String?): List<Task> {
                 return listOf(Task(
                     id = "432",
                     content = "Test Task",
                     description = "(id: fake-sensor)",
                     completed = false,
                 ))
-            }
-
-            override suspend fun close(token: String, taskId: String) {
-                closed += taskId
             }
         }
         val client = testClient.copy(
@@ -262,8 +237,9 @@ class AwolDeviceReporterTest {
 
         AwolDeviceReporter(client, api).runCron(time)
 
-        assertEquals(0, api.closed.size)
-        assertEquals(0, api.created.size)
+        assertEquals(0, api.closed.size, "closed")
+        assertEquals(0, api.updated.size, "updated")
+        assertEquals(0, api.created.size, "created")
     }
 
     @Test
@@ -271,28 +247,16 @@ class AwolDeviceReporterTest {
         val events = object: EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(time.instant)
         }
-        val api = object: TodoistApi by ApiStub {
-            val closed = mutableListOf<String>()
-            override suspend fun getTasks(token: String, projectId: String?, labelId: String?): List<Task> {
-                return listOf(Task(
-                    id = "432",
-                    content = "Test Task",
-                    description = "(id: fake-sensor)",
-                    completed = false,
-                ))
-            }
-
-            override suspend fun close(token: String, taskId: String) {
-                closed += taskId
-            }
-        }
+        val api = ApiSpy()
         val client = testClient.copy(
             eventAccess = events,
         )
 
         AwolDeviceReporter(client, api).runCron(time)
 
-        assertEquals(0, api.closed.size)
+        assertEquals(0, api.closed.size, "closed")
+        assertEquals(0, api.updated.size, "updated")
+        assertEquals(0, api.created.size, "created")
     }
 
     @Test
@@ -307,19 +271,133 @@ class AwolDeviceReporterTest {
                 } else null
             }
         }
-        val api = object: TodoistApi by ApiStub {
-            val closed = mutableListOf<String>()
-            override suspend fun getTasks(token: String, projectId: String?, labelId: String?): List<Task> {
+        val api = object: ApiSpy() {
+            override suspend fun getTasks(token: String, projectId: String?, label: String?): List<Task> {
+                return listOf(StubTask.copy(
+                    description = "(id: fake-sensor)",
+                ))
+            }
+        }
+        val client = testClient.copy(
+            eventAccess = events,
+        )
+
+        AwolDeviceReporter(client, api).runCron(time)
+
+        assertEquals(0, api.closed.size, "closed")
+        assertEquals(0, api.updated.size, "updated")
+        assertEquals(0, api.created.size, "created")
+    }
+
+    @Test
+    fun lowBatteryEvent() = runTest {
+        val api = ApiSpy()
+        val events = object: EventAccess by EventAccessStub {
+            override val events: OngoingFlow<Event> = ongoingFlowOf(
+                FakeEvents.LowBattery.copy(
+                    source = Identifier("fake-sensor"),
+                ),
+            )
+        }
+        val client = testClient.copy(
+            eventAccess = events,
+            configurationAccess = config,
+        )
+        val daemon = launch { AwolDeviceReporter(client, api).start() }
+        advanceUntilIdle()
+
+        assertEquals(0, api.closed.size, "closed")
+        assertEquals(0, api.updated.size, "updated")
+        assertEquals(1, api.created.size, "created")
+        daemon.cancel()
+    }
+
+    @Test
+    fun lowBatteryCleared() = runTest {
+        val api = object: ApiSpy() {
+            override suspend fun getTasks(token: String, projectId: String?, label: String?): List<Task> {
                 return listOf(Task(
                     id = "432",
-                    content = "Test Task",
+                    content = "Low battery in Test",
                     description = "(id: fake-sensor)",
                     completed = false,
                 ))
             }
+        }
+        val events = object: EventAccess by EventAccessStub {
+            override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
+            override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
+                return if (id.value == "fake-sensor" && type == Event.Battery::class) {
+                    FakeEvents.FullBattery.copy(
+                        timestamp = time.instant,
+                    ) as T
+                } else null
+            }
+        }
+        val client = testClient.copy(
+            eventAccess = events,
+            configurationAccess = config,
+        )
+        AwolDeviceReporter(client, api).runCron(time)
 
-            override suspend fun close(token: String, taskId: String) {
-                closed += taskId
+        assertEquals(1, api.closed.size, "closed")
+        assertEquals(0, api.updated.size, "updated")
+        assertEquals(0, api.created.size, "created")
+    }
+
+    @Test
+    fun lowBatteryNotCleared() = runTest {
+        val events = object: EventAccess by EventAccessStub {
+            override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
+            override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
+                return if (id.value == "fake-sensor" && type == Event.Water::class) {
+                    FakeEvents.Wet.copy(
+                        timestamp = time.instant
+                    ) as T
+                } else null
+            }
+        }
+        val api = object: ApiSpy() {
+            override suspend fun getTasks(token: String, projectId: String?, label: String?): List<Task> {
+                return listOf(Task(
+                    id = "432",
+                    content = "Low battery for Test Task",
+                    description = "(id: fake-sensor)",
+                    completed = false,
+                ))
+            }
+        }
+        val client = testClient.copy(
+            eventAccess = events,
+        )
+
+        AwolDeviceReporter(client, api).runCron(time)
+
+        assertEquals(0, api.closed.size, "closed")
+        assertEquals(0, api.updated.size, "updated")
+        assertEquals(0, api.created.size, "created")
+    }
+
+    @Test
+    fun lowBatteryUpgraded() = runTest {
+        val events = object: EventAccess by EventAccessStub {
+            override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
+            override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
+                return if (id.value == "fake-sensor" && type == Event.Water::class) {
+                    FakeEvents.LowBattery.copy(
+                        timestamp = time.instant - 2.minutes
+                    ) as T
+                } else null
+            }
+        }
+        val api = object: ApiSpy() {
+            override suspend fun getTasks(token: String, projectId: String?, label: String?): List<Task> {
+                return listOf(Task(
+                    id = "432",
+                    content = "Low battery for Test Task",
+                    description = "(id: fake-sensor)",
+                    completed = false,
+                ))
             }
         }
         val client = testClient.copy(
@@ -329,23 +407,7 @@ class AwolDeviceReporterTest {
         AwolDeviceReporter(client, api).runCron(time)
 
         assertEquals(0, api.closed.size)
+        assertEquals(1, api.updated.size)
+        assertEquals(0, api.created.size)
     }
-}
-
-
-private object ApiStub: TodoistApi {
-    override suspend fun getTasks(token: String, projectId: String?, labelId: String?): List<Task> {
-        return emptyList()
-    }
-
-    override suspend fun create(token: String, task: TaskParameters): Task {
-        return Task(
-            id = "123",
-            projectId = task.projectId,
-            content = task.content,
-            completed = false,
-        )
-    }
-
-    override suspend fun close(token: String, taskId: String) {}
 }

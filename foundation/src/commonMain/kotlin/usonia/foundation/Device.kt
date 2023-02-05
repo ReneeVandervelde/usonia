@@ -8,7 +8,6 @@ import kotlinx.serialization.encoding.Encoder
 import usonia.kotlin.mapSet
 import usonia.kotlin.singleOrThrow
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.ExperimentalTime
 
 data class Device(
     val id: Identifier,
@@ -19,7 +18,6 @@ data class Device(
     val parent: ExternalAssociation? = null,
 )
 
-@OptIn(ExperimentalTime::class)
 class DeviceSerializer(
     private val archetypes: Set<Capabilities>,
 ): KSerializer<Device> {
