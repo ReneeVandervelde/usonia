@@ -3,7 +3,6 @@ package usonia.telegram
 import com.inkapplications.telegram.structures.*
 import kimchi.logger.EmptyLogger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
@@ -227,7 +226,6 @@ class TelegramBotTest {
             ),
             HttpRequest(headers = emptyMap(), parameters = emptyMap()),
         )
-        runCurrent()
 
         successfulResponse(response)
         assertions(TestCommandContext(actionSpy, messageSpy, setFlags))

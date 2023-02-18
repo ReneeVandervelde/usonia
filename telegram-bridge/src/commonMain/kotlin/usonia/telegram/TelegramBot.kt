@@ -64,7 +64,13 @@ internal class TelegramBot(
 
     private suspend fun onUnknownUserCommand(update: Update.MessageUpdate) {
         client.alertAll(
-            message = "An unknown telegram user (@${update.message.from?.username}) Sent the following message:\n ${update.message.text}",
+            message = """
+                An unknown telegram user (@${update.message.from?.username})
+                In Chat ID: `${update.message.chat.id.value}`
+                Sent the following message:
+                --------
+                ${update.message.text}
+                """.trimIndent(),
             level = Action.Alert.Level.Debug
         )
         telegram.sendStickerWithMessage(
