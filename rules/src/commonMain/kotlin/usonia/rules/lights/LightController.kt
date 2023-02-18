@@ -91,10 +91,10 @@ internal class LightController(
             is LightSettings.Temperature -> setRoomTemperature(room, settings)
             is LightSettings.Switch -> switchRoomLights(room, settings.state)
             LightSettings.Ignore -> {
-                logger.trace("Ignored action for room event: $room")
+                logger.trace("Ignored action for room event: ${room.name}")
             }
             LightSettings.Unhandled -> {
-                logger.warn("Unhandled action for room event: $room")
+                logger.warn("Unhandled action for room event: ${room.name}")
             }
         }
     }
