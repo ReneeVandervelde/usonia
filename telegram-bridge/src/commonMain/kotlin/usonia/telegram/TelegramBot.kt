@@ -55,6 +55,7 @@ internal class TelegramBot(
             "/endmovie" -> onMovieEnd(data)
             "/pauselights" -> onPauseLights(data)
             "/resumelights" -> onResumeLights(data)
+            "/announce" -> onAnnounce(data)
             else -> onUnknownCommand(data)
         }
 
@@ -64,7 +65,7 @@ internal class TelegramBot(
     private suspend fun onUnknownUserCommand(update: Update.MessageUpdate) {
         client.alertAll(
             message = "An unknown telegram user (@${update.message.from?.username}) Sent the following message:\n ${update.message.text}",
-            level = Action.Alert.Level.Info
+            level = Action.Alert.Level.Debug
         )
         telegram.sendStickerWithMessage(
             chat = update.message.chat.id,
@@ -130,6 +131,13 @@ internal class TelegramBot(
             chat = update.message.chat.id,
             sticker = Icon.Confused.asSticker,
             message = "Please Send a command with the menu",
+        )
+    }
+
+    private suspend fun onAnnounce(update: Update.MessageUpdate) {
+        client.alertAll(
+            message = update.message.text?.substringAfter("/announce")?.trim().orEmpty(),
+            level = Action.Alert.Level.Info,
         )
     }
 }

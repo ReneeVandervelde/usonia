@@ -3,6 +3,7 @@ package usonia.telegram
 import com.inkapplications.telegram.structures.*
 import kimchi.logger.EmptyLogger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
@@ -155,6 +156,13 @@ class TelegramBotTest {
 
             assertEquals(0, actionSpy.actions.size, "No alerts should be sent")
         }
+        testCommand("/announce", text = "Test?") {
+            assertEquals(2, actionSpy.actions.size, "Alert sent to all info users")
+            assertEquals(listOf(FakeUsers.John.id, FakeUsers.Jane.id), actionSpy.actions.map { (it as? Action.Alert)?.target })
+            assertEquals("Test?", (actionSpy.actions.first() as Action.Alert).message)
+
+            assertEquals(0, setFlags.size, "No flags are changed")
+        }
         testCommand("/unknowncommand") {
             assertEquals(1, messageSpy.messages.size, "Single message sent to caller")
             assertEquals(123L, (messageSpy.messages.single().chatId as ChatReference.Id).value)
@@ -173,7 +181,7 @@ class TelegramBotTest {
         val setFlags: List<Pair<String, String?>>,
     )
 
-    private fun testCommand(command: String, assertions: TestCommandContext.() -> Unit) = runTest {
+    private fun testCommand(command: String, text: String? = null, assertions: TestCommandContext.() -> Unit) = runTest {
         val messageSpy = MessageSpy()
         val actionSpy = ActionPublisherSpy()
         val setFlags = mutableListOf<Pair<String, String?>>()
@@ -184,12 +192,20 @@ class TelegramBotTest {
                         setFlags.add(key to value)
                     }
                     override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-                        users = setOf(FakeUsers.John.copy(
-                            alertLevel = Action.Alert.Level.Debug,
-                            parameters = mapOf(
-                                CHAT_ID_KEY to "123"
+                        users = setOf(
+                            FakeUsers.John.copy(
+                                alertLevel = Action.Alert.Level.Debug,
+                                parameters = mapOf(
+                                    CHAT_ID_KEY to "123"
+                                )
+                            ),
+                            FakeUsers.Jane.copy(
+                                alertLevel = Action.Alert.Level.Info,
+                                parameters = mapOf(
+                                    CHAT_ID_KEY to "456"
+                                )
                             )
-                        ))
+                        )
                     ))
                 },
                 actionPublisher = actionSpy,
@@ -205,12 +221,13 @@ class TelegramBotTest {
                     id = ChatReference.Id(0L),
                     date = Instant.DISTANT_PAST,
                     chat = Chat(ChatReference.Id(123L), ChatType.Private),
-                    text = command,
+                    text = command + text?.let { " $it" }.orEmpty(),
                     entities = listOf(MessageEntity(MessageEntityType.BotCommand, 0, command.length)),
                 ),
             ),
             HttpRequest(headers = emptyMap(), parameters = emptyMap()),
         )
+        runCurrent()
 
         successfulResponse(response)
         assertions(TestCommandContext(actionSpy, messageSpy, setFlags))
