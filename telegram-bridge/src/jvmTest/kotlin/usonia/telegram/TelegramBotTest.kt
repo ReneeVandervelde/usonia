@@ -9,6 +9,7 @@ import kotlinx.serialization.json.Json
 import org.junit.Test
 import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
+import usonia.core.state.EventPublisherSpy
 import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
 import usonia.kotlin.ongoingFlowOf
@@ -17,6 +18,7 @@ import usonia.server.DummyClient
 import usonia.server.http.HttpRequest
 import usonia.server.http.RestResponse
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TelegramBotTest {
@@ -162,6 +164,20 @@ class TelegramBotTest {
 
             assertEquals(0, setFlags.size, "No flags are changed")
         }
+        testCommand("/home") {
+            assertEquals(1, eventSpy.events.size, "Presence event published")
+            val event = eventSpy.events.single()
+            assertTrue(event is Event.Presence)
+            assertEquals(PresenceState.HOME, event.state)
+            assertEquals(FakeUsers.John.id, event.source)
+        }
+        testCommand("/away") {
+            assertEquals(1, eventSpy.events.size, "Presence event published")
+            val event = eventSpy.events.single()
+            assertTrue(event is Event.Presence)
+            assertEquals(PresenceState.AWAY, event.state)
+            assertEquals(FakeUsers.John.id, event.source)
+        }
         testCommand("/unknowncommand") {
             assertEquals(1, messageSpy.messages.size, "Single message sent to caller")
             assertEquals(123L, (messageSpy.messages.single().chatId as ChatReference.Id).value)
@@ -176,6 +192,7 @@ class TelegramBotTest {
 
     private data class TestCommandContext(
         val actionSpy: ActionPublisherSpy,
+        val eventSpy: EventPublisherSpy,
         val messageSpy: MessageSpy,
         val setFlags: List<Pair<String, String?>>,
     )
@@ -183,6 +200,7 @@ class TelegramBotTest {
     private fun testCommand(command: String, text: String? = null, assertions: TestCommandContext.() -> Unit) = runTest {
         val messageSpy = MessageSpy()
         val actionSpy = ActionPublisherSpy()
+        val eventSpy = EventPublisherSpy()
         val setFlags = mutableListOf<Pair<String, String?>>()
         val bot = TelegramBot(
             client = DummyClient.copy(
@@ -208,6 +226,7 @@ class TelegramBotTest {
                     ))
                 },
                 actionPublisher = actionSpy,
+                eventPublisher = eventSpy,
             ),
             telegram = messageSpy,
             json = Json,
@@ -228,7 +247,7 @@ class TelegramBotTest {
         )
 
         successfulResponse(response)
-        assertions(TestCommandContext(actionSpy, messageSpy, setFlags))
+        assertions(TestCommandContext(actionSpy, eventSpy, messageSpy, setFlags))
     }
 
     private fun successfulResponse(response: RestResponse<Status>) {

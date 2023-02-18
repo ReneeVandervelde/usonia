@@ -3,15 +3,15 @@ package usonia.telegram
 import com.inkapplications.telegram.client.TelegramBotClient
 import com.inkapplications.telegram.structures.*
 import kimchi.logger.KimchiLogger
+import kotlinx.datetime.Clock
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import usonia.core.client.alertAll
 import usonia.core.state.getSite
 import usonia.core.state.setFlag
-import usonia.foundation.Action
+import usonia.foundation.*
 import usonia.foundation.Action.Alert.Icon
-import usonia.foundation.Status
-import usonia.foundation.Statuses
+import usonia.foundation.User
 import usonia.rules.Flags
 import usonia.server.client.BackendClient
 import usonia.server.http.HttpRequest
@@ -25,6 +25,7 @@ internal class TelegramBot(
     private val telegram: TelegramBotClient,
     json: Json,
     logger: KimchiLogger,
+    private val clock: Clock = Clock.System,
 ): RestController<Update, Status>(json, logger) {
     override val path: String = "/telegram-bridge"
     override val method: String = "POST"
@@ -37,10 +38,12 @@ internal class TelegramBot(
             return RestResponse(Statuses.SUCCESS)
         }
 
-        client.getSite().users.find { data.message.chat.id.value == it.parameters[CHAT_ID_KEY]?.toLongOrNull() } ?: run {
-            onUnknownUserCommand(data)
-            return RestResponse(Statuses.SUCCESS)
-        }
+        val user = client.getSite().users
+            .find { data.message.chat.id.value == it.parameters[CHAT_ID_KEY]?.toLongOrNull() }
+            ?: run {
+                onUnknownUserCommand(data)
+                return RestResponse(Statuses.SUCCESS)
+            }
 
         val command = data.message.entities
             ?.firstOrNull { it.type == MessageEntityType.BotCommand }
@@ -56,6 +59,8 @@ internal class TelegramBot(
             "/pauselights" -> onPauseLights(data)
             "/resumelights" -> onResumeLights(data)
             "/announce" -> onAnnounce(data)
+            "/home" -> onHome(data, user)
+            "/away" -> onAway(data, user)
             else -> onUnknownCommand(data)
         }
 
@@ -145,5 +150,21 @@ internal class TelegramBot(
             message = update.message.text?.substringAfter("/announce")?.trim().orEmpty(),
             level = Action.Alert.Level.Info,
         )
+    }
+
+    private suspend fun onHome(update: Update.MessageUpdate, user: User) {
+        client.publishEvent(Event.Presence(
+            source = user.id,
+            timestamp = clock.now(),
+            state = PresenceState.HOME,
+        ))
+    }
+
+    private suspend fun onAway(update: Update.MessageUpdate, user: User) {
+        client.publishEvent(Event.Presence(
+            source = user.id,
+            timestamp = clock.now(),
+            state = PresenceState.AWAY,
+        ))
     }
 }
