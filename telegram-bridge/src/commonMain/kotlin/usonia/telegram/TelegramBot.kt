@@ -9,6 +9,7 @@ import usonia.core.client.alertAll
 import usonia.core.state.getSite
 import usonia.core.state.setFlag
 import usonia.foundation.Action
+import usonia.foundation.Action.Alert.Icon
 import usonia.foundation.Status
 import usonia.foundation.Statuses
 import usonia.rules.Flags
@@ -65,35 +66,35 @@ internal class TelegramBot(
             message = "An unknown telegram user (@${update.message.from?.username}) Sent the following message:\n ${update.message.text}",
             level = Action.Alert.Level.Info
         )
-        sendStickerWithMessage(
+        telegram.sendStickerWithMessage(
             chat = update.message.chat.id,
-            sticker = "CAACAgEAAxkBAAEFUYli123oWYOwJkPILV-i-7lQjAfJQAACjwAD1guxBDOYraKGvkauKQQ",
+            sticker = Icon.Disallowed.asSticker,
             message = "You don't have permission to use this bot! I let the admin know.",
         )
     }
 
     private suspend fun onWakeCommand(update: Update.MessageUpdate) {
-        sendStickerWithMessage(
+        telegram.sendStickerWithMessage(
             chat = update.message.chat.id,
-            sticker = "CAACAgEAAxkBAAEFUYdi123JYJY3EtPnHz731Pyjk6290AACKwAD1guxBOSLzZg9iCiqKQQ",
+            sticker = Icon.Wake.asSticker,
             message = "Good Morning!",
         )
         client.setFlag(Flags.SleepMode, false)
     }
 
     private suspend fun onSleepCommand(update: Update.MessageUpdate) {
-        sendStickerWithMessage(
+        telegram.sendStickerWithMessage(
             chat = update.message.chat.id,
-            sticker = "CAACAgMAAxkBAAEFUZpi13Ia23J8vJehFoRmtDgE5O_e3gACFgEAAmL1YwSXaKYAAS3ha_EpBA",
+            sticker = Icon.Sleep.asSticker,
             message = "Good Night!",
         )
         client.setFlag(Flags.SleepMode, true)
     }
 
     private suspend fun onMovieStart(update: Update.MessageUpdate) {
-        sendStickerWithMessage(
+        telegram.sendStickerWithMessage(
             chat = update.message.chat.id,
-            sticker = "CAACAgEAAxkBAAEFUYVi123Gaoef9EtimUJG32PgulHQuQACRwAD1guxBJjGVxH7DFlbKQQ",
+            sticker = Icon.Entertained.asSticker,
             message = "Enjoy the film!\nJust send /endmovie when it's done.",
         )
         client.setFlag(Flags.MovieMode, true)
@@ -116,34 +117,19 @@ internal class TelegramBot(
     }
 
     private suspend fun onResumeLights(update: Update.MessageUpdate) {
-        sendStickerWithMessage(
+        telegram.sendStickerWithMessage(
             chat = update.message.chat.id,
-            sticker = "CAACAgEAAxkBAAEFU9Zi2Ijag5aMaiUN0LXzEOPcjhKJRgACHQEAAoTlaEYYrhoHPNOJzikE",
+            sticker = Icon.Bot.asSticker,
             message = "Turning the lights back on.",
         )
         client.setFlag(Flags.MotionLights, true)
     }
 
     private suspend fun onUnknownCommand(update: Update.MessageUpdate) {
-        sendStickerWithMessage(
+        telegram.sendStickerWithMessage(
             chat = update.message.chat.id,
-            sticker = "CAACAgEAAxkBAAEFUZxi13LNg36F6WaLBcbVSqHVPUd-JwACSwAD1guxBLtGTF8kC7YZKQQ",
+            sticker = Icon.Confused.asSticker,
             message = "Please Send a command with the menu",
         )
-    }
-
-    private suspend fun sendStickerWithMessage(
-        chat: ChatReference,
-        sticker: String,
-        message: String,
-    ) {
-        telegram.sendSticker(StickerParameters(
-            chatId = chat,
-            sticker = InputFile.FileId(sticker),
-        ))
-        telegram.sendMessage(MessageParameters(
-            chatId = chat,
-            text = message,
-        ))
     }
 }

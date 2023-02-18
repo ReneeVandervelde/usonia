@@ -1,6 +1,7 @@
 package usonia.telegram
 
 import com.inkapplications.telegram.structures.ChatReference
+import com.inkapplications.telegram.structures.InputFile
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
@@ -13,6 +14,7 @@ import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
 import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
+import javax.swing.Icon
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -69,6 +71,63 @@ class TelegramAlertsTest {
 
         job.cancelAndJoin()
     }
+
+    @Test
+    fun sendAlertWithSticker() = runTest {
+        val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(
+                FakeSite.copy(
+                    users = setOf(
+                        FakeUsers.John.copy(
+                            parameters = mapOf(
+                                "telegram.chat" to "123"
+                            ),
+                        )
+                    ),
+                    bridges = setOf(
+                        FakeBridge.copy(
+                            service = "telegram",
+                            parameters = mapOf(
+                                "bot" to "test-bot",
+                                "token" to "test-token",
+                            ),
+                        )
+                    ),
+                )
+            )
+        }
+        val fakeActions = ActionAccessFake()
+        val client = DummyClient.copy(
+            actionAccess = fakeActions,
+            configurationAccess = fakeConfigAccess,
+        )
+        val telegramSpy = MessageSpy()
+        val alerts = TelegramAlerts(
+            client,
+            telegramSpy,
+            requestScope = this
+        )
+
+        val job = launch { alerts.start() }
+        advanceUntilIdle()
+
+        fakeActions.mutableActions.emit(Action.Alert(
+            target = FakeUsers.John.id,
+            message = "test",
+            icon = Action.Alert.Icon.Disallowed,
+        ))
+        advanceUntilIdle()
+
+        assertEquals(1, telegramSpy.messages.size)
+        assertEquals(123L, (telegramSpy.messages.first().chatId as? ChatReference.Id)?.value)
+        assertEquals("test", telegramSpy.messages.first().text)
+
+        assertEquals(1, telegramSpy.stickers.size)
+        assertEquals(123L, (telegramSpy.stickers.first().chatId as? ChatReference.Id)?.value)
+
+        job.cancelAndJoin()
+    }
+
     @Test
     fun unknownUser() = runTest {
         val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {

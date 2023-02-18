@@ -9,6 +9,7 @@ import usonia.rules.charging.PowerLimitCharge
 import usonia.rules.greenhouse.FanControl
 import usonia.rules.indicator.Indicator
 import usonia.rules.lights.*
+import usonia.rules.locks.CodeAlerts
 import usonia.rules.locks.LockAfterTime
 import usonia.rules.locks.LockOnAway
 import usonia.rules.locks.LockOnSleep
@@ -50,6 +51,7 @@ class RulesPlugin(
         FanControl(client, logger),
         PowerLimitCharge(client, logger),
         DoorAlert(client, logger),
+        CodeAlerts(client, logger),
     )
 
     override val crons: List<CronJob> = listOf(

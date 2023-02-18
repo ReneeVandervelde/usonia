@@ -2,7 +2,9 @@ package usonia.telegram
 
 import com.inkapplications.telegram.client.TelegramBotClient
 import com.inkapplications.telegram.structures.ChatReference
+import com.inkapplications.telegram.structures.InputFile
 import com.inkapplications.telegram.structures.MessageParameters
+import com.inkapplications.telegram.structures.StickerParameters
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
@@ -47,9 +49,18 @@ internal class TelegramAlerts(
             return
         }
         logger.trace("Sending alerts to <${user.name}>")
-        requestScope.launch { telegram.sendMessage(MessageParameters(
-            chatId = ChatReference.Id(chatId),
-            text = alert.message,
-        )) }
+        requestScope.launch {
+            val stickerId = alert.icon?.asSticker
+            if (stickerId != null) {
+                telegram.sendSticker(StickerParameters(
+                    chatId = ChatReference.Id(chatId),
+                    sticker = InputFile.FileId(stickerId),
+                ))
+            }
+            telegram.sendMessage(MessageParameters(
+                chatId = ChatReference.Id(chatId),
+                text = alert.message,
+            ))
+        }
     }
 }

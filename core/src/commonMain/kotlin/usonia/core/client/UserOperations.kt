@@ -44,6 +44,7 @@ val UsoniaClient.userPresenceStates: OngoingFlow<Pair<User, Event.Presence?>> ge
 suspend fun UsoniaClient.alertAll(
     message: String,
     level: Action.Alert.Level,
+    icon: Action.Alert.Icon? = null,
 ) {
     getSite().users
         .filter { level >= it.alertLevel }
@@ -52,6 +53,7 @@ suspend fun UsoniaClient.alertAll(
                 target = user.id,
                 message = message,
                 level = level,
+                icon = icon,
             ))
         }
 }

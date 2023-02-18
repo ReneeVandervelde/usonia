@@ -86,8 +86,23 @@ sealed class Action {
         override val target: Identifier,
         val message: String,
         val level: Level = Level.Debug,
+        val icon: Icon? = null,
     ): Action() {
         override fun withTarget(target: Identifier): Action = copy(target = target)
+
+        enum class Icon {
+            Suspicious,
+            Flood,
+            Pipes,
+            Bot,
+            Confused,
+            Disallowed,
+            Danger,
+            Panic,
+            Sleep,
+            Wake,
+            Entertained,
+        }
 
         enum class Level {
             Debug,

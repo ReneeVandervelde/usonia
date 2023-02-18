@@ -16,6 +16,7 @@ data class Device(
     val fixture: Fixture? = null,
     val siblings: Set<Identifier> = emptySet(),
     val parent: ExternalAssociation? = null,
+    val parameters: ParameterBag = emptyMap(),
 )
 
 class DeviceSerializer(
@@ -51,6 +52,7 @@ class DeviceSerializer(
                     id = Identifier(device.parentId ?: throw IllegalArgumentException("Context specified with no ID")),
                 )
             },
+            parameters = device.parameters,
         )
     }
 
@@ -66,6 +68,7 @@ class DeviceSerializer(
             siblings = value.siblings.mapSet(Identifier::value),
             parentContext = value.parent?.context?.value,
             parentId = value.parent?.id?.value,
+            parameters = value.parameters,
         )
 
         encoder.encodeSerializableValue(serializer, json)
@@ -89,4 +92,5 @@ internal data class DeviceJson(
     val siblings: Set<String> = emptySet(),
     val parentContext: String? = null,
     val parentId: String? = null,
+    val parameters: ParameterBag = emptyMap(),
 )
