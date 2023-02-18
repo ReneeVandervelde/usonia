@@ -4,6 +4,8 @@ import androidx.compose.runtime.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import org.jetbrains.compose.web.dom.H2
+import org.jetbrains.compose.web.dom.Text
 import usonia.client.HttpClient
 import usonia.core.client.userPresenceStates
 import usonia.foundation.Event
@@ -37,6 +39,7 @@ class FlagsSection(
                 }
             }
 
+        H2 { Text("User Presence") }
         client.userPresenceStates.collectAsState(emptyList())
             .value
             .sortedBy { it.first.name }
