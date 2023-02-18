@@ -183,7 +183,7 @@ suspend inline fun <T> OngoingFlow<T>.collectOn(scope: CoroutineScope, crossinli
  *
  * This is identical to [collect], but throws an exception if the flow ends.
  */
-suspend inline fun <T> OngoingFlow<T>.collect(crossinline observer: (T) -> Unit): Nothing {
+suspend inline fun <T> OngoingFlow<T>.collect(crossinline observer: suspend (T) -> Unit): Nothing {
     asFlow().collect { observer(it) }
     throw IllegalStateException("Unexpected end of flow")
 }

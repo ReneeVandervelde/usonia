@@ -3,6 +3,7 @@ package usonia.rules
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import usonia.rules.alerts.DoorAlert
+import usonia.rules.alerts.LogErrorAlerts
 import usonia.rules.alerts.PipeMonitor
 import usonia.rules.alerts.WaterMonitor
 import usonia.rules.charging.PowerLimitCharge
@@ -39,6 +40,7 @@ class RulesPlugin(
     )
 
     override val daemons: List<Daemon> = listOf(
+        LogErrorAlerts.also { it.client.value = client },
         WaterMonitor(client, logger),
         LightController(client, colorPicker, logger),
         Indicator(client, weather, logger),

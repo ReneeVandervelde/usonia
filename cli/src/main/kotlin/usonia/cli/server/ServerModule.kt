@@ -9,6 +9,7 @@ import kimchi.logger.KimchiLogger
 import kotlinx.serialization.json.Json
 import usonia.cli.ColorWriter
 import usonia.core.state.memory.InMemoryActionAccess
+import usonia.rules.alerts.LogErrorAlerts
 import usonia.server.ServerPlugin
 import usonia.server.UsoniaServer
 import usonia.server.client.BackendClient
@@ -61,7 +62,7 @@ class ServerModule(
     @Provides
     @Reusable
     fun logger(): KimchiLogger {
-        return setOf(LogSocket, ColorWriter)
+        return setOf(LogSocket, ColorWriter, LogErrorAlerts)
             .let(::CompositeLogWriter)
             .let(::ConsolidatedLogger)
     }
