@@ -34,4 +34,5 @@ internal val Action.Alert.Icon.asSticker get() = when (this) {
     Action.Alert.Icon.Sleep -> "CAACAgMAAxkBAAEFUZpi13Ia23J8vJehFoRmtDgE5O_e3gACFgEAAmL1YwSXaKYAAS3ha_EpBA"
     Action.Alert.Icon.Wake -> "CAACAgEAAxkBAAEFUYdi123JYJY3EtPnHz731Pyjk6290AACKwAD1guxBOSLzZg9iCiqKQQ"
     Action.Alert.Icon.Entertained -> "CAACAgEAAxkBAAEFUYVi123Gaoef9EtimUJG32PgulHQuQACRwAD1guxBJjGVxH7DFlbKQQ"
+    Action.Alert.Icon.Wave -> "CAACAgEAAxkBAAEHzUdj8VPKFpkILeoy6FaGGmgu6HqcjgACQwAD1guxBMpRw5bJpAABpS4E"
 }

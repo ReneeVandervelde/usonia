@@ -158,6 +158,11 @@ internal class TelegramBot(
             timestamp = clock.now(),
             state = PresenceState.HOME,
         ))
+        telegram.sendStickerWithMessage(
+            update.message.chat.id,
+            sticker = Icon.Wave.asSticker,
+            message = "Welcome Home!"
+        )
     }
 
     private suspend fun onAway(update: Update.MessageUpdate, user: User) {
@@ -166,5 +171,10 @@ internal class TelegramBot(
             timestamp = clock.now(),
             state = PresenceState.AWAY,
         ))
+        telegram.sendStickerWithMessage(
+            update.message.chat.id,
+            sticker = Icon.Wave.asSticker,
+            message = "See you later!"
+        )
     }
 }

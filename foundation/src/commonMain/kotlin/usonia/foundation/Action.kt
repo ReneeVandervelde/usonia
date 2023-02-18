@@ -102,6 +102,7 @@ sealed class Action {
             Sleep,
             Wake,
             Entertained,
+            Wave,
         }
 
         enum class Level {

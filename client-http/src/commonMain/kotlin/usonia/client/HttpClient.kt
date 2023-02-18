@@ -213,10 +213,12 @@ class HttpClient(
             accept(ContentType.Application.Json)
         }
 
-        return try {
-            httpClient.get(request).bodyAsText().let { json.decodeFromString(EventSerializer, it) as T }
-        } catch (error: ClientRequestException) {
-            if (error.response.status.value == 404) null else throw error
+        val response = httpClient.get(request)
+
+        return when (response.status) {
+            HttpStatusCode.OK -> response.bodyAsText().let { json.decodeFromString(EventSerializer, it) as T }
+            HttpStatusCode.NotFound -> null
+            else -> throw RuntimeException("Unexpected Status: ${response.status}")
         }
     }
 

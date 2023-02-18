@@ -4,6 +4,8 @@ import androidx.compose.runtime.*
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.onSubmit
 import org.jetbrains.compose.web.dom.*
+import usonia.foundation.PresenceState
+import usonia.foundation.User
 
 @Composable
 fun DisabledFlagControl(
@@ -12,7 +14,7 @@ fun DisabledFlagControl(
 ) {
     InlineForm {
         Label {
-            Text("$key:")
+            Text("$key: ")
         }
         Button(
             attrs = {
@@ -27,13 +29,41 @@ fun DisabledFlagControl(
 }
 
 @Composable
+fun UserControl(
+    user: User,
+    state: PresenceState?,
+    onStateChance: (PresenceState) -> Unit,
+) {
+    InlineForm {
+        Label { Text("${user.name}: ") }
+        Button(
+            attrs = {
+                if (state == PresenceState.HOME) classes("primary")
+                onClick {
+                    onStateChance(when (state) {
+                        PresenceState.HOME, null -> PresenceState.AWAY
+                        PresenceState.AWAY -> PresenceState.HOME
+                    })
+                }
+            }
+        ) {
+            when (state) {
+                PresenceState.HOME -> Text("Home")
+                PresenceState.AWAY -> Text("Away")
+                null -> Text("Unknown")
+            }
+        }
+    }
+}
+
+@Composable
 fun EnabledFlagControl(
     key: String,
     onFlagChange: (String?) -> Unit,
 ) {
     InlineForm {
         Label {
-            Text("$key:")
+            Text("$key: ")
         }
         Button(
             attrs = {
@@ -57,7 +87,7 @@ fun TextFlagField(
     var currentValue by remember { mutableStateOf(value) }
     InlineForm {
         Label {
-            Text("$key:")
+            Text("$key: ")
         }
         Input(
             type = InputType.Text,

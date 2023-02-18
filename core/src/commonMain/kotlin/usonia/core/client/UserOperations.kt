@@ -1,5 +1,6 @@
 package usonia.core.client
 
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
@@ -25,13 +26,15 @@ fun UsoniaClient.userPresence(user: Identifier): OngoingFlow<Event.Presence?> {
 /**
  * Observes all users' presence states, starting with their last known state.
  */
-val UsoniaClient.userPresenceStates: OngoingFlow<Pair<User, Event.Presence?>> get() {
+val UsoniaClient.userPresenceStates: OngoingFlow<List<Pair<User, Event.Presence?>>> get() {
     return site
         .map { it.users }
         .flatMapLatest { users ->
             users.map { user ->
                 userPresence(user.id).asFlow().map { user to it }
-            }.merge()
+            }.let {
+                combine(it) { it.toList() }
+            }
         }
 }
 
