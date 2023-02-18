@@ -59,9 +59,9 @@ class DeviceSerializer(
             id = value.id.value,
             name = value.name,
             capabilitiesArchetype = value.capabilities.archetypeId,
-            actionTypes = value.capabilities.actions.mapSet { it.simpleName!! },
-            eventTypes = value.capabilities.events.mapSet { it.simpleName!! },
-            heartbeat = value.capabilities.heartbeat?.inWholeMilliseconds,
+            actionTypes = value.ifNoArchetype { capabilities.actions.mapSet { it.simpleName!! } },
+            eventTypes = value.ifNoArchetype { capabilities.events.mapSet { it.simpleName!! } },
+            heartbeat = value.ifNoArchetype { capabilities.heartbeat?.inWholeMilliseconds },
             fixture = value.fixture?.name,
             siblings = value.siblings.mapSet(Identifier::value),
             parentContext = value.parent?.context?.value,
@@ -69,6 +69,10 @@ class DeviceSerializer(
         )
 
         encoder.encodeSerializableValue(serializer, json)
+    }
+
+    private fun <T> Device.ifNoArchetype(value: Device.() -> T): T? {
+        return if (capabilities.archetypeId == null) value(this) else null
     }
 }
 
