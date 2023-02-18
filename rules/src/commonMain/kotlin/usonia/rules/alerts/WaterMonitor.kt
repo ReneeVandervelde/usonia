@@ -55,6 +55,10 @@ internal class WaterMonitor(
             logger.error("Unable to find device with ID: <${event.source}>")
         }
         logger.trace("Sending out alerts for <$name>")
-        client.alertAll("Water detected by $name!", Action.Alert.Level.Emergency)
+        client.alertAll(
+            message = "Water detected by $name!",
+            level = Action.Alert.Level.Emergency,
+            icon = Action.Alert.Icon.Flood,
+        )
     }
 }

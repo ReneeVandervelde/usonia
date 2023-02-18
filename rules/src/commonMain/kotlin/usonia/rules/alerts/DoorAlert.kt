@@ -30,7 +30,11 @@ class DoorAlert(
                 .filter { Fixture.EntryPoint == it.fixture }
                 .collectLatest {  device ->
                     if (client.allAway(site.users)) {
-                        client.alertAll("${device.name} was opened while you were gone!", Action.Alert.Level.Warning)
+                        client.alertAll(
+                            message = "${device.name} was opened while you were gone!",
+                            level = Action.Alert.Level.Warning,
+                            icon = Action.Alert.Icon.Suspicious,
+                        )
                     }
                 }
         }

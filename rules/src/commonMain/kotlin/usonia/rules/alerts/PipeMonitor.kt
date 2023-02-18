@@ -56,6 +56,7 @@ class PipeMonitor(
         client.alertAll(
             message = "${device.name} is down to ${event.temperature}º!",
             level = Action.Alert.Level.Warning,
+            icon = Action.Alert.Icon.Pipes,
         )
 
         alerted += device.id
