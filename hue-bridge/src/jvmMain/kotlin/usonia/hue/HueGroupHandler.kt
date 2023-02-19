@@ -5,7 +5,9 @@ import inkapplications.shade.groupedlights.parameters.GroupedLightUpdateParamete
 import inkapplications.shade.lights.parameters.ColorParameters
 import inkapplications.shade.lights.parameters.ColorTemperatureParameters
 import inkapplications.shade.lights.parameters.DimmingParameters
+import inkapplications.shade.structures.ApiStatusError
 import inkapplications.shade.structures.ResourceId
+import inkapplications.shade.structures.ShadeException
 import inkapplications.shade.structures.parameters.PowerParameters
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
@@ -97,10 +99,16 @@ internal class HueGroupHandler(
                     groups.updateGroup(device.parent!!.id.value.let(::ResourceId), modification)
                 }
             } catch (e: CancellationException) {
-                logger.warn("Hue Action was Cancelled", e)
+                logger.warn("Hue Action was Cancelled while updating hue group: ${device.name}", e)
                 throw e
+            } catch (e: ApiStatusError) {
+                if (e.code == 207) {
+                    logger.warn("Partial success from hue group update for group: ${device.name}", e)
+                } else {
+                    logger.error("API Error updating hue group: ${device.name}", e)
+                }
             } catch (e: Throwable) {
-                logger.error("Error setting hue group state.", e)
+                logger.error("Unknown Error updating hue group: ${device.name}.", e)
             }
         }
     }
