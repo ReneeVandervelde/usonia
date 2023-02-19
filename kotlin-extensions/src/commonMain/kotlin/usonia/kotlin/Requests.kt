@@ -18,7 +18,7 @@ import kotlin.time.Duration.Companion.seconds
  * @param onError invoked each time the attempt fails to complete.
  * @param block The task to be executed/retried.
  */
-suspend fun <T> executeRetryable(
+suspend fun <T> runRetryable(
     attemptTimeout: Duration = Duration.INFINITE,
     strategy: RetryStrategy,
     retryFilter: (Throwable) -> Boolean = { it !is CancellationException },
@@ -31,12 +31,15 @@ suspend fun <T> executeRetryable(
         }
     }
     return runCatching {
+        if (strategy.attempts == 0) {
+            throw IllegalArgumentException("No attempts were made.")
+        }
         repeat(strategy.attempts) { attempt ->
             try {
                 return@runCatching timeoutBlock()
             } catch (e: Throwable) {
                 onError(e)
-                if (attempt > strategy.attempts) throw e
+                if (attempt >= strategy.attempts - 1) throw e
                 if (!retryFilter(e)) throw e
                 delay(strategy.calculateDelay(attempt))
             }

@@ -3,7 +3,6 @@ package usonia.weather.accuweather
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -119,7 +118,7 @@ internal class AccuweatherAccess(
         token: String,
     ): Conditions {
         logger.debug("Refreshing Conditions")
-        val conditionsResult = executeRetryable(
+        val conditionsResult = runRetryable(
             strategy = retryStrategy,
             attemptTimeout = timeout,
             onError = { error -> logger.warn("Error getting fresh conditions", error) }
@@ -150,7 +149,7 @@ internal class AccuweatherAccess(
     ): Forecast {
         logger.debug("Refreshing Conditions")
 
-        val forecastResult = executeRetryable(
+        val forecastResult = runRetryable(
             strategy = retryStrategy,
             attemptTimeout = timeout,
             onError = { error -> logger.warn("Error getting forecast", error) },

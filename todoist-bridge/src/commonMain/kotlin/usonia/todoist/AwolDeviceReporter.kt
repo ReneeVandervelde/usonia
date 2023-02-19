@@ -20,7 +20,6 @@ import usonia.todoist.api.Task
 import usonia.todoist.api.TaskCreateParameters
 import usonia.todoist.api.TaskUpdateParameters
 import usonia.todoist.api.TodoistApi
-import java.net.UnknownHostException
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -105,7 +104,7 @@ internal class AwolDeviceReporter(
                 description = "(id: ${device.id.value})"
             )
 
-            executeRetryable(
+            runRetryable(
                 strategy = retryStrategy,
                 attemptTimeout = timeout,
                 onError = { error -> logger.warn("Error attempting to create AWOL task", error) },
@@ -123,7 +122,7 @@ internal class AwolDeviceReporter(
                 content = device.awolContentString,
             )
 
-            executeRetryable(
+            runRetryable(
                 strategy = retryStrategy,
                 attemptTimeout = timeout,
                 onError = { error -> logger.warn("Error updating AWOL task", error) },
@@ -137,7 +136,7 @@ internal class AwolDeviceReporter(
         }
 
         (found + saved).forEach { task ->
-            executeRetryable(
+            runRetryable(
                 strategy = retryStrategy,
                 attemptTimeout = timeout,
                 onError = { error -> logger.warn("Error updating AWOL task", error) },
@@ -175,7 +174,7 @@ internal class AwolDeviceReporter(
             description = "(id: ${device.id.value})"
         )
 
-        executeRetryable(
+        runRetryable(
             strategy = RetryStrategy.Bracket(
                 attempts = 10,
                 timeouts = listOf(500.milliseconds, 5.seconds, 30.seconds, 5.minutes)

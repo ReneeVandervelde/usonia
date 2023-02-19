@@ -91,13 +91,14 @@ internal class HueGroupHandler(
         }
 
         requestScope.launch {
-            val executionResult = executeRetryable(
+            val executionResult = runRetryable(
                 attemptTimeout = 5.seconds,
                 strategy = RetryStrategy.Bracket(
                     attempts = 5,
                     timeouts = listOf(100.milliseconds, 800.milliseconds, 2.seconds),
                 ),
-                onError = { onError(it, device) }
+                onError = { onError(it, device) },
+                retryFilter = { it !is CancellationException && !(it is ApiStatusError && it.code == 207) },
             ) {
                 groups.updateGroup(device.parent!!.id.value.let(::ResourceId), modification)
             }.throwCancels()

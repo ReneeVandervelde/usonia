@@ -6,7 +6,6 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -16,9 +15,7 @@ import usonia.kotlin.*
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 
 /**
  * Forwards Action events to a hubitat bridge.
@@ -86,7 +83,7 @@ internal class ActionRelay(
         }
 
         requestScope.launch {
-            val result = executeRetryable(
+            val result = runRetryable(
                 strategy = RetryStrategy.Bracket(
                     attempts = 10,
                     timeouts = listOf(100.milliseconds, 300.milliseconds, 1.seconds, 5.seconds),

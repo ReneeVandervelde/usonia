@@ -13,7 +13,6 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 import usonia.foundation.*
 import usonia.kotlin.*
 import usonia.server.Daemon
@@ -94,13 +93,14 @@ internal class HueLightHandler(
         }
 
         requestScope.launch {
-            val executionResult = executeRetryable(
+            val executionResult = runRetryable(
                 attemptTimeout = 5.seconds,
                 strategy = RetryStrategy.Bracket(
                     attempts = 5,
                     timeouts = listOf(100.milliseconds, 800.milliseconds, 2.seconds),
                 ),
-                onError = { onError(it, device) }
+                onError = { onError(it, device) },
+                retryFilter = { it !is CancellationException && !(it is ApiStatusError && it.code == 207) },
             ) {
                 shade.updateLight(device.parent!!.id.value.let(::ResourceId), modification)
             }.throwCancels()

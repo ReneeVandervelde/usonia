@@ -13,6 +13,7 @@ import usonia.foundation.*
 import usonia.foundation.Action.Alert.Icon
 import usonia.foundation.User
 import usonia.rules.Flags
+import usonia.rules.alerts.LogErrorAlerts
 import usonia.server.client.BackendClient
 import usonia.server.http.HttpRequest
 import usonia.server.http.RestController
@@ -61,6 +62,8 @@ internal class TelegramBot(
             "/announce" -> onAnnounce(data)
             "/home" -> onHome(data, user)
             "/away" -> onAway(data, user)
+            "/disablealerts" -> onDisableErrorAlerts(data)
+            "/enablealerts" -> onEnableErrorAlerts(data)
             else -> onUnknownCommand(data)
         }
 
@@ -175,6 +178,23 @@ internal class TelegramBot(
             update.message.chat.id,
             sticker = Icon.Wave.asSticker,
             message = "See you later!"
+        )
+    }
+
+    private suspend fun onDisableErrorAlerts(update: Update.MessageUpdate) {
+        client.setFlag(Flags.LogAlerts, false)
+        telegram.sendMessage(MessageParameters(
+            update.message.chat.id,
+            text = "Log Alerts are now disabled. This can be re-enabled with /enablealerts",
+        ))
+    }
+
+    private suspend fun onEnableErrorAlerts(update: Update.MessageUpdate) {
+        client.setFlag(Flags.LogAlerts, true)
+        telegram.sendStickerWithMessage(
+            update.message.chat.id,
+            sticker = Icon.Bot.asSticker,
+            message = "Log Alerts are now enabled!",
         )
     }
 }

@@ -6,8 +6,8 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import usonia.core.client.alertAll
 import usonia.foundation.Action
-import usonia.kotlin.asOngoing
-import usonia.kotlin.collect
+import usonia.kotlin.*
+import usonia.rules.Flags
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
 
@@ -27,12 +27,22 @@ object LogErrorAlerts: Daemon, LogWriter {
     }
 
     override suspend fun start(): Nothing {
-        logs.asOngoing().collect { log ->
-            client.value?.alertAll(
-                message = "Error: $log",
-                level = Action.Alert.Level.Debug,
-                icon = Action.Alert.Icon.Danger,
-            )
-        }
+        client
+            .filterNotNull()
+            .asOngoing()
+            .flatMapLatest { client ->
+                client.flags.map { client to it[Flags.LogAlerts] }.asFlow()
+            }
+            .flatMapLatest { (client, enabled) ->
+                if (enabled.toBoolean()) logs.map { client to it }
+                else emptyFlow()
+            }
+            .collect { (client, log) ->
+                client.alertAll(
+                    message = "Error: $log",
+                    level = Action.Alert.Level.Debug,
+                    icon = Action.Alert.Icon.Danger,
+                )
+            }
     }
 }

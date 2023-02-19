@@ -178,6 +178,14 @@ class TelegramBotTest {
             assertEquals(PresenceState.AWAY, event.state)
             assertEquals(FakeUsers.John.id, event.source)
         }
+        testCommand("/disablealerts") {
+            assertEquals(1, setFlags.size, "Flag updated")
+            assertEquals(Flags.LogAlerts to "false", setFlags.single())
+        }
+        testCommand("/enablealerts") {
+            assertEquals(1, setFlags.size, "Flag updated")
+            assertEquals(Flags.LogAlerts to "true", setFlags.single())
+        }
         testCommand("/unknowncommand") {
             assertEquals(1, messageSpy.messages.size, "Single message sent to caller")
             assertEquals(123L, (messageSpy.messages.single().chatId as ChatReference.Id).value)
