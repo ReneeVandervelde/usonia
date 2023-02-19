@@ -10,10 +10,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import usonia.core.state.findBridgeByServiceTag
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.asOngoing
+import usonia.kotlin.*
 import usonia.kotlin.datetime.ZonedDateTime
-import usonia.kotlin.first
 import usonia.server.client.BackendClient
 import usonia.server.cron.CronJob
 import usonia.server.cron.Schedule
@@ -21,6 +19,8 @@ import usonia.weather.Conditions
 import usonia.weather.Forecast
 import usonia.weather.WeatherAccess
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 private const val SERVICE = "accuweather"
@@ -42,6 +42,11 @@ internal class AccuweatherAccess(
     private val clock: Clock = Clock.System,
     private val logger: KimchiLogger = EmptyLogger,
 ): WeatherAccess, CronJob {
+    private val retryStrategy = RetryStrategy.Bracket(
+        attempts = 4,
+        timeouts = listOf(200.milliseconds, 1.seconds, 5.seconds),
+    )
+    private val timeout = 60.seconds
     private val forecastFlow = MutableStateFlow(
         Forecast(
             timestamp = Instant.DISTANT_PAST,
@@ -114,9 +119,15 @@ internal class AccuweatherAccess(
         token: String,
     ): Conditions {
         logger.debug("Refreshing Conditions")
-        try {
-            val conditionsResponse = api.getConditions(location, token)
+        val conditionsResult = executeRetryable(
+            strategy = retryStrategy,
+            attemptTimeout = timeout,
+            onError = { error -> logger.warn("Error getting fresh conditions", error) }
+        ) {
+            api.getConditions(location, token)
+        }.throwCancels()
 
+        conditionsResult.onSuccess {  conditionsResponse ->
             return Conditions(
                 timestamp = clock.now(),
                 cloudCover = conditionsResponse.cloudCover.percent,
@@ -124,13 +135,13 @@ internal class AccuweatherAccess(
             ).also {
                 logger.debug("New Conditions: <$it>")
             }
-        } catch (e: CancellationException) {
-            logger.warn("Conditions fetch was cancelled", e)
-            throw e
-        } catch (error: Throwable) {
-            logger.error("Unable to get fresh conditions.", error)
-            return conditionsFlow.value
         }
+
+        conditionsResult.onFailure { error ->
+            logger.error("Failed to get fresh conditions.", error)
+        }
+
+        return conditionsFlow.value
     }
 
     private suspend fun getFreshForecast(
@@ -138,9 +149,16 @@ internal class AccuweatherAccess(
         token: String,
     ): Forecast {
         logger.debug("Refreshing Conditions")
-        try {
-            val forecastResponse = api.getForecast(location, token)
 
+        val forecastResult = executeRetryable(
+            strategy = retryStrategy,
+            attemptTimeout = timeout,
+            onError = { error -> logger.warn("Error getting forecast", error) },
+        ) {
+            api.getForecast(location, token)
+        }.throwCancels()
+
+        forecastResult.onSuccess { forecastResponse ->
             return Forecast(
                 timestamp = clock.now(),
                 sunrise = forecastResponse.daily.single().sun.rise.let(Instant.Companion::fromEpochSeconds),
@@ -150,12 +168,12 @@ internal class AccuweatherAccess(
             ).also {
                 logger.debug("New Forecast: <$it>")
             }
-        } catch (e: CancellationException) {
-            logger.warn("Forecast fetch was cancelled", e)
-            throw e
-        } catch (error: Throwable) {
-            logger.error("Unable to get fresh forecast.", error)
-            return forecastFlow.value
         }
+
+        forecastResult.onFailure { error ->
+            logger.error("Failed to get fresh conditions.", error)
+        }
+
+        return forecastFlow.value
     }
 }

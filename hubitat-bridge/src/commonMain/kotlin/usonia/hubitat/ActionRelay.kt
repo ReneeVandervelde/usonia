@@ -12,18 +12,17 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import usonia.client.ktor.PlatformEngine
 import usonia.foundation.*
-import usonia.kotlin.IoScope
-import usonia.kotlin.collect
-import usonia.kotlin.collectLatest
+import usonia.kotlin.*
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 /**
  * Forwards Action events to a hubitat bridge.
  */
-@OptIn(ExperimentalTime::class)
 internal class ActionRelay(
     private val client: BackendClient,
     private val json: Json = Json,
@@ -87,7 +86,14 @@ internal class ActionRelay(
         }
 
         requestScope.launch {
-            try {
+            val result = executeRetryable(
+                strategy = RetryStrategy.Bracket(
+                    attempts = 10,
+                    timeouts = listOf(100.milliseconds, 300.milliseconds, 1.seconds, 5.seconds),
+                ),
+                attemptTimeout = 10.seconds,
+                onError = { error -> logger.warn("Error publishing action to <$name>", error) }
+            ) {
                 httpClient.post {
                     url {
                         this.host = host
@@ -98,11 +104,14 @@ internal class ActionRelay(
                     contentType(ContentType.Application.Json)
                     setBody(json.encodeToString(ActionSerializer, action.withTarget(parent.id)))
                 }
-            } catch (e: CancellationException) {
-                logger.warn("Publish action was cancelled", e)
-                throw e
-            } catch (error: Throwable) {
-                logger.error("Failed to post action to <${name}>", error)
+            }.throwCancels()
+
+            result.onSuccess {
+                logger.debug("Posted action to <$name>")
+            }
+
+            result.onFailure { error ->
+                logger.error("Failed to post action to <$name>", error)
             }
         }
     }

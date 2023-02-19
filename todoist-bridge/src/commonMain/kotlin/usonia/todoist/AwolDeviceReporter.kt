@@ -10,11 +10,8 @@ import usonia.core.state.findDevicesBy
 import usonia.core.state.getOldestEvent
 import usonia.foundation.*
 import usonia.foundation.unit.compareTo
-import usonia.kotlin.collectLatest
-import usonia.kotlin.combineToPair
+import usonia.kotlin.*
 import usonia.kotlin.datetime.ZonedDateTime
-import usonia.kotlin.filter
-import usonia.kotlin.filterIsInstance
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
 import usonia.server.cron.CronJob
@@ -23,6 +20,10 @@ import usonia.todoist.api.Task
 import usonia.todoist.api.TaskCreateParameters
 import usonia.todoist.api.TaskUpdateParameters
 import usonia.todoist.api.TodoistApi
+import java.net.UnknownHostException
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 private const val TODOIST_SERVICE = "todoist"
 private const val TODOIST_TOKEN = "token"
@@ -89,6 +90,11 @@ internal class AwolDeviceReporter(
             .filter { it.isWarning }
             .filter { client.getState(it.device!!, Event.Battery::class)?.percentage?.let { it > 80.percent } ?: false }
             .also { logger.debug("${it.size} devices are no longer low-battery.") }
+        val retryStrategy = RetryStrategy.Bracket(
+            attempts = 5,
+            timeouts = listOf(500.milliseconds, 5.seconds, 10.seconds)
+        )
+        val timeout = 30.seconds
 
         new.forEach { device ->
             val parameters = TaskCreateParameters(
@@ -98,18 +104,50 @@ internal class AwolDeviceReporter(
                 dueString = "Today",
                 description = "(id: ${device.id.value})"
             )
-            api.create(token, parameters)
+
+            executeRetryable(
+                strategy = retryStrategy,
+                attemptTimeout = timeout,
+                onError = { error -> logger.warn("Error attempting to create AWOL task", error) },
+            ) {
+                api.create(token, parameters)
+            }.onSuccess {
+                logger.info("Created AWOL Task: ${it.id}")
+            }.throwCancels().onFailure { error ->
+                logger.error("Unable to create AWOL task", error)
+            }
         }
 
         upgraded.forEach { (device, report) ->
             val parameters = TaskUpdateParameters(
                 content = device.awolContentString,
             )
-            api.update(token, report.id, parameters)
+
+            executeRetryable(
+                strategy = retryStrategy,
+                attemptTimeout = timeout,
+                onError = { error -> logger.warn("Error updating AWOL task", error) },
+            ) {
+                api.update(token, report.id, parameters)
+            }.onSuccess {
+                logger.info("Updated AWOL Task: ${it.id}")
+            }.throwCancels().onFailure { error ->
+                logger.error("Unable to update AWOL task", error)
+            }
         }
 
-        (found + saved).forEach {
-            api.close(token, it.id)
+        (found + saved).forEach { task ->
+            executeRetryable(
+                strategy = retryStrategy,
+                attemptTimeout = timeout,
+                onError = { error -> logger.warn("Error updating AWOL task", error) },
+            ) {
+                api.close(token, task.id)
+            }.onSuccess {
+                logger.info("Closed Task: ${task.id}")
+            }.throwCancels().onFailure { error ->
+                logger.error("Unable to close task: ${task.id}", error)
+            }
         }
     }
 
@@ -136,7 +174,21 @@ internal class AwolDeviceReporter(
             dueString = "Today",
             description = "(id: ${device.id.value})"
         )
-        api.create(token, parameters)
+
+        executeRetryable(
+            strategy = RetryStrategy.Bracket(
+                attempts = 10,
+                timeouts = listOf(500.milliseconds, 5.seconds, 30.seconds, 5.minutes)
+            ),
+            attemptTimeout = 60.seconds,
+            onError = { error -> logger.warn("Error attempting to create low battery task", error) },
+        ) {
+            api.create(token, parameters)
+        }.onSuccess {
+            logger.info("Created Low Battery Task: ${it.id}")
+        }.throwCancels().onFailure { error ->
+            logger.error("Unable to create low battery task", error)
+        }
     }
 
     private suspend fun isRecent(

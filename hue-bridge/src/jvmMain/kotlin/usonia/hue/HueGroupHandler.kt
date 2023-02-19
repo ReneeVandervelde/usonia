@@ -7,18 +7,15 @@ import inkapplications.shade.lights.parameters.ColorTemperatureParameters
 import inkapplications.shade.lights.parameters.DimmingParameters
 import inkapplications.shade.structures.ApiStatusError
 import inkapplications.shade.structures.ResourceId
-import inkapplications.shade.structures.ShadeException
 import inkapplications.shade.structures.parameters.PowerParameters
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.*
 import usonia.foundation.*
 import usonia.kotlin.*
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
@@ -94,21 +91,49 @@ internal class HueGroupHandler(
         }
 
         requestScope.launch {
-            try {
-                withTimeout(5.seconds) {
-                    groups.updateGroup(device.parent!!.id.value.let(::ResourceId), modification)
-                }
-            } catch (e: CancellationException) {
-                logger.warn("Hue Action was Cancelled while updating hue group: ${device.name}", e)
-                throw e
-            } catch (e: ApiStatusError) {
-                if (e.code == 207) {
-                    logger.warn("Partial success from hue group update for group: ${device.name}", e)
-                } else {
-                    logger.error("API Error updating hue group: ${device.name}", e)
-                }
-            } catch (e: Throwable) {
-                logger.error("Unknown Error updating hue group: ${device.name}.", e)
+            val executionResult = executeRetryable(
+                attemptTimeout = 5.seconds,
+                strategy = RetryStrategy.Bracket(
+                    attempts = 5,
+                    timeouts = listOf(100.milliseconds, 800.milliseconds, 2.seconds),
+                ),
+                onError = { onError(it, device) }
+            ) {
+                groups.updateGroup(device.parent!!.id.value.let(::ResourceId), modification)
+            }.throwCancels()
+
+            executionResult.onSuccess { reference ->
+                logger.trace("Successfully updated Hue Group: ${device.name}")
+            }.onFailure { error ->
+                onFailure(error, device)
+            }
+        }
+    }
+
+    private fun onError(error: Throwable, device: Device) {
+        when {
+            error is CancellationException -> {
+                logger.warn("Hue Action was Cancelled while updating hue group: ${device.name}", error)
+            }
+            error is ApiStatusError && error.code == 207 -> {
+                logger.warn("Partial success from hue group update for group: ${device.name}", error)
+            }
+            error is ApiStatusError -> {
+                logger.warn("API Error updating hue group: ${device.name}", error)
+            }
+            else -> {
+                logger.warn("Unknown Error updating hue group: ${device.name}.", error)
+            }
+        }
+    }
+
+    private fun onFailure(error: Throwable, device: Device) {
+        when {
+            error is ApiStatusError && error.code == 207 -> {
+                logger.warn("Hue Group update finished with partial success. Ignoring error.")
+            }
+            else -> {
+                logger.error("Hue operation was unable to succeed for group update: ${device.name}", error)
             }
         }
     }

@@ -18,6 +18,7 @@ import usonia.foundation.*
 import usonia.kotlin.*
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
@@ -93,21 +94,49 @@ internal class HueLightHandler(
         }
 
         requestScope.launch {
-            try {
-                withTimeout(5.seconds) {
-                    shade.updateLight(device.parent!!.id.value.let(::ResourceId), modification)
-                }
-            } catch (e: CancellationException) {
-                logger.warn("Hue Action was Cancelled while updating light: ${device.id}", e)
-                throw e
-            } catch (e: ApiStatusError) {
-                if (e.code == 207) {
-                    logger.warn("Partial success from hue group update for light: ${device.name}", e)
-                } else {
-                    logger.error("API Error updating hue light: ${device.name}", e)
-                }
-            } catch (e: Throwable) {
-                logger.error("Unknown error updating hue light: ${device.name}", e)
+            val executionResult = executeRetryable(
+                attemptTimeout = 5.seconds,
+                strategy = RetryStrategy.Bracket(
+                    attempts = 5,
+                    timeouts = listOf(100.milliseconds, 800.milliseconds, 2.seconds),
+                ),
+                onError = { onError(it, device) }
+            ) {
+                shade.updateLight(device.parent!!.id.value.let(::ResourceId), modification)
+            }.throwCancels()
+
+            executionResult.onSuccess { reference ->
+                logger.trace("Successfully updated Hue Group: ${device.name}")
+            }.onFailure { error ->
+                onFailure(error, device)
+            }
+        }
+    }
+
+    private fun onError(error: Throwable, device: Device) {
+        when {
+            error is CancellationException -> {
+                logger.warn("Hue Action was Cancelled while updating hue light: ${device.name}", error)
+            }
+            error is ApiStatusError && error.code == 207 -> {
+                logger.warn("Partial success from hue group update for light: ${device.name}", error)
+            }
+            error is ApiStatusError -> {
+                logger.warn("API Error updating hue light: ${device.name}", error)
+            }
+            else -> {
+                logger.warn("Unknown Error updating hue light: ${device.name}.", error)
+            }
+        }
+    }
+
+    private fun onFailure(error: Throwable, device: Device) {
+        when {
+            error is ApiStatusError && error.code == 207 -> {
+                logger.warn("Hue light update finished with partial success. Ignoring error.")
+            }
+            else -> {
+                logger.error("Hue operation was unable to succeed for light update: ${device.name}", error)
             }
         }
     }
