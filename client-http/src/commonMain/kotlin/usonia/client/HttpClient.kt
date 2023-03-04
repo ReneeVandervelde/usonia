@@ -14,6 +14,7 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.decodeFromString
@@ -257,6 +258,29 @@ class HttpClient(
 
                     try {
                         emit(json.decodeFromString(EventSerializer, it.readText()))
+                    } catch (error: Throwable) {
+                        logger.error("Failed to deserialize device event", error)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun deviceEventHistory(id: Identifier, size: Int?): OngoingFlow<List<Event>> {
+        return ongoingFlow {
+            httpClient.ws(
+                host = host,
+                port = port,
+                path = "events/history/${id.value}",
+                request = {
+                    if (size != null) parameter("count", size)
+                },
+            ) {
+                incoming.consumeEach {
+                    if (it !is Frame.Text) return@consumeEach
+
+                    try {
+                        emit(json.decodeFromString(ListSerializer(EventSerializer), it.readText()))
                     } catch (error: Throwable) {
                         logger.error("Failed to deserialize device event", error)
                     }

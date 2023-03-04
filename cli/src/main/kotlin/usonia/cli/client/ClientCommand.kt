@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
+import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.runBlocking
 import usonia.cli.CliComponent
 
@@ -33,6 +34,8 @@ abstract class ClientCommand(
      * Usonia HTTP Client.
      */
     protected val client by lazy { clientComponent.client() }
+
+    protected val logger: KimchiLogger by lazy { clientComponent.logger() }
 
     final override fun run() = runBlocking {
         execute()

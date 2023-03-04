@@ -4,13 +4,12 @@ import kimchi.Kimchi
 import kimchi.logger.defaultWriter
 import kotlinx.browser.window
 import usonia.client.HttpClient
-import usonia.frontend.configuration.ConfigurationSection
+import usonia.frontend.configuration.DeviceSection
+import usonia.frontend.configuration.RoomSection
 import usonia.frontend.flags.FlagsSection
 import usonia.frontend.logs.LogsSection
 import usonia.frontend.metrics.MetricsSection
 import usonia.frontend.navigation.NavigationContainer
-import usonia.frontend.navigation.NavigationSection
-import usonia.kotlin.DefaultScope
 import usonia.kotlin.IoScope
 import usonia.serialization.SerializationModule
 
@@ -27,18 +26,13 @@ class MainModule {
     )
 
     private val networkScope = IoScope()
-    private val renderScope = DefaultScope()
-
-    val sections: List<NavigationSection> = listOf(
+    private val mainController = MainController(listOf(
         FlagsSection(client, networkScope),
         LogsSection(client),
         MetricsSection(client, logger),
-        ConfigurationSection(client),
-    )
-
-    val mainController = MainController(
-        sections = sections,
-    )
+        RoomSection(client),
+        DeviceSection(client),
+    ))
 
     val navigationContainer: NavigationContainer = mainController
 }

@@ -1,13 +1,15 @@
 package usonia.frontend
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import org.jetbrains.compose.web.attributes.href
 import org.jetbrains.compose.web.dom.*
+import usonia.frontend.navigation.NavigationContainer
+import usonia.frontend.navigation.NavigationInstructions
 
 @Composable
 fun MainLayout(
-    controller: MainController,
+    controller: NavigationContainer,
 ) {
     Header(
         attrs = {
@@ -17,27 +19,26 @@ fun MainLayout(
         H1 {
             Text("Control Panel")
         }
-        controller.sections.forEach { page ->
+        controller.topLevelRoutes.forEach { route ->
             A(
                 attrs = {
-                    href("javascript:void(0)")
-                    onClick {
-                        controller.navigateTo(page)
-                    }
+                    href(route.route)
                 }
             ) {
-                Text(page.title)
+                Text(route.title)
             }
         }
     }
+    Section(controller.currentSection.collectAsState().value)
+}
+
+@Composable
+private fun Section(instructions: NavigationInstructions) {
     Section(
         attrs = {
             classes("content-break")
         }
     ) {
-        H1 {
-            Text(controller.currentSection.value.title)
-        }
-        controller.currentSection.value.renderContent()
+        instructions.section.renderContent(instructions.args)
     }
 }

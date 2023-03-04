@@ -3,9 +3,9 @@ package usonia.state
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
+import kimchi.logger.EmptyLogger
+import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.Json
@@ -13,25 +13,27 @@ import usonia.foundation.Event
 import usonia.foundation.EventSerializer
 import usonia.foundation.Identifier
 import usonia.foundation.Site
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.asOngoing
+import usonia.kotlin.*
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
-import usonia.kotlin.mapEach
 import kotlin.reflect.KClass
 import kotlin.time.DurationUnit
-import kotlin.time.ExperimentalTime
+
+/**
+ * The default limit to use when querying potentially large collections.
+ */
+private const val DEFAULT_COLLECTION_SIZE = 100L
 
 /**
  * Implement database services via SQLite
  */
-@OptIn(ExperimentalTime::class)
 internal class DatabaseStateAccess(
     private val eventQueries: Lazy<EventQueries>,
     private val siteQueries: Lazy<SiteQueries>,
     private val flagQueries: Lazy<FlagQueries>,
     private val json: Json,
     private val zonedClock: ZonedClock = ZonedSystemClock,
+    private val logger: KimchiLogger = EmptyLogger,
 ): DatabaseServices {
     private val eventsFlow = MutableSharedFlow<Event>()
     override val events: OngoingFlow<Event> = eventsFlow.asOngoing()
@@ -105,7 +107,9 @@ internal class DatabaseStateAccess(
              .let { eventQueries.value.eventsBySourceAndType(it, Event.Temperature::class.simpleName!!) }
              .asFlow()
              .mapToList()
-             .mapEach { json.decodeFromString(EventSerializer, String(it)) as Event.Temperature }
+             .mapEachCatching { json.decodeFromString(EventSerializer, String(it)) as Event.Temperature }
+             .onEachFailure { logger.warn("Failed to deserialize temperature event", it) }
+             .filterSuccess()
              .map {
                  it.groupBy { (it.timestamp - zonedClock.now()).toInt(DurationUnit.HOURS) }
                      .map { (hoursAgo, events) ->
@@ -114,6 +118,17 @@ internal class DatabaseStateAccess(
                      .toMap()
              }
              .asOngoing()
+    }
+
+    override fun deviceEventHistory(id: Identifier, size: Int?): OngoingFlow<List<Event>> {
+        return eventQueries.value.eventsBySource(setOf(id.value), size?.toLong() ?: DEFAULT_COLLECTION_SIZE)
+            .asFlow()
+            .mapToList()
+            .mapEachCatching { json.decodeFromString(EventSerializer, String(it)) }
+            .onEachFailure { logger.warn("Failed to deserialize event") }
+            .filterSuccess()
+            .map { it.toList() }
+            .asOngoing()
     }
 
     override fun getLatestEvent(id: Identifier): OngoingFlow<Event> {

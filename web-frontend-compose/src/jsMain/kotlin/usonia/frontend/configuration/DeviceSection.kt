@@ -1,0 +1,119 @@
+package usonia.frontend.configuration
+
+import androidx.compose.runtime.Composable
+import inkapplications.spondee.scalar.toWholePercentage
+import org.jetbrains.compose.web.dom.*
+import usonia.client.FrontendClient
+import usonia.foundation.*
+import usonia.frontend.extensions.collectAsState
+import usonia.frontend.navigation.NavigationSection
+import usonia.frontend.navigation.Routing
+import usonia.frontend.widgets.KeyValue
+import usonia.frontend.widgets.LoadingIndicator
+import usonia.kotlin.combineToPair
+import usonia.kotlin.map
+
+class DeviceSection(
+    private val client: FrontendClient,
+): NavigationSection {
+    override val route: Routing = Routing.Dynamic(
+        route = "/devices/{deviceId}"
+    )
+
+    @Composable
+    override fun renderContent(args: ParameterBag) {
+        val id = args["deviceId"]?.let(::Identifier)!!
+        val deviceState = client.site
+            .map { it.getDevice(id) }
+            .combineToPair(client.deviceEventHistory(id, 10))
+            .map { (device, events) ->
+                ViewState.Loaded(device, events) as ViewState
+            }
+            .collectAsState(ViewState.Initial)
+
+        when (val currentState = deviceState.value) {
+            ViewState.Initial -> LoadingIndicator()
+            is ViewState.Loaded -> DeviceDetails(currentState.device, currentState.events)
+        }
+    }
+
+    @Composable
+    private fun DeviceDetails(device: Device, events: List<Event>) {
+        H2 { Text("Info") }
+        KeyValue("Name", device.name)
+        Br()
+        KeyValue("ID", device.id.value)
+        Br()
+        device.parent?.run {
+            KeyValue("Parent", toString())
+            Br()
+        }
+        device.fixture?.run {
+            KeyValue("Fixture", name)
+            Br()
+        }
+        H3 { Text("Capabilities") }
+        device.capabilities.archetypeId?.run {
+            KeyValue("Archetype", this)
+            Br()
+        }
+        device.capabilities.heartbeat?.run {
+            KeyValue("Heartbeat", toString())
+            Br()
+        }
+        KeyValue("Events", device.capabilities.events.map { it.simpleName }.joinToString().ifEmpty { "None" })
+        Br()
+        KeyValue("Actions", device.capabilities.actions.map { it.simpleName }.joinToString().ifEmpty { "None" })
+        Br()
+
+        H2 { Text("Recent Events") }
+        Table {
+            Tr {
+                Th {
+                    Text("Name")
+                }
+                Th {
+                    Text("State")
+                }
+                Th {
+                    Text("Timestamp")
+                }
+            }
+            events.forEach { event ->
+                Tr {
+                    Td {
+                        Text(event::class.simpleName!!)
+                    }
+                    Td {
+                        when (event) {
+                            is Event.Battery -> Text("${event.percentage.toWholePercentage()}")
+                            is Event.Humidity -> Text("${event.humidity.toWholePercentage()}")
+                            is Event.Latch -> Text("${event.state}")
+                            is Event.Lock -> Text("${event.state}")
+                            is Event.Motion -> Text("${event.state}")
+                            is Event.Movement -> Text("${event.state}")
+                            is Event.Power -> Text("${event.power}")
+                            is Event.Presence -> Text("${event.state}")
+                            is Event.Pressure -> Text("${event.pressure}")
+                            is Event.Switch -> Text("${event.state}")
+                            is Event.Temperature -> Text("${event.temperature}")
+                            is Event.Tilt -> Text("x: ${event.x} y: ${event.y} z: ${event.z}")
+                            is Event.Water -> Text("${event.state}")
+                        }
+                    }
+                    Td {
+                        Text(event.timestamp.toString())
+                    }
+                }
+            }
+        }
+    }
+
+    private sealed interface ViewState {
+        object Initial: ViewState
+        data class Loaded(
+            val device: Device,
+            val events: List<Event> = emptyList()
+        ): ViewState
+    }
+}

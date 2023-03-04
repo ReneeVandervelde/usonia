@@ -30,8 +30,9 @@ class ServerModule(
     @Reusable
     fun databaseBackendClient(
         json: Json,
+        logger: KimchiLogger,
     ): BackendClient {
-        val databaseModule = DatabaseModule(json)
+        val databaseModule = DatabaseModule(json, logger)
         val database = if (path == null) databaseModule.inMemoryDatabase() else databaseModule.database(path)
         val actions = InMemoryActionAccess()
 

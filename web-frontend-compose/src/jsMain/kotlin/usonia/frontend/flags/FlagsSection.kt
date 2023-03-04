@@ -4,25 +4,31 @@ import androidx.compose.runtime.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import org.jetbrains.compose.web.dom.H2
+import org.jetbrains.compose.web.dom.H1
 import org.jetbrains.compose.web.dom.Text
 import usonia.client.HttpClient
 import usonia.core.client.userPresenceStates
 import usonia.foundation.Event
+import usonia.foundation.ParameterBag
 import usonia.foundation.PresenceState
 import usonia.foundation.User
 import usonia.frontend.extensions.collectAsState
 import usonia.frontend.navigation.NavigationSection
+import usonia.frontend.navigation.Routing
 
 class FlagsSection(
     private val client: HttpClient,
     private val backgroundScope: CoroutineScope,
     private val clock: Clock = Clock.System,
 ): NavigationSection {
-    override val title: String = "Flags"
+    override val route: Routing = Routing.TopLevel(
+        route = "/flags",
+        title = "Flags",
+    )
 
     @Composable
-    override fun renderContent() {
+    override fun renderContent(args: ParameterBag) {
+        H1 { Text("Flags") }
         client.flags.collectAsState(emptyMap())
             .value
             .toList()
@@ -39,7 +45,7 @@ class FlagsSection(
                 }
             }
 
-        H2 { Text("User Presence") }
+        H1 { Text("User Presence") }
         client.userPresenceStates.collectAsState(emptyList())
             .value
             .sortedBy { it.first.name }

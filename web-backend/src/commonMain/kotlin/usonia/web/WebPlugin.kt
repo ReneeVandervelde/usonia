@@ -31,6 +31,7 @@ class WebPlugin(
         StaticResourceController("js.map", "application/javascript"),
         StaticResourceController("css", "text/css"),
         DefaultController,
+        AppRouteController,
     )
     override val socketController: List<WebSocketController> = listOf(
         LogSocket,
@@ -41,5 +42,6 @@ class WebPlugin(
         OldestEventSocket(client, json),
         TemperatureHistorySocket(client, json, logger),
         LatestEventSocket(client, json, logger),
+        EventHistorySocket(client, json, logger),
     )
 }

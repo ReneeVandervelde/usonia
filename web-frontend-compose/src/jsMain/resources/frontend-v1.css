@@ -1,5 +1,5 @@
 
-@import url("https://assets.inkapplications.com/css/main-v1.css");
+@import url("https://assets.inkapplications.com/css/main-v1.1.css");
 
 :root
 {
@@ -90,4 +90,29 @@ form.inline > input:not([type="button"]):not([type="submit"]):not([type="checkbo
 {
     display: inline-block;
     margin: .25rem .25rem .25rem 0;
+}
+
+/* Tables */
+table
+{
+    width: 100%;
+}
+
+th
+{
+    text-align: start;
+    font-weight: 700;
+}
+
+td,
+th
+{
+    padding: .5rem;
+}
+
+table,
+th,
+td
+{
+    border: 1px solid var(--color-foreground-subtle)
 }

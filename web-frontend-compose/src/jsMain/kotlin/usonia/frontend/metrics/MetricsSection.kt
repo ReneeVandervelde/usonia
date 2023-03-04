@@ -3,15 +3,15 @@ package usonia.frontend.metrics
 import androidx.compose.runtime.Composable
 import chart.*
 import kimchi.logger.KimchiLogger
+import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.dom.H2
-import org.jetbrains.compose.web.dom.H3
-import org.jetbrains.compose.web.dom.P
-import org.jetbrains.compose.web.dom.Text
 import usonia.client.FrontendClient
 import usonia.foundation.Event
 import usonia.foundation.Fixture
+import usonia.foundation.ParameterBag
 import usonia.frontend.extensions.collectAsState
 import usonia.frontend.navigation.NavigationSection
+import usonia.frontend.navigation.Routing
 import usonia.kotlin.map
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.days
@@ -21,7 +21,10 @@ class MetricsSection(
     private val client: FrontendClient,
     private val logger: KimchiLogger,
 ): NavigationSection {
-    override val title: String = "Metrics"
+    override val route: Routing = Routing.TopLevel(
+        route = "/metrics",
+        title = "Metrics",
+    )
 
     private val eventsData = client.eventsByDay
         .map {
@@ -33,10 +36,11 @@ class MetricsSection(
         .map { it.sortedBy { it.name } }
 
     @Composable
-    override fun renderContent() {
+    override fun renderContent(args: ParameterBag) {
         val eventState = eventsData.collectAsState(listOf())
         val rooms = rooms.collectAsState(listOf())
 
+        H1 { Text("Metrics") }
         H2 {
             Text("Events")
         }

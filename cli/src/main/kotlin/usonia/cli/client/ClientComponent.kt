@@ -1,6 +1,7 @@
 package usonia.cli.client
 
 import dagger.Subcomponent
+import kimchi.logger.KimchiLogger
 import usonia.client.FrontendClient
 
 /**
@@ -17,4 +18,5 @@ import usonia.client.FrontendClient
 @ClientScope
 interface ClientComponent {
     fun client(): FrontendClient
+    fun logger(): KimchiLogger
 }

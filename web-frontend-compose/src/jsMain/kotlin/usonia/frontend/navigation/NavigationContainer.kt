@@ -1,13 +1,12 @@
 package usonia.frontend.navigation
 
-import androidx.compose.runtime.State
-import kotlin.reflect.KClass
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Controls navigation and its current state.
  */
 interface NavigationContainer {
-    val currentSection: State<NavigationSection>
-    fun navigateTo(target: KClass<out NavigationSection>)
-    fun navigateTo(target: NavigationSection)
+    val sections: List<NavigationSection>
+    val currentSection: StateFlow<NavigationInstructions>
+    val topLevelRoutes: List<Routing.TopLevel>
 }

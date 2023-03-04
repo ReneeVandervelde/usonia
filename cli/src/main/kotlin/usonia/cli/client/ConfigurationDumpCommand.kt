@@ -18,6 +18,7 @@ class ConfigurationDumpCommand @Inject constructor(
     private val database by argument().file(canBeDir = false)
     private val backendModule get() = DatabaseModule(
         json = SerializationModule.json,
+        logger = logger,
     )
 
     override suspend fun execute() {

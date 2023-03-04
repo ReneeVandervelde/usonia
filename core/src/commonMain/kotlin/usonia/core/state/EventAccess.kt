@@ -35,6 +35,17 @@ interface EventAccess {
     suspend fun <T: Event> getState(id: Identifier, type: KClass<T>): T?
 
     /**
+     * Latest events for a specific device.
+     *
+     * @param id The device to get event data for
+     * @param size The maximum number of events to return in a single set.
+     *        If unspecified, the default size will be determined by the
+     *        data implementation.
+     * @return A list of the most recent events for a device.
+     */
+    fun deviceEventHistory(id: Identifier, size: Int? = null): OngoingFlow<List<Event>>
+
+    /**
      * History of hourly temperatures reported for a group of devices.
      *
      * Multiple reports by one or more devices are averaged into a single data point.
