@@ -82,4 +82,8 @@ suspend fun ConfigurationAccess.getBooleanFlag(
     key: String,
     default: Boolean = false
 ): Boolean = flags.first()[key]?.toBoolean() ?: default
+suspend fun ConfigurationAccess.toggleBooleanFlag(
+    key: String,
+    default: Boolean = false,
+) = setFlag(key, !getBooleanFlag(key, default))
 suspend fun ConfigurationAccess.setFlag(key: String, value: Boolean) = setFlag(key, value.toString())

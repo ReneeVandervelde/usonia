@@ -25,6 +25,7 @@ class WebPlugin(
         LatestEventController(client, json),
         SiteUpdateController(client, json, logger),
         FlagUpdateController(client, json, logger),
+        FlagToggleController(client, json, logger),
         FlagDeleteController(client, json),
         StaticResourceController("html", "text/html"),
         StaticResourceController("js", "application/javascript"),
