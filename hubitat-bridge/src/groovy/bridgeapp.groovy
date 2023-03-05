@@ -169,6 +169,9 @@ def onEvent(event) {
         case "power":
             eventJson.power = event.value
             break;
+        case "lastCodeName":
+            log.debug "Ignoring event ${event.name}"
+            return;
     }
 
     def requestParams = [
