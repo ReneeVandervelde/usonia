@@ -125,7 +125,7 @@ internal class DatabaseStateAccess(
             .asFlow()
             .mapToList()
             .mapEachCatching { json.decodeFromString(EventSerializer, String(it)) }
-            .onEachFailure { logger.warn("Failed to deserialize event") }
+            .onEachFailure { logger.warn("Failed to deserialize event", it) }
             .filterSuccess()
             .map { it.toList() }
             .asOngoing()
