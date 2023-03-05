@@ -1,5 +1,6 @@
 package usonia.weather.accuweather
 
+import com.inkapplications.standard.throwCancels
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger

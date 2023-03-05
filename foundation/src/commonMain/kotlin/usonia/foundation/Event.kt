@@ -3,6 +3,8 @@ package usonia.foundation
 import inkapplications.spondee.measure.metric.watts
 import inkapplications.spondee.scalar.Percentage
 import inkapplications.spondee.scalar.decimalPercentage
+import inkapplications.spondee.scalar.percent
+import inkapplications.spondee.scalar.toWholePercentage
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -203,7 +205,7 @@ object EventSerializer: KSerializer<Event> {
             Event.Humidity::class.simpleName -> Event.Humidity(
                 id,
                 timestamp,
-                json.humidity!!.decimalPercentage,
+                json.humidity!!.percent,
             )
             Event.Presence::class.simpleName -> Event.Presence(
                 id,
@@ -223,7 +225,7 @@ object EventSerializer: KSerializer<Event> {
             Event.Battery::class.simpleName -> Event.Battery(
                 id,
                 timestamp,
-                json.battery!!.decimalPercentage,
+                json.battery!!.percent,
             )
             Event.Movement::class.simpleName -> Event.Movement(
                 id,
@@ -268,7 +270,7 @@ object EventSerializer: KSerializer<Event> {
                 temperature = value.temperature
             )
             is Event.Humidity -> prototype.copy(
-                humidity = value.humidity.toDecimal().value.toFloat(),
+                humidity = value.humidity.toWholePercentage().value.toFloat(),
             )
             is Event.Lock -> prototype.copy(
                 lockState = value.state.name
@@ -283,7 +285,7 @@ object EventSerializer: KSerializer<Event> {
                 presenceState = value.state.name
             )
             is Event.Battery -> prototype.copy(
-                battery = value.percentage.toDecimal().value.toFloat(),
+                battery = value.percentage.toWholePercentage().value.toFloat(),
             )
             is Event.Tilt -> prototype.copy(
                 x = value.x,

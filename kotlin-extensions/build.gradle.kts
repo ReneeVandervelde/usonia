@@ -8,6 +8,7 @@ kotlin {
             dependencies {
                 api(kotlinLibraries.coroutines.core)
                 api(kotlinLibraries.datetime)
+                api(inkLibraries.bundles.watermelon.kotlin)
             }
         }
 

@@ -1,5 +1,6 @@
 package usonia.hubitat
 
+import com.inkapplications.standard.throwCancels
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*

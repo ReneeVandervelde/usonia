@@ -1,5 +1,8 @@
 package usonia.state
 
+import com.inkapplications.coroutines.filterItemSuccess
+import com.inkapplications.coroutines.mapItemsCatching
+import com.inkapplications.coroutines.onItemFailure
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
@@ -107,9 +110,9 @@ internal class DatabaseStateAccess(
              .let { eventQueries.value.eventsBySourceAndType(it, Event.Temperature::class.simpleName!!) }
              .asFlow()
              .mapToList()
-             .mapEachCatching { json.decodeFromString(EventSerializer, String(it)) as Event.Temperature }
-             .onEachFailure { logger.warn("Failed to deserialize temperature event", it) }
-             .filterSuccess()
+             .mapItemsCatching { json.decodeFromString(EventSerializer, String(it)) as Event.Temperature }
+             .onItemFailure { logger.warn("Failed to deserialize temperature event", it) }
+             .filterItemSuccess()
              .map {
                  it.groupBy { (it.timestamp - zonedClock.now()).toInt(DurationUnit.HOURS) }
                      .map { (hoursAgo, events) ->
@@ -124,9 +127,9 @@ internal class DatabaseStateAccess(
         return eventQueries.value.eventsBySource(setOf(id.value), size?.toLong() ?: DEFAULT_COLLECTION_SIZE)
             .asFlow()
             .mapToList()
-            .mapEachCatching { json.decodeFromString(EventSerializer, String(it)) }
-            .onEachFailure { logger.warn("Failed to deserialize event", it) }
-            .filterSuccess()
+            .mapItemsCatching { json.decodeFromString(EventSerializer, String(it)) }
+            .onItemFailure { logger.warn("Failed to deserialize event", it) }
+            .filterItemSuccess()
             .map { it.toList() }
             .asOngoing()
     }
