@@ -90,7 +90,7 @@ sealed class Event {
         override val source: Identifier,
         override val timestamp: Instant,
         val state: LockState,
-        val method: LockMethod,
+        val method: LockMethod? = null,
         val code: String?
     ): Event() {
         override fun withSource(source: Identifier): Event = copy(source = source)
@@ -197,7 +197,7 @@ object EventSerializer: KSerializer<Event> {
                 id,
                 timestamp,
                 json.lockState!!.let { LockState.valueOf(it) },
-                json.lockMethod!!,
+                json.lockMethod,
                 json.lockCode
             )
             Event.Temperature::class.simpleName -> Event.Temperature(
