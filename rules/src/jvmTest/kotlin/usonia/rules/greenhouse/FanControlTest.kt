@@ -1,5 +1,6 @@
 package usonia.rules.greenhouse
 
+import inkapplications.spondee.measure.us.fahrenheit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
@@ -49,7 +50,7 @@ class FanControlTest {
 
         val daemonJob = launch { daemon.start() }
         runCurrent()
-        fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 80f))
+        fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 80.fahrenheit))
         runCurrent()
         assertEquals(1, actionSpy.actions.size, "Fan is switched on")
         val action = actionSpy.actions.single()
@@ -73,9 +74,9 @@ class FanControlTest {
 
         val daemonJob = launch { daemon.start() }
         runCurrent()
-        fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 79f))
-        fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 78f))
-        fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 77f))
+        fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 79.fahrenheit))
+        fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 78.fahrenheit))
+        fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 77.fahrenheit))
         assertEquals(0, actionSpy.actions.size, "Fan not adjusted in buffer.")
 
         daemonJob.cancelAndJoin()
@@ -94,7 +95,7 @@ class FanControlTest {
 
         val daemonJob = launch { daemon.start() }
         runCurrent()
-        fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 76f))
+        fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 76.fahrenheit))
         runCurrent()
         assertEquals(1, actionSpy.actions.size, "Fan is switched off outside of buffer.")
         val action = actionSpy.actions.single()
@@ -118,8 +119,8 @@ class FanControlTest {
 
         val daemonJob = launch { daemon.start() }
         runCurrent()
-        fakeEvents.mutableEvents.emit(Event.Temperature(Identifier("unrelated-sensor"), Instant.DISTANT_PAST, 99f))
-        fakeEvents.mutableEvents.emit(Event.Temperature(Identifier("unrelated-sensor"), Instant.DISTANT_PAST, 1f))
+        fakeEvents.mutableEvents.emit(Event.Temperature(Identifier("unrelated-sensor"), Instant.DISTANT_PAST, 99.fahrenheit))
+        fakeEvents.mutableEvents.emit(Event.Temperature(Identifier("unrelated-sensor"), Instant.DISTANT_PAST, 1.fahrenheit))
         assertEquals(0, actionSpy.actions.size, "No action taken on unrelated temperature event")
         daemonJob.cancelAndJoin()
     }

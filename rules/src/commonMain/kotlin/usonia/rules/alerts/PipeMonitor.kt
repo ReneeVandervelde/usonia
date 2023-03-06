@@ -1,5 +1,7 @@
 package usonia.rules.alerts
 
+import inkapplications.spondee.measure.us.toFahrenheit
+import inkapplications.spondee.structure.toFloat
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +29,7 @@ class PipeMonitor(
                 launch {
                     client.events
                         .filterIsInstance<Event.Temperature>()
-                        .filter { it.temperature < 38 }
+                        .filter { it.temperature.toFahrenheit().toFloat() < 38 }
                         .map { site.findDevice(it.source) to it }
                         .filter { (device, _) -> device?.fixture == Fixture.Pipe }
                         .collectOn(backgroundScope) { (device, event) ->
@@ -37,7 +39,7 @@ class PipeMonitor(
                 launch {
                     client.events
                         .filterIsInstance<Event.Temperature>()
-                        .filter { it.temperature > 40 }
+                        .filter { it.temperature.toFahrenheit().toFloat() > 40 }
                         .map { site.findDevice(it.source) }
                         .filter { device -> device?.fixture == Fixture.Pipe }
                         .collect { device -> reset(device!!) }

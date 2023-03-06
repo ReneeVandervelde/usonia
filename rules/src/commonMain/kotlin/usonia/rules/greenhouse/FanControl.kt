@@ -1,5 +1,7 @@
 package usonia.rules.greenhouse
 
+import inkapplications.spondee.measure.us.toFahrenheit
+import inkapplications.spondee.structure.toFloat
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
@@ -39,11 +41,11 @@ class FanControl(
             return
         }
         when {
-            event.temperature >= DEFAULT_HIGH_BOUND -> {
+            event.temperature.toFahrenheit().toFloat() >= DEFAULT_HIGH_BOUND -> {
                 logger.info("Temperature of <${device.name}> exceeds upper greenhouse bound. Currently ${event.temperature}ºF")
                 switchFans(room, SwitchState.ON)
             }
-            event.temperature < DEFAULT_HIGH_BOUND - DEFAULT_UPPER_BUFFER -> {
+            event.temperature.toFahrenheit().toFloat() < DEFAULT_HIGH_BOUND - DEFAULT_UPPER_BUFFER -> {
                 logger.trace("Temperature of <${device.name}> is within bounds <${event.temperature}ºF>")
                 switchFans(room, SwitchState.OFF)
             }

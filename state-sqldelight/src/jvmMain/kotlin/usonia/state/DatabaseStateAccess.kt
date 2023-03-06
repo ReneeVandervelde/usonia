@@ -6,6 +6,8 @@ import com.inkapplications.coroutines.onItemFailure
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
+import inkapplications.spondee.measure.us.toFahrenheit
+import inkapplications.spondee.structure.toFloat
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.flow.*
@@ -116,7 +118,7 @@ internal class DatabaseStateAccess(
              .map {
                  it.groupBy { (it.timestamp - zonedClock.now()).toInt(DurationUnit.HOURS) }
                      .map { (hoursAgo, events) ->
-                         hoursAgo to events.map { it.temperature }.average().toFloat()
+                         hoursAgo to events.map { it.temperature.toFahrenheit().toFloat() }.average().toFloat()
                      }
                      .toMap()
              }

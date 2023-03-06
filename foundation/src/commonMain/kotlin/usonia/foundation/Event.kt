@@ -1,10 +1,13 @@
 package usonia.foundation
 
+import inkapplications.spondee.measure.Temperature
 import inkapplications.spondee.measure.metric.watts
+import inkapplications.spondee.measure.us.fahrenheit
+import inkapplications.spondee.measure.us.toFahrenheit
 import inkapplications.spondee.scalar.Percentage
-import inkapplications.spondee.scalar.decimalPercentage
 import inkapplications.spondee.scalar.percent
 import inkapplications.spondee.scalar.toWholePercentage
+import inkapplications.spondee.structure.toFloat
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -68,7 +71,7 @@ sealed class Event {
     data class Temperature(
         override val source: Identifier,
         override val timestamp: Instant,
-        val temperature: Float
+        val temperature: inkapplications.spondee.measure.Temperature
     ): Event() {
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
@@ -200,7 +203,7 @@ object EventSerializer: KSerializer<Event> {
             Event.Temperature::class.simpleName -> Event.Temperature(
                 id,
                 timestamp,
-                json.temperature!!
+                json.temperature!!.fahrenheit
             )
             Event.Humidity::class.simpleName -> Event.Humidity(
                 id,
@@ -267,7 +270,7 @@ object EventSerializer: KSerializer<Event> {
                 switchState = value.state.name
             )
             is Event.Temperature -> prototype.copy(
-                temperature = value.temperature
+                temperature = value.temperature.toFahrenheit().toFloat()
             )
             is Event.Humidity -> prototype.copy(
                 humidity = value.humidity.toWholePercentage().value.toFloat(),

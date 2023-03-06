@@ -1,5 +1,6 @@
 package usonia.rules.alerts
 
+import inkapplications.spondee.measure.us.fahrenheit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
@@ -51,7 +52,7 @@ class PipeMonitorTest {
         events.mutableEvents.emit(Event.Temperature(
             source = FakeDevices.TemperatureSensor.id,
             timestamp = Instant.DISTANT_PAST,
-            temperature = 20f,
+            temperature = 20.fahrenheit,
         ))
         advanceUntilIdle()
 
@@ -79,12 +80,12 @@ class PipeMonitorTest {
         events.mutableEvents.emit(Event.Temperature(
             source = FakeDevices.TemperatureSensor.id,
             timestamp = Instant.DISTANT_PAST,
-            temperature = 20f,
+            temperature = 20.fahrenheit,
         ))
         events.mutableEvents.emit(Event.Temperature(
             source = FakeDevices.TemperatureSensor.id,
             timestamp = Instant.DISTANT_PAST,
-            temperature = 20f,
+            temperature = 20.fahrenheit,
         ))
         advanceUntilIdle()
 
@@ -108,17 +109,17 @@ class PipeMonitorTest {
         events.mutableEvents.emit(Event.Temperature(
             source = FakeDevices.TemperatureSensor.id,
             timestamp = Instant.DISTANT_PAST,
-            temperature = 20f,
+            temperature = 20.fahrenheit,
         ))
         events.mutableEvents.emit(Event.Temperature(
             source = FakeDevices.TemperatureSensor.id,
             timestamp = Instant.DISTANT_PAST,
-            temperature = 45f,
+            temperature = 45.fahrenheit,
         ))
         events.mutableEvents.emit(Event.Temperature(
             source = FakeDevices.TemperatureSensor.id,
             timestamp = Instant.DISTANT_PAST,
-            temperature = 20f,
+            temperature = 20.fahrenheit,
         ))
         advanceUntilIdle()
 
