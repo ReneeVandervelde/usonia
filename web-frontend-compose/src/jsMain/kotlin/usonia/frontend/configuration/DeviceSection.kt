@@ -1,7 +1,9 @@
 package usonia.frontend.configuration
 
 import androidx.compose.runtime.Composable
+import inkapplications.spondee.measure.us.toFahrenheit
 import inkapplications.spondee.scalar.toWholePercentage
+import inkapplications.spondee.structure.format
 import org.jetbrains.compose.web.dom.*
 import usonia.client.FrontendClient
 import usonia.foundation.*
@@ -86,8 +88,8 @@ class DeviceSection(
                     }
                     Td {
                         when (event) {
-                            is Event.Battery -> Text("${event.percentage.toWholePercentage()}")
-                            is Event.Humidity -> Text("${event.humidity.toWholePercentage()}")
+                            is Event.Battery -> Text(event.percentage.toWholePercentage().format())
+                            is Event.Humidity -> Text(event.humidity.toWholePercentage().format())
                             is Event.Latch -> Text("${event.state}")
                             is Event.Lock -> Text("${event.state}")
                             is Event.Motion -> Text("${event.state}")
@@ -96,7 +98,7 @@ class DeviceSection(
                             is Event.Presence -> Text("${event.state}")
                             is Event.Pressure -> Text("${event.pressure}")
                             is Event.Switch -> Text("${event.state}")
-                            is Event.Temperature -> Text("${event.temperature}")
+                            is Event.Temperature -> Text(event.temperature.toFahrenheit().format())
                             is Event.Tilt -> Text("x: ${event.x} y: ${event.y} z: ${event.z}")
                             is Event.Water -> Text("${event.state}")
                         }
