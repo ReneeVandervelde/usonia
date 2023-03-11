@@ -24,6 +24,7 @@ import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
 import usonia.kotlin.ongoingFlow
 import kotlin.reflect.KClass
+import kotlin.time.Duration
 
 /**
  * HTTP Client for interacting with a Usonia server.
@@ -223,23 +224,27 @@ class HttpClient(
         }
     }
 
-    override fun temperatureHistory(devices: Collection<Identifier>): OngoingFlow<Map<Int, Float>> {
+    override fun temperatureHistorySnapshots(
+        devices: Collection<Identifier>,
+        limit: Duration?
+    ): OngoingFlow<List<TemperatureSnapshot>> {
         return ongoingFlow {
             httpClient.ws(
                 host = host,
                 port = port,
-                path = "events/metric-temperature-history",
+                path = "events/temperature-history-snapshots",
                 request = {
                     devices.forEach { parameter("devices", it.value) }
+                    if (limit != null) parameter("limit", limit.inWholeMilliseconds)
                 }
             ) {
                 incoming.consumeEach {
                     if (it !is Frame.Text) return@consumeEach
 
                     try {
-                        emit(json.decodeFromString(RelativeHourMetricSerializer, it.readText()))
+                        emit(json.decodeFromString(it.readText()))
                     } catch (error: Throwable) {
-                        logger.error("Failed to deserialize temperature metrics", error)
+                        logger.error("Failed to deserialize temperature snapshots", error)
                     }
                 }
             }

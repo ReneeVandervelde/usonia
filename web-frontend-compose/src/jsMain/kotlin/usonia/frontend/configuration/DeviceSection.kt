@@ -6,13 +6,13 @@ import inkapplications.spondee.scalar.toWholePercentage
 import inkapplications.spondee.structure.format
 import org.jetbrains.compose.web.dom.*
 import usonia.client.FrontendClient
+import usonia.core.client.deviceEvents
 import usonia.foundation.*
 import usonia.frontend.extensions.collectAsState
 import usonia.frontend.navigation.NavigationSection
 import usonia.frontend.navigation.Routing
 import usonia.frontend.widgets.KeyValue
 import usonia.frontend.widgets.LoadingIndicator
-import usonia.kotlin.combineToPair
 import usonia.kotlin.map
 
 class DeviceSection(
@@ -25,9 +25,7 @@ class DeviceSection(
     @Composable
     override fun renderContent(args: ParameterBag) {
         val id = args["deviceId"]?.let(::Identifier)!!
-        val deviceState = client.site
-            .map { it.getDevice(id) }
-            .combineToPair(client.deviceEventHistory(id, 10))
+        val deviceState = client.deviceEvents(id, limit = 20)
             .map { (device, events) ->
                 ViewState.Loaded(device, events) as ViewState
             }

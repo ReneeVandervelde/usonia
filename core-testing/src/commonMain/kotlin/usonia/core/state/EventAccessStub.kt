@@ -4,9 +4,11 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import usonia.foundation.Event
 import usonia.foundation.Identifier
+import usonia.foundation.TemperatureSnapshot
 import usonia.kotlin.OngoingFlow
 import usonia.kotlin.ongoingFlowOf
 import kotlin.reflect.KClass
+import kotlin.time.Duration
 
 object EventAccessStub: EventAccess {
     override val events: OngoingFlow<Event> get() = ongoingFlowOf()
@@ -15,6 +17,6 @@ object EventAccessStub: EventAccess {
 
     override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = null
     override fun deviceEventHistory(id: Identifier, size: Int?): OngoingFlow<List<Event>> = ongoingFlowOf()
-    override fun temperatureHistory(devices: Collection<Identifier>): OngoingFlow<Map<Int, Float>> = ongoingFlowOf()
+    override fun temperatureHistorySnapshots(devices: Collection<Identifier>, limit: Duration?): OngoingFlow<List<TemperatureSnapshot>> = ongoingFlowOf()
     override fun getLatestEvent(id: Identifier): OngoingFlow<Event> = ongoingFlowOf()
 }

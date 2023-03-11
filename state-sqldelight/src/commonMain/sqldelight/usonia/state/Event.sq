@@ -45,11 +45,11 @@ FROM Event
 ORDER BY timestamp ASC
 LIMIT 1;
 
-eventsBySourceAndType:
+eventsBySourceAndTypeAfterTimestampInclusive:
 SELECT
 data
 FROM Event
-WHERE source IN ? AND type = ?;
+WHERE source IN ? AND type = ? AND timestamp >= ?;
 
 eventsBySource:
 SELECT data

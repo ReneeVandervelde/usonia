@@ -2,13 +2,12 @@ package usonia.core.state
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
-import usonia.foundation.Event
-import usonia.foundation.Identifier
-import usonia.foundation.PresenceState
-import usonia.foundation.User
+import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
 import usonia.kotlin.first
+import usonia.kotlin.map
 import kotlin.reflect.KClass
+import kotlin.time.Duration
 
 /**
  * Provides Read access to events in the system.
@@ -51,9 +50,12 @@ interface EventAccess {
      * Multiple reports by one or more devices are averaged into a single data point.
      *
      * @param devices The ID's of the devices to include in temperature averages.
+     * @param limit a maximum amount of time to search for events in history.
+     *        If unspecified, the default limit will be determined by the data
+     *        implementation.
      * @return A map of temperatures grouped by the number of hours (negative) in the past they were reported.
      */
-    fun temperatureHistory(devices: Collection<Identifier>): OngoingFlow<Map<Int, Float>>
+    fun temperatureHistorySnapshots(devices: Collection<Identifier>, limit: Duration? = null): OngoingFlow<List<TemperatureSnapshot>>
 
     /**
      * Get the most recent event, of any type, for a particular device.
@@ -75,3 +77,22 @@ suspend fun EventAccess.allAway(users: Collection<User>): Boolean {
  * Oldest recorded event, used to determine the time relevance of data.
  */
 suspend fun EventAccess.getOldestEvent(): Instant? = oldestEventTime.first()
+
+/**
+ * Observe the recent temperature history of a room based on its devices.
+ *
+ * @param room The room to get temperature info for, based on its associated
+ *        devices. Note that some devices, such as a refrigerator are excluded
+ *        from this list.
+ * @param range The amount of time to fetch history for.
+ * @return A flow of temperature data that is divided into hours snapshots.
+ */
+fun EventAccess.roomTemperatureHistory(room: Room, range: Duration? = null): OngoingFlow<List<TemperatureSnapshot>> {
+    val excludedTypes = setOf(Fixture.Refrigerator, Fixture.Freezer)
+    return room.devices
+        .filter { Event.Temperature::class in it.capabilities.events }
+        .filter { it.fixture !in excludedTypes }
+        .map { it.id }
+        .let { temperatureHistorySnapshots(it, range) }
+        .map { it.toList() }
+}

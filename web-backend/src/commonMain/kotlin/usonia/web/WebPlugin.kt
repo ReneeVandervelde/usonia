@@ -41,7 +41,7 @@ class WebPlugin(
         FlagListSocket(client, json),
         EventsByDaySocket(client, json),
         OldestEventSocket(client, json),
-        TemperatureHistorySocket(client, json, logger),
+        TemperatureHistorySnapshotSocket(client, json, logger),
         LatestEventSocket(client, json, logger),
         EventHistorySocket(client, json, logger),
     )

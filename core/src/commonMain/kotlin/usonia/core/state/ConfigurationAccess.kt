@@ -3,6 +3,7 @@ package usonia.core.state
 import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
 import usonia.kotlin.first
+import usonia.kotlin.map
 
 /**
  * Provides access to the configuration of the application.
@@ -33,6 +34,11 @@ interface ConfigurationAccess {
      */
     suspend fun removeFlag(key: String)
 }
+
+/**
+ * Rooms configured on the site.
+ */
+val ConfigurationAccess.rooms get() = site.map { it.rooms.toList() }
 
 /**
  * Get the latest data available for the configured site.
@@ -77,13 +83,31 @@ suspend fun ConfigurationAccess.findDevicesBy(predicate: (Device) -> Boolean) = 
  */
 suspend fun ConfigurationAccess.findBridgeByServiceTag(service: String): Bridge? = getSite().findBridgeByServiceTag(service)
 
+/**
+ * Get the current value of a flag, if set.
+ */
 suspend fun ConfigurationAccess.getFlag(key: String): String? = flags.first()[key]
+
+/**
+ * Get the current state of a flag, cast as a boolean.
+ */
 suspend fun ConfigurationAccess.getBooleanFlag(
     key: String,
     default: Boolean = false
 ): Boolean = flags.first()[key]?.toBoolean() ?: default
+
+/**
+ * Change the state of a boolean flag to the opposite of its current state.
+ *
+ * If no state is set, [default] is used. Flag values are treated as false-y
+ * if a non-boolean.
+ */
 suspend fun ConfigurationAccess.toggleBooleanFlag(
     key: String,
     default: Boolean = false,
 ) = setFlag(key, !getBooleanFlag(key, default))
+
+/**
+ * Set the value of a boolean flag.
+ */
 suspend fun ConfigurationAccess.setFlag(key: String, value: Boolean) = setFlag(key, value.toString())

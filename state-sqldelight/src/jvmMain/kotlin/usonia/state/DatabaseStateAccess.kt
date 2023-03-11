@@ -6,6 +6,7 @@ import com.inkapplications.coroutines.onItemFailure
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
+import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.measure.us.toFahrenheit
 import inkapplications.spondee.structure.toFloat
 import kimchi.logger.EmptyLogger
@@ -14,20 +15,27 @@ import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.Json
+import usonia.foundation.*
 import usonia.foundation.Event
-import usonia.foundation.EventSerializer
-import usonia.foundation.Identifier
 import usonia.foundation.Site
 import usonia.kotlin.*
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
 import kotlin.reflect.KClass
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.DurationUnit
 
 /**
  * The default limit to use when querying potentially large collections.
  */
 private const val DEFAULT_COLLECTION_SIZE = 100L
+
+/**
+ * Default time limit to use for historical queries.
+ */
+private val DEFAULT_HISTORY_DURATION = 7.days
 
 /**
  * Implement database services via SQLite
@@ -106,23 +114,30 @@ internal class DatabaseStateAccess(
         }.executeAsOneOrNull() as T?
     }
 
-    override fun temperatureHistory(devices: Collection<Identifier>): OngoingFlow<Map<Int, Float>> {
-         return devices
-             .map { it.value }
-             .let { eventQueries.value.eventsBySourceAndType(it, Event.Temperature::class.simpleName!!) }
-             .asFlow()
-             .mapToList()
-             .mapItemsCatching { json.decodeFromString(EventSerializer, String(it)) as Event.Temperature }
-             .onItemFailure { logger.warn("Failed to deserialize temperature event", it) }
-             .filterItemSuccess()
-             .map {
-                 it.groupBy { (it.timestamp - zonedClock.now()).toInt(DurationUnit.HOURS) }
-                     .map { (hoursAgo, events) ->
-                         hoursAgo to events.map { it.temperature.toFahrenheit().toFloat() }.average().toFloat()
-                     }
-                     .toMap()
-             }
-             .asOngoing()
+    override fun temperatureHistorySnapshots(devices: Collection<Identifier>, limit: Duration?): OngoingFlow<List<TemperatureSnapshot>> {
+        return devices
+            .map { it.value }
+            .let {
+                eventQueries.value.eventsBySourceAndTypeAfterTimestampInclusive(
+                    source = it,
+                    type = Event.Temperature::class.simpleName!!,
+                    timestamp = zonedClock.now().minus(limit ?: DEFAULT_HISTORY_DURATION).toEpochMilliseconds(),
+                )
+            }
+            .asFlow()
+            .mapToList()
+            .mapItemsCatching { json.decodeFromString(EventSerializer, String(it)) as Event.Temperature }
+            .onItemFailure { logger.warn("Failed to deserialize temperature event", it) }
+            .filterItemSuccess()
+            .map {
+                it.groupBy { (it.timestamp - zonedClock.now()).toInt(DurationUnit.HOURS).hours }
+                    .mapValues { (_, events) ->
+                        events.map { it.temperature.toFahrenheit().toFloat() }.average().fahrenheit
+                    }
+                    .map { (key, value) -> TemperatureSnapshot(key, value) }
+                    .sortedBy { it.timeAgo }
+            }
+            .asOngoing()
     }
 
     override fun deviceEventHistory(id: Identifier, size: Int?): OngoingFlow<List<Event>> {

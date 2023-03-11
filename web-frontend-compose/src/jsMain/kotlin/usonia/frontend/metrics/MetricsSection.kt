@@ -2,19 +2,18 @@ package usonia.frontend.metrics
 
 import androidx.compose.runtime.Composable
 import chart.*
+import inkapplications.spondee.measure.us.toFahrenheit
 import kimchi.logger.KimchiLogger
 import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.dom.H2
 import usonia.client.FrontendClient
-import usonia.foundation.Event
-import usonia.foundation.Fixture
+import usonia.core.state.roomTemperatureHistory
+import usonia.core.state.rooms
 import usonia.foundation.ParameterBag
 import usonia.frontend.extensions.collectAsState
 import usonia.frontend.navigation.NavigationSection
 import usonia.frontend.navigation.Routing
 import usonia.kotlin.map
-import kotlin.math.abs
-import kotlin.time.Duration.Companion.days
 import kotlin.time.DurationUnit
 
 class MetricsSection(
@@ -30,9 +29,7 @@ class MetricsSection(
         .map {
             it.mapKeys { it.toString() }.toList()
         }
-    private val rooms = client.site
-        .map { it.rooms }
-        .map { it.toList() }
+    private val rooms = client.rooms
         .map { it.sortedBy { it.name } }
 
     @Composable
@@ -56,14 +53,8 @@ class MetricsSection(
         }
         rooms.value.forEach { room ->
             H3 { Text(room.name) }
-            val temperatureData = room.devices
-                .filter { Event.Temperature::class in it.capabilities.events }
-                .filter { it.fixture !in setOf(Fixture.Refrigerator, Fixture.Freezer) }
-                .map { it.id }
-                .let { client.temperatureHistory(it) }
-                .map { it.filter { abs(it.key) < 14.days.toInt(DurationUnit.HOURS) } }
-                .map { it.toList() }
-                .map { it.map { it.first.toString() to it.second } }
+            val temperatureData = client.roomTemperatureHistory(room)
+                .map { it.map { it.timeAgo.toInt(DurationUnit.HOURS).toString() to it.temperature.toFahrenheit().value } }
                 .collectAsState(emptyList())
 
             LineChart(
