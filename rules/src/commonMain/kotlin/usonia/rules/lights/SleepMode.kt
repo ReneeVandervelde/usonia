@@ -3,9 +3,11 @@ package usonia.rules.lights
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.selects.select
 import usonia.core.state.getBooleanFlag
 import usonia.core.state.hasAdjacentType
 import usonia.core.state.publishAll
@@ -19,13 +21,19 @@ import usonia.server.Daemon
 import usonia.server.client.BackendClient
 import usonia.server.cron.CronJob
 import usonia.server.cron.Schedule
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 
 private const val NIGHT_START = "sleep.night.start"
-private const val DEFAULT_NIGHT = 20 * 60
+private val DEFAULT_NIGHT = 20.hours.inWholeMinutes
 private const val NIGHT_END = "sleep.night.end"
-private const val DEFAULT_NIGHT_END = 4 * 60
+private val DEFAULT_NIGHT_END = 4.hours.inWholeMinutes
+
+private const val MORNING_START = "sleep.morning.start"
+private val DEFAULT_MORNING_START = 5.hours.inWholeMinutes
+private const val MORNING_END = "sleep.morning.end"
+private val DEFAULT_MORNING_END = 16.hours.inWholeMinutes
 
 /**
  * Keeps bedroom and adjacent rooms dim/off when sleep mode is enabled.
@@ -34,10 +42,11 @@ internal class SleepMode(
     private val client: BackendClient,
     private val logger: KimchiLogger = EmptyLogger,
     private val clock: ZonedClock = ZonedSystemClock,
+    private val backgroundScope: CoroutineScope = DefaultScope(),
 ): LightSettingsPicker, Daemon, CronJob {
 
     override val schedule: Schedule = Schedule(
-        hours = setOf(9),
+        hours = setOf(16),
         minutes = setOf(0),
     )
 
@@ -71,7 +80,7 @@ internal class SleepMode(
     }
 
     override suspend fun runCron(time: ZonedDateTime) {
-        logger.info("Auto-Disabling Sleep Mode.")
+        logger.info("Auto-Disabling Sleep Mode by cron.")
         client.setFlag(Flags.SleepMode, false)
     }
 
@@ -79,6 +88,7 @@ internal class SleepMode(
         client.site.collectLatest { site ->
             coroutineScope {
                 launch { autoEnable(site) }
+                launch { autoDisable(site) }
                 launch { lightsOffOnEnable(site) }
                 launch { intentEnable(site) }
             }
@@ -139,10 +149,10 @@ internal class SleepMode(
 
     private suspend fun intentEnable(site: Site) {
         val nightStartMinute = site.parameters[NIGHT_START]
-            ?.toInt()
+            ?.toLong()
             ?: DEFAULT_NIGHT
         val nightEndMinute = site.parameters[NIGHT_END]
-            ?.toInt()
+            ?.toLong()
             ?: DEFAULT_NIGHT_END
 
         client.actions.filterIsInstance<Action.Intent>()
@@ -154,10 +164,10 @@ internal class SleepMode(
 
     private suspend fun autoEnable(site: Site) {
         val nightStartMinute = site.parameters[NIGHT_START]
-            ?.toInt()
+            ?.toLong()
             ?: DEFAULT_NIGHT
         val nightEndMinute = site.parameters[NIGHT_END]
-            ?.toInt()
+            ?.toLong()
             ?: DEFAULT_NIGHT_END
 
         client.events
@@ -167,5 +177,50 @@ internal class SleepMode(
             .filter { site.findRoomContainingDevice(it.source)?.type == Room.Type.Bedroom }
             .onEach { logger.info("Enabling Night Mode based on door latch") }
             .collectLatest { client.setFlag(Flags.SleepMode, true) }
+    }
+
+    private suspend fun autoDisable(site: Site) {
+        val morningStartMinute = site.parameters[MORNING_START]
+            ?.toLong()
+            ?: DEFAULT_MORNING_START
+        val morningEndMinute = site.parameters[MORNING_END]
+            ?.toLong()
+            ?: DEFAULT_MORNING_END
+
+        client.events
+            .filter { clock.current.localDateTime.minuteOfDay in morningStartMinute..morningEndMinute }
+            .filterIsInstance<Event.Latch>()
+            .filter { it.state == LatchState.OPEN }
+            .filter { site.findRoomContainingDevice(it.source)?.type == Room.Type.Bedroom }
+            .onEach { logger.info("Launching wake disable timer") }
+            .collectLatest { openEvent ->
+                val cancellation = backgroundScope.launch {
+                    client.events
+                        .filterIsInstance<Event.Latch>()
+                        .filter { it.state == LatchState.CLOSED }
+                        .filter { it.source == openEvent.source }
+                        .onEach { logger.info("Cancelling wake disable timer, door closed was closed.") }
+                        .first()
+                }
+                val timer = backgroundScope.launch {
+                    logger.debug("Starting timer for wake disable")
+                    delay(10.minutes)
+                    logger.debug("Wake disable timer complete")
+                }
+                val cancelled = select {
+                    cancellation.onJoin { true }
+                    timer.onJoin { false }
+                }
+
+                cancellation.cancel()
+                timer.cancel()
+
+                if (!cancelled) {
+                    logger.info("Auto-Disabling Sleep Mode.")
+                    client.setFlag(Flags.SleepMode, false)
+                } else {
+                    logger.info("Cancelling auto-wake action")
+                }
+            }
     }
 }

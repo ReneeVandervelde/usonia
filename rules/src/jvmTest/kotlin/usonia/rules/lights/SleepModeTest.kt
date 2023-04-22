@@ -19,23 +19,16 @@ import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class SleepModeTest {
-    private val configurationDouble = object: ConfigurationAccess by ConfigurationAccessStub {
-        val setFlags = mutableListOf<Pair<String, String?>>()
-        override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-            rooms = setOf(FakeRooms.FakeBedroom.copy(
-                devices = setOf(FakeDevices.Latch, FakeDevices.HueGroup)
-            ))
+    private val fakeSite = FakeSite.copy(
+        rooms = setOf(FakeRooms.FakeBedroom.copy(
+            devices = setOf(FakeDevices.Latch, FakeDevices.HueGroup)
         ))
-
-        override suspend fun setFlag(key: String, value: String?) {
-            setFlags += key to value
-        }
-    }
+    )
 
     private val night = object: ZonedClock by UtcClock {
         override fun now(): Instant = parseLocalDateTime("2020-01-02T23:00:00").instant
@@ -47,23 +40,25 @@ class SleepModeTest {
 
     @Test
     fun enabled() = runTest {
-        val fakeConfig = object: ConfigurationAccess by configurationDouble {
+        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(
                 mapOf("Sleep Mode" to "true")
             )
         }
         val client = DummyClient.copy(
             configurationAccess = fakeConfig,
+            actionAccess = ActionAccessFake(),
         )
-        val picker = SleepMode(client, clock = night)
+        val rule = SleepMode(client, clock = night)
 
-        val bedroom = picker.getActiveSettings(FakeRooms.FakeBedroom)
-        val livingRoom = picker.getActiveSettings(FakeRooms.LivingRoom)
-        val tranquilHallwayResult = picker.getActiveSettings(FakeRooms.FakeHallway.copy(
+        val bedroom = rule.getActiveSettings(FakeRooms.FakeBedroom)
+        val livingRoom = rule.getActiveSettings(FakeRooms.LivingRoom)
+        val tranquilHallwayResult = rule.getActiveSettings(FakeRooms.FakeHallway.copy(
             adjacentRooms = setOf(FakeRooms.FakeBedroom.id)
         ))
-        val unaffectedHallwayResult = picker.getActiveSettings(FakeRooms.FakeHallway)
-        val bathroom = picker.getActiveSettings(FakeRooms.FakeBathroom)
+        val unaffectedHallwayResult = rule.getActiveSettings(FakeRooms.FakeHallway)
+        val bathroom = rule.getActiveSettings(FakeRooms.FakeBathroom)
 
         assertTrue(tranquilHallwayResult is LightSettings.Temperature)
         assertEquals(Colors.Warm, tranquilHallwayResult.temperature)
@@ -78,23 +73,25 @@ class SleepModeTest {
 
     @Test
     fun enabledMorning() = runTest {
-        val fakeConfig = object: ConfigurationAccess by configurationDouble {
+        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(
                 mapOf("Sleep Mode" to "true")
             )
         }
         val client = DummyClient.copy(
             configurationAccess = fakeConfig,
+            actionAccess = ActionAccessFake(),
         )
-        val picker = SleepMode(client, clock = morning)
+        val rule = SleepMode(client, clock = morning)
 
-        val bedroom = picker.getActiveSettings(FakeRooms.FakeBedroom)
-        val livingRoom = picker.getActiveSettings(FakeRooms.LivingRoom)
-        val tranquilHallwayResult = picker.getActiveSettings(FakeRooms.FakeHallway.copy(
+        val bedroom = rule.getActiveSettings(FakeRooms.FakeBedroom)
+        val livingRoom = rule.getActiveSettings(FakeRooms.LivingRoom)
+        val tranquilHallwayResult = rule.getActiveSettings(FakeRooms.FakeHallway.copy(
             adjacentRooms = setOf(FakeRooms.FakeBedroom.id)
         ))
-        val unaffectedHallwayResult = picker.getActiveSettings(FakeRooms.FakeHallway)
-        val bathroom = picker.getActiveSettings(FakeRooms.FakeBathroom)
+        val unaffectedHallwayResult = rule.getActiveSettings(FakeRooms.FakeHallway)
+        val bathroom = rule.getActiveSettings(FakeRooms.FakeBathroom)
 
         assertTrue(tranquilHallwayResult is LightSettings.Temperature)
         assertEquals(Colors.Warm, tranquilHallwayResult.temperature)
@@ -107,23 +104,25 @@ class SleepModeTest {
 
     @Test
     fun disabled() = runTest {
-        val fakeConfig = object: ConfigurationAccess by configurationDouble {
+        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(
                 mapOf("Sleep Mode" to "false")
             )
         }
         val client = DummyClient.copy(
             configurationAccess = fakeConfig,
+            actionAccess = ActionAccessFake(),
         )
-        val picker = SleepMode(client)
+        val rule = SleepMode(client)
 
-        val bedroom = picker.getActiveSettings(FakeRooms.FakeBedroom)
-        val livingRoom = picker.getActiveSettings(FakeRooms.LivingRoom)
-        val tranquilHallwayResult = picker.getActiveSettings(FakeRooms.FakeHallway.copy(
+        val bedroom = rule.getActiveSettings(FakeRooms.FakeBedroom)
+        val livingRoom = rule.getActiveSettings(FakeRooms.LivingRoom)
+        val tranquilHallwayResult = rule.getActiveSettings(FakeRooms.FakeHallway.copy(
             adjacentRooms = setOf(FakeRooms.FakeBedroom.id)
         ))
-        val unaffectedHallwayResult = picker.getActiveSettings(FakeRooms.FakeHallway)
-        val bathroom = picker.getActiveSettings(FakeRooms.FakeBathroom)
+        val unaffectedHallwayResult = rule.getActiveSettings(FakeRooms.FakeHallway)
+        val bathroom = rule.getActiveSettings(FakeRooms.FakeBathroom)
 
         assertTrue(tranquilHallwayResult is LightSettings.Unhandled)
         assertTrue(bathroom is LightSettings.Unhandled)
@@ -146,17 +145,21 @@ class SleepModeTest {
                 nanosecond = 0,
             ).toInstant(timeZone)
         }
+        val spyConfig = object: ConfigurationAccessSpy() {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
+        }
         val fakeEvents = EventAccessFake()
         val client = DummyClient.copy(
-            configurationAccess = configurationDouble,
+            configurationAccess = spyConfig,
             eventAccess = fakeEvents,
+            actionAccess = ActionAccessFake(),
         )
-        val picker = SleepMode(
+        val rule = SleepMode(
             client = client,
             clock = clock.withTimeZone(timeZone),
         )
 
-        val daemon = launch { picker.start() }
+        val daemon = launch { rule.start() }
         runCurrent()
 
         fakeEvents.mutableEvents.emit(Event.Latch(
@@ -166,7 +169,7 @@ class SleepModeTest {
         ))
         runCurrent()
 
-        assertTrue("Sleep Mode" to "true" in configurationDouble.setFlags, "Sleep mode is set on bedroom door close")
+        assertTrue("Sleep Mode" to "true" in spyConfig.flagUpdates, "Sleep mode is set on bedroom door close")
 
         daemon.cancelAndJoin()
     }
@@ -185,17 +188,21 @@ class SleepModeTest {
                 nanosecond = 0,
             ).toInstant(timeZone)
         }
+        val spyConfig = object: ConfigurationAccessSpy() {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
+        }
         val fakeEvents = EventAccessFake()
         val client = DummyClient.copy(
-            configurationAccess = configurationDouble,
+            configurationAccess = spyConfig,
             eventAccess = fakeEvents,
+            actionAccess = ActionAccessFake(),
         )
-        val picker = SleepMode(
+        val rule = SleepMode(
             client = client,
             clock = clock.withTimeZone(timeZone),
         )
 
-        val daemon = launch { picker.start() }
+        val daemon = launch { rule.start() }
         runCurrent()
 
         fakeEvents.mutableEvents.emit(Event.Latch(
@@ -205,7 +212,7 @@ class SleepModeTest {
         ))
         runCurrent()
 
-        assertTrue("Sleep Mode" to "true" in configurationDouble.setFlags, "Sleep mode is set on bedroom door close")
+        assertTrue("Sleep Mode" to "true" in spyConfig.flagUpdates, "Sleep mode is set on bedroom door close")
 
         daemon.cancelAndJoin()
     }
@@ -224,17 +231,21 @@ class SleepModeTest {
                 nanosecond = 0,
             ).toInstant(timeZone)
         }
+        val spyConfig = object: ConfigurationAccessSpy() {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
+        }
         val fakeEvents = EventAccessFake()
         val client = DummyClient.copy(
-            configurationAccess = configurationDouble,
+            configurationAccess = spyConfig,
             eventAccess = fakeEvents,
+            actionAccess = ActionAccessFake(),
         )
-        val picker = SleepMode(
+        val rule = SleepMode(
             client = client,
             clock = clock.withTimeZone(timeZone),
         )
 
-        val daemon = launch { picker.start() }
+        val daemon = launch { rule.start() }
 
         fakeEvents.mutableEvents.emit(Event.Latch(
             source = FakeDevices.Latch.id,
@@ -242,14 +253,15 @@ class SleepModeTest {
             state = LatchState.CLOSED,
         ))
 
-        assertTrue("Sleep Mode" to "true" !in configurationDouble.setFlags, "Sleep mode not set during day")
+        assertTrue("Sleep Mode" to "true" !in spyConfig.flagUpdates, "Sleep mode not set during day")
 
         daemon.cancelAndJoin()
     }
 
     @Test
     fun lightsOffOnEnable() = runTest {
-        val fakeConfig = object: ConfigurationAccess by configurationDouble {
+        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
             val mutableFlags = MutableSharedFlow<Map<String, String?>>()
             override val flags = mutableFlags.asOngoing()
         }
@@ -258,10 +270,11 @@ class SleepModeTest {
             configurationAccess = fakeConfig,
             eventAccess = EventAccessStub,
             actionPublisher = actionSpy,
+            actionAccess = ActionAccessFake(),
         )
-        val picker = SleepMode(client)
+        val rule = SleepMode(client)
 
-        val daemon = launch { picker.start() }
+        val daemon = launch { rule.start() }
         runCurrent()
         fakeConfig.mutableFlags.emit(mapOf("Sleep Mode" to "true"))
         runCurrent()
@@ -274,13 +287,12 @@ class SleepModeTest {
         assertTrue(offAction is Action.Switch)
         assertEquals(SwitchState.OFF, offAction.state)
 
-
         daemon.cancelAndJoin()
     }
 
     @Test
     fun noopOnDisable() = runTest {
-        val fakeConfig = object: ConfigurationAccess by configurationDouble {
+        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
             val mutableFlags = MutableSharedFlow<Map<String, String?>>()
             override val flags = mutableFlags.asOngoing()
         }
@@ -289,6 +301,7 @@ class SleepModeTest {
             configurationAccess = fakeConfig,
             eventAccess = EventAccessStub,
             actionPublisher = actionSpy,
+            actionAccess = ActionAccessFake(),
         )
         val picker = SleepMode(client)
 
@@ -302,13 +315,147 @@ class SleepModeTest {
     }
 
     @Test
-    fun autoDisable() = runTest {
+    fun intentEnable() = runTest {
+        val timeZone = TimeZone.UTC
+        val clock = object: Clock {
+            override fun now(): Instant = LocalDateTime(
+                year = 2000,
+                monthNumber = 1,
+                dayOfMonth = 1,
+                hour = 23,
+                minute = 0,
+                second = 0,
+                nanosecond = 0,
+            ).toInstant(timeZone)
+        }
+        val spyConfig = object: ConfigurationAccessSpy() {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
+        }
+        val actions = ActionAccessFake()
         val client = DummyClient.copy(
-            configurationAccess = configurationDouble,
+            configurationAccess = spyConfig,
+            eventAccess = EventAccessStub,
+            actionAccess = actions,
+        )
+        val sleepMode = SleepMode(
+            client = client,
+            clock = clock.withTimeZone(timeZone)
+        )
+
+        val daemon = launch { sleepMode.start() }
+        runCurrent()
+        actions.mutableActions.emit(Action.Intent(
+            target = FakeSite.id,
+            action = "bed.enter",
+        ))
+        runCurrent()
+
+        assertEquals("Sleep Mode" to "true", spyConfig.flagUpdates.last())
+        daemon.cancelAndJoin()
+    }
+
+    @Test
+    fun autoDisableByCron() = runTest {
+        val spyConfig = object: ConfigurationAccessSpy() {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
+        }
+        val client = DummyClient.copy(
+            configurationAccess = spyConfig,
         )
         val picker = SleepMode(client)
         picker.runCron(Instant.DISTANT_PAST.withZone(TimeZone.UTC))
 
-        assertTrue("Sleep Mode" to "false" in configurationDouble.setFlags, "Sleep mode is set to false on cron run")
+        assertTrue("Sleep Mode" to "false" in spyConfig.flagUpdates, "Sleep mode is set to false on cron run")
+    }
+
+    @Test
+    fun autoDisableByLatch() = runTest {
+        val timeZone = TimeZone.UTC
+        val clock = object: Clock {
+            override fun now(): Instant = LocalDateTime(
+                year = 2000,
+                monthNumber = 1,
+                dayOfMonth = 1,
+                hour = 9,
+                minute = 0,
+                second = 0,
+                nanosecond = 0,
+            ).toInstant(timeZone)
+        }
+        val spyConfig = object: ConfigurationAccessSpy() {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
+        }
+        val fakeEvents = EventAccessFake()
+        val client = DummyClient.copy(
+            configurationAccess = spyConfig,
+            eventAccess = fakeEvents,
+            actionAccess = ActionAccessFake(),
+        )
+        val sleepMode = SleepMode(
+            client = client,
+            clock = clock.withTimeZone(timeZone),
+            backgroundScope = this,
+        )
+        val daemon = launch { sleepMode.start() }
+        runCurrent()
+        fakeEvents.mutableEvents.emit(Event.Latch(
+            source = FakeDevices.Latch.id,
+            timestamp = Instant.DISTANT_PAST,
+            state = LatchState.OPEN,
+        ))
+        advanceTimeBy(11.minutes.inWholeMilliseconds)
+        runCurrent()
+
+        assertEquals("Sleep Mode" to "false", spyConfig.flagUpdates.last())
+        daemon.cancelAndJoin()
+    }
+
+    @Test
+    fun autoDisableCancel() = runTest {
+        val timeZone = TimeZone.UTC
+        val clock = object: Clock {
+            override fun now(): Instant = LocalDateTime(
+                year = 2000,
+                monthNumber = 1,
+                dayOfMonth = 1,
+                hour = 9,
+                minute = 0,
+                second = 0,
+                nanosecond = 0,
+            ).toInstant(timeZone)
+        }
+        val spyConfig = object: ConfigurationAccessSpy() {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
+        }
+        val fakeEvents = EventAccessFake()
+        val client = DummyClient.copy(
+            configurationAccess = spyConfig,
+            eventAccess = fakeEvents,
+            actionAccess = ActionAccessFake(),
+        )
+        val sleepMode = SleepMode(
+            client = client,
+            clock = clock.withTimeZone(timeZone),
+            backgroundScope = this,
+        )
+        val daemon = launch { sleepMode.start() }
+        runCurrent()
+        fakeEvents.mutableEvents.emit(Event.Latch(
+            source = FakeDevices.Latch.id,
+            timestamp = Instant.DISTANT_PAST,
+            state = LatchState.OPEN,
+        ))
+        advanceTimeBy(5.minutes.inWholeMilliseconds)
+        runCurrent()
+        fakeEvents.mutableEvents.emit(Event.Latch(
+            source = FakeDevices.Latch.id,
+            timestamp = Instant.DISTANT_PAST,
+            state = LatchState.CLOSED,
+        ))
+        advanceTimeBy(6.minutes.inWholeMilliseconds)
+        runCurrent()
+
+        assertTrue(spyConfig.flagUpdates.isEmpty(), "No flags changed if door closed before timer")
+        daemon.cancelAndJoin()
     }
 }

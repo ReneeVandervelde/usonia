@@ -55,8 +55,4 @@ class RulesPlugin(
         DoorAlert(client, logger),
         CodeAlerts(client, logger),
     )
-
-    override val crons: List<CronJob> = listOf(
-        sleepMode,
-    )
 }

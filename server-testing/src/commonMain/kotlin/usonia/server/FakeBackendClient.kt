@@ -3,13 +3,11 @@ package usonia.server
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import usonia.core.state.*
-import usonia.foundation.Action
-import usonia.foundation.Event
-import usonia.foundation.Identifier
-import usonia.foundation.Site
+import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
 import usonia.server.client.ComposedBackendClient
 import kotlin.reflect.KClass
+import kotlin.time.Duration
 
 val DummyClient = ComposedBackendClient(
     actionAccess = object: ActionAccess {
@@ -24,7 +22,7 @@ val DummyClient = ComposedBackendClient(
         override val oldestEventTime: OngoingFlow<Instant?> get() = TODO()
         override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = TODO("Not yet implemented")
         override fun deviceEventHistory(id: Identifier, size: Int?): OngoingFlow<List<Event>> = TODO()
-        override fun temperatureHistory(devices: Collection<Identifier>): OngoingFlow<Map<Int, Float>> = TODO()
+        override fun temperatureHistorySnapshots(devices: Collection<Identifier>, limit: Duration?): OngoingFlow<List<TemperatureSnapshot>> = TODO()
         override fun getLatestEvent(id: Identifier): OngoingFlow<Event> = TODO()
     },
     eventPublisher = object: EventPublisher {
