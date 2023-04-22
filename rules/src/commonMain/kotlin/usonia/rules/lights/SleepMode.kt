@@ -30,7 +30,6 @@ private const val DEFAULT_NIGHT_END = 4 * 60
 /**
  * Keeps bedroom and adjacent rooms dim/off when sleep mode is enabled.
  */
-@OptIn(ExperimentalTime::class)
 internal class SleepMode(
     private val client: BackendClient,
     private val logger: KimchiLogger = EmptyLogger,
@@ -81,6 +80,7 @@ internal class SleepMode(
             coroutineScope {
                 launch { autoEnable(site) }
                 launch { lightsOffOnEnable(site) }
+                launch { intentEnable(site) }
             }
         }
     }
@@ -137,6 +137,21 @@ internal class SleepMode(
             }
     }
 
+    private suspend fun intentEnable(site: Site) {
+        val nightStartMinute = site.parameters[NIGHT_START]
+            ?.toInt()
+            ?: DEFAULT_NIGHT
+        val nightEndMinute = site.parameters[NIGHT_END]
+            ?.toInt()
+            ?: DEFAULT_NIGHT_END
+
+        client.actions.filterIsInstance<Action.Intent>()
+            .filter { it.action == "bed.enter" }
+            .filter { clock.current.localDateTime.minuteOfDay >= nightStartMinute || clock.current.localDateTime.minuteOfDay <= nightEndMinute }
+            .onEach { logger.info("Enabling Night Mode based on Intent") }
+            .collectLatest { client.setFlag(Flags.SleepMode, true) }
+    }
+
     private suspend fun autoEnable(site: Site) {
         val nightStartMinute = site.parameters[NIGHT_START]
             ?.toInt()
@@ -150,7 +165,7 @@ internal class SleepMode(
             .filterIsInstance<Event.Latch>()
             .filter { it.state == LatchState.CLOSED }
             .filter { site.findRoomContainingDevice(it.source)?.type == Room.Type.Bedroom }
-            .onEach { logger.info("Enabling Night Mode") }
+            .onEach { logger.info("Enabling Night Mode based on door latch") }
             .collectLatest { client.setFlag(Flags.SleepMode, true) }
     }
 }

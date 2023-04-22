@@ -232,6 +232,27 @@ def actions() {
             else if (action.lockState == "UNLOCKED") device.unlock()
             else log.error "Unknown State ${action.type}"
             break
+        case "Intent":
+            sendBridgeAction([
+                "type": "Intent",
+                "target": action.target,
+                "intentAction": action.action,
+            ])
+            break
     }
     return [success: true]
+}
+
+def sendBridgeAction(actionJson) {
+    def requestParams = [
+        "uri": "$bridgeUrl/bridges/$bridgeId/actions",
+        "query": null,
+        "requestContentType": "application/json",
+        "body": actionJson
+    ]
+
+    log.debug "Sending event with params: $requestParams"
+    httpPost(requestParams) { resp ->
+        log.debug "Request sent, response ${resp?.status}"
+    }
 }
