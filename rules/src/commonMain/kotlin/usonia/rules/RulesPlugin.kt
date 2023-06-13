@@ -10,8 +10,8 @@ import usonia.rules.charging.PowerLimitCharge
 import usonia.rules.greenhouse.FanControl
 import usonia.rules.indicator.Indicator
 import usonia.rules.lights.*
-import usonia.rules.locks.CodeAlerts
-import usonia.rules.locks.LockAfterTime
+import usonia.rules.locks.*
+import usonia.rules.locks.LockJammed
 import usonia.rules.locks.LockOnAway
 import usonia.rules.locks.LockOnSleep
 import usonia.server.Daemon
@@ -54,5 +54,6 @@ class RulesPlugin(
         PowerLimitCharge(client, logger),
         DoorAlert(client, logger),
         CodeAlerts(client, logger),
+        LockJammed(client, logger),
     )
 }
