@@ -19,7 +19,7 @@ preferences {
         input "switches", "capability.switch", title: "Choose Switches", multiple: true, required: false
         input "water", "capability.waterSensor", title: "Choose Water Sensors", multiple: true, required: false
         input "doors", "capability.contactSensor", title: "Choose Door Sensors", multiple: true, required: false
-        input "power", "capability.powerMeter", title: "Power Meters", multiple: true, required: true
+        input "power", "capability.powerMeter", title: "Power Meters", multiple: true, required: false
     }
     section("Config") {
         input "bridgeUrl", "text", title: "Bridge URL"
