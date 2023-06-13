@@ -245,7 +245,7 @@ def actions() {
 
 def sendBridgeAction(actionJson) {
     def requestParams = [
-        "uri": "$bridgeUrl/bridges/$bridgeId/actions",
+        "uri": "$bridgeUrl/actions",
         "query": null,
         "requestContentType": "application/json",
         "body": actionJson
