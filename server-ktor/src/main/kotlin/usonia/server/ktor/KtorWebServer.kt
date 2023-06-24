@@ -60,6 +60,7 @@ class KtorWebServer(
                                         else -> logger.debug("Unhandled frame type: ${it::class.simpleName}")
                                     }
                                 }
+                                logger.trace("Incoming Job completed on socket <${controller::class.simpleName}>")
                             }
                             val outputJob = launch {
                                 output.consumeEach {
@@ -67,7 +68,7 @@ class KtorWebServer(
                                 }
                             }
                             incomingJob.join()
-                            outputJob.join()
+                            outputJob.cancel()
                             controllerJob.cancel()
                             logger.trace { "CLOSED: ${controller::class.simpleName}" }
                             close()
