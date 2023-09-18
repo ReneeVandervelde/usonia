@@ -14,4 +14,5 @@ enum class Fixture {
     Indicator,
     Fan,
     Charger,
+    Plant,
 }
