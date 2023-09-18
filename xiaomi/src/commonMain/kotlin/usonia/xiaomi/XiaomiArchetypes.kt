@@ -2,6 +2,7 @@ package usonia.xiaomi
 
 import usonia.foundation.Capabilities
 import usonia.foundation.Event
+import kotlin.time.Duration.Companion.days
 
 object XiaomiArchetypes {
     val temperature = Capabilities(
@@ -11,5 +12,6 @@ object XiaomiArchetypes {
             Event.Humidity::class,
             Event.Battery::class,
         ),
+        heartbeat = 2.days,
     )
 }

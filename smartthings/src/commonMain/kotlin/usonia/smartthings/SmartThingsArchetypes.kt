@@ -32,7 +32,7 @@ object SmartThingsArchetypes {
             Event.Temperature::class,
             Event.Humidity::class,
         ),
-        heartbeat = 5.days,
+        heartbeat = 2.days,
     )
 
     val moisture = Capabilities(
