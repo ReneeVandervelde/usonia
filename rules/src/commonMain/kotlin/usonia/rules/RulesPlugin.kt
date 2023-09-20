@@ -8,6 +8,7 @@ import usonia.rules.alerts.PipeMonitor
 import usonia.rules.alerts.WaterMonitor
 import usonia.rules.charging.PowerLimitCharge
 import usonia.rules.greenhouse.FanControl
+import usonia.rules.greenhouse.HeatControl
 import usonia.rules.greenhouse.MorningPlantLight
 import usonia.rules.indicator.Indicator
 import usonia.rules.lights.*
@@ -52,6 +53,7 @@ class RulesPlugin(
         LockAfterTime(client, logger),
         PipeMonitor(client, logger),
         FanControl(client, logger),
+        HeatControl(client, logger),
         PowerLimitCharge(client, logger),
         DoorAlert(client, logger),
         CodeAlerts(client, logger),

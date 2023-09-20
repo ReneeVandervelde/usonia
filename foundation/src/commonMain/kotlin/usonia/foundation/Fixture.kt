@@ -15,4 +15,5 @@ enum class Fixture {
     Fan,
     Charger,
     Plant,
+    Heat,
 }

@@ -11,8 +11,8 @@ import usonia.kotlin.*
 import usonia.server.Daemon
 import usonia.server.client.BackendClient
 
-const val DEFAULT_HIGH_BOUND = 80
-const val DEFAULT_UPPER_BUFFER = 3
+private const val DEFAULT_HIGH_BOUND = 80
+private const val DEFAULT_UPPER_BUFFER = 3
 
 /**
  * Turns fans on/off based on an upper-limit temperature.
