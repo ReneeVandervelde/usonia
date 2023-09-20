@@ -52,7 +52,7 @@ internal class ActionRelay(
     private fun publish(site: Site, device: Device, action: Action) {
         val bridge = site.findAssociatedBridge(device)
         if (bridge?.service != "hubitat") {
-            logger.trace("Ignoring non-hubitat action.")
+            logger.trace("Ignoring non-hubitat action for device ${device.id}.")
             return
         }
 
@@ -105,11 +105,11 @@ internal class ActionRelay(
             }.throwCancels()
 
             result.onSuccess {
-                logger.debug("Posted action to <$name>")
+                logger.debug("Posted action to <$name>: $action")
             }
 
             result.onFailure { error ->
-                logger.error("Failed to post action to <$name>", error)
+                logger.error("Failed to post action to <$name>: ${action}", error)
             }
         }
     }
