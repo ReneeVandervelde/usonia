@@ -56,6 +56,9 @@ class RulesPlugin(
         DoorAlert(client, logger),
         CodeAlerts(client, logger),
         LockJammed(client, logger),
-        MorningPlantLight(client, weather, logger = logger),
+    )
+
+    override val crons: List<CronJob> = listOf(
+        MorningPlantLight(client, weather, logger),
     )
 }

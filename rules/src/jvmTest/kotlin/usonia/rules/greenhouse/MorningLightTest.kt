@@ -6,11 +6,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
 import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
+import usonia.kotlin.datetime.withZone
 import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import usonia.weather.Conditions
@@ -20,6 +22,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.seconds
 
 class MorningLightTest {
     private val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
@@ -36,8 +39,9 @@ class MorningLightTest {
     }
 
     @Test
-    fun idealCase() = runTest {
+    fun before() = runTest {
         val sunriseTime = Instant.fromEpochMilliseconds(currentTime + 20.hours.inWholeMilliseconds)
+        val now = Instant.fromEpochMilliseconds(currentTime)
         val weatherAccess = object: WeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(Forecast(
                 timestamp = Instant.DISTANT_PAST,
@@ -53,35 +57,17 @@ class MorningLightTest {
             configurationAccess = fakeConfig,
             actionPublisher = actionSpy,
         )
-        val fakeClock = object: Clock {
-            override fun now(): Instant = Instant.fromEpochMilliseconds(currentTime)
-        }
 
-        val daemonJob = launch { MorningPlantLight(client, weatherAccess, fakeClock).start() }
-        advanceTimeBy(16.hours.inWholeMilliseconds)
-        runCurrent()
-        assertEquals(0, actionSpy.actions.size, "No action taken before sunrise")
-        advanceTimeBy(1.hours.inWholeMilliseconds)
-        runCurrent()
-        assertEquals(1, actionSpy.actions.size, "On Light Action Sent")
-        assertEquals(SwitchState.ON, (actionSpy.actions[0] as? Action.ColorTemperatureChange?)?.switchState)
-        advanceTimeBy(4.hours.inWholeMilliseconds)
-        runCurrent()
-        assertEquals(1, actionSpy.actions.size, "Off command not sent before timeframe")
-        advanceTimeBy(1.hours.inWholeMilliseconds)
-        runCurrent()
-        assertEquals(2, actionSpy.actions.size, "Off Light Action Sent")
-        assertEquals(SwitchState.OFF, (actionSpy.actions[1] as? Action.Switch?)?.state)
-        advanceUntilIdle()
-        runCurrent()
-        assertEquals(2, actionSpy.actions.size, "No further actions sent")
+        MorningPlantLight(client, weatherAccess).runCron(now.withZone(TimeZone.UTC))
 
-        daemonJob.cancelAndJoin()
+        runCurrent()
+        assertEquals(0, actionSpy.actions.size, "No action before sunrise")
     }
 
     @Test
-    fun midMorningStart() = runTest {
-        val sunriseTime = Instant.fromEpochMilliseconds(currentTime + 1.hours.inWholeMilliseconds)
+    fun afterStart() = runTest {
+        val sunriseTime = Instant.fromEpochMilliseconds(currentTime + 20.hours.inWholeMilliseconds)
+        val now = sunriseTime - 3.hours
         val weatherAccess = object: WeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(Forecast(
                 timestamp = Instant.DISTANT_PAST,
@@ -97,27 +83,18 @@ class MorningLightTest {
             configurationAccess = fakeConfig,
             actionPublisher = actionSpy,
         )
-        val fakeClock = object: Clock {
-            override fun now(): Instant = Instant.fromEpochMilliseconds(currentTime)
-        }
 
-        val daemonJob = launch { MorningPlantLight(client, weatherAccess, fakeClock).start() }
-        runCurrent()
-        assertEquals(1, actionSpy.actions.size, "On Light Action Sent Immediately")
-        assertEquals(SwitchState.ON, (actionSpy.actions[0] as? Action.ColorTemperatureChange?)?.switchState)
-        advanceTimeBy(4.hours.inWholeMilliseconds)
-        assertEquals(2, actionSpy.actions.size, "Off command sent")
-        assertEquals(SwitchState.OFF, (actionSpy.actions[1] as? Action.Switch?)?.state)
-        advanceUntilIdle()
-        runCurrent()
-        assertEquals(2, actionSpy.actions.size, "No additional actions sent")
+        MorningPlantLight(client, weatherAccess).runCron(now.withZone(TimeZone.UTC))
 
-        daemonJob.cancelAndJoin()
+        runCurrent()
+        assertEquals(1, actionSpy.actions.size, "On action sent")
+        assertEquals(SwitchState.ON, (actionSpy.actions.single() as? Action.ColorTemperatureChange)?.switchState)
     }
 
     @Test
-    fun afterHoursStart() = runTest {
-        val sunriseTime = Instant.fromEpochMilliseconds(currentTime - 2.hours.inWholeMilliseconds)
+    fun afterEnd() = runTest {
+        val sunriseTime = Instant.fromEpochMilliseconds(currentTime + 20.hours.inWholeMilliseconds)
+        val now = sunriseTime + 3.hours
         val weatherAccess = object: WeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(Forecast(
                 timestamp = Instant.DISTANT_PAST,
@@ -133,15 +110,11 @@ class MorningLightTest {
             configurationAccess = fakeConfig,
             actionPublisher = actionSpy,
         )
-        val fakeClock = object: Clock {
-            override fun now(): Instant = Instant.fromEpochMilliseconds(currentTime)
-        }
 
-        val daemonJob = launch { MorningPlantLight(client, weatherAccess, fakeClock).start() }
-        advanceUntilIdle()
+        MorningPlantLight(client, weatherAccess).runCron(now.withZone(TimeZone.UTC))
+
         runCurrent()
-        assertEquals(0, actionSpy.actions.size, "No additional actions sent")
-
-        daemonJob.cancelAndJoin()
+        assertEquals(1, actionSpy.actions.size, "Off action sent")
+        assertEquals(SwitchState.OFF, (actionSpy.actions.single() as? Action.Switch)?.state)
     }
 }
