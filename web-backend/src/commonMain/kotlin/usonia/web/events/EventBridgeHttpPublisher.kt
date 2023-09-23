@@ -8,6 +8,7 @@ import usonia.foundation.*
 import usonia.foundation.Statuses.DEVICE_NOT_FOUND
 import usonia.foundation.Statuses.SUCCESS
 import usonia.server.client.BackendClient
+import usonia.server.client.adjustForOffsets
 import usonia.server.http.HttpRequest
 import usonia.server.http.RestController
 import usonia.server.http.RestResponse
@@ -37,7 +38,7 @@ internal class EventBridgeHttpPublisher(
                 return RestResponse(DEVICE_NOT_FOUND)
             }
 
-        client.publishEvent(data.withSource(deviceId))
+        client.publishEvent(data.withSource(deviceId).let { client.adjustForOffsets(it) })
         return RestResponse(SUCCESS)
     }
 }
