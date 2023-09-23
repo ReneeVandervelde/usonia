@@ -8,6 +8,7 @@ import usonia.foundation.EventSerializer
 import usonia.foundation.Status
 import usonia.foundation.Statuses
 import usonia.server.client.BackendClient
+import usonia.server.client.adjustForOffsets
 import usonia.server.http.HttpRequest
 import usonia.server.http.RestController
 import usonia.server.http.RestResponse
@@ -26,7 +27,7 @@ internal class EventHttpPublisher(
     override val serializer = Status.serializer()
 
     override suspend fun getResponse(data: Event, request: HttpRequest): RestResponse<Status> {
-        client.publishEvent(data)
+        client.publishEvent(client.adjustForOffsets(data))
         return RestResponse(Statuses.SUCCESS)
     }
 }
