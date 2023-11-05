@@ -16,6 +16,7 @@ class DatabaseModule(
             JdbcSqliteDriver(url)
                 .also { Database.Schema.create(it) }
                 .also { Database.Schema.migrate(it, 1, 2)}
+                .also { Database.Schema.migrate(it, 2, 3)}
                 .let { Database(it) }
         }
         return DatabaseStateAccess(

@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS Event (
   data BLOB NOT NULL
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS StateLookup
-ON Event (timestamp, type, source);
+CREATE INDEX IF NOT EXISTS StateLookup
+ON Event (type, source, timestamp);
 
 CREATE INDEX IF NOT EXISTS OrderedEvents
 ON Event (timestamp);

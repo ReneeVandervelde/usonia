@@ -1,0 +1,5 @@
+DROP INDEX IF EXISTS StateLookup;
+
+-- Step 2: Create a new non-unique index with the same name
+CREATE INDEX IF NOT EXISTS StateLookup
+ON Event (type, source, timestamp);
