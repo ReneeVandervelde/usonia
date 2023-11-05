@@ -1,4 +1,4 @@
-package usonia.server.timemachine
+package usonia.timemachine
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -7,20 +7,19 @@ import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedDateTime
 import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.kotlin.datetime.current
+import kotlin.time.Duration
 
 /**
- * A time-machine that ticks every second.
- *
- * Note: This does not provide second-level accuracy, but will tick roughly
- * each second.
+ * Time machine that emits a tick roughly each [duration] period.
  */
-class SecondFrequency(
-    clock: ZonedClock = ZonedSystemClock
+class InexactDurationMachine(
+    duration: Duration,
+    clock: ZonedClock = ZonedSystemClock,
 ): TimeMachine {
     override val ticks: Flow<ZonedDateTime> = flow {
         while (true) {
             emit(clock.current)
-            delay(1000)
+            delay(duration)
         }
     }
 }

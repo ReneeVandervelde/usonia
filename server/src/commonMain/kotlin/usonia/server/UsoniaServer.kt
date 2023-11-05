@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
-import usonia.server.timemachine.SecondFrequency
-import usonia.server.timemachine.minutes
+import usonia.timemachine.SecondFrequency
+import usonia.timemachine.minutes
 
 /**
  * The "backend" part of the application that starts up long running services.
