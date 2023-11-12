@@ -43,7 +43,7 @@ class PowerLimitChargeTest {
         )
         val daemon = PowerLimitCharge(client)
 
-        val daemonJob = launch { daemon.start() }
+        val daemonJob = launch { daemon.startDaemon() }
         runCurrent()
 
         fakeEvents.mutableEvents.emit(Event.Power(
@@ -87,7 +87,7 @@ class PowerLimitChargeTest {
         )
         val daemon = PowerLimitCharge(client)
 
-        val daemonJob = launch { daemon.start() }
+        val daemonJob = launch { daemon.startDaemon() }
         fakeEvents.mutableEvents.emit(Event.Power(
             source = FakeDevices.Switch.id,
             timestamp = Instant.DISTANT_PAST,
@@ -126,7 +126,7 @@ class PowerLimitChargeTest {
         )
         val daemon = PowerLimitCharge(client)
 
-        val daemonJob = launch { daemon.start() }
+        val daemonJob = launch { daemon.startDaemon() }
         fakeEvents.mutableEvents.emit(Event.Power(
             source = FakeDevices.Switch.id,
             timestamp = Instant.DISTANT_PAST,
@@ -165,7 +165,7 @@ class PowerLimitChargeTest {
         )
         val daemon = PowerLimitCharge(client)
 
-        val daemonJob = launch { daemon.start() }
+        val daemonJob = launch { daemon.startDaemon() }
         fakeEvents.mutableEvents.emit(Event.Power(
             source = FakeDevices.Switch.id,
             timestamp = Instant.DISTANT_PAST,

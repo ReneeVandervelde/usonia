@@ -71,7 +71,7 @@ class IndicatorTest {
 
         val indicator = Indicator(client, fakeWeather)
 
-        val indicatorJob = launch { indicator.start() }
+        val indicatorJob = launch { indicator.startDaemon() }
 
         runCurrent()
         assertEquals(1, spyPublisher.actions.size)
@@ -98,7 +98,7 @@ class IndicatorTest {
 
         val indicator = Indicator(client, fakeWeather)
 
-        val indicatorJob = launch { indicator.start() }
+        val indicatorJob = launch { indicator.startDaemon() }
 
         runCurrent()
         assertEquals(1, spyPublisher.actions.size)
@@ -125,7 +125,7 @@ class IndicatorTest {
 
         val indicator = Indicator(client, fakeWeather)
 
-        val indicatorJob = launch { indicator.start() }
+        val indicatorJob = launch { indicator.startDaemon() }
 
         runCurrent()
         assertEquals(1, spyPublisher.actions.size)
@@ -152,7 +152,7 @@ class IndicatorTest {
 
         val indicator = Indicator(client, fakeWeather)
 
-        val indicatorJob = launch { indicator.start() }
+        val indicatorJob = launch { indicator.startDaemon() }
 
         runCurrent()
         assertEquals(1, spyPublisher.actions.size)
@@ -180,7 +180,7 @@ class IndicatorTest {
 
         val indicator = Indicator(client, fakeWeather)
 
-        val indicatorJob = launch { indicator.start() }
+        val indicatorJob = launch { indicator.startDaemon() }
 
         runCurrent()
         assertEquals(1, spyPublisher.actions.size)
@@ -218,7 +218,7 @@ class IndicatorTest {
 
         val indicator = Indicator(client, fakeWeather)
 
-        val indicatorJob = launch { indicator.start() }
+        val indicatorJob = launch { indicator.startDaemon() }
         runCurrent()
         eventAccess.mutableEvents.emit(presence)
         runCurrent()
@@ -257,7 +257,7 @@ class IndicatorTest {
 
         val indicator = Indicator(client, fakeWeather)
 
-        val indicatorJob = launch { indicator.start() }
+        val indicatorJob = launch { indicator.startDaemon() }
         runCurrent()
         eventAccess.mutableEvents.emit(presence)
         runCurrent()

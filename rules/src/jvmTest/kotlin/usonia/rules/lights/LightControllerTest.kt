@@ -65,7 +65,7 @@ class LightControllerTest {
         )
 
         val controller = LightController(client, settingsPicker, backgroundScope = this)
-        val daemonJob = launch { controller.start() }
+        val daemonJob = launch { controller.startDaemon() }
         runCurrent()
 
         eventAccess.mutableEvents.emit(Event.Motion(
@@ -96,7 +96,7 @@ class LightControllerTest {
         }
 
         val controller = LightController(client, settingsPicker, backgroundScope = this)
-        val daemonJob = launch { controller.start() }
+        val daemonJob = launch { controller.startDaemon() }
 
         eventAccess.mutableEvents.emit(Event.Motion(
             FakeDevices.Motion.id,
@@ -123,7 +123,7 @@ class LightControllerTest {
         }
 
         val controller = LightController(client, settingsPicker, backgroundScope = this)
-        val daemonJob = launch { controller.start() }
+        val daemonJob = launch { controller.startDaemon() }
         runCurrent()
 
         eventAccess.mutableEvents.emit(Event.Motion(
@@ -148,7 +148,7 @@ class LightControllerTest {
         )
 
         val controller = LightController(client, settingsPicker, backgroundScope = this)
-        val daemonJob = launch { controller.start() }
+        val daemonJob = launch { controller.startDaemon() }
         runCurrent()
 
         eventAccess.mutableEvents.emit(Event.Motion(
@@ -178,7 +178,7 @@ class LightControllerTest {
         )
 
         val controller = LightController(client, settingsPicker, backgroundScope = this)
-        val daemonJob = launch { controller.start() }
+        val daemonJob = launch { controller.startDaemon() }
         runCurrent()
 
         eventAccess.mutableEvents.emit(Event.Motion(

@@ -61,7 +61,7 @@ class HueGroupHandlerTest {
 
         val handler = HueGroupHandler(client, shadeSpy, requestScope = this)
 
-        val handlerJob = launch { handler.start() }
+        val handlerJob = launch { handler.startDaemon() }
         advanceUntilIdle()
 
         actionAccess.mutableActions.emit(Action.Switch(
@@ -98,7 +98,7 @@ class HueGroupHandlerTest {
 
         val handler = HueGroupHandler(client, shadeSpy, requestScope = this)
 
-        val handlerJob = launch { handler.start() }
+        val handlerJob = launch { handler.startDaemon() }
         advanceUntilIdle()
 
         actionAccess.mutableActions.emit(Action.Switch(
@@ -135,7 +135,7 @@ class HueGroupHandlerTest {
 
         val handler = HueGroupHandler(client, shadeSpy, requestScope = this)
 
-        val handlerJob = launch { handler.start() }
+        val handlerJob = launch { handler.startDaemon() }
         advanceUntilIdle()
 
         actionAccess.mutableActions.emit(Action.Lock(
@@ -195,7 +195,7 @@ class HueGroupHandlerTest {
 
         val handler = HueGroupHandler(client, shadeSpy, requestScope = this)
 
-        val handlerJob = launch { handler.start() }
+        val handlerJob = launch { handler.startDaemon() }
         advanceUntilIdle()
 
         actionAccess.mutableActions.emit(action)

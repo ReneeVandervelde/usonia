@@ -7,24 +7,22 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
+import regolith.processes.daemon.Daemon
 import usonia.core.state.publishAll
 import usonia.foundation.*
 import usonia.kotlin.*
-import usonia.server.Daemon
 import usonia.server.client.BackendClient
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.ExperimentalTime
 
 /**
  * Locks entry-point doors after they've been closed for a given amount of time.
  */
-@OptIn(ExperimentalTime::class)
 class LockAfterTime(
     private val client: BackendClient,
     private val logger: KimchiLogger = EmptyLogger,
     private val backgroundScope: CoroutineScope = DefaultScope(),
 ): Daemon {
-    override suspend fun start(): Nothing {
+    override suspend fun startDaemon(): Nothing {
         client.site.collectLatest { site ->
             client.events
                 .filterIsInstance<Event.Latch>()

@@ -1,6 +1,7 @@
 [versions]
 kimchi = "2.0.3"
 watermelon = "1.0.1"
+regolith = "0.5.0"
 
 [libraries.kimchi-core]
 version.ref = "kimchi"
@@ -21,6 +22,10 @@ module = "com.inkapplications.watermelon:coroutines"
 [libraries.watermelon-standard]
 version.ref = "watermelon"
 module = "com.inkapplications.watermelon:standard"
+
+[libraries.regolith-processes]
+version.ref = "regolith"
+module = "com.inkapplications.regolith:processes"
 
 [bundles]
 watermelon-kotlin = [

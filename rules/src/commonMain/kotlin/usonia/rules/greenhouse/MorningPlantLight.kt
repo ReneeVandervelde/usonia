@@ -5,6 +5,11 @@ import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import regolith.processes.cron.CronJob
+import regolith.processes.cron.Schedule
 import usonia.core.state.publishAll
 import usonia.foundation.Action
 import usonia.foundation.Fixture
@@ -12,9 +17,8 @@ import usonia.foundation.SwitchState
 import usonia.foundation.findDevicesBy
 import usonia.kotlin.*
 import usonia.kotlin.datetime.ZonedDateTime
+import usonia.kotlin.datetime.withZone
 import usonia.server.client.BackendClient
-import usonia.server.cron.CronJob
-import usonia.server.cron.Schedule
 import usonia.weather.Forecast
 import usonia.weather.WeatherAccess
 import kotlin.time.Duration.Companion.days
@@ -29,23 +33,24 @@ class MorningPlantLight(
 ): CronJob {
     override val schedule: Schedule = Schedule().withMinutes { it % 10 == 0 }
 
-    override suspend fun runCron(time: ZonedDateTime) {
+    override suspend fun runCron(time: LocalDateTime, zone: TimeZone) {
         val (devices, forecast) = client.site
             .map { it.findDevicesBy { it.fixture == Fixture.Plant } }
             .combineToPair(weatherAccess.forecast)
             .first()
 
         // Fix for late forecast updates in the morning.
-        val sunrise = forecast.sunriseToday(time)
-        val sunset = forecast.nextSunset(time)
+        val sunrise = forecast.sunriseToday(time.withZone(zone))
+        val sunset = forecast.nextSunset(time.withZone(zone))
         val additionalTime = TARGET_LIGHT_TIME - (sunset - sunrise)
         val onTime = sunrise - (additionalTime - 3.hours)
         val offTime = sunrise + 3.hours
+        val instant = time.toInstant(zone)
 
         logger.trace("Sunrise is ${sunrise} onTime: $onTime offTime: $offTime")
 
         when {
-            time.instant >= onTime && time.instant < offTime -> {
+            instant >= onTime && instant < offTime -> {
                 logger.trace("Turning on ${devices.size} Morning Plant Lights")
                 devices.map {
                     Action.ColorTemperatureChange(
@@ -56,7 +61,7 @@ class MorningPlantLight(
                     )
                 }.run { client.publishAll(this) }
             }
-            time.instant >= offTime -> {
+            instant >= offTime -> {
                 logger.trace("Turning off ${devices.size} Morning Plant Lights")
                 devices.map {
                     Action.Switch(it.id, SwitchState.OFF)

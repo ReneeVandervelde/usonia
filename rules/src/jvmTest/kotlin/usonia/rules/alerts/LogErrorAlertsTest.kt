@@ -36,7 +36,7 @@ class LogErrorAlertsTest {
             configurationAccess = config,
         )
         LogErrorAlerts.client.value = client
-        val daemon = launch { LogErrorAlerts.start() }
+        val daemon = launch { LogErrorAlerts.startDaemon() }
         runCurrent()
         LogErrorAlerts.log(LogLevel.ERROR, "Test")
         runCurrent()
@@ -59,7 +59,7 @@ class LogErrorAlertsTest {
             configurationAccess = disabledFlagConfig,
         )
         LogErrorAlerts.client.value = client
-        val daemon = launch { LogErrorAlerts.start() }
+        val daemon = launch { LogErrorAlerts.startDaemon() }
         runCurrent()
         LogErrorAlerts.log(LogLevel.ERROR, "Test")
         runCurrent()

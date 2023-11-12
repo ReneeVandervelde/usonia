@@ -80,7 +80,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).runCron(time)
+        AwolDeviceReporter(client, api).runCron(time.localDateTime, time.zone)
 
         assertEquals("test-token", api.tokenUsed)
         assertEquals("666", api.projectUsed)
@@ -104,7 +104,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).runCron(time)
+        AwolDeviceReporter(client, api).runCron(time.localDateTime, time.zone)
 
         assertEquals(0, api.closed.size, "closed")
         assertEquals(0, api.updated.size, "updated")
@@ -128,7 +128,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).runCron(time)
+        AwolDeviceReporter(client, api).runCron(time.localDateTime, time.zone)
 
         assertEquals(0, api.closed.size, "closed")
         assertEquals(0, api.updated.size, "updated")
@@ -151,7 +151,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).runCron(time)
+        AwolDeviceReporter(client, api).runCron(time.localDateTime, time.zone)
 
         assertEquals(0, api.closed.size, "closed")
         assertEquals(0, api.updated.size, "updated")
@@ -168,7 +168,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).runCron(time)
+        AwolDeviceReporter(client, api).runCron(time.localDateTime, time.zone)
 
         assertEquals(0, api.closed.size, "closed")
         assertEquals(0, api.updated.size, "updated")
@@ -201,7 +201,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).runCron(time)
+        AwolDeviceReporter(client, api).runCron(time.localDateTime, time.zone)
 
         assertEquals(1, api.closed.size, "closed")
         assertEquals(0, api.updated.size, "updated")
@@ -235,7 +235,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).runCron(time)
+        AwolDeviceReporter(client, api).runCron(time.localDateTime, time.zone)
 
         assertEquals(0, api.closed.size, "closed")
         assertEquals(0, api.updated.size, "updated")
@@ -252,7 +252,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).runCron(time)
+        AwolDeviceReporter(client, api).runCron(time.localDateTime, time.zone)
 
         assertEquals(0, api.closed.size, "closed")
         assertEquals(0, api.updated.size, "updated")
@@ -282,7 +282,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).runCron(time)
+        AwolDeviceReporter(client, api).runCron(time.localDateTime, time.zone)
 
         assertEquals(0, api.closed.size, "closed")
         assertEquals(0, api.updated.size, "updated")
@@ -303,7 +303,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
             configurationAccess = config,
         )
-        val daemon = launch { AwolDeviceReporter(client, api).start() }
+        val daemon = launch { AwolDeviceReporter(client, api).startDaemon() }
         advanceUntilIdle()
 
         assertEquals(0, api.closed.size, "closed")
@@ -338,7 +338,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
             configurationAccess = config,
         )
-        AwolDeviceReporter(client, api).runCron(time)
+        AwolDeviceReporter(client, api).runCron(time.localDateTime, time.zone)
 
         assertEquals(1, api.closed.size, "closed")
         assertEquals(0, api.updated.size, "updated")
@@ -371,7 +371,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).runCron(time)
+        AwolDeviceReporter(client, api).runCron(time.localDateTime, time.zone)
 
         assertEquals(0, api.closed.size, "closed")
         assertEquals(0, api.updated.size, "updated")
@@ -404,7 +404,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
         )
 
-        AwolDeviceReporter(client, api).runCron(time)
+        AwolDeviceReporter(client, api).runCron(time.localDateTime, time.zone)
 
         assertEquals(0, api.closed.size)
         assertEquals(1, api.updated.size)

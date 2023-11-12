@@ -1,9 +1,9 @@
 package usonia.todoist
 
 import kimchi.logger.KimchiLogger
+import regolith.processes.cron.CronJob
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
-import usonia.server.cron.CronJob
 import usonia.todoist.api.TodoistApiClient
 
 class TodoistBridgePlugin(

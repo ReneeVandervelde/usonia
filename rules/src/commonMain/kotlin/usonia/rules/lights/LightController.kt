@@ -7,10 +7,10 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
+import regolith.processes.daemon.Daemon
 import usonia.core.state.publishAll
 import usonia.foundation.*
 import usonia.kotlin.*
-import usonia.server.Daemon
 import usonia.server.client.BackendClient
 
 /**
@@ -22,8 +22,7 @@ internal class LightController(
     private val logger: KimchiLogger = EmptyLogger,
     private val backgroundScope: CoroutineScope = DefaultScope(),
 ): Daemon {
-
-    override suspend fun start(): Nothing {
+    override suspend fun startDaemon(): Nothing {
         client.site.collectLatest { site ->
             client.events
                 .filterIsInstance<Event.Motion>()

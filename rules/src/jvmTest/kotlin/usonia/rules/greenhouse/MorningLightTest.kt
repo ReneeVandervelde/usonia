@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
@@ -58,7 +59,7 @@ class MorningLightTest {
             actionPublisher = actionSpy,
         )
 
-        MorningPlantLight(client, weatherAccess).runCron(now.withZone(TimeZone.UTC))
+        MorningPlantLight(client, weatherAccess).runCron(now.toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
 
         runCurrent()
         assertEquals(0, actionSpy.actions.size, "No action before sunrise")
@@ -84,7 +85,7 @@ class MorningLightTest {
             actionPublisher = actionSpy,
         )
 
-        MorningPlantLight(client, weatherAccess).runCron(now.withZone(TimeZone.UTC))
+        MorningPlantLight(client, weatherAccess).runCron(now.toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
 
         runCurrent()
         assertEquals(1, actionSpy.actions.size, "On action sent")
@@ -111,7 +112,7 @@ class MorningLightTest {
             actionPublisher = actionSpy,
         )
 
-        MorningPlantLight(client, weatherAccess).runCron(now.withZone(TimeZone.UTC))
+        MorningPlantLight(client, weatherAccess).runCron(now.toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
 
         runCurrent()
         assertEquals(1, actionSpy.actions.size, "Off action sent")

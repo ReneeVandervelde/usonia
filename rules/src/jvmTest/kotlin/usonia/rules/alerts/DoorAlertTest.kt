@@ -45,7 +45,7 @@ class DoorAlertTest {
             actionPublisher = actionSpy,
         )
 
-        val daemon = launch { DoorAlert(client).start() }
+        val daemon = launch { DoorAlert(client).startDaemon() }
         advanceUntilIdle()
 
         fakeEvents.mutableEvents.emit(Event.Latch(FakeDevices.Latch.id, Instant.DISTANT_PAST, LatchState.OPEN))
@@ -75,7 +75,7 @@ class DoorAlertTest {
             actionPublisher = actionSpy,
         )
 
-        val daemon = launch { DoorAlert(client).start() }
+        val daemon = launch { DoorAlert(client).startDaemon() }
         advanceUntilIdle()
 
         fakeEvents.mutableEvents.emit(Event.Latch(FakeDevices.Latch.id, Instant.DISTANT_PAST, LatchState.OPEN))
@@ -108,7 +108,7 @@ class DoorAlertTest {
             actionPublisher = actionSpy,
         )
 
-        val daemon = launch { DoorAlert(client).start() }
+        val daemon = launch { DoorAlert(client).startDaemon() }
         advanceUntilIdle()
 
         fakeEvents.mutableEvents.emit(Event.Latch(FakeDevices.Latch.id, Instant.DISTANT_PAST, LatchState.OPEN))
@@ -133,7 +133,7 @@ class DoorAlertTest {
             actionPublisher = actionSpy,
         )
 
-        val daemon = launch { DoorAlert(client).start() }
+        val daemon = launch { DoorAlert(client).startDaemon() }
         advanceUntilIdle()
 
         fakeEvents.mutableEvents.emit(Event.Latch(FakeDevices.Latch.id, Instant.DISTANT_PAST, LatchState.CLOSED))

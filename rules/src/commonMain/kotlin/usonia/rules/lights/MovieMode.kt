@@ -3,6 +3,7 @@ package usonia.rules.lights
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import regolith.processes.daemon.Daemon
 import usonia.core.state.getBooleanFlag
 import usonia.core.state.getSite
 import usonia.core.state.publishAll
@@ -13,7 +14,6 @@ import usonia.kotlin.distinctUntilChanged
 import usonia.kotlin.drop
 import usonia.kotlin.map
 import usonia.rules.Flags
-import usonia.server.Daemon
 import usonia.server.client.BackendClient
 
 /**
@@ -41,7 +41,7 @@ internal class MovieMode(
         }
     }
 
-    override suspend fun start(): Nothing {
+    override suspend fun startDaemon(): Nothing {
         client.flags
             .map { it[Flags.MovieMode].toBoolean() }
             .drop(1)

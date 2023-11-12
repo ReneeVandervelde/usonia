@@ -41,7 +41,7 @@ class LockOnSleepTest {
         )
         val picker = LockOnSleep(client)
 
-        val daemon = launch { picker.start() }
+        val daemon = launch { picker.startDaemon() }
         runCurrent()
         fakeConfig.mutableFlags.emit(mapOf("Sleep Mode" to "true"))
         runCurrent()
@@ -64,7 +64,7 @@ class LockOnSleepTest {
         )
         val picker = LockOnSleep(client)
 
-        val daemon = launch { picker.start() }
+        val daemon = launch { picker.startDaemon() }
         fakeConfig.mutableFlags.emit(mapOf("Sleep Mode" to "false"))
         runCurrent()
         assertEquals(0, actionSpy.actions.size, "Locks not locked if not entering sleep mode")

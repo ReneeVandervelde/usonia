@@ -9,13 +9,13 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import regolith.processes.daemon.Daemon
 import usonia.foundation.Action
 import usonia.foundation.Site
 import usonia.kotlin.IoScope
 import usonia.kotlin.collect
 import usonia.kotlin.collectLatest
 import usonia.kotlin.filterIsInstance
-import usonia.server.Daemon
 import usonia.server.client.BackendClient
 
 /**
@@ -31,7 +31,7 @@ internal class TelegramAlerts(
     private val logger: KimchiLogger = EmptyLogger,
     private val requestScope: CoroutineScope = IoScope()
 ): Daemon {
-    override suspend fun start(): Nothing {
+    override suspend fun startDaemon(): Nothing {
         client.site.collectLatest { site ->
             client.actions.filterIsInstance<Action.Alert>().collect {
                 send(site, it)

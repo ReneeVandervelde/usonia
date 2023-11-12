@@ -2,8 +2,8 @@ package usonia.hubitat
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import regolith.processes.daemon.Daemon
 import usonia.serialization.SerializationModule
-import usonia.server.Daemon
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
 

@@ -7,10 +7,10 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import regolith.processes.daemon.Daemon
 import usonia.core.client.alertAll
 import usonia.foundation.*
 import usonia.kotlin.*
-import usonia.server.Daemon
 import usonia.server.client.BackendClient
 
 /**
@@ -23,7 +23,7 @@ class PipeMonitor(
 ): Daemon {
     private val alerted = mutableSetOf<Identifier>()
 
-    override suspend fun start(): Nothing {
+    override suspend fun startDaemon(): Nothing {
         client.site.collectLatest { site ->
             coroutineScope {
                 launch {

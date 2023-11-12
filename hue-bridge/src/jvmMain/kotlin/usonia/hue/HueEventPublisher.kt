@@ -9,11 +9,11 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
+import regolith.processes.daemon.Daemon
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.EventPublisher
 import usonia.foundation.*
 import usonia.kotlin.*
-import usonia.server.Daemon
 
 @OptIn(UndocumentedApi::class)
 class HueEventPublisher(
@@ -23,7 +23,7 @@ class HueEventPublisher(
     private val clock: Clock = Clock.System,
     private val logger: KimchiLogger = EmptyLogger,
 ): Daemon {
-    override suspend fun start(): Nothing {
+    override suspend fun startDaemon(): Nothing {
         configurationAccess.site
             .filter { it.findBridgeByServiceTag(HUE_SERVICE) != null }
             .flatMapLatest { site ->

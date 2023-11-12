@@ -8,6 +8,8 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.FakeBridge
@@ -17,16 +19,17 @@ import usonia.kotlin.OngoingFlow
 import usonia.kotlin.collect
 import usonia.kotlin.datetime.UtcClock
 import usonia.kotlin.datetime.current
+import usonia.kotlin.datetime.withZone
 import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
+import usonia.server.test.DummyManager
 import usonia.weather.Conditions
 import usonia.weather.Forecast
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class AccuweatherAccessTest {
     private val fakeApi = object: AccuweatherApi {
         var forecast = ForecastResponse(
@@ -103,8 +106,8 @@ class AccuweatherAccessTest {
         val conditionCollection = launch { access.conditions.collect { conditions += it } }
         runCurrent()
 
-        access.primeCron()
-        access.runCron(UtcClock.current)
+        access.initialize(DummyManager)
+        access.runCron(Clock.System.now().toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
         runCurrent()
 
         assertEquals(1, forecasts.size)
@@ -129,7 +132,7 @@ class AccuweatherAccessTest {
         val conditionCollection = launch { access.conditions.collect { conditions += it } }
         runCurrent()
 
-        access.primeCron()
+        access.initialize(DummyManager)
         runCurrent()
 
         assertEquals(2, forecasts.size)
@@ -164,7 +167,7 @@ class AccuweatherAccessTest {
         val conditionCollection = launch { access.conditions.collect { conditions += it } }
         runCurrent()
 
-        access.primeCron()
+        access.initialize(DummyManager)
         fakeApi.conditions = ConditionsResponse(
             cloudCover = 100,
             temperature = ConditionsResponse.TemperatureTypes(
@@ -173,7 +176,7 @@ class AccuweatherAccessTest {
                 )
             )
         )
-        access.runCron(UtcClock.current)
+        access.runCron(Clock.System.now().toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
         runCurrent()
 
         assertEquals(2, forecasts.size)
@@ -207,7 +210,7 @@ class AccuweatherAccessTest {
         val forecastCollection = launch { access.forecast.collect { forecasts += it } }
         val conditionCollection = launch { access.conditions.collect { conditions += it } }
 
-        access.primeCron()
+        access.initialize(DummyManager)
         runCurrent()
         fakeClock.current = fakeClock.current + 5.hours
         fakeApi.forecast = ForecastResponse(
@@ -224,7 +227,7 @@ class AccuweatherAccessTest {
                 )
             )
         )
-        access.runCron(UtcClock.current)
+        access.runCron(Clock.System.now().toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
         runCurrent()
 
         assertEquals(3, forecasts.size)

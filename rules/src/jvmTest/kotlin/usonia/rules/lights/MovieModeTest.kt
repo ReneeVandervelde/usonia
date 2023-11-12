@@ -116,7 +116,7 @@ class MovieModeTest {
         )
         val picker = MovieMode(client)
 
-        val daemon = launch { picker.start() }
+        val daemon = launch { picker.startDaemon() }
         fakeConfig.mutableFlags.emit(mapOf(
             "Movie Mode" to "true"
         ))
@@ -144,7 +144,7 @@ class MovieModeTest {
         )
         val picker = MovieMode(client)
 
-        val daemon = launch { picker.start() }
+        val daemon = launch { picker.startDaemon() }
         runCurrent()
         fakeConfig.mutableFlags.emit(mapOf(
             "Movie Mode" to "false"
@@ -180,7 +180,7 @@ class MovieModeTest {
         )
         val picker = MovieMode(client)
 
-        val daemon = launch { picker.start() }
+        val daemon = launch { picker.startDaemon() }
         runCurrent()
         fakeConfig.mutableFlags.emit(mapOf(
             "Movie Mode" to "true"

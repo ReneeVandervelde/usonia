@@ -5,10 +5,10 @@ import inkapplications.spondee.structure.toFloat
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
+import regolith.processes.daemon.Daemon
 import usonia.core.state.publishAll
 import usonia.foundation.*
 import usonia.kotlin.*
-import usonia.server.Daemon
 import usonia.server.client.BackendClient
 
 private const val DEFAULT_HIGH_BOUND = 80
@@ -22,7 +22,7 @@ class FanControl(
     private val logger: KimchiLogger = EmptyLogger,
     private val backgroundScope: CoroutineScope = DefaultScope(),
 ): Daemon {
-    override suspend fun start(): Nothing {
+    override suspend fun startDaemon(): Nothing {
         client.site.collectLatest { site ->
             client.events
                 .filterIsInstance<Event.Temperature>()

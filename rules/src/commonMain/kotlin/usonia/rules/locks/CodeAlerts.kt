@@ -2,10 +2,10 @@ package usonia.rules.locks
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import regolith.processes.daemon.Daemon
 import usonia.core.client.alertAll
 import usonia.foundation.*
 import usonia.kotlin.*
-import usonia.server.Daemon
 import usonia.server.client.BackendClient
 
 /**
@@ -26,7 +26,7 @@ class CodeAlerts(
     private val client: BackendClient,
     private val logger: KimchiLogger = EmptyLogger,
 ): Daemon {
-    override suspend fun start(): Nothing {
+    override suspend fun startDaemon(): Nothing {
         client.events
             .filterIsInstance<Event.Lock>()
             .filter { it.state == LockState.UNLOCKED }

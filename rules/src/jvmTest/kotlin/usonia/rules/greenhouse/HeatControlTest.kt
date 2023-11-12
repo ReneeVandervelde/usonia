@@ -50,7 +50,7 @@ class HeatControlTest {
         )
         val daemon = HeatControl(client, backgroundScope = backgroundScope)
 
-        val daemonJob = launch { daemon.start() }
+        val daemonJob = launch { daemon.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 73.fahrenheit))
         runCurrent()
@@ -74,7 +74,7 @@ class HeatControlTest {
         )
         val daemon = HeatControl(client, backgroundScope = backgroundScope)
 
-        val daemonJob = launch { daemon.start() }
+        val daemonJob = launch { daemon.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 74.fahrenheit))
         fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 75.fahrenheit))
@@ -95,7 +95,7 @@ class HeatControlTest {
         )
         val daemon = HeatControl(client, backgroundScope = backgroundScope)
 
-        val daemonJob = launch { daemon.start() }
+        val daemonJob = launch { daemon.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 77.fahrenheit))
         runCurrent()
@@ -119,7 +119,7 @@ class HeatControlTest {
         )
         val daemon = HeatControl(client, backgroundScope = backgroundScope)
 
-        val daemonJob = launch { daemon.start() }
+        val daemonJob = launch { daemon.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Temperature(Identifier("unrelated-sensor"), Instant.DISTANT_PAST, 99.fahrenheit))
         fakeEvents.mutableEvents.emit(Event.Temperature(Identifier("unrelated-sensor"), Instant.DISTANT_PAST, 1.fahrenheit))
@@ -138,7 +138,7 @@ class HeatControlTest {
         )
         val daemon = HeatControl(client, backgroundScope = backgroundScope)
 
-        val daemonJob = launch { daemon.start() }
+        val daemonJob = launch { daemon.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 73.fahrenheit))
         runCurrent()
@@ -178,7 +178,7 @@ class HeatControlTest {
         )
         val daemon = HeatControl(client, backgroundScope = backgroundScope)
 
-        val daemonJob = launch { daemon.start() }
+        val daemonJob = launch { daemon.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 73.fahrenheit))
         runCurrent()
@@ -223,7 +223,7 @@ class HeatControlTest {
         )
         val daemon = HeatControl(client, backgroundScope = backgroundScope)
 
-        val daemonJob = launch { daemon.start() }
+        val daemonJob = launch { daemon.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Temperature(FakeDevices.TemperatureSensor.id, Instant.DISTANT_PAST, 66.fahrenheit))
         runCurrent()

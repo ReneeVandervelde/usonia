@@ -6,11 +6,11 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import regolith.processes.daemon.Daemon
 import usonia.core.state.allAway
 import usonia.foundation.*
 import usonia.foundation.unit.compareTo
 import usonia.kotlin.*
-import usonia.server.Daemon
 import usonia.server.client.BackendClient
 import usonia.weather.Conditions
 import usonia.weather.Forecast
@@ -32,7 +32,7 @@ internal class Indicator(
     private val snowColor = RGB(255, 255 , 255)
     private val rainColor = RGB(0, 255 , 255)
 
-    override suspend fun start(): Nothing {
+    override suspend fun startDaemon(): Nothing {
         client.site.collectLatest { site ->
             coroutineScope {
                 launch { bindColorUpdates(site) }

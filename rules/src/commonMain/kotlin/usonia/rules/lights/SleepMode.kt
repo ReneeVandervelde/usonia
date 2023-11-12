@@ -8,6 +8,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import regolith.processes.cron.CronJob
+import regolith.processes.cron.Schedule
+import regolith.processes.daemon.Daemon
 import usonia.core.state.getBooleanFlag
 import usonia.core.state.hasAdjacentType
 import usonia.core.state.publishAll
@@ -17,10 +22,7 @@ import usonia.kotlin.*
 import usonia.kotlin.datetime.*
 import usonia.rules.Flags
 import usonia.rules.sleepMode
-import usonia.server.Daemon
 import usonia.server.client.BackendClient
-import usonia.server.cron.CronJob
-import usonia.server.cron.Schedule
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -46,7 +48,7 @@ internal class SleepMode(
 ): LightSettingsPicker, Daemon, CronJob {
 
     override val schedule: Schedule = Schedule(
-        hours = setOf(16),
+        hours = setOf(12),
         minutes = setOf(0),
     )
 
@@ -79,12 +81,12 @@ internal class SleepMode(
         }
     }
 
-    override suspend fun runCron(time: ZonedDateTime) {
+    override suspend fun runCron(time: LocalDateTime, zone: TimeZone) {
         logger.info("Auto-Disabling Sleep Mode by cron.")
         client.setFlag(Flags.SleepMode, false)
     }
 
-    override suspend fun start(): Nothing {
+    override suspend fun startDaemon(): Nothing {
         client.site.collectLatest { site ->
             coroutineScope {
                 launch { autoEnable(site) }

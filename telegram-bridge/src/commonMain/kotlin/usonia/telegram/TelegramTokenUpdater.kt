@@ -2,9 +2,9 @@ package usonia.telegram
 
 import com.inkapplications.telegram.client.TelegramClientModule
 import kimchi.logger.KimchiLogger
+import regolith.processes.daemon.Daemon
 import usonia.foundation.Site
 import usonia.kotlin.collectLatest
-import usonia.server.Daemon
 import usonia.server.client.BackendClient
 
 private const val BOT_KEY = "bot"
@@ -18,7 +18,7 @@ internal class TelegramTokenUpdater(
 ): Daemon {
     private val clientModule = TelegramClientModule()
 
-    override suspend fun start(): Nothing {
+    override suspend fun startDaemon(): Nothing {
         client.site.collectLatest(::onSiteUpdate)
     }
 

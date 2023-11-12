@@ -159,7 +159,7 @@ class SleepModeTest {
             clock = clock.withTimeZone(timeZone),
         )
 
-        val daemon = launch { rule.start() }
+        val daemon = launch { rule.startDaemon() }
         runCurrent()
 
         fakeEvents.mutableEvents.emit(Event.Latch(
@@ -202,7 +202,7 @@ class SleepModeTest {
             clock = clock.withTimeZone(timeZone),
         )
 
-        val daemon = launch { rule.start() }
+        val daemon = launch { rule.startDaemon() }
         runCurrent()
 
         fakeEvents.mutableEvents.emit(Event.Latch(
@@ -245,7 +245,7 @@ class SleepModeTest {
             clock = clock.withTimeZone(timeZone),
         )
 
-        val daemon = launch { rule.start() }
+        val daemon = launch { rule.startDaemon() }
 
         fakeEvents.mutableEvents.emit(Event.Latch(
             source = FakeDevices.Latch.id,
@@ -274,7 +274,7 @@ class SleepModeTest {
         )
         val rule = SleepMode(client)
 
-        val daemon = launch { rule.start() }
+        val daemon = launch { rule.startDaemon() }
         runCurrent()
         fakeConfig.mutableFlags.emit(mapOf("Sleep Mode" to "true"))
         runCurrent()
@@ -305,7 +305,7 @@ class SleepModeTest {
         )
         val picker = SleepMode(client)
 
-        val daemon = launch { picker.start() }
+        val daemon = launch { picker.startDaemon() }
         runCurrent()
         fakeConfig.mutableFlags.emit(mapOf("Sleep Mode" to "false"))
         runCurrent()
@@ -342,7 +342,7 @@ class SleepModeTest {
             clock = clock.withTimeZone(timeZone)
         )
 
-        val daemon = launch { sleepMode.start() }
+        val daemon = launch { sleepMode.startDaemon() }
         runCurrent()
         actions.mutableActions.emit(Action.Intent(
             target = FakeSite.id,
@@ -363,7 +363,7 @@ class SleepModeTest {
             configurationAccess = spyConfig,
         )
         val picker = SleepMode(client)
-        picker.runCron(Instant.DISTANT_PAST.withZone(TimeZone.UTC))
+        picker.runCron(Instant.DISTANT_PAST.toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
 
         assertTrue("Sleep Mode" to "false" in spyConfig.flagUpdates, "Sleep mode is set to false on cron run")
     }
@@ -396,7 +396,7 @@ class SleepModeTest {
             clock = clock.withTimeZone(timeZone),
             backgroundScope = this,
         )
-        val daemon = launch { sleepMode.start() }
+        val daemon = launch { sleepMode.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Latch(
             source = FakeDevices.Latch.id,
@@ -438,7 +438,7 @@ class SleepModeTest {
             clock = clock.withTimeZone(timeZone),
             backgroundScope = this,
         )
-        val daemon = launch { sleepMode.start() }
+        val daemon = launch { sleepMode.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Latch(
             source = FakeDevices.Latch.id,

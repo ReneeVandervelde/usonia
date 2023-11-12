@@ -48,7 +48,7 @@ class LockOnAwayTest {
         )
         val daemon = LockOnAway(client)
 
-        val daemonJob = launch { daemon.start() }
+        val daemonJob = launch { daemon.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Presence(FakeUsers.John.id, Clock.System.now(), PresenceState.AWAY))
         runCurrent()
@@ -79,7 +79,7 @@ class LockOnAwayTest {
         )
         val daemon = LockOnAway(client)
 
-        val daemonJob = launch { daemon.start() }
+        val daemonJob = launch { daemon.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Presence(FakeUsers.John.id, Clock.System.now(), PresenceState.HOME))
         assertEquals(0, actionSpy.actions.size, "Not locked if home")
@@ -104,7 +104,7 @@ class LockOnAwayTest {
         )
         val daemon = LockOnAway(client)
 
-        val daemonJob = launch { daemon.start() }
+        val daemonJob = launch { daemon.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Presence(FakeUsers.John.id, Clock.System.now(), PresenceState.AWAY))
         assertEquals(0, actionSpy.actions.size, "Not locked if some user is home")

@@ -8,15 +8,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
-import usonia.core.state.EventPublisher
 import usonia.core.state.EventPublisherSpy
 import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
@@ -83,7 +80,7 @@ class HueEventPublisherTest {
         val publisherSpy = EventPublisherSpy()
         val publisher = HueEventPublisher(hueEvents, configuration, publisherSpy, clock)
 
-        val daemon = launch { publisher.start() }
+        val daemon = launch { publisher.startDaemon() }
         advanceUntilIdle()
 
         assertEquals(2, publisherSpy.events.size, "Two events should be published.")
@@ -118,7 +115,7 @@ class HueEventPublisherTest {
         }
         val publisher = HueEventPublisher(hueEvents, configuration, publisherSpy, clock)
 
-        val daemon = launch { publisher.start() }
+        val daemon = launch { publisher.startDaemon() }
         advanceUntilIdle()
 
         assertTrue(publisherSpy.events.none { it is Event.Switch }, "Switch state not published without power info.")
@@ -134,7 +131,7 @@ class HueEventPublisherTest {
         }
         val publisher = HueEventPublisher(hueEvents, configuration, publisherSpy, clock)
 
-        val daemon = launch { publisher.start() }
+        val daemon = launch { publisher.startDaemon() }
         advanceUntilIdle()
 
         assertEquals(0, publisherSpy.events.size, "No events published without hue events.")
@@ -148,7 +145,7 @@ class HueEventPublisherTest {
         val configuration = ConfigurationAccessStub
         val publisher = HueEventPublisher(hueEvents, configuration, publisherSpy, clock)
 
-        val daemon = launch { publisher.start() }
+        val daemon = launch { publisher.startDaemon() }
         advanceUntilIdle()
 
         assertEquals(0, publisherSpy.events.size, "No events published without site config.")

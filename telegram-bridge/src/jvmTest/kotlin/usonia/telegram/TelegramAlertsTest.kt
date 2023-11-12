@@ -1,7 +1,6 @@
 package usonia.telegram
 
 import com.inkapplications.telegram.structures.ChatReference
-import com.inkapplications.telegram.structures.InputFile
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
@@ -14,7 +13,6 @@ import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
 import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
-import javax.swing.Icon
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -56,7 +54,7 @@ class TelegramAlertsTest {
             requestScope = this
         )
 
-        val job = launch { alerts.start() }
+        val job = launch { alerts.startDaemon() }
         advanceUntilIdle()
 
         fakeActions.mutableActions.emit(Action.Alert(
@@ -108,7 +106,7 @@ class TelegramAlertsTest {
             requestScope = this
         )
 
-        val job = launch { alerts.start() }
+        val job = launch { alerts.startDaemon() }
         advanceUntilIdle()
 
         fakeActions.mutableActions.emit(Action.Alert(
@@ -164,7 +162,7 @@ class TelegramAlertsTest {
             requestScope = this
         )
 
-        val job = launch { alerts.start() }
+        val job = launch { alerts.startDaemon() }
         advanceUntilIdle()
 
         fakeActions.mutableActions.emit(Action.Alert(
@@ -210,7 +208,7 @@ class TelegramAlertsTest {
             requestScope = this
         )
 
-        val job = launch { alerts.start() }
+        val job = launch { alerts.startDaemon() }
         advanceUntilIdle()
 
         fakeActions.mutableActions.emit(Action.Alert(
@@ -243,7 +241,7 @@ class TelegramAlertsTest {
             requestScope = this
         )
 
-        val job = launch { alerts.start() }
+        val job = launch { alerts.startDaemon() }
         advanceUntilIdle()
 
         fakeActions.mutableActions.emit(Action.Alert(

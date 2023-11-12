@@ -4,19 +4,17 @@ import com.inkapplications.standard.throwCancels
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlinx.datetime.*
+import regolith.processes.cron.CronJob
+import regolith.processes.cron.Schedule
+import regolith.processes.daemon.Daemon
 import usonia.core.state.findBridgeByServiceTag
 import usonia.core.state.findDevicesBy
 import usonia.core.state.getOldestEvent
 import usonia.foundation.*
 import usonia.foundation.unit.compareTo
 import usonia.kotlin.*
-import usonia.kotlin.datetime.ZonedDateTime
-import usonia.server.Daemon
 import usonia.server.client.BackendClient
-import usonia.server.cron.CronJob
-import usonia.server.cron.Schedule
 import usonia.todoist.api.Task
 import usonia.todoist.api.TaskCreateParameters
 import usonia.todoist.api.TaskUpdateParameters
@@ -38,7 +36,7 @@ internal class AwolDeviceReporter(
 ): CronJob, Daemon {
     override val schedule: Schedule = Schedule().withMinutes { it % 20 == 0 }
 
-    override suspend fun start(): Nothing {
+    override suspend fun startDaemon(): Nothing {
         client.events
             .filterIsInstance<Event.Battery>()
             .filter { it.percentage < 20.percent }
@@ -46,7 +44,7 @@ internal class AwolDeviceReporter(
             .collectLatest { (event, site) -> lowBatteries(site, event) }
     }
 
-    override suspend fun runCron(time: ZonedDateTime) {
+    override suspend fun runCron(time: LocalDateTime, zone: TimeZone) {
         val bridge = client.findBridgeByServiceTag(TODOIST_SERVICE) ?: run {
             logger.warn("Todoist not configured. Configure a bridge for the service `$TODOIST_SERVICE`")
             return
@@ -57,7 +55,7 @@ internal class AwolDeviceReporter(
         }
         val project = bridge.parameters[TODOIST_PROJECT]
         val label = bridge.parameters[TODOIST_LABEL]
-        val timeInstant = time.instant
+        val timeInstant = time.toInstant(zone)
 
         val devices = client.findDevicesBy { it.capabilities.heartbeat != null }
             .also { logger.debug("Checking ${it.size} device heartbeats") }

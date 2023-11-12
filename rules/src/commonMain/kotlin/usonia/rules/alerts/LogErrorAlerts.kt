@@ -4,11 +4,11 @@ import kimchi.logger.LogLevel
 import kimchi.logger.LogWriter
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
+import regolith.processes.daemon.Daemon
 import usonia.core.client.alertAll
 import usonia.foundation.Action
 import usonia.kotlin.*
 import usonia.rules.Flags
-import usonia.server.Daemon
 import usonia.server.client.BackendClient
 
 /**
@@ -26,7 +26,7 @@ object LogErrorAlerts: Daemon, LogWriter {
         return level >= LogLevel.ERROR
     }
 
-    override suspend fun start(): Nothing {
+    override suspend fun startDaemon(): Nothing {
         client
             .filterNotNull()
             .asOngoing()

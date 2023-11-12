@@ -9,12 +9,15 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import regolith.init.Initializer
+import regolith.init.TargetManager
+import regolith.processes.cron.CronJob
+import regolith.processes.cron.Schedule
 import usonia.core.state.findBridgeByServiceTag
 import usonia.kotlin.*
-import usonia.kotlin.datetime.ZonedDateTime
 import usonia.server.client.BackendClient
-import usonia.server.cron.CronJob
-import usonia.server.cron.Schedule
 import usonia.weather.Conditions
 import usonia.weather.Forecast
 import usonia.weather.WeatherAccess
@@ -35,13 +38,12 @@ private const val TOKEN = "token"
  * Forecast is updated only after it has expired. Subsequently, sunrise
  * times may not reflect the next day until the previous forecast has expired.
  */
-@OptIn(ExperimentalTime::class)
 internal class AccuweatherAccess(
     private val api: AccuweatherApi,
     private val client: BackendClient,
     private val clock: Clock = Clock.System,
     private val logger: KimchiLogger = EmptyLogger,
-): WeatherAccess, CronJob {
+): WeatherAccess, CronJob, Initializer {
     private val retryStrategy = RetryStrategy.Bracket(
         attempts = 4,
         timeouts = listOf(200.milliseconds, 1.seconds, 5.seconds),
@@ -70,7 +72,7 @@ internal class AccuweatherAccess(
         minutes = setOf(0)
     )
 
-    override suspend fun runCron(time: ZonedDateTime) {
+    override suspend fun runCron(time: LocalDateTime, zone: TimeZone) {
         val (location, token) = getConfig() ?: return
 
         coroutineScope {
@@ -85,7 +87,7 @@ internal class AccuweatherAccess(
         }
     }
 
-    override suspend fun primeCron() {
+    override suspend fun initialize(targetManager: TargetManager) {
         val (location, token) = getConfig() ?: return
 
         coroutineScope {

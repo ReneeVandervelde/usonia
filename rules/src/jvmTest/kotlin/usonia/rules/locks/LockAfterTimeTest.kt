@@ -52,7 +52,7 @@ class LockAfterTimeTest {
         )
         val daemon = LockAfterTime(fakeClient, backgroundScope = this)
 
-        val daemonJob = launch { daemon.start() }
+        val daemonJob = launch { daemon.startDaemon() }
         runCurrent()
 
         eventAccess.mutableEvents.emit(Event.Latch(
@@ -80,7 +80,7 @@ class LockAfterTimeTest {
         )
         val daemon = LockAfterTime(fakeClient, backgroundScope = this)
 
-        val daemonJob = launch { daemon.start() }
+        val daemonJob = launch { daemon.startDaemon() }
 
         eventAccess.mutableEvents.emit(Event.Latch(
             source = FakeDevices.Latch.id,
@@ -110,7 +110,7 @@ class LockAfterTimeTest {
         )
         val daemon = LockAfterTime(fakeClient, backgroundScope = this)
 
-        val daemonJob = launch { daemon.start() }
+        val daemonJob = launch { daemon.startDaemon() }
 
         eventAccess.mutableEvents.emit(Event.Latch(
             source = FakeDevices.Latch.id,

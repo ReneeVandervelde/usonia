@@ -12,25 +12,23 @@ import inkapplications.shade.structures.parameters.PowerParameters
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.*
+import regolith.processes.daemon.Daemon
 import usonia.foundation.*
 import usonia.kotlin.*
-import usonia.server.Daemon
 import usonia.server.client.BackendClient
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 
 /**
  * Handles actions sent to Hue Group devices.
  */
-@OptIn(ExperimentalTime::class)
 internal class HueGroupHandler(
     private val client: BackendClient,
     private val groups: GroupedLightControls,
     private val logger: KimchiLogger = EmptyLogger,
     private val requestScope: CoroutineScope = IoScope()
 ): Daemon {
-    override suspend fun start(): Nothing {
+    override suspend fun startDaemon(): Nothing {
         client.site.collectLatest { site ->
             client.actions
                 .filter { it::class in HueArchetypes.group.actions }

@@ -61,7 +61,7 @@ class HueLightHandlerTest {
 
         val handler = HueLightHandler(client, shadeSpy, requestScope = this)
 
-        val handlerJob = launch { handler.start() }
+        val handlerJob = launch { handler.startDaemon() }
         runCurrent()
         actionAccess.mutableActions.emit(Action.Switch(
             target = FakeDevices.HueColorLight.id,
@@ -97,7 +97,7 @@ class HueLightHandlerTest {
 
         val handler = HueLightHandler(client, shadeSpy, requestScope = this)
 
-        val handlerJob = launch { handler.start() }
+        val handlerJob = launch { handler.startDaemon() }
         runCurrent()
 
         actionAccess.mutableActions.emit(Action.Switch(
@@ -134,7 +134,7 @@ class HueLightHandlerTest {
 
         val handler = HueLightHandler(client, shadeSpy, requestScope = this)
 
-        val handlerJob = launch { handler.start() }
+        val handlerJob = launch { handler.startDaemon() }
         runCurrent()
 
         actionAccess.mutableActions.emit(Action.Lock(
@@ -194,7 +194,7 @@ class HueLightHandlerTest {
 
         val handler = HueLightHandler(client, shadeSpy, requestScope = this)
 
-        val handlerJob = launch { handler.start() }
+        val handlerJob = launch { handler.startDaemon() }
         runCurrent()
 
         actionAccess.mutableActions.emit(action)

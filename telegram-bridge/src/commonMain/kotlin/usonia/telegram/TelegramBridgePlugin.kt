@@ -3,8 +3,8 @@ package usonia.telegram
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.json.Json
+import regolith.processes.daemon.Daemon
 import usonia.serialization.SerializationModule
-import usonia.server.Daemon
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
 import usonia.server.http.HttpController

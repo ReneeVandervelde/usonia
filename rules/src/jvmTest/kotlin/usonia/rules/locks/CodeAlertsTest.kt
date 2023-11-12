@@ -50,7 +50,7 @@ class CodeAlertsTest {
         )
         val alerts = CodeAlerts(client)
 
-        val daemon = launch { alerts.start() }
+        val daemon = launch { alerts.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Lock(
             source = Identifier("test-lock"),
@@ -81,7 +81,7 @@ class CodeAlertsTest {
         )
         val alerts = CodeAlerts(client)
 
-        val daemon = launch { alerts.start() }
+        val daemon = launch { alerts.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Lock(
             source = Identifier("test-lock"),
@@ -108,7 +108,7 @@ class CodeAlertsTest {
         )
         val alerts = CodeAlerts(client)
 
-        val daemon = launch { alerts.start() }
+        val daemon = launch { alerts.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Lock(
             source = Identifier("test-lock"),
@@ -135,7 +135,7 @@ class CodeAlertsTest {
         )
         val alerts = CodeAlerts(client)
 
-        val daemon = launch { alerts.start() }
+        val daemon = launch { alerts.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Lock(
             source = Identifier("test-lock"),
@@ -172,7 +172,7 @@ class CodeAlertsTest {
         )
         val alerts = CodeAlerts(client)
 
-        val daemon = launch { alerts.start() }
+        val daemon = launch { alerts.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Lock(
             source = Identifier("test-lock"),

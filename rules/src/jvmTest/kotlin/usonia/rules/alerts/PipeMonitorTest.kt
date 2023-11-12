@@ -46,7 +46,7 @@ class PipeMonitorTest {
         )
         val monitor = PipeMonitor(client, backgroundScope = this)
 
-        val monitorJob = launch { monitor.start() }
+        val monitorJob = launch { monitor.startDaemon() }
         advanceUntilIdle()
 
         events.mutableEvents.emit(Event.Temperature(
@@ -74,7 +74,7 @@ class PipeMonitorTest {
         )
         val monitor = PipeMonitor(client, backgroundScope = this)
 
-        val monitorJob = launch { monitor.start() }
+        val monitorJob = launch { monitor.startDaemon() }
         advanceUntilIdle()
 
         events.mutableEvents.emit(Event.Temperature(
@@ -103,7 +103,7 @@ class PipeMonitorTest {
         )
         val monitor = PipeMonitor(client, backgroundScope = this)
 
-        val monitorJob = launch { monitor.start() }
+        val monitorJob = launch { monitor.startDaemon() }
         advanceUntilIdle()
 
         events.mutableEvents.emit(Event.Temperature(

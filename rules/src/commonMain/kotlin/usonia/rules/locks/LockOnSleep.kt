@@ -2,6 +2,7 @@ package usonia.rules.locks
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import regolith.processes.daemon.Daemon
 import usonia.core.state.publishAll
 import usonia.foundation.Action
 import usonia.foundation.LockState
@@ -10,7 +11,6 @@ import usonia.kotlin.collectLatest
 import usonia.kotlin.distinctUntilChanged
 import usonia.kotlin.filterTrue
 import usonia.rules.sleepMode
-import usonia.server.Daemon
 import usonia.server.client.BackendClient
 
 /**
@@ -20,7 +20,7 @@ internal class LockOnSleep(
     private val client: BackendClient,
     private val logger: KimchiLogger = EmptyLogger,
 ): Daemon {
-    override suspend fun start(): Nothing {
+    override suspend fun startDaemon(): Nothing {
         client.site.collectLatest { site ->
             client.sleepMode
                 .distinctUntilChanged()

@@ -5,11 +5,11 @@ import inkapplications.spondee.structure.toFloat
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.*
+import regolith.processes.daemon.Daemon
 import usonia.core.state.allAway
 import usonia.core.state.publishAll
 import usonia.foundation.*
 import usonia.kotlin.*
-import usonia.server.Daemon
 import usonia.server.client.BackendClient
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration.Companion.hours
@@ -29,7 +29,7 @@ class HeatControl(
 ): Daemon {
     private val heatingTimeouts = ConcurrentHashMap<Room, Job?>()
 
-    override suspend fun start(): Nothing {
+    override suspend fun startDaemon(): Nothing {
         client.site.collectLatest { site ->
             client.events
                 .filterIsInstance<Event.Temperature>()

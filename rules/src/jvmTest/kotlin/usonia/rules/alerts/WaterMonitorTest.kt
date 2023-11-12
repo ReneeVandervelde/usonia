@@ -44,7 +44,7 @@ class WaterMonitorTest {
         )
         val monitor = WaterMonitor(client, backgroundScope = this)
 
-        val monitorJob = launch { monitor.start() }
+        val monitorJob = launch { monitor.startDaemon() }
         advanceUntilIdle()
 
         events.mutableEvents.emit(FakeEvents.Wet)
@@ -66,7 +66,7 @@ class WaterMonitorTest {
         )
         val monitor = WaterMonitor(client, backgroundScope = this)
 
-        val monitorJob = launch { monitor.start() }
+        val monitorJob = launch { monitor.startDaemon() }
         advanceUntilIdle()
 
         events.mutableEvents.emit(FakeEvents.Wet)
@@ -88,7 +88,7 @@ class WaterMonitorTest {
         )
         val monitor = WaterMonitor(client, backgroundScope = this)
 
-        val monitorJob = launch { monitor.start() }
+        val monitorJob = launch { monitor.startDaemon() }
         advanceUntilIdle()
 
         events.mutableEvents.emit(FakeEvents.Wet)
@@ -110,7 +110,7 @@ class WaterMonitorTest {
         )
         val monitor = WaterMonitor(client, backgroundScope = this)
 
-        val monitorJob = launch { monitor.start() }
+        val monitorJob = launch { monitor.startDaemon() }
         advanceUntilIdle()
 
         events.mutableEvents.emit(FakeEvents.Dry)
@@ -130,7 +130,7 @@ class WaterMonitorTest {
         )
         val monitor = WaterMonitor(client, backgroundScope = this)
 
-        val monitorJob = launch { monitor.start() }
+        val monitorJob = launch { monitor.startDaemon() }
         advanceUntilIdle()
 
         events.mutableEvents.emit(FakeEvents.SwitchOff)

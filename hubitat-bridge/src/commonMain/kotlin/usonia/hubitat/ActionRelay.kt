@@ -10,10 +10,10 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import regolith.processes.daemon.Daemon
 import usonia.client.ktor.PlatformEngine
 import usonia.foundation.*
 import usonia.kotlin.*
-import usonia.server.Daemon
 import usonia.server.client.BackendClient
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -33,7 +33,7 @@ internal class ActionRelay(
         }
     }
 
-    override suspend fun start(): Nothing {
+    override suspend fun startDaemon(): Nothing {
         client.site.collectLatest { site ->
             client.actions.collect { action ->
                 onAction(site, action)

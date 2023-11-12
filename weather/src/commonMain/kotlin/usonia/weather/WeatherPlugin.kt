@@ -2,9 +2,10 @@ package usonia.weather
 
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import regolith.init.Initializer
+import regolith.processes.cron.CronJob
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
-import usonia.server.cron.CronJob
 import usonia.weather.accuweather.AccuweatherAccess
 import usonia.weather.accuweather.AccuweatherApiClient
 
@@ -22,4 +23,6 @@ class WeatherPlugin(
     val weatherAccess: WeatherAccess = accuweather
 
     override val crons: List<CronJob> = listOf(accuweather)
+    override val initializers: List<Initializer> = listOf(accuweather)
+
 }

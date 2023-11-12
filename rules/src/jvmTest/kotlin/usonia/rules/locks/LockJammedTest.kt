@@ -47,7 +47,7 @@ class LockJammedTest {
         )
         val alerts = LockJammed(client)
 
-        val daemon = launch { alerts.start() }
+        val daemon = launch { alerts.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Lock(
             source = Identifier("test-lock"),
@@ -79,7 +79,7 @@ class LockJammedTest {
         )
         val alerts = LockJammed(client)
 
-        val daemon = launch { alerts.start() }
+        val daemon = launch { alerts.startDaemon() }
         runCurrent()
         fakeEvents.mutableEvents.emit(Event.Lock(
             source = Identifier("test-lock"),
