@@ -50,3 +50,5 @@ fun LocalDateTime.withZone(zone: TimeZone) = ZonedDateTime(toInstant(zone), zone
  * Create a Zoned DateTime from an Instant and its zone.
  */
 fun Instant.withZone(zone: TimeZone) = ZonedDateTime(this, zone)
+
+val ZonedDateTime.startOfDay: ZonedDateTime get() = localDateTime.startOfDay.withZone(zone)

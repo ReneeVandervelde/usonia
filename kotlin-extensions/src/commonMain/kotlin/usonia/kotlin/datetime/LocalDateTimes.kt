@@ -27,3 +27,12 @@ val LocalDateTime.timestapSentanceFormat: String get() {
 }
 
 val LocalDateTime.minuteOfDay: Int get() = (hour * 60) + minute
+val LocalDateTime.startOfDay: LocalDateTime get() = LocalDateTime(
+    year = year,
+    monthNumber = monthNumber,
+    dayOfMonth = dayOfMonth,
+    hour = 0,
+    minute = 0,
+    second = 0,
+    nanosecond = 0,
+)

@@ -4,6 +4,7 @@ import inkapplications.spondee.measure.metric.kelvin
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.datetime.Instant
 import usonia.core.state.publishAll
 import usonia.foundation.Action
 import usonia.foundation.Fixture
@@ -14,7 +15,9 @@ import usonia.kotlin.datetime.ZonedDateTime
 import usonia.server.client.BackendClient
 import usonia.server.cron.CronJob
 import usonia.server.cron.Schedule
+import usonia.weather.Forecast
 import usonia.weather.WeatherAccess
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
 private val TARGET_LIGHT_TIME = 18.hours
@@ -32,9 +35,14 @@ class MorningPlantLight(
             .combineToPair(weatherAccess.forecast)
             .first()
 
-        val additionalTime = TARGET_LIGHT_TIME - (forecast.sunset - forecast.sunrise)
-        val onTime = forecast.sunrise - (additionalTime - 3.hours)
-        val offTime = forecast.sunrise + 3.hours
+        // Fix for late forecast updates in the morning.
+        val sunrise = forecast.sunriseToday(time)
+        val sunset = forecast.nextSunset(time)
+        val additionalTime = TARGET_LIGHT_TIME - (sunset - sunrise)
+        val onTime = sunrise - (additionalTime - 3.hours)
+        val offTime = sunrise + 3.hours
+
+        logger.trace("Sunrise is ${sunrise} onTime: $onTime offTime: $offTime")
 
         when {
             time.instant >= onTime && time.instant < offTime -> {
@@ -59,4 +67,19 @@ class MorningPlantLight(
             }
         }
     }
+
+    private fun Forecast.sunriseToday(now: ZonedDateTime): Instant {
+        return when {
+            sunrise < now.instant && sunset < now.instant -> sunrise + 1.days
+            else -> sunrise
+        }
+    }
+
+    private fun Forecast.nextSunset(now: ZonedDateTime): Instant {
+        return when {
+            sunrise < now.instant && sunset < now.instant -> sunset + 1.days
+            else -> sunset
+        }
+    }
+
 }
