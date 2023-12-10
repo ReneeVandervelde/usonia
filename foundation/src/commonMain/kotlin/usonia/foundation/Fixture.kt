@@ -16,4 +16,5 @@ enum class Fixture {
     Charger,
     Plant,
     Heat,
+    DataExfiltrator,
 }

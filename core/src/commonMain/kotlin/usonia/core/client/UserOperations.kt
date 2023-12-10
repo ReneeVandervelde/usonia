@@ -4,10 +4,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import usonia.core.state.getSite
-import usonia.foundation.Action
-import usonia.foundation.Event
-import usonia.foundation.Identifier
-import usonia.foundation.User
+import usonia.foundation.*
 import usonia.kotlin.*
 
 /**
@@ -20,6 +17,13 @@ fun UsoniaClient.userPresence(user: Identifier): OngoingFlow<Event.Presence?> {
         .filterIsInstance<Event.Presence?>()
         .unsafeModify { onStart { getState(user, Event.Presence::class).also { emit(it) } }
     }
+}
+
+/**
+ * Get the current user presence state for a user
+ */
+suspend fun UsoniaClient.getUserPresence(user: Identifier): PresenceState? {
+    return getState(user, Event.Presence::class)?.state
 }
 
 /**

