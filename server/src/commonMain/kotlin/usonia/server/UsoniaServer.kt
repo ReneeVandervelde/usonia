@@ -6,6 +6,7 @@ import kotlinx.coroutines.*
 import regolith.init.RegolithInitRunner
 import regolith.processes.cron.CoroutineCronDaemon
 import regolith.processes.daemon.Daemon
+import regolith.processes.daemon.DaemonCallbacks
 import regolith.processes.daemon.DaemonInitializer
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
@@ -17,7 +18,7 @@ class UsoniaServer(
     override val plugins: Set<ServerPlugin>,
     private val server: WebServer,
     private val logger: KimchiLogger = EmptyLogger,
-    daemonScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
+    private val daemonScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
     clock: ZonedClock = ZonedSystemClock,
 ): AppConfig, Daemon {
     private val kimchiRegolith = KimchiRegolithAdapter(logger)
@@ -28,7 +29,12 @@ class UsoniaServer(
     )
     private val daemonInitializer = DaemonInitializer(
         daemons = plugins.flatMap { it.daemons } + cronDaemon + this,
-        callbacks = kimchiRegolith,
+        callbacks = object: DaemonCallbacks by kimchiRegolith {
+            override fun onPanic(daemon: Daemon, error: Throwable) {
+                kimchiRegolith.onPanic(daemon, error)
+                daemonScope.coroutineContext.job.cancel()
+            }
+        },
         daemonScope = daemonScope,
     )
     private val regolithInitRunner = RegolithInitRunner(
@@ -51,6 +57,6 @@ class UsoniaServer(
         }
 
         regolithInitRunner.initialize().join()
-        suspendCancellableCoroutine<Nothing> {  }
+        daemonScope.coroutineContext.job.join()
     }
 }

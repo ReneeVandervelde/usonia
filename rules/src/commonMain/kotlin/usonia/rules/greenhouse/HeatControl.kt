@@ -6,6 +6,9 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.*
 import regolith.processes.daemon.Daemon
+import regolith.processes.daemon.DaemonFailureHandler
+import regolith.processes.daemon.DaemonRunAttempt
+import regolith.processes.daemon.FailureSignal
 import usonia.core.state.allAway
 import usonia.core.state.publishAll
 import usonia.foundation.*
@@ -24,10 +27,15 @@ private const val AWAY_TEMP_SHIFT = 8
  */
 class HeatControl(
     private val client: BackendClient,
+    private val failureHandler: DaemonFailureHandler,
     private val logger: KimchiLogger = EmptyLogger,
     private val backgroundScope: CoroutineScope = DefaultScope(),
 ): Daemon {
     private val heatingTimeouts = ConcurrentHashMap<Room, Job?>()
+
+    override suspend fun onFailure(attempts: List<DaemonRunAttempt>): FailureSignal {
+        return failureHandler.onFailure(attempts)
+    }
 
     override suspend fun startDaemon(): Nothing {
         client.site.collectLatest { site ->

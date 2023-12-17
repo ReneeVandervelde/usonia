@@ -20,6 +20,7 @@ import usonia.rules.locks.LockOnAway
 import usonia.rules.locks.LockOnSleep
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
+import usonia.server.daemons.ThrottledFailureHandler
 import usonia.weather.WeatherAccess
 
 class RulesPlugin(
@@ -27,6 +28,7 @@ class RulesPlugin(
     weather: WeatherAccess,
     logger: KimchiLogger = EmptyLogger,
 ): ServerPlugin {
+    private val failureHandler = ThrottledFailureHandler()
     private val movieMode = MovieMode(client, logger)
     private val sleepMode = SleepMode(client, logger)
 
@@ -52,8 +54,8 @@ class RulesPlugin(
         LockOnAway(client, logger),
         LockAfterTime(client, logger),
         PipeMonitor(client, logger),
-        FanControl(client, logger),
-        HeatControl(client, logger),
+        FanControl(client, failureHandler, logger),
+        HeatControl(client, failureHandler, logger),
         PowerLimitCharge(client, logger),
         DoorAlert(client, logger),
         CodeAlerts(client, logger),

@@ -6,6 +6,7 @@ import regolith.init.InitTarget
 import regolith.init.Initializer
 import regolith.processes.daemon.Daemon
 import regolith.processes.daemon.DaemonCallbacks
+import regolith.processes.daemon.DaemonRunAttempt
 import kotlin.reflect.KClass
 
 internal class KimchiRegolithAdapter(
@@ -37,5 +38,13 @@ internal class KimchiRegolithAdapter(
 
     override fun onDaemonStarted(daemon: Daemon) {
         logger.debug("[DAEMON_START] ${daemon::class.simpleName}")
+    }
+
+    override fun onDaemonRestart(daemon: Daemon, previousAttempts: List<DaemonRunAttempt>) {
+        logger.warn("[DAEMON_RESTART] ${daemon::class.simpleName} (attempt ${previousAttempts.size + 1})")
+    }
+
+    override fun onPanic(daemon: Daemon, error: Throwable) {
+        logger.error("[DAEMON_PANIC] ${daemon::class.simpleName}", error)
     }
 }

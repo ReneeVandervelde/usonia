@@ -5,7 +5,7 @@ import inkapplications.spondee.structure.toFloat
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
-import regolith.processes.daemon.Daemon
+import regolith.processes.daemon.*
 import usonia.core.state.publishAll
 import usonia.foundation.*
 import usonia.kotlin.*
@@ -19,9 +19,14 @@ private const val DEFAULT_UPPER_BUFFER = 3
  */
 class FanControl(
     private val client: BackendClient,
+    private val failureHandler: DaemonFailureHandler,
     private val logger: KimchiLogger = EmptyLogger,
     private val backgroundScope: CoroutineScope = DefaultScope(),
 ): Daemon {
+    override suspend fun onFailure(attempts: List<DaemonRunAttempt>): FailureSignal {
+        return failureHandler.onFailure(attempts)
+    }
+
     override suspend fun startDaemon(): Nothing {
         client.site.collectLatest { site ->
             client.events
