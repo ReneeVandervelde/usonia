@@ -2,10 +2,7 @@ package usonia.hue
 
 import com.inkapplications.standard.throwCancels
 import inkapplications.shade.lights.LightControls
-import inkapplications.shade.lights.parameters.ColorParameters
-import inkapplications.shade.lights.parameters.ColorTemperatureParameters
-import inkapplications.shade.lights.parameters.DimmingParameters
-import inkapplications.shade.lights.parameters.LightUpdateParameters
+import inkapplications.shade.lights.parameters.*
 import inkapplications.shade.structures.ApiStatusError
 import inkapplications.shade.structures.ResourceId
 import inkapplications.shade.structures.parameters.PowerParameters
@@ -51,6 +48,7 @@ internal class HueLightHandler(
                 power = PowerParameters(
                     on = action.state == SwitchState.ON,
                 ),
+                dynamics = dynamicsForState(action),
             )
             is Action.Dim -> LightUpdateParameters(
                 dimming = DimmingParameters(
@@ -60,7 +58,8 @@ internal class HueLightHandler(
                     PowerParameters(
                         on = it,
                     )
-                }
+                },
+                dynamics = dynamicsForState(action),
             )
             is Action.ColorTemperatureChange -> LightUpdateParameters(
                 colorTemperature = ColorTemperatureParameters(
@@ -74,6 +73,7 @@ internal class HueLightHandler(
                         on = it,
                     )
                 },
+                dynamics = dynamicsForState(action),
             )
             is Action.ColorChange -> LightUpdateParameters(
                 color = ColorParameters(
@@ -87,6 +87,7 @@ internal class HueLightHandler(
                         on = it,
                     )
                 },
+                dynamics = dynamicsForState(action),
             )
             else -> throw IllegalStateException("Impossible! Did the event filtering change without updating the modification conditions?")
         }
@@ -139,4 +140,23 @@ internal class HueLightHandler(
             }
         }
     }
+}
+
+internal fun dynamicsForState(action: Action): DynamicsParameters? {
+    val offDuration = 5.seconds
+    val onDuration = 1.seconds
+    val switchState = when (action) {
+        is Action.ColorChange -> action.switchState
+        is Action.ColorTemperatureChange -> action.switchState
+        is Action.Dim -> action.switchState
+        is Action.Switch -> action.state
+        else -> return null
+    }
+
+    return DynamicsParameters(
+        duration = when (switchState) {
+            SwitchState.OFF -> offDuration
+            else -> onDuration
+        }
+    )
 }

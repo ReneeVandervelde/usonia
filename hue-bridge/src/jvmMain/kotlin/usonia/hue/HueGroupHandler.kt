@@ -6,6 +6,7 @@ import inkapplications.shade.groupedlights.parameters.GroupedLightUpdateParamete
 import inkapplications.shade.lights.parameters.ColorParameters
 import inkapplications.shade.lights.parameters.ColorTemperatureParameters
 import inkapplications.shade.lights.parameters.DimmingParameters
+import inkapplications.shade.lights.parameters.DynamicsParameters
 import inkapplications.shade.structures.ApiStatusError
 import inkapplications.shade.structures.ResourceId
 import inkapplications.shade.structures.parameters.PowerParameters
@@ -49,6 +50,7 @@ internal class HueGroupHandler(
                 power = PowerParameters(
                     on = action.state == SwitchState.ON,
                 ),
+                dynamics = dynamicsForState(action),
             )
             is Action.Dim -> GroupedLightUpdateParameters(
                 dimming = DimmingParameters(
@@ -59,6 +61,7 @@ internal class HueGroupHandler(
                         on = it,
                     )
                 },
+                dynamics = dynamicsForState(action),
             )
             is Action.ColorTemperatureChange -> GroupedLightUpdateParameters(
                 colorTemperature = ColorTemperatureParameters(
@@ -72,6 +75,7 @@ internal class HueGroupHandler(
                         on = it,
                     )
                 },
+                dynamics = dynamicsForState(action),
             )
             is Action.ColorChange -> GroupedLightUpdateParameters(
                 color = ColorParameters(
@@ -85,6 +89,7 @@ internal class HueGroupHandler(
                         on = it,
                     )
                 },
+                dynamics = dynamicsForState(action),
             )
             else -> throw IllegalStateException("Impossible! Did the event filtering change without updating the modification conditions?")
         }

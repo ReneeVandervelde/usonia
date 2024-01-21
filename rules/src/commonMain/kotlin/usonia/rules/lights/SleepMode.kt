@@ -106,7 +106,7 @@ internal class SleepMode(
                 val bedrooms = site.rooms.filter { it.type == Room.Type.Bedroom }
 
                 bedrooms.flatMap(::getDimActions).run { client.publishAll(this) }
-                delay(30.seconds)
+                delay(90.seconds)
                 bedrooms.flatMap(::getOffActions).run { client.publishAll(this) }
             }
     }
@@ -182,6 +182,7 @@ internal class SleepMode(
     }
 
     private suspend fun autoDisable(site: Site) {
+        return // temporarily disable this
         val morningStartMinute = site.parameters[MORNING_START]
             ?.toLong()
             ?: DEFAULT_MORNING_START
