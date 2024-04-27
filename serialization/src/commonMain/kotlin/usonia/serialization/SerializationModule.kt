@@ -5,6 +5,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 import usonia.foundation.DeviceSerializer
 import usonia.hue.HueArchetypes
+import usonia.linkstyle.LinkstyleArchetypes
 import usonia.schlage.SchlageArchetypes
 import usonia.smartthings.SmartThingsArchetypes
 import usonia.xiaomi.XiaomiArchetypes
@@ -16,6 +17,7 @@ object SerializationModule {
         HueArchetypes.color,
         SchlageArchetypes.connectLock,
         XiaomiArchetypes.temperature,
+        LinkstyleArchetypes.valve,
     )
 
     val json = Json {

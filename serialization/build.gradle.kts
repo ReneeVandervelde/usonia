@@ -9,9 +9,7 @@ kotlin {
                 api(projects.foundation)
                 api(kotlinLibraries.serialization.json)
                 implementation(projects.hueBridge)
-                implementation(projects.schlage)
-                implementation(projects.smartthings)
-                implementation(projects.xiaomi)
+                implementation(projects.archetypes)
             }
         }
 
