@@ -5,10 +5,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
+import usonia.core.state.ConfigurationAccessSpy
 import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
@@ -18,6 +20,7 @@ import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.hours
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MovieModeTest {
@@ -31,7 +34,10 @@ class MovieModeTest {
         val client = DummyClient.copy(
             configurationAccess = fakeConfig,
         )
-        val picker = MovieMode(client)
+        val picker = MovieMode(
+            client = client,
+            backgroundScope = this,
+        )
 
         val livingRoom = picker.getActiveSettings(FakeRooms.LivingRoom)
         assertTrue(livingRoom is LightSettings.Ignore)
@@ -60,7 +66,10 @@ class MovieModeTest {
         val client = DummyClient.copy(
             configurationAccess = fakeConfig,
         )
-        val picker = MovieMode(client)
+        val picker = MovieMode(
+            client = client,
+            backgroundScope = this,
+        )
 
         val livingRoom = picker.getActiveSettings(FakeRooms.LivingRoom)
         assertTrue(livingRoom is LightSettings.Unhandled)
@@ -83,7 +92,10 @@ class MovieModeTest {
         val client = DummyClient.copy(
             configurationAccess = fakeConfig,
         )
-        val picker = MovieMode(client)
+        val picker = MovieMode(
+            client = client,
+            backgroundScope = this,
+        )
 
         val livingRoom = picker.getActiveSettings(FakeRooms.LivingRoom)
         assertTrue(livingRoom is LightSettings.Unhandled)
@@ -114,7 +126,10 @@ class MovieModeTest {
             configurationAccess = fakeConfig,
             actionPublisher = publisherSpy,
         )
-        val picker = MovieMode(client)
+        val picker = MovieMode(
+            client = client,
+            backgroundScope = this,
+        )
 
         val daemon = launch { picker.startDaemon() }
         fakeConfig.mutableFlags.emit(mapOf(
@@ -142,7 +157,10 @@ class MovieModeTest {
             configurationAccess = fakeConfig,
             actionPublisher = publisherSpy,
         )
-        val picker = MovieMode(client)
+        val picker = MovieMode(
+            client = client,
+            backgroundScope = this,
+        )
 
         val daemon = launch { picker.startDaemon() }
         runCurrent()
@@ -158,6 +176,14 @@ class MovieModeTest {
         val action = publisherSpy.actions.single()
         assertTrue(action is Action.Switch)
         assertEquals(SwitchState.OFF, action.state)
+
+        // End to cancel observers:
+        fakeConfig.mutableFlags.emit(mapOf(
+            "Movie Mode" to "true"
+        ))
+        fakeConfig.mutableFlags.emit(mapOf(
+            "Movie Mode" to "false"
+        ))
 
         daemon.cancelAndJoin()
     }
@@ -178,7 +204,10 @@ class MovieModeTest {
             configurationAccess = fakeConfig,
             actionPublisher = publisherSpy,
         )
-        val picker = MovieMode(client)
+        val picker = MovieMode(
+            client = client,
+            backgroundScope = this,
+        )
 
         val daemon = launch { picker.startDaemon() }
         runCurrent()
@@ -196,6 +225,48 @@ class MovieModeTest {
         assertEquals(SwitchState.ON, action.switchState)
         assertEquals(10.percent, action.level)
         assertEquals(Colors.Warm, action.temperature)
+
+        daemon.cancelAndJoin()
+    }
+
+    @Test
+    fun autoDisable() = runTest {
+        val fakeConfig = object: ConfigurationAccessSpy() {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
+                rooms = setOf(FakeRooms.LivingRoom.copy(
+                    devices = setOf(FakeDevices.HueGroup),
+                )),
+            ))
+            val mutableFlags = MutableSharedFlow<Map<String, String?>>()
+            override val flags = mutableFlags.asOngoing()
+        }
+        val publisherSpy = ActionPublisherSpy()
+        val client = DummyClient.copy(
+            configurationAccess = fakeConfig,
+            actionPublisher = publisherSpy,
+        )
+        val picker = MovieMode(
+            client = client,
+            backgroundScope = this,
+        )
+
+        val daemon = launch { picker.startDaemon() }
+        runCurrent()
+        fakeConfig.mutableFlags.emit(mapOf(
+            "Movie Mode" to "false"
+        ))
+        fakeConfig.mutableFlags.emit(mapOf(
+            "Movie Mode" to "true"
+        ))
+        runCurrent()
+
+        assertEquals(1, publisherSpy.actions.size)
+        assertEquals(0, fakeConfig.flagUpdates.size)
+
+        advanceTimeBy(4.hours.inWholeMilliseconds)
+
+        assertEquals(1, fakeConfig.flagUpdates.size)
+        assertEquals("Movie Mode" to "false", fakeConfig.flagUpdates.single())
 
         daemon.cancelAndJoin()
     }

@@ -3,24 +3,29 @@ package usonia.rules.lights
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.selects.select
 import regolith.processes.daemon.Daemon
 import usonia.core.state.getBooleanFlag
 import usonia.core.state.getSite
 import usonia.core.state.publishAll
+import usonia.core.state.setFlag
 import usonia.foundation.*
 import usonia.foundation.Room.Type.*
-import usonia.kotlin.collectLatest
-import usonia.kotlin.distinctUntilChanged
-import usonia.kotlin.drop
-import usonia.kotlin.map
+import usonia.kotlin.*
 import usonia.rules.Flags
 import usonia.server.client.BackendClient
+import kotlin.time.Duration.Companion.hours
 
 /**
  * Dims lights during when a flag is set.
  */
 internal class MovieMode(
     private val client: BackendClient,
+    private val backgroundScope: CoroutineScope = DefaultScope(),
     private val logger: KimchiLogger = EmptyLogger,
 ): LightSettingsPicker, Daemon {
     override suspend fun getActiveSettings(room: Room): LightSettings {
@@ -73,6 +78,39 @@ internal class MovieMode(
             }
 
         client.publishAll(switchActions + indicatorActions)
+
+        val endObserver = backgroundScope.launch {
+            client.flags
+                .map { it[Flags.MovieMode].toBoolean() }
+                .filter { !it }
+                .first()
+        }
+
+        val timer = backgroundScope.launch {
+            delay(3.hours)
+        }
+
+        val result = select {
+            endObserver.onJoin { EndCondition.Disabled }
+            timer.onJoin { EndCondition.Expired }
+        }
+        endObserver.cancelAndJoin()
+        timer.cancelAndJoin()
+
+        when (result) {
+            EndCondition.Disabled -> {
+                logger.info("Movie Mode was disabled. Ending timer")
+            }
+            EndCondition.Expired -> {
+                logger.info("Movie Mode timer expired. Ending Movie Mode.")
+                client.setFlag(Flags.MovieMode, false)
+            }
+        }
+    }
+
+    private enum class EndCondition {
+        Disabled,
+        Expired,
     }
 
     private suspend fun stopMovieMode() {
