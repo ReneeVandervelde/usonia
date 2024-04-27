@@ -5,8 +5,6 @@ import regolith.init.TargetManager
 import kotlin.reflect.KClass
 
 object DummyManager: TargetManager {
-    override suspend fun <T : InitTarget> awaitTarget(targetClass: KClass<T>): T {
-        TODO()
-    }
-    override suspend fun postTarget(target: InitTarget) {}
+    override suspend fun <T : InitTarget> awaitTarget(targetClass: KClass<T>): T = TODO()
+    override fun postTarget(target: InitTarget) = TODO()
 }

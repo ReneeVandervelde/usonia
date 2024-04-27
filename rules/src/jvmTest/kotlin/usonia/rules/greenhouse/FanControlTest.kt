@@ -14,6 +14,7 @@ import usonia.core.state.EventAccessFake
 import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
 import usonia.kotlin.ongoingFlowOf
+import usonia.rules.DummyFailureHandler
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -46,7 +47,11 @@ class FanControlTest {
             eventAccess = fakeEvents,
             actionPublisher = actionSpy,
         )
-        val daemon = FanControl(client, backgroundScope = this)
+        val daemon = FanControl(
+            client = client,
+            failureHandler = DummyFailureHandler,
+            backgroundScope = this,
+        )
 
         val daemonJob = launch { daemon.startDaemon() }
         runCurrent()
@@ -70,7 +75,11 @@ class FanControlTest {
             eventAccess = fakeEvents,
             actionPublisher = actionSpy,
         )
-        val daemon = FanControl(client, backgroundScope = this)
+        val daemon = FanControl(
+            client = client,
+            failureHandler = DummyFailureHandler,
+            backgroundScope = this,
+        )
 
         val daemonJob = launch { daemon.startDaemon() }
         runCurrent()
@@ -91,7 +100,11 @@ class FanControlTest {
             eventAccess = fakeEvents,
             actionPublisher = actionSpy,
         )
-        val daemon = FanControl(client, backgroundScope = this)
+        val daemon = FanControl(
+            client = client,
+            failureHandler = DummyFailureHandler,
+            backgroundScope = this,
+        )
 
         val daemonJob = launch { daemon.startDaemon() }
         runCurrent()
@@ -115,7 +128,11 @@ class FanControlTest {
             eventAccess = fakeEvents,
             actionPublisher = actionSpy,
         )
-        val daemon = FanControl(client, backgroundScope = this)
+        val daemon = FanControl(
+            client = client,
+            failureHandler = DummyFailureHandler,
+            backgroundScope = this,
+        )
 
         val daemonJob = launch { daemon.startDaemon() }
         runCurrent()

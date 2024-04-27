@@ -29,7 +29,10 @@ class RulesPlugin(
     logger: KimchiLogger = EmptyLogger,
 ): ServerPlugin {
     private val failureHandler = ThrottledFailureHandler()
-    private val movieMode = MovieMode(client, logger)
+    private val movieMode = MovieMode(
+        client = client,
+        logger = logger
+    )
     private val sleepMode = SleepMode(client, logger)
 
     private val colorPicker = CompositeLightingPicker(

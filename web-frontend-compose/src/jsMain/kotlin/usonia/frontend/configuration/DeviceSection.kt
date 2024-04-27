@@ -99,6 +99,7 @@ class DeviceSection(
                             is Event.Temperature -> Text(event.temperature.toFahrenheit().format())
                             is Event.Tilt -> Text("x: ${event.x} y: ${event.y} z: ${event.z}")
                             is Event.Water -> Text("${event.state}")
+                            is Event.Valve -> Text("${event.state}")
                         }
                     }
                     Td {
