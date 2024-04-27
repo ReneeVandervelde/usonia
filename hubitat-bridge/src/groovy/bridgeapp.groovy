@@ -227,6 +227,17 @@ def actions() {
                 log.error "Unknown State ${action.type}"
             }
             break
+        case "ColorTemperatureChange":
+            if (action.switchState == "ON") {
+                logger.debug("Turning device on: $device")
+                device.on()
+            } else if (action.switchState == "OFF") {
+                logger.debug("Turning device off: $device")
+                device.off()
+            } else {
+                log.debug "Ignoring CT State ${action.type}"
+            }
+            break
         case "Lock":
             if (action.lockState == "LOCKED") device.lock()
             else if (action.lockState == "UNLOCKED") device.unlock()
