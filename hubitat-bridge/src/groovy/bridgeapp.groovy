@@ -97,6 +97,8 @@ def cannonicalType(event) {
             return "Lock"
         case "battery":
             return "Battery"
+        case "valve":
+            return "Valve"
         case "contact":
             return "Latch"
         case "acceleration":
@@ -169,6 +171,8 @@ def onEvent(event) {
         case "power":
             eventJson.power = event.value
             break;
+        case "valve":
+            eventJson.valveState = event.value.toUpperCase()
         case "lastCodeName":
             log.debug "Ignoring event ${event.name}"
             return;
@@ -236,6 +240,17 @@ def actions() {
                 device.off()
             } else {
                 log.debug "Ignoring CT State ${action.type}"
+            }
+            break
+        case "Valve":
+            if (action.valveState == "OPEN") {
+                logger.debug("Opening valve: $device")
+                device.open()
+            } else if (action.valveState == "CLOSED") {
+                logger.debug("Closing valve: $device")
+                device.close()
+            } else {
+                log.error "Unknown Valve Action: ${action.type}"
             }
             break
         case "Lock":

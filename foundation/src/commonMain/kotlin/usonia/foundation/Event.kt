@@ -117,6 +117,15 @@ sealed class Event {
     }
 
     @Serializable(with = EventSerializer::class)
+    data class Valve(
+        override val source: Identifier,
+        override val timestamp: Instant,
+        val state: ValveState
+    ): Event() {
+        override fun withSource(source: Identifier): Event = copy(source = source)
+    }
+
+    @Serializable(with = EventSerializer::class)
     data class Presence(
         override val source: Identifier,
         override val timestamp: Instant,
@@ -220,6 +229,11 @@ object EventSerializer: KSerializer<Event> {
                 timestamp,
                 json.latchState!!.let { LatchState.valueOf(it) }
             )
+            Event.Valve::class.simpleName -> Event.Valve(
+                id,
+                timestamp,
+                json.valveState!!.let { ValveState.valueOf(it) }
+            )
             Event.Water::class.simpleName -> Event.Water(
                 id,
                 timestamp,
@@ -284,6 +298,9 @@ object EventSerializer: KSerializer<Event> {
             is Event.Latch -> prototype.copy(
                 latchState = value.state.name
             )
+            is Event.Valve -> prototype.copy(
+                valveState = value.state.name
+            )
             is Event.Presence -> prototype.copy(
                 presenceState = value.state.name
             )
@@ -323,6 +340,7 @@ internal data class EventJson(
     val lockMethod: Event.Lock.LockMethod? = null,
     val lockCode: String? = null,
     val latchState: String? = null,
+    val valveState: String? = null,
     val presenceState: String? = null,
     val intent: String? = null,
     val sleepState: String? = null,

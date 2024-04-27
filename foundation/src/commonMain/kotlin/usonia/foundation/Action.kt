@@ -42,6 +42,13 @@ sealed class Action {
         override fun withTarget(target: Identifier): Action = copy(target = target)
     }
 
+    data class Valve(
+        override val target: Identifier,
+        val state: ValveState,
+    ): Action() {
+        override fun withTarget(target: Identifier): Action = copy(target = target)
+    }
+
     data class Dim(
         override val target: Identifier,
         val level: Percentage,
@@ -157,6 +164,10 @@ object ActionSerializer: KSerializer<Action> {
                 message = json.alertMessage!!,
                 level = json.alertLevel?.let { Action.Alert.Level.valueOf(it) } ?: Action.Alert.Level.Info,
             )
+            Action.Valve::class.simpleName -> Action.Valve(
+                target = target,
+                state = json.valveState!!.let { ValveState.valueOf(it) },
+            )
             else -> throw IllegalArgumentException("Unknown type: ${json.type}")
         }
     }
@@ -194,6 +205,9 @@ object ActionSerializer: KSerializer<Action> {
                 alertMessage = value.message,
                 alertLevel = value.level.name,
             )
+            is Action.Valve -> prototype.copy(
+                valveState = value.state.name,
+            )
         }
 
         encoder.encodeSerializableValue(serializer, json)
@@ -213,4 +227,5 @@ internal data class ActionJson(
     val intentAction: String? = null,
     val alertMessage: String? = null,
     val alertLevel: String? = null,
+    val valveState: String? = null,
 )
