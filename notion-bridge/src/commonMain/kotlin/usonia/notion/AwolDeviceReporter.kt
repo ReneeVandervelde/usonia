@@ -88,11 +88,11 @@ internal class AwolDeviceReporter(
                         filters = listOf(
                             PageFilter.Text(
                                 property = NotionConfig.Properties.REF,
-                                text = TextFilter.Empty(false),
+                                filter = TextFilter.Empty(false),
                             ),
-                            PageFilter.Select(
+                            PageFilter.Status(
                                 property = NotionConfig.Properties.STATUS,
-                                select = FilterQuery.DoesNotEqual(
+                                filter = FilterQuery.DoesNotEqual(
                                     value = NotionConfig.PropertyValues.STATUS_DONE
                                 )
                             ),
@@ -100,13 +100,13 @@ internal class AwolDeviceReporter(
                                 filters = listOf(
                                     PageFilter.MultiSelect(
                                         property = NotionConfig.Properties.TAGS,
-                                        multi_select = FilterQuery.Contains(
+                                        filter = FilterQuery.Contains(
                                             contains = NotionConfig.Tags.LOW_BATTERY
                                         )
                                     ),
                                     PageFilter.MultiSelect(
                                         property = NotionConfig.Properties.TAGS,
-                                        multi_select = FilterQuery.Contains(
+                                        filter = FilterQuery.Contains(
                                             contains = NotionConfig.Tags.DEAD_BATTERY
                                         )
                                     )
@@ -256,7 +256,7 @@ internal class AwolDeviceReporter(
             query = DatabaseQuery(
                 filter = PageFilter.MultiSelect(
                     property = NotionConfig.Properties.REF,
-                    multi_select = FilterQuery.Contains(
+                    filter = FilterQuery.Contains(
                         contains = ref.value
                     )
                 )

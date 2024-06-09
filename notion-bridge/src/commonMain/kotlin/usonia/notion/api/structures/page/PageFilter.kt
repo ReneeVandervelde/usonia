@@ -11,17 +11,22 @@ import usonia.notion.api.structures.property.PropertyName
 internal sealed interface PageFilter {
     data class Select(
         val property: PropertyName,
-        val select: FilterQuery,
+        val filter: FilterQuery,
+    ): PageFilter
+
+    data class Status(
+        val property: PropertyName,
+        val filter: FilterQuery,
     ): PageFilter
 
     data class MultiSelect(
         val property: PropertyName,
-        val multi_select: FilterQuery,
+        val filter: FilterQuery,
     ): PageFilter
 
     data class Text(
         val property: PropertyName,
-        val text: TextFilter? = null,
+        val filter: TextFilter? = null,
     ): PageFilter
 
     data class Or(
@@ -80,15 +85,19 @@ internal object PageFilterSerializer: KSerializer<PageFilter> {
         val surrogate = when (value) {
             is PageFilter.Select -> Surrogate(
                 property = value.property,
-                select = value.select,
+                select = value.filter,
             )
             is PageFilter.MultiSelect -> Surrogate(
                 property = value.property,
-                multi_select = value.multi_select,
+                multi_select = value.filter,
+            )
+            is PageFilter.Status -> Surrogate(
+                property = value.property,
+                status = value.filter,
             )
             is PageFilter.Text -> Surrogate(
                 property = value.property,
-                rich_text = value.text,
+                rich_text = value.filter,
             )
             is PageFilter.Or -> Surrogate(
                 or = value.filters,
@@ -105,6 +114,7 @@ internal object PageFilterSerializer: KSerializer<PageFilter> {
         val property: PropertyName? = null,
         val multi_select: FilterQuery? = null,
         val select: FilterQuery? = null,
+        val status: FilterQuery? = null,
         val rich_text: TextFilter? = null,
         val or: List<PageFilter>? = null,
         val and: List<PageFilter>? = null,
