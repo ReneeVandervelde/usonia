@@ -8,6 +8,7 @@ import dagger.multibindings.IntoSet
 import kimchi.logger.KimchiLogger
 import usonia.hubitat.HubitatPlugin
 import usonia.hue.HueBridgePlugin
+import usonia.notion.NotionBridgePlugin
 import usonia.rules.RulesPlugin
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
@@ -86,6 +87,14 @@ object PluginsModule {
         client: BackendClient,
         logger: KimchiLogger,
     ): ServerPlugin = TelegramBridgePlugin(client, logger)
+
+    @Provides
+    @Reusable
+    @IntoSet
+    fun notion(
+        client: BackendClient,
+        logger: KimchiLogger,
+    ): ServerPlugin = NotionBridgePlugin(client, logger)
 
     @Provides
     fun weatherAccess(source: WeatherPlugin) = source.weatherAccess

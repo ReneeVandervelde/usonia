@@ -39,6 +39,7 @@ dependencies {
     implementation(projects.telegramBridge)
     implementation(projects.weather)
     implementation(projects.webBackend)
+    implementation(projects.notionBridge)
     implementation(kotlinLibraries.coroutines.core)
     implementation(inkLibraries.kimchi.core)
     implementation("com.github.ajalt.clikt:clikt:3.5.0")
