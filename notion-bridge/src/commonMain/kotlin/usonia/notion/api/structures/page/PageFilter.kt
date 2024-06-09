@@ -9,6 +9,11 @@ import usonia.notion.api.structures.property.PropertyName
 
 @Serializable(with = PageFilterSerializer::class)
 internal sealed interface PageFilter {
+    data class Select(
+        val property: PropertyName,
+        val select: FilterQuery,
+    ): PageFilter
+
     data class MultiSelect(
         val property: PropertyName,
         val multi_select: FilterQuery,
@@ -73,6 +78,10 @@ internal object PageFilterSerializer: KSerializer<PageFilter> {
 
     override fun serialize(encoder: Encoder, value: PageFilter) {
         val surrogate = when (value) {
+            is PageFilter.Select -> Surrogate(
+                property = value.property,
+                select = value.select,
+            )
             is PageFilter.MultiSelect -> Surrogate(
                 property = value.property,
                 multi_select = value.multi_select,
@@ -95,6 +104,7 @@ internal object PageFilterSerializer: KSerializer<PageFilter> {
     private data class Surrogate(
         val property: PropertyName? = null,
         val multi_select: FilterQuery? = null,
+        val select: FilterQuery? = null,
         val rich_text: TextFilter? = null,
         val or: List<PageFilter>? = null,
         val and: List<PageFilter>? = null,

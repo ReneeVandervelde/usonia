@@ -12,6 +12,10 @@ internal sealed interface FilterQuery {
     data class Contains(
         val contains: String,
     ): FilterQuery
+
+    data class DoesNotEqual(
+        val value: String,
+    ): FilterQuery
 }
 
 internal object FilterQuerySerializer: KSerializer<FilterQuery> {
@@ -24,13 +28,16 @@ internal object FilterQuerySerializer: KSerializer<FilterQuery> {
             is FilterQuery.Contains -> Surrogate(
                 contains = value.contains,
             )
+            is FilterQuery.DoesNotEqual -> Surrogate(
+                does_not_equal = value.value,
+            )
         }
         Surrogate.serializer().serialize(encoder, surrogate)
     }
 
     @Serializable
     private data class Surrogate(
-        @SerialName("contains")
         val contains: String? = null,
+        val does_not_equal: String? = null,
     )
 }

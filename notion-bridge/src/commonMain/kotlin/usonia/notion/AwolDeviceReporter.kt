@@ -46,7 +46,7 @@ internal class AwolDeviceReporter(
     private val clock: ZonedClock = ZonedSystemClock,
     private val logger: KimchiLogger = EmptyLogger,
 ): CronJob, Daemon {
-    override val schedule: Schedule = Schedule().withMinutes { it % 1 == 0 }
+    override val schedule: Schedule = Schedule().withMinutes { it % 20 == 0 }
 
     override suspend fun runCron(time: LocalDateTime, zone: TimeZone) {
         val bridge = backendClient.findBridgeByServiceTag(NotionConfig.SERVICE) ?: run {
@@ -89,6 +89,12 @@ internal class AwolDeviceReporter(
                             PageFilter.Text(
                                 property = NotionConfig.Properties.REF,
                                 text = TextFilter.Empty(false),
+                            ),
+                            PageFilter.Select(
+                                property = NotionConfig.Properties.STATUS,
+                                select = FilterQuery.DoesNotEqual(
+                                    value = NotionConfig.PropertyValues.STATUS_DONE
+                                )
                             ),
                             PageFilter.Or(
                                 filters = listOf(
