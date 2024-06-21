@@ -3,7 +3,6 @@ plugins {
 }
 
 kotlin {
-    jvm() {
-        jvmToolchain(15)
-    }
+    jvmToolchain(15)
+    jvm()
 }

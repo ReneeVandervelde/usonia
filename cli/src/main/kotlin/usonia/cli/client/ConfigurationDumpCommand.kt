@@ -2,17 +2,15 @@ package usonia.cli.client
 
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.types.file
-import usonia.cli.CliComponent
 import usonia.foundation.Site
 import usonia.kotlin.first
 import usonia.serialization.SerializationModule
 import usonia.state.DatabaseModule
-import javax.inject.Inject
 
-class ConfigurationDumpCommand @Inject constructor(
-    component: CliComponent,
+class ConfigurationDumpCommand(
+    module: ClientModule,
 ): ClientCommand(
-    component = component,
+    clientModule = module,
     help = "Dump site json from a database file."
 ) {
     private val database by argument().file(canBeDir = false)

@@ -27,6 +27,14 @@ module = "com.inkapplications.watermelon:standard"
 version.ref = "regolith"
 module = "com.inkapplications.regolith:processes"
 
+[libraries.regolith-timemachine]
+version.ref = "regolith"
+module = "com.inkapplications.regolith:time-machine"
+
+[libraries.glass-client]
+version = "0.11.2"
+module = "com.inkapplications.glassconsole:client"
+
 [bundles]
 watermelon-kotlin = [
     "watermelon-coroutines",

@@ -28,6 +28,7 @@ kotlin {
 dependencies {
     implementation(projects.clientHttp)
     implementation(projects.core)
+    implementation(projects.glassBridge)
     implementation(projects.hubitatBridge)
     implementation(projects.hueBridge)
     implementation(projects.rules)
@@ -43,6 +44,4 @@ dependencies {
     implementation(kotlinLibraries.coroutines.core)
     implementation(inkLibraries.kimchi.core)
     implementation("com.github.ajalt.clikt:clikt:3.5.0")
-    implementation("com.google.dagger:dagger:2.44.2")
-    kapt("com.google.dagger:dagger-compiler:2.44.2")
 }

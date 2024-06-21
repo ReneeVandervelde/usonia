@@ -1,6 +1,6 @@
 [versions]
-kotlin = "1.8.0"
-coroutines = "1.6.4"
+kotlin = "2.0.0"
+coroutines = "1.8.1"
 
 [libraries.gradle]
 version.ref = "kotlin"
@@ -23,11 +23,11 @@ version.ref = "coroutines"
 module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-js"
 
 [libraries.datetime]
-version = "0.4.0"
+version = "0.6.0"
 module = "org.jetbrains.kotlinx:kotlinx-datetime"
 
 [libraries.serialization-json]
-version = "1.3.3"
+version = "1.7.0"
 module = "org.jetbrains.kotlinx:kotlinx-serialization-json"
 
 [libraries.serialization-gradle]

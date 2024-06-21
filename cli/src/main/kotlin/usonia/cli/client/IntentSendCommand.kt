@@ -1,15 +1,13 @@
 package usonia.cli.client
 
 import com.github.ajalt.clikt.parameters.arguments.argument
-import usonia.cli.CliComponent
 import usonia.foundation.Action
 import usonia.foundation.Identifier
-import javax.inject.Inject
 
-class IntentSendCommand @Inject constructor(
-    component: CliComponent,
+class IntentSendCommand(
+    module: ClientModule,
 ): ClientCommand(
-    component = component,
+    clientModule = module,
     help = "Sends an intent Action to the server to be broadcast."
 ) {
     private val target by argument()

@@ -1,48 +1,22 @@
 package usonia.cli
 
-import com.github.ajalt.clikt.core.CliktCommand
-import dagger.Binds
-import dagger.Module
-import dagger.multibindings.IntoSet
-import dagger.multibindings.Multibinds
 import usonia.cli.client.*
+import usonia.cli.server.ServerModule
 import usonia.cli.server.ServerRunCommand
+import usonia.serialization.SerializationModule
 
-@Module
-interface CommandModule {
-    @Multibinds
-    @JvmSuppressWildcards
-    fun commands(): Set<CliktCommand>
-
-    @Binds
-    @IntoSet
-    fun run(command: ServerRunCommand): CliktCommand
-
-    @Binds
-    @IntoSet
-    fun clientLogs(command: LogsCommand): CliktCommand
-
-    @Binds
-    @IntoSet
-    fun clientEvents(command: EventsListenCommand): CliktCommand
-
-    @Binds
-    @IntoSet
-    fun intentSend(command: IntentSendCommand): CliktCommand
-
-    @Binds
-    @IntoSet
-    fun siteUpdate(command: SiteUpdateCommand): CliktCommand
-
-    @Binds
-    @IntoSet
-    fun setFlag(command: FlagSetCommand): CliktCommand
-
-    @Binds
-    @IntoSet
-    fun removeFlag(command: FlagRemoveCommand): CliktCommand
-
-    @Binds
-    @IntoSet
-    fun configDump(command: ConfigurationDumpCommand): CliktCommand
+object CommandModule {
+    private val json = SerializationModule.json
+    private val serverModule = ServerModule(json)
+    private val clientModule = ClientModule(json)
+    val commands = setOf(
+        ServerRunCommand(serverModule),
+        LogsCommand(clientModule),
+        EventsListenCommand(clientModule),
+        IntentSendCommand(clientModule),
+        SiteUpdateCommand(clientModule, json),
+        FlagSetCommand(clientModule),
+        FlagRemoveCommand(clientModule),
+        ConfigurationDumpCommand(clientModule),
+    )
 }

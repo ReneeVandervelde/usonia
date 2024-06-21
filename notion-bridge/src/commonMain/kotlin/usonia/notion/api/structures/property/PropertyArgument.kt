@@ -23,7 +23,7 @@ internal sealed interface PropertyArgument {
     ): PropertyArgument
 }
 
-internal object PropertyArgumentSerializer: KSerializer<PropertyArgument> {
+internal class PropertyArgumentSerializer: KSerializer<PropertyArgument> {
     @Serializable
     private data class Surrogate(
         val multi_select: List<MultiSelectArgument>? = null,

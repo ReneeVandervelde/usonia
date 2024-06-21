@@ -2,27 +2,28 @@ plugins {
     backendlibrary()
 }
 
-configurations {
-    create("importResources")
-}
-
 tasks {
-    create("collectDistributions", Sync::class) {
+    val copyResources = create("copyResources", Sync::class) {
         dependsOn(":${project.projects.webFrontendCompose.name}:jsBrowserDistribution")
-        into(temporaryDir).from(configurations.getByName("importResources"))
+        from(project(":web-frontend-compose").file("${project(":web-frontend-compose").buildDir}/dist/js/productionExecutable"))
+        into("$buildDir/imported-resources")
+    }
+    all {
+        if (this != copyResources) {
+            dependsOn(copyResources)
+        }
     }
 }
 
 kotlin {
     sourceSets {
         val commonMain by getting {
-            resources.srcDirs(tasks.getByName("collectDistributions"))
+            resources.srcDirs("$buildDir/imported-resources")
 
             dependencies {
                 api(projects.core)
                 api(projects.server)
                 api(projects.serialization)
-                dependencies.add("importResources", project(":${projects.webFrontendCompose.name}", "dist"))
                 api(inkLibraries.kimchi.logger)
             }
         }

@@ -3,18 +3,16 @@ package usonia.cli.client
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.types.file
 import kotlinx.serialization.json.Json
-import usonia.cli.CliComponent
 import usonia.foundation.Site
-import javax.inject.Inject
 
 /**
  * Uploads a file as a new site configuration.
  */
-class SiteUpdateCommand @Inject constructor(
-    component: CliComponent,
+class SiteUpdateCommand(
+    module: ClientModule,
     private val json: Json,
 ): ClientCommand(
-    component = component,
+    clientModule = module,
     help = "Update a server's site configuration",
 ) {
     private val configFile by argument(

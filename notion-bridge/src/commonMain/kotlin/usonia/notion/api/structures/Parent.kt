@@ -14,7 +14,7 @@ internal sealed interface Parent {
     ): Parent
 }
 
-internal object ParentSerializer: KSerializer<Parent> {
+internal class ParentSerializer: KSerializer<Parent> {
     override val descriptor: SerialDescriptor = Surrogate.serializer().descriptor
 
     override fun deserialize(decoder: Decoder): Parent {

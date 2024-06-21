@@ -21,7 +21,7 @@ internal sealed interface Block {
 }
 
 
-internal object BlockSerializer: KSerializer<Block> {
+internal class BlockSerializer: KSerializer<Block> {
     override val descriptor: SerialDescriptor = Surrogate.serializer().descriptor
 
     override fun serialize(encoder: Encoder, value: Block) = TODO("Not implemented")

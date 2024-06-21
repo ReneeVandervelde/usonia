@@ -32,7 +32,7 @@ internal sealed interface Property {
     ): Property
 }
 
-internal object PropertySerializer: KSerializer<Property> {
+internal class PropertySerializer: KSerializer<Property> {
     override val descriptor: SerialDescriptor = Surrogate.serializer().descriptor
 
     override fun serialize(encoder: Encoder, value: Property) = TODO("Not yet implemented")

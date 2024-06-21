@@ -1,8 +1,5 @@
 package usonia.cli.server
 
-import dagger.Module
-import dagger.Provides
-import dagger.Reusable
 import kimchi.logger.CompositeLogWriter
 import kimchi.logger.ConsolidatedLogger
 import kimchi.logger.KimchiLogger
@@ -10,7 +7,6 @@ import kotlinx.serialization.json.Json
 import usonia.cli.ColorWriter
 import usonia.core.state.memory.InMemoryActionAccess
 import usonia.rules.alerts.LogErrorAlerts
-import usonia.server.ServerPlugin
 import usonia.server.UsoniaServer
 import usonia.server.client.BackendClient
 import usonia.server.client.ComposedBackendClient
@@ -21,16 +17,23 @@ import usonia.web.LogSocket
 /**
  * Create instances on the backend client based on runtime parameters.
  */
-@Module
 class ServerModule(
-    private val path: String?,
-    private val port: Int,
+    private val json: Json,
 ) {
-    @Provides
-    @Reusable
+    val logger: KimchiLogger = setOf(
+            LogSocket,
+            ColorWriter,
+            LogErrorAlerts,
+        )
+        .let(::CompositeLogWriter)
+        .let(::ConsolidatedLogger)
+
+    fun createPluginsModule(
+        client: BackendClient,
+    ) = PluginsModule(client, logger)
+
     fun databaseBackendClient(
-        json: Json,
-        logger: KimchiLogger,
+        path: String?,
     ): BackendClient {
         val databaseModule = DatabaseModule(json, logger)
         val database = if (path == null) databaseModule.inMemoryDatabase() else databaseModule.database(path)
@@ -45,26 +48,18 @@ class ServerModule(
         )
     }
 
-    @Provides
-    @Reusable
     fun createServer(
-        logger: KimchiLogger,
-        plugins: @JvmSuppressWildcards Set<ServerPlugin>
+        port: Int,
+        databasePath: String?,
     ): UsoniaServer {
         val server = KtorWebServer(port, logger)
+        val client = databaseBackendClient(databasePath)
+        val pluginsModule = createPluginsModule(client)
 
         return UsoniaServer(
-            plugins = plugins,
+            plugins = pluginsModule.plugins,
             server = server,
             logger = logger,
         )
-    }
-
-    @Provides
-    @Reusable
-    fun logger(): KimchiLogger {
-        return setOf(LogSocket, ColorWriter, LogErrorAlerts)
-            .let(::CompositeLogWriter)
-            .let(::ConsolidatedLogger)
     }
 }

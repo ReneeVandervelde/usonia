@@ -1,7 +1,6 @@
 package usonia.notion.api.structures.page
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
@@ -18,7 +17,7 @@ internal sealed interface FilterQuery {
     ): FilterQuery
 }
 
-internal object FilterQuerySerializer: KSerializer<FilterQuery> {
+internal class FilterQuerySerializer: KSerializer<FilterQuery> {
     override val descriptor: SerialDescriptor = Surrogate.serializer().descriptor
 
     override fun deserialize(decoder: Decoder): FilterQuery = TODO("Not yet implemented")

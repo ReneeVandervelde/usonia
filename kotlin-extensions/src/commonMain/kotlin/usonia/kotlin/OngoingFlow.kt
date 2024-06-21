@@ -81,7 +81,7 @@ inline fun <T> OngoingFlow<T>.filter(crossinline predicate: (T) -> Boolean) = un
 /**
  * @see Flow.map
  */
-inline fun <T, R> OngoingFlow<T>.map(crossinline mapper:  (T) -> R) = unsafeModify { map { mapper(it) } }
+inline fun <T, R> OngoingFlow<T>.map(crossinline mapper: suspend (T) -> R) = unsafeModify { map { mapper(it) } }
 
 /**
  * @see Flow.mapLatest
@@ -93,7 +93,7 @@ inline fun <T, R> OngoingFlow<T>.mapLatest(crossinline mapper: suspend (T) -> R)
  * @see Flow.flatMapLatest
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-inline fun <T, R> OngoingFlow<T>.flatMapLatest(crossinline mapper:  (T) -> Flow<R>) = unsafeModify { flatMapLatest { mapper(it) } }
+inline fun <T, R> OngoingFlow<T>.flatMapLatest(crossinline mapper:  suspend (T) -> Flow<R>) = unsafeModify { flatMapLatest { mapper(it) } }
 
 /**
  * @see Flow.flatMapConcat
@@ -109,7 +109,7 @@ inline fun <T> OngoingFlow<T>.onEach(crossinline action: (T) -> Unit) = unsafeMo
 /**
  * @see Flow.combine
  */
-inline fun <T1, T2, R> OngoingFlow<T1>.combine(other: OngoingFlow<T2>, crossinline transform: (a: T1, b: T2) -> R): OngoingFlow<R> {
+inline fun <T1, T2, R> OngoingFlow<T1>.combineWith(other: OngoingFlow<T2>, crossinline transform: (a: T1, b: T2) -> R): OngoingFlow<R> {
     return unsafeModify {
         this.combine(other.asFlow()) { a, b ->
             transform(a, b)
@@ -196,4 +196,76 @@ suspend inline fun <T> OngoingFlow<T>.collect(crossinline observer: suspend (T) 
 suspend inline fun <T> OngoingFlow<T>.collectLatest(crossinline observer: suspend (T) -> Unit): Nothing {
     asFlow().collectLatest { observer(it) }
     throw IllegalStateException("Unexpected end of flow")
+}
+
+/**
+ * Analogue to [Flow.combine] for ongoing flows.
+ */
+fun <T1, T2, R> combine(
+flow1: OngoingFlow<T1>,
+    flow2: OngoingFlow<T2>,
+    transform: (a: T1, b: T2) -> R,
+): OngoingFlow<R> {
+    return combine(
+        flow1.asFlow(),
+        flow2.asFlow(),
+        transform
+    ).asOngoing()
+}
+
+/**
+ * Analogue to [Flow.combine] for ongoing flows.
+ */
+fun <T1, T2, T3, R> combine(
+    flow1: OngoingFlow<T1>,
+    flow2: OngoingFlow<T2>,
+    flow3: OngoingFlow<T3>,
+    transform: (a: T1, b: T2, c: T3) -> R,
+): OngoingFlow<R> {
+    return combine(
+        flow1.asFlow(),
+        flow2.asFlow(),
+        flow3.asFlow(),
+        transform
+    ).asOngoing()
+}
+
+/**
+ * Analogue to [Flow.combine] for ongoing flows.
+ */
+fun <T1, T2, T3, T4, R> combine(
+    flow1: OngoingFlow<T1>,
+    flow2: OngoingFlow<T2>,
+    flow3: OngoingFlow<T3>,
+    flow4: OngoingFlow<T4>,
+    transform: (a: T1, b: T2, c: T3, d: T4) -> R,
+) {
+    combine(
+        flow1.asFlow(),
+        flow2.asFlow(),
+        flow3.asFlow(),
+        flow4.asFlow(),
+        transform
+    ).asOngoing()
+}
+
+/**
+ * Analogue to [Flow.combine] for ongoing flows.
+ */
+fun <T1, T2, T3, T4, T5, R> combine(
+    flow1: OngoingFlow<T1>,
+    flow2: OngoingFlow<T2>,
+    flow3: OngoingFlow<T3>,
+    flow4: OngoingFlow<T4>,
+    flow5: OngoingFlow<T5>,
+    transform: (a: T1, b: T2, c: T3, d: T4, e: T5) -> R,
+) {
+    combine(
+        flow1.asFlow(),
+        flow2.asFlow(),
+        flow3.asFlow(),
+        flow4.asFlow(),
+        flow5.asFlow(),
+        transform
+    ).asOngoing()
 }

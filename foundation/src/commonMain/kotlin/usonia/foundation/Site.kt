@@ -19,6 +19,20 @@ data class Site(
     val parameters: ParameterBag = emptyMap(),
 )
 
+/**
+ * Collection of all devices in all rooms of a site.
+ */
+val Site.devices: Set<Device> get() = rooms.flatMap { it.devices }.toSet()
+
+/**
+ * Filter a list of devices by those associated with an Entrypoint Fixture.
+ */
+val Iterable<Device>.entryPoints get() = filter { it.fixture == Fixture.EntryPoint }.toSet()
+
+/**
+ * Filter a list of devices by those with a latch capability.
+ */
+val Iterable<Device>.latchableDevices get() = filter { Event.Latch::class in it.capabilities.events }.toSet()
 
 /**
  * Find a site-wide device that matches a [predicate]

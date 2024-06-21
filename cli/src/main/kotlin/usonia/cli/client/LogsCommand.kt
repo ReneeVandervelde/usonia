@@ -3,15 +3,13 @@ package usonia.cli.client
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
-import usonia.cli.CliComponent
 import usonia.cli.ColorWriter
 import usonia.kotlin.collect
-import javax.inject.Inject
 
-class LogsCommand @Inject constructor(
-    component: CliComponent,
+class LogsCommand(
+    module: ClientModule,
 ): ClientCommand(
-    component = component,
+    clientModule = module,
     help = "Listen to log statements being recorded on the server."
 ) {
     private val buffer by option(

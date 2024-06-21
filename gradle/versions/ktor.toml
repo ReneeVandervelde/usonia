@@ -1,5 +1,5 @@
 [versions]
-ktor = "2.2.4"
+ktor = "2.3.11"
 
 [libraries.client-core]
 version.ref = "ktor"

@@ -2,6 +2,7 @@ package usonia.core.state
 
 import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
+import usonia.kotlin.filter
 import usonia.kotlin.first
 import usonia.kotlin.map
 
@@ -34,6 +35,13 @@ interface ConfigurationAccess {
      */
     suspend fun removeFlag(key: String)
 }
+
+val ConfigurationAccess.booleanFlags: OngoingFlow<Map<String, Boolean>> get() = flags
+    .map {
+        it.filter {
+            it.value.equals("true", ignoreCase = true) || it.value.equals("false", ignoreCase = true)
+        }.mapValues { it.value!!.toBooleanStrict() }
+    }
 
 /**
  * Rooms configured on the site.

@@ -2,13 +2,11 @@ package usonia.cli.client
 
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.optional
-import usonia.cli.CliComponent
-import javax.inject.Inject
 
-class FlagSetCommand @Inject constructor(
-    component: CliComponent,
+class FlagSetCommand(
+    module: ClientModule,
 ): ClientCommand(
-    component = component,
+    clientModule = module,
     help = "Set a configuration flag on a server"
 ) {
     private val key by argument()

@@ -2,6 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 subprojects {
     repositories {
+        mavenLocal()
         mavenCentral()
         maven(url = "https://jitpack.io")
     }

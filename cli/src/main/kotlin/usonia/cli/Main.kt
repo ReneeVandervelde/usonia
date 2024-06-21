@@ -6,8 +6,7 @@ import kotlin.system.exitProcess
 
 class Main: NoOpCliktCommand() {
     init {
-        DaggerCliComponent.create()
-            .commands()
+        CommandModule.commands
             .run(::subcommands)
     }
 }

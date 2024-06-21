@@ -1,13 +1,11 @@
 package usonia.cli.client
 
-import usonia.cli.CliComponent
 import usonia.kotlin.collect
-import javax.inject.Inject
 
-class EventsListenCommand @Inject constructor(
-    component: CliComponent,
+class EventsListenCommand(
+    module: ClientModule,
 ): ClientCommand(
-    component = component,
+    clientModule = module,
     help = "Listen to the pipeline of events occurring on the server."
 ) {
 

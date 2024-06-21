@@ -38,45 +38,7 @@ internal sealed interface PageFilter {
     ): PageFilter
 }
 
-@Serializable(with = TextFilterSerializer::class)
-sealed interface TextFilter {
-    data class Equals(
-        val equals: String,
-    ): TextFilter
-
-    data class Empty(
-        val empty: Boolean,
-    ): TextFilter
-}
-
-internal object TextFilterSerializer: KSerializer<TextFilter> {
-    override val descriptor: SerialDescriptor = Surrogate.serializer().descriptor
-
-    override fun deserialize(decoder: Decoder): TextFilter = TODO()
-
-    override fun serialize(encoder: Encoder, value: TextFilter) {
-        val surrogate = when (value) {
-            is TextFilter.Equals -> Surrogate(
-                equals = value.equals,
-            )
-            is TextFilter.Empty -> if (value.empty) Surrogate(
-                is_empty = true,
-            ) else Surrogate(
-                is_not_empty = true,
-            )
-        }
-        Surrogate.serializer().serialize(encoder, surrogate)
-    }
-
-    @Serializable
-    private data class Surrogate(
-        val equals: String? = null,
-        val is_empty: Boolean? = null,
-        val is_not_empty: Boolean? = null,
-    )
-}
-
-internal object PageFilterSerializer: KSerializer<PageFilter> {
+internal class PageFilterSerializer: KSerializer<PageFilter> {
     override val descriptor: SerialDescriptor = Surrogate.serializer().descriptor
 
     override fun deserialize(decoder: Decoder): PageFilter = TODO("Not yet implemented")

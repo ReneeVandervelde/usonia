@@ -1,19 +1,17 @@
 package usonia.core.client
 
-import usonia.foundation.Device
-import usonia.foundation.Event
-import usonia.foundation.Identifier
-import usonia.foundation.getDevice
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.combine
-import usonia.kotlin.map
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onStart
+import usonia.foundation.*
+import usonia.kotlin.*
+import kotlin.reflect.KClass
 
 /**
  * Listen to a device's latest events
  */
 fun UsoniaClient.deviceEvents(id: Identifier, limit: Int? = null): OngoingFlow<DeviceEvents> {
     return site.map { it.getDevice(id) }
-        .combine(deviceEventHistory(id, limit)) { device, events ->
+        .combineWith(deviceEventHistory(id, limit)) { device, events ->
             DeviceEvents(
                 device = device,
                 events = events,
@@ -27,4 +25,18 @@ fun UsoniaClient.deviceEvents(id: Identifier, limit: Int? = null): OngoingFlow<D
 data class DeviceEvents(
     val device: Device,
     val events: List<Event>,
+)
+
+inline fun <reified T: Event> UsoniaClient.latestDeviceEventOfType(device: Device): OngoingFlow<DeviceProperty<T?>> {
+    return events.filterIsInstance<T>()
+        .filter { it.source == device.id }
+        .map { it as T? }
+        .unsafeModify { onStart { emit(getState(device.id, T::class)) } }
+        .map { DeviceProperty(device, it) }
+}
+
+
+data class DeviceProperty<T>(
+    val device: Device,
+    val event: T,
 )
