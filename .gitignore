@@ -16,3 +16,6 @@ gradle-app.setting
 config.json
 test-config.json
 *.db
+
+# Kotlin
+.kotlin/
