@@ -3,6 +3,7 @@ package usonia.cli.server
 import kimchi.logger.CompositeLogWriter
 import kimchi.logger.ConsolidatedLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import usonia.cli.ColorWriter
 import usonia.core.state.memory.InMemoryActionAccess
@@ -13,6 +14,7 @@ import usonia.server.client.ComposedBackendClient
 import usonia.server.ktor.KtorWebServer
 import usonia.state.DatabaseModule
 import usonia.web.LogSocket
+import java.io.File
 
 /**
  * Create instances on the backend client based on runtime parameters.
@@ -30,13 +32,14 @@ class ServerModule(
 
     fun createPluginsModule(
         client: BackendClient,
-    ) = PluginsModule(client, logger)
+    ) = PluginsModule(client, logger, json, Clock.System)
 
     fun databaseBackendClient(
-        path: String?,
+        databasePath: String?,
+        settingsFile: File,
     ): BackendClient {
-        val databaseModule = DatabaseModule(json, logger)
-        val database = if (path == null) databaseModule.inMemoryDatabase() else databaseModule.database(path)
+        val databaseModule = DatabaseModule(settingsFile, json, logger)
+        val database = if (databasePath == null) databaseModule.inMemoryDatabase() else databaseModule.database(databasePath)
         val actions = InMemoryActionAccess()
 
         return ComposedBackendClient(
@@ -45,15 +48,17 @@ class ServerModule(
             eventAccess = database,
             eventPublisher = database,
             configurationAccess = database,
+            fullSecurityAccess = database,
         )
     }
 
     fun createServer(
         port: Int,
+        settingsFile: File,
         databasePath: String?,
     ): UsoniaServer {
         val server = KtorWebServer(port, logger)
-        val client = databaseBackendClient(databasePath)
+        val client = databaseBackendClient(databasePath, settingsFile)
         val pluginsModule = createPluginsModule(client)
 
         return UsoniaServer(

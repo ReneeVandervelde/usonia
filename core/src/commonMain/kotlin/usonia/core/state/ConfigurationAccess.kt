@@ -2,7 +2,6 @@ package usonia.core.state
 
 import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
-import usonia.kotlin.filter
 import usonia.kotlin.first
 import usonia.kotlin.map
 
@@ -21,6 +20,11 @@ interface ConfigurationAccess {
     val flags: OngoingFlow<Map<String, String?>>
 
     /**
+     * The alarm/security state for the site.
+     */
+    val securityState: OngoingFlow<SecurityState>
+
+    /**
      * Update site configuration.
      */
     suspend fun updateSite(site: Site)
@@ -34,6 +38,11 @@ interface ConfigurationAccess {
      * Remove a key completely from settings.
      */
     suspend fun removeFlag(key: String)
+
+    /**
+     * Set the security state to [SecurityState.Armed]
+     */
+    suspend fun armSecurity()
 }
 
 val ConfigurationAccess.booleanFlags: OngoingFlow<Map<String, Boolean>> get() = flags
@@ -90,6 +99,11 @@ suspend fun ConfigurationAccess.findDevicesBy(predicate: (Device) -> Boolean) = 
  * @see [Site.findBridgeByServiceTag]
  */
 suspend fun ConfigurationAccess.findBridgeByServiceTag(service: String): Bridge? = getSite().findBridgeByServiceTag(service)
+
+/**
+ * Get a bridge config by its ID.
+ */
+suspend fun ConfigurationAccess.findBridgeById(id: Identifier): Bridge? = getSite().bridges.find { it.id == id }
 
 /**
  * Get the current value of a flag, if set.

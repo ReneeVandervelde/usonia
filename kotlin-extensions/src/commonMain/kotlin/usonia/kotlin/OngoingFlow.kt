@@ -130,7 +130,7 @@ fun <T: Any> OngoingFlow<T?>.filterNotNull() = unsafeModify { filterNotNull() }
 /**
  * @see Flow.distinctUntilChanged
  */
-fun OngoingFlow<Boolean>.distinctUntilChanged() = unsafeModify { distinctUntilChanged() }
+fun <T> OngoingFlow<T>.distinctUntilChanged() = unsafeModify { distinctUntilChanged() }
 
 /**
  * Emits an item at the start of a flow.
@@ -239,8 +239,8 @@ fun <T1, T2, T3, T4, R> combine(
     flow3: OngoingFlow<T3>,
     flow4: OngoingFlow<T4>,
     transform: (a: T1, b: T2, c: T3, d: T4) -> R,
-) {
-    combine(
+): OngoingFlow<R> {
+    return combine(
         flow1.asFlow(),
         flow2.asFlow(),
         flow3.asFlow(),
@@ -259,8 +259,8 @@ fun <T1, T2, T3, T4, T5, R> combine(
     flow4: OngoingFlow<T4>,
     flow5: OngoingFlow<T5>,
     transform: (a: T1, b: T2, c: T3, d: T4, e: T5) -> R,
-) {
-    combine(
+): OngoingFlow<R> {
+    return combine(
         flow1.asFlow(),
         flow2.asFlow(),
         flow3.asFlow(),

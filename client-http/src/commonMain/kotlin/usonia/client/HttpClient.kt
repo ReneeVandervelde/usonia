@@ -1,7 +1,6 @@
 package usonia.client
 
 import io.ktor.client.*
-import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
@@ -17,7 +16,6 @@ import kotlinx.datetime.LocalDate
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import usonia.client.ktor.PlatformEngine
 import usonia.foundation.*
@@ -39,6 +37,24 @@ class HttpClient(
         install(WebSockets)
         install(ContentNegotiation) {
             json(json)
+        }
+    }
+
+    override val securityState: OngoingFlow<SecurityState> = ongoingFlow {
+        httpClient.ws(
+            host = host,
+            port = port,
+            path = "security",
+        ) {
+            incoming.consumeEach {
+                if (it !is Frame.Text) return@consumeEach
+
+                try {
+                    emit(json.decodeFromString(it.readText()))
+                } catch (error: Throwable) {
+                    logger.error("Failed to deserialize security state", error)
+                }
+            }
         }
     }
 
@@ -204,6 +220,18 @@ class HttpClient(
 
         httpClient.delete(request)
         // TODO: Check status returns
+    }
+
+    override suspend fun armSecurity() {
+        val request = HttpRequestBuilder(
+            host = host,
+            port = port,
+            path = "/security/arm",
+        ).apply {
+            accept(ContentType.Application.Json)
+        }
+
+        httpClient.put(request)
     }
 
     override suspend fun <T: Event> getState(id: Identifier, type: KClass<T>): T? {

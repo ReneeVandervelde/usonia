@@ -2,8 +2,11 @@ package usonia.core.state.memory
 
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import usonia.core.state.ConfigurationAccess
+import usonia.foundation.SecurityState
 import usonia.foundation.Site
+import usonia.kotlin.OngoingFlow
 import usonia.kotlin.asOngoing
 import usonia.kotlin.first
 
@@ -21,8 +24,10 @@ class InMemoryConfigAccess: ConfigurationAccess {
     ).also {
         it.tryEmit(emptyMap())
     }
+    private val mutableSecurityState = MutableStateFlow(SecurityState.Disarmed)
     override val site = mutableSite.asOngoing()
     override val flags = mutableFlags.asOngoing()
+    override val securityState: OngoingFlow<SecurityState> = mutableSecurityState.asOngoing()
 
     override suspend fun updateSite(site: Site) {
         this.mutableSite.emit(site)
@@ -40,5 +45,9 @@ class InMemoryConfigAccess: ConfigurationAccess {
             .toMutableMap()
             .also { it.remove(key) }
             .run { mutableFlags.emit(this) }
+    }
+
+    override suspend fun armSecurity() {
+        mutableSecurityState.value = SecurityState.Armed
     }
 }

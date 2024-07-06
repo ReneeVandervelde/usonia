@@ -38,4 +38,14 @@ object Statuses {
         message = "No events were found.",
         code = 5,
     )
+
+    val BRIDGE_NOT_FOUND = Status(
+        message = "Could not find a bridge with the specified ID",
+        code = 6,
+    )
+
+    fun bridgeNotConfigured(bridgeId: Identifier) = Status(
+        code = 7,
+        message = "Bridge $bridgeId is not configured properly",
+    )
 }

@@ -1,6 +1,8 @@
 package usonia.cli.server
 
 import kimchi.logger.KimchiLogger
+import kotlinx.datetime.Clock
+import kotlinx.serialization.json.Json
 import usonia.glass.GlassPlugin
 import usonia.hubitat.HubitatPlugin
 import usonia.hue.HueBridgePlugin
@@ -18,11 +20,13 @@ import usonia.web.WebPlugin
 class PluginsModule(
     client: BackendClient,
     logger: KimchiLogger,
+    json: Json,
+    clock: Clock,
 ) {
     val weatherPlugin = WeatherPlugin(client, logger)
     val plugins = setOf(
         WebPlugin(client, logger),
-        GlassPlugin(client, logger),
+        GlassPlugin(client, logger, json, clock),
         weatherPlugin,
         TodoistBridgePlugin(client, logger),
         RulesPlugin(client, weatherPlugin.weatherAccess, logger),

@@ -34,5 +34,10 @@ val DummyClient = ComposedBackendClient(
         override suspend fun updateSite(site: Site) = TODO("Not yet implemented")
         override suspend fun setFlag(key: String, value: String?) = TODO()
         override suspend fun removeFlag(key: String) = TODO()
+        override suspend fun armSecurity() = TODO()
+        override val securityState: OngoingFlow<SecurityState> get() = TODO()
+    },
+    fullSecurityAccess = object: FullSecurityAccess {
+        override suspend fun disarmSecurity() = TODO()
     },
 )

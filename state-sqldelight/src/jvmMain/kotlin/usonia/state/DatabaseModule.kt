@@ -3,11 +3,15 @@ package usonia.state
 import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.json.Json
+import regolith.data.settings.JvmSettingsModule
+import java.io.File
 
 class DatabaseModule(
+    settingsFile: File,
     private val json: Json,
     private val logger: KimchiLogger,
 ) {
+    private val settingsModule = JvmSettingsModule(settingsFile)
     fun database(databasePath: String): DatabaseServices = create("jdbc:sqlite:$databasePath")
     fun inMemoryDatabase(): DatabaseServices = create(JdbcSqliteDriver.IN_MEMORY)
 
@@ -23,6 +27,7 @@ class DatabaseModule(
             eventQueries = lazy { database.value.eventQueries },
             siteQueries = lazy { database.value.siteQueries },
             flagQueries = lazy { database.value.flagQueries },
+            settingsAccess = settingsModule.settingsAccess,
             json = json,
             logger = logger,
         )

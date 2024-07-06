@@ -27,6 +27,7 @@ class WebPlugin(
         FlagUpdateController(client, json, logger),
         FlagToggleController(client, json, logger),
         FlagDeleteController(client, json),
+        ArmSecurityController(client, json),
         StaticResourceController("html", "text/html"),
         StaticResourceController("js", "application/javascript"),
         StaticResourceController("js.map", "application/javascript"),
@@ -44,5 +45,6 @@ class WebPlugin(
         TemperatureHistorySnapshotSocket(client, json, logger),
         LatestEventSocket(client, json, logger),
         EventHistorySocket(client, json, logger),
+        SecurityStateSocket(client, json),
     )
 }

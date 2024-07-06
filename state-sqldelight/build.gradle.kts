@@ -17,11 +17,13 @@ kotlin {
                 api(projects.foundation)
                 api(kotlinLibraries.coroutines.core)
                 api(kotlinLibraries.serialization.json)
+                implementation(inkLibraries.regolith.data)
             }
         }
 
         val jvmMain by getting {
             dependencies {
+                implementation(inkLibraries.regolith.data)
                 implementation(libraries.bundles.sqldelight)
             }
         }

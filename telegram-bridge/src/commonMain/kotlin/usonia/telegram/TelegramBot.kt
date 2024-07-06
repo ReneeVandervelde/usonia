@@ -13,13 +13,10 @@ import usonia.foundation.*
 import usonia.foundation.Action.Alert.Icon
 import usonia.foundation.User
 import usonia.rules.Flags
-import usonia.rules.alerts.LogErrorAlerts
 import usonia.server.client.BackendClient
 import usonia.server.http.HttpRequest
 import usonia.server.http.RestController
 import usonia.server.http.RestResponse
-
-private const val USERNAME_KEY = "telegram.username"
 
 internal class TelegramBot(
     private val client: BackendClient,
@@ -64,6 +61,8 @@ internal class TelegramBot(
             "/away" -> onAway(data, user)
             "/disablealerts" -> onDisableErrorAlerts(data)
             "/enablealerts" -> onEnableErrorAlerts(data)
+            "/arm" -> onArmSecurity(data)
+            "/disarm" -> onDisarmSecurity(data)
             else -> onUnknownCommand(data)
         }
 
@@ -86,6 +85,24 @@ internal class TelegramBot(
             sticker = Icon.Disallowed.asSticker,
             message = "You don't have permission to use this bot! I let the admin know.",
         )
+    }
+
+    private suspend fun onArmSecurity(update: Update.MessageUpdate) {
+        telegram.sendStickerWithMessage(
+            chat = update.message.chat.id,
+            sticker = Icon.Bot.asSticker,
+            message = "Security system armed. You can disarm with /disarm",
+        )
+        client.armSecurity()
+    }
+
+    private suspend fun onDisarmSecurity(update: Update.MessageUpdate) {
+        telegram.sendStickerWithMessage(
+            chat = update.message.chat.id,
+            sticker = Icon.Bot.asSticker,
+            message = "Security system disarmed.",
+        )
+        client.disarmSecurity()
     }
 
     private suspend fun onWakeCommand(update: Update.MessageUpdate) {

@@ -8,10 +8,12 @@ data class ComposedBackendClient(
     private val eventAccess: EventAccess,
     private val eventPublisher: EventPublisher,
     private val configurationAccess: ConfigurationAccess,
+    private val fullSecurityAccess: FullSecurityAccess,
 ):
     BackendClient,
     ActionAccess by actionAccess,
     ActionPublisher by actionPublisher,
     EventAccess by eventAccess,
     EventPublisher by eventPublisher,
-    ConfigurationAccess by configurationAccess
+    ConfigurationAccess by configurationAccess,
+    FullSecurityAccess by fullSecurityAccess

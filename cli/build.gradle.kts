@@ -22,7 +22,7 @@ sourceSets {
 }
 
 kotlin {
-    jvmToolchain(15)
+    jvmToolchain(17)
 }
 
 dependencies {
@@ -44,4 +44,5 @@ dependencies {
     implementation(kotlinLibraries.coroutines.core)
     implementation(inkLibraries.kimchi.core)
     implementation("com.github.ajalt.clikt:clikt:3.5.0")
+    implementation("org.slf4j:slf4j-nop:2.0.13")
 }

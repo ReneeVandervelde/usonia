@@ -15,6 +15,13 @@ import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.Json
+import regolith.data.settings.SettingLevel
+import regolith.data.settings.SettingsAccess
+import regolith.data.settings.observeSetting
+import regolith.data.settings.structure.StringData
+import regolith.data.settings.structure.StringSetting
+import regolith.data.settings.structure.createKeyedEnumTransformer
+import regolith.data.settings.writeSetting
 import usonia.foundation.*
 import usonia.foundation.Event
 import usonia.foundation.Site
@@ -44,11 +51,31 @@ internal class DatabaseStateAccess(
     private val eventQueries: Lazy<EventQueries>,
     private val siteQueries: Lazy<SiteQueries>,
     private val flagQueries: Lazy<FlagQueries>,
+    private val settingsAccess: SettingsAccess,
     private val json: Json,
     private val zonedClock: ZonedClock = ZonedSystemClock,
     private val logger: KimchiLogger = EmptyLogger,
 ): DatabaseServices {
+    private val securityStateSetting = StringData(
+        key = "usonia.state.security",
+        name = "Security State",
+        dataTransformer = createKeyedEnumTransformer(),
+        defaultValue = SecurityState.Disarmed,
+        level = SettingLevel.Hidden,
+    )
     private val eventsFlow = MutableSharedFlow<Event>()
+    override val securityState: OngoingFlow<SecurityState> = settingsAccess
+        .observeSetting(securityStateSetting)
+        .asOngoing()
+
+    override suspend fun armSecurity() {
+        settingsAccess.writeSetting(securityStateSetting, SecurityState.Armed)
+    }
+
+    override suspend fun disarmSecurity() {
+        settingsAccess.writeSetting(securityStateSetting, SecurityState.Disarmed)
+    }
+
     override val events: OngoingFlow<Event> = eventsFlow.asOngoing()
     override val eventsByDay: OngoingFlow<Map<LocalDate, Int>> by lazy {
         eventQueries.value.eventsByDay()

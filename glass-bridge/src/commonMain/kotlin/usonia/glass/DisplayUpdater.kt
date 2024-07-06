@@ -1,13 +1,18 @@
 package usonia.glass
 
-import com.inkapplications.glassconsole.client.GlassClient
 import com.inkapplications.glassconsole.client.HttpException
+import com.inkapplications.glassconsole.client.pin.PinValidator
+import com.inkapplications.glassconsole.client.remote.GlassHttpClient
+import com.inkapplications.glassconsole.structures.pin.Pin
+import com.inkapplications.glassconsole.structures.pin.Psk
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.merge
 import regolith.processes.daemon.Daemon
 import regolith.timemachine.InexactDurationMachine
+import usonia.glass.GlassPluginConfig.DisplayType.Large
+import usonia.glass.GlassPluginConfig.DisplayType.Small
 import usonia.kotlin.collect
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
@@ -24,7 +29,7 @@ internal val UPDATE_GRACE = 5.minutes
 internal class DisplayUpdater(
     private val client: BackendClient,
     private val composer: DisplayComposer,
-    private val glass: GlassClient,
+    private val glassClient: GlassHttpClient,
     private val logger: KimchiLogger = EmptyLogger,
     clock: ZonedClock = ZonedSystemClock,
 ): Daemon {
@@ -35,16 +40,30 @@ internal class DisplayUpdater(
             .map { it.bridges.filter { it.service == "glass" } }
             .flatMapLatest { bridges ->
                 bridges.map { bridge ->
-                    val homeIp = bridge.parameters["homeIp"] ?: return@map null
-                    when (bridge.parameters["type"]) {
-                        "large" -> composer.composeLargePortrait(homeIp)
-                        else -> composer.composeSmallPortrait(homeIp)
+                    val homeIp = bridge.parameters["homeIp"] ?: return@map null.also {
+                        logger.warn("No Home IP set for bridge: ${bridge.id}")
+                    }
+                    val psk = bridge.parameters["psk"]?.let(::Psk) ?: return@map null.also {
+                        logger.warn("No PSK set for bridge: ${bridge.id}")
+                    }
+                    val pin = bridge.parameters["pin"]?.let(::Pin) ?: return@map null.also {
+                        logger.warn("No PIN set for bridge: ${bridge.id}")
+                    }
+                    val type = bridge.parameters["type"]
+                        ?.let { runCatching { GlassPluginConfig.DisplayType.valueOf(it) }.getOrNull() }
+                        ?: return@map null.also {
+                            logger.warn("No Display Type set for bridge: ${bridge.id}")
+                        }
+                    val config = GlassPluginConfig(bridge.id, homeIp, psk, pin, type)
+                    when (config.type) {
+                        Large -> composer.composeLargePortrait(config)
+                        Small -> composer.composeSmallPortrait(config)
                     }.asFlow().combine(updateTicks) { config, _ -> UpdateCommand(bridge, config) }
                 }.filterNotNull().merge()
             }
             .collect {
                 try {
-                    glass.updateDisplay(it.config, it.bridge.parameters["deviceIp"]!!)
+                    glassClient.updateDisplay(it.config, it.bridge.parameters["deviceIp"]!!)
                 } catch (e: CancellationException) {
                     logger.warn("Display update canceled", e)
                     throw e
