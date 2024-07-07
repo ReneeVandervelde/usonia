@@ -3,6 +3,7 @@ package usonia.rules.alerts
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
@@ -19,6 +20,7 @@ import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DoorAlertTest {
@@ -176,6 +178,35 @@ class DoorAlertTest {
         fakeEvents.mutableEvents.emit(Event.Latch(FakeDevices.Latch.id, Instant.DISTANT_PAST, LatchState.OPEN))
         advanceUntilIdle()
         assertEquals(2, actionSpy.actions.size, "No additional actions taken when disarmed")
+
+        daemon.cancel()
+    }
+
+    @Test
+    fun disarmedBeforeSend() = runTest {
+        val fakeEvents = object: EventAccessFake() {
+            override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
+                return Event.Presence(id, Instant.DISTANT_PAST, PresenceState.AWAY) as T
+            }
+        }
+        val actionSpy = ActionPublisherSpy()
+        val securityState = MutableStateFlow(SecurityState.Armed)
+        val client = DummyClient.copy(
+            configurationAccess = object: ConfigurationAccess by baseConfig {
+                override val securityState: OngoingFlow<SecurityState> = securityState.asOngoing()
+            },
+            eventAccess = fakeEvents,
+            actionPublisher = actionSpy,
+        )
+
+        val daemon = launch { DoorAlert(client).startDaemon() }
+        advanceUntilIdle()
+
+        fakeEvents.mutableEvents.emit(Event.Latch(FakeDevices.Latch.id, Instant.DISTANT_PAST, LatchState.OPEN))
+        advanceTimeBy(1.seconds)
+        securityState.value = SecurityState.Disarmed
+
+        assertEquals(0, actionSpy.actions.size, "Alert not sent if disarmed within time window")
 
         daemon.cancel()
     }

@@ -11,12 +11,6 @@ import usonia.server.client.BackendClient
 /**
  * Send an alert when unapproved codes are used.
  *
- * This uses a parameter field on the lock device define allowed codes:
- *
- *     "parameters": {
- *         "ownerCodes": "1,2,3"
- *     }
- *
  * Codes used that are not in the `ownerCodes` list will generate an alert
  * notification when the lock is unlocked.
  * If a lock has no ownership codes defined, no notifications will be sent
@@ -51,12 +45,5 @@ class CodeAlerts(
         } else {
             logger.info("Not alerting on owner unlock code")
         }
-    }
-
-    private val Device.ownerCodes: List<String> get(){
-        return parameters.get("ownerCodes")
-            ?.split(',')
-            ?.map { it.trim() }
-            .orEmpty()
     }
 }

@@ -62,6 +62,7 @@ class RulesPlugin(
         PowerLimitCharge(client, logger),
         DoorAlert(client, logger),
         CodeAlerts(client, logger),
+        DisarmOnPrimaryCode(client, logger),
         LockJammed(client, logger),
     )
 
