@@ -38,6 +38,7 @@ class HeatControlTest {
             ),
             users = setOf(FakeUsers.John),
         ))
+        override val securityState: OngoingFlow<SecurityState> = ongoingFlowOf(SecurityState.Disarmed)
     }
 
     @Test
@@ -233,16 +234,12 @@ class HeatControlTest {
     @Test
     fun awayShift() = runTest {
         val actionSpy = ActionPublisherSpy()
-        val fakeEvents = object: EventAccessFake() {
-            override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
-                return when (type) {
-                    Event.Presence::class -> Event.Presence(id, Instant.DISTANT_PAST, PresenceState.AWAY) as T
-                    else -> null
-                }
-            }
+        val armedConfig = object: ConfigurationAccess by fakeConfig {
+            override val securityState: OngoingFlow<SecurityState> = ongoingFlowOf(SecurityState.Armed)
         }
+        val fakeEvents = EventAccessFake()
         val client = DummyClient.copy(
-            configurationAccess = fakeConfig,
+            configurationAccess = armedConfig,
             eventAccess = fakeEvents,
             actionPublisher = actionSpy,
         )

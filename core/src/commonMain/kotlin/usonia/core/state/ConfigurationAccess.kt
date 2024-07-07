@@ -111,6 +111,11 @@ suspend fun ConfigurationAccess.findBridgeById(id: Identifier): Bridge? = getSit
 suspend fun ConfigurationAccess.getFlag(key: String): String? = flags.first()[key]
 
 /**
+ * Get the current security state of the site.
+ */
+suspend fun ConfigurationAccess.getSecurityState(): SecurityState = securityState.first()
+
+/**
  * Get the current state of a flag, cast as a boolean.
  */
 suspend fun ConfigurationAccess.getBooleanFlag(

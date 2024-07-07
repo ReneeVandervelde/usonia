@@ -9,7 +9,7 @@ import regolith.processes.daemon.Daemon
 import regolith.processes.daemon.DaemonFailureHandler
 import regolith.processes.daemon.DaemonRunAttempt
 import regolith.processes.daemon.FailureSignal
-import usonia.core.state.allAway
+import usonia.core.state.getSecurityState
 import usonia.core.state.publishAll
 import usonia.foundation.*
 import usonia.kotlin.*
@@ -55,13 +55,13 @@ class HeatControl(
             logger.warn("Unable to find room containing device `${event.source}` for fan control.")
             return
         }
-        val allAway = client.allAway(site.users)
-        val onPoint = if (allAway) {
+        val securityState = client.getSecurityState()
+        val onPoint = if (securityState == SecurityState.Armed) {
             DEFAULT_LOW_BOUND - AWAY_TEMP_SHIFT
         } else {
             DEFAULT_LOW_BOUND
         }
-        val offPoint = if (allAway) {
+        val offPoint = if (securityState == SecurityState.Armed) {
             DEFAULT_LOW_BOUND + DEFAULT_LOW_BUFFER - AWAY_TEMP_SHIFT
         } else {
             DEFAULT_LOW_BOUND + DEFAULT_LOW_BUFFER
