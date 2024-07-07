@@ -4,6 +4,7 @@ import com.github.ajalt.colormath.model.RGB
 import inkapplications.spondee.scalar.percent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -12,12 +13,12 @@ import kotlinx.datetime.Instant
 import usonia.core.state.*
 import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
+import usonia.kotlin.asOngoing
 import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import usonia.weather.Conditions
 import usonia.weather.Forecast
 import usonia.weather.WeatherAccess
-import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -196,20 +197,12 @@ class IndicatorTest {
     @Test
     fun awayBrightness() = runTest {
         val spyPublisher = ActionPublisherSpy()
-        val presence = Event.Presence(
-            source = FakeUsers.John.id,
-            timestamp = Clock.System.now(),
-            state = PresenceState.AWAY,
-        )
-        val eventAccess = object: EventAccessFake() {
-            override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = when (type) {
-                Event.Presence::class -> presence as T
-                else -> TODO()
-            }
-        }
+        val securityState = MutableStateFlow(SecurityState.Disarmed)
         val client = testClient.copy(
             actionPublisher = spyPublisher,
-            eventAccess = eventAccess,
+            configurationAccess = object: ConfigurationAccess by fakeConfig {
+                override val securityState = securityState.asOngoing()
+            },
         )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf()
@@ -220,14 +213,18 @@ class IndicatorTest {
 
         val indicatorJob = launch { indicator.startDaemon() }
         runCurrent()
-        eventAccess.mutableEvents.emit(presence)
+        securityState.value = SecurityState.Armed
         runCurrent()
 
-        assertEquals(1, spyPublisher.actions.size)
-        val action = spyPublisher.actions.single()
-        assertTrue(action is Action.Dim)
-        assertEquals(FakeDevices.HueGroup.id, action.target)
-        assertEquals(5.percent, action.level)
+        assertEquals(2, spyPublisher.actions.size)
+        val initialDimAction = spyPublisher.actions[0]
+        assertTrue(initialDimAction is Action.Dim)
+        assertEquals(FakeDevices.HueGroup.id, initialDimAction.target)
+        assertEquals(80.percent, initialDimAction.level)
+        val changeAction = spyPublisher.actions[1]
+        assertTrue(changeAction is Action.Dim)
+        assertEquals(FakeDevices.HueGroup.id, changeAction.target)
+        assertEquals(1.percent, changeAction.level)
 
         indicatorJob.cancelAndJoin()
     }
@@ -235,20 +232,12 @@ class IndicatorTest {
     @Test
     fun presentBrightness() = runTest {
         val spyPublisher = ActionPublisherSpy()
-        val presence = Event.Presence(
-            source = FakeUsers.John.id,
-            timestamp = Clock.System.now(),
-            state = PresenceState.HOME,
-        )
-        val eventAccess = object: EventAccessFake() {
-            override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = when (type) {
-                Event.Presence::class -> presence as T
-                else -> TODO()
-            }
-        }
+        val securityState = MutableStateFlow(SecurityState.Armed)
         val client = testClient.copy(
             actionPublisher = spyPublisher,
-            eventAccess = eventAccess,
+            configurationAccess = object: ConfigurationAccess by fakeConfig {
+                override val securityState = securityState.asOngoing()
+            },
         )
         val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf()
@@ -259,14 +248,18 @@ class IndicatorTest {
 
         val indicatorJob = launch { indicator.startDaemon() }
         runCurrent()
-        eventAccess.mutableEvents.emit(presence)
+        securityState.value = SecurityState.Disarmed
         runCurrent()
 
-        assertEquals(1, spyPublisher.actions.size)
-        val action = spyPublisher.actions.single()
-        assertTrue(action is Action.Dim)
-        assertEquals(FakeDevices.HueGroup.id, action.target)
-        assertEquals(100.percent, action.level)
+        assertEquals(2, spyPublisher.actions.size)
+        val initialDimAction = spyPublisher.actions[0]
+        assertTrue(initialDimAction is Action.Dim)
+        assertEquals(FakeDevices.HueGroup.id, initialDimAction.target)
+        assertEquals(1.percent, initialDimAction.level)
+        val changeAction = spyPublisher.actions[1]
+        assertTrue(changeAction is Action.Dim)
+        assertEquals(FakeDevices.HueGroup.id, changeAction.target)
+        assertEquals(80.percent, changeAction.level)
 
         indicatorJob.cancelAndJoin()
     }

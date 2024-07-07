@@ -7,7 +7,7 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import regolith.processes.daemon.Daemon
-import usonia.core.state.allAway
+import usonia.core.state.getSecurityState
 import usonia.foundation.*
 import usonia.foundation.unit.compareTo
 import usonia.kotlin.*
@@ -61,10 +61,9 @@ internal class Indicator(
     }
 
     private suspend fun bindAwayBrightness(site: Site) {
-        client.events
-            .filterIsInstance<Event.Presence>()
+        client.securityState
             .mapLatest {
-                if (client.allAway(site.users)) 5.percent else 100.percent
+                if (it == SecurityState.Armed) 1.percent else 80.percent
             }
             .collectLatest { level ->
                 site.findDevicesBy { it.fixture == Fixture.Indicator }
