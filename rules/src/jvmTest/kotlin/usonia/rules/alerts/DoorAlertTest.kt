@@ -1,6 +1,7 @@
 package usonia.rules.alerts
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -11,6 +12,7 @@ import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessFake
 import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
+import usonia.kotlin.asOngoing
 import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.reflect.KClass
@@ -20,7 +22,7 @@ import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DoorAlertTest {
-    private val entryConfig = object: ConfigurationAccess by ConfigurationAccessStub {
+    private val baseConfig = object: ConfigurationAccess by ConfigurationAccessStub {
         override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
             users = setOf(FakeUsers.John, FakeUsers.Jane),
             rooms = setOf(FakeRooms.LivingRoom.copy(
@@ -29,6 +31,13 @@ class DoorAlertTest {
                 )),
             )),
         ))
+        override val securityState: OngoingFlow<SecurityState> = ongoingFlowOf(SecurityState.Disarmed)
+    }
+    private val disarmedEntryConfig = object: ConfigurationAccess by baseConfig {
+        override val securityState: OngoingFlow<SecurityState> = ongoingFlowOf(SecurityState.Disarmed)
+    }
+    private val armedEntryConfig = object: ConfigurationAccess by baseConfig {
+        override val securityState: OngoingFlow<SecurityState> = ongoingFlowOf(SecurityState.Armed)
     }
 
     @Test
@@ -40,7 +49,7 @@ class DoorAlertTest {
         }
         val actionSpy = ActionPublisherSpy()
         val client = DummyClient.copy(
-            configurationAccess = entryConfig,
+            configurationAccess = armedEntryConfig,
             eventAccess = fakeEvents,
             actionPublisher = actionSpy,
         )
@@ -70,7 +79,7 @@ class DoorAlertTest {
         }
         val actionSpy = ActionPublisherSpy()
         val client = DummyClient.copy(
-            configurationAccess = entryConfig,
+            configurationAccess = disarmedEntryConfig,
             eventAccess = fakeEvents,
             actionPublisher = actionSpy,
         )
@@ -88,12 +97,8 @@ class DoorAlertTest {
 
     @Test
     fun nonEntryPoint() = runTest {
-        val fakeEvents = object: EventAccessFake() {
-            override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
-                return Event.Presence(id, Instant.DISTANT_PAST, PresenceState.AWAY) as T
-            }
-        }
-        val config = object: ConfigurationAccess by ConfigurationAccessStub {
+        val fakeEvents = EventAccessFake()
+        val config = object: ConfigurationAccess by armedEntryConfig {
             override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
                 users = setOf(FakeUsers.John),
                 rooms = setOf(FakeRooms.LivingRoom.copy(
@@ -121,14 +126,10 @@ class DoorAlertTest {
 
     @Test
     fun closed() = runTest {
-        val fakeEvents = object: EventAccessFake() {
-            override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
-                return Event.Presence(id, Instant.DISTANT_PAST, PresenceState.AWAY) as T
-            }
-        }
+        val fakeEvents = EventAccessFake()
         val actionSpy = ActionPublisherSpy()
         val client = DummyClient.copy(
-            configurationAccess = entryConfig,
+            configurationAccess = armedEntryConfig,
             eventAccess = fakeEvents,
             actionPublisher = actionSpy,
         )
@@ -140,6 +141,41 @@ class DoorAlertTest {
         advanceUntilIdle()
 
         assertEquals(0, actionSpy.actions.size, "No alert sent for close event.")
+
+        daemon.cancel()
+    }
+
+    @Test
+    fun disarmed() = runTest {
+        val fakeEvents = object: EventAccessFake() {
+            override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
+                return Event.Presence(id, Instant.DISTANT_PAST, PresenceState.AWAY) as T
+            }
+        }
+        val actionSpy = ActionPublisherSpy()
+        val securityState = MutableStateFlow(SecurityState.Armed)
+        val client = DummyClient.copy(
+            configurationAccess = object: ConfigurationAccess by baseConfig {
+                override val securityState: OngoingFlow<SecurityState> = securityState.asOngoing()
+            },
+            eventAccess = fakeEvents,
+            actionPublisher = actionSpy,
+        )
+
+        val daemon = launch { DoorAlert(client).startDaemon() }
+        advanceUntilIdle()
+
+        fakeEvents.mutableEvents.emit(Event.Latch(FakeDevices.Latch.id, Instant.DISTANT_PAST, LatchState.OPEN))
+        advanceUntilIdle()
+
+        assertEquals(2, actionSpy.actions.size, "Alert sent for each user.")
+        assertTrue(actionSpy.actions.all { it is Action.Alert }, "All actions are alerts.")
+
+        securityState.value = SecurityState.Disarmed
+
+        fakeEvents.mutableEvents.emit(Event.Latch(FakeDevices.Latch.id, Instant.DISTANT_PAST, LatchState.OPEN))
+        advanceUntilIdle()
+        assertEquals(2, actionSpy.actions.size, "No additional actions taken when disarmed")
 
         daemon.cancel()
     }
