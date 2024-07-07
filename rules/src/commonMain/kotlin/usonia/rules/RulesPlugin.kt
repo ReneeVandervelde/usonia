@@ -16,7 +16,7 @@ import usonia.rules.indicator.Indicator
 import usonia.rules.lights.*
 import usonia.rules.locks.*
 import usonia.rules.locks.LockJammed
-import usonia.rules.locks.LockOnAway
+import usonia.rules.locks.LockOnSecure
 import usonia.rules.locks.LockOnSleep
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
@@ -54,7 +54,7 @@ class RulesPlugin(
         sleepMode,
         movieMode,
         LockOnSleep(client, logger),
-        LockOnAway(client, logger),
+        LockOnSecure(client, logger),
         LockAfterTime(client, logger),
         PipeMonitor(client, logger),
         FanControl(client, failureHandler, logger),

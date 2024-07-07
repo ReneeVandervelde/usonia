@@ -3,29 +3,26 @@ package usonia.rules.locks
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import regolith.processes.daemon.Daemon
-import usonia.core.state.allAway
 import usonia.core.state.publishAll
 import usonia.foundation.*
 import usonia.kotlin.*
 import usonia.server.client.BackendClient
 
-internal class LockOnAway(
+internal class LockOnSecure(
     private val client: BackendClient,
     private val logger: KimchiLogger = EmptyLogger,
 ): Daemon {
     override suspend fun startDaemon(): Nothing {
         client.site.collectLatest { site ->
-            client.events
-                .filterIsInstance<Event.Presence>()
-                .mapLatest { client.allAway(site.users) }
+            client.securityState
                 .distinctUntilChanged()
-                .filterTrue()
+                .filter { it == SecurityState.Armed }
                 .collectLatest { lockAllDoors(site) }
         }
     }
 
     private suspend fun lockAllDoors(site: Site) {
-        logger.info("Locking All Doors for Away Mode")
+        logger.info("Security Armed - Locking All Doors")
         site.findDevicesBy { Action.Lock::class in it.capabilities.actions }
             .map { Action.Lock(it.id, LockState.LOCKED) }
             .run { client.publishAll(this) }
