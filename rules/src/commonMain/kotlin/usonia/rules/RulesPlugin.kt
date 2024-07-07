@@ -50,6 +50,7 @@ class RulesPlugin(
         LogErrorAlerts.also { it.client.value = client },
         WaterMonitor(client, logger),
         LightController(client, colorPicker, logger),
+        LightsOffOnSecurityArm(client),
         Indicator(client, weather, logger),
         sleepMode,
         movieMode,
