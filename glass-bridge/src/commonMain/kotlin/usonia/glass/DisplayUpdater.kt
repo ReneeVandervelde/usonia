@@ -1,23 +1,17 @@
 package usonia.glass
 
 import com.inkapplications.glassconsole.client.HttpException
-import com.inkapplications.glassconsole.client.pin.PinValidator
 import com.inkapplications.glassconsole.client.remote.GlassHttpClient
 import com.inkapplications.glassconsole.structures.pin.Pin
 import com.inkapplications.glassconsole.structures.pin.Psk
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.merge
 import regolith.processes.daemon.Daemon
 import regolith.timemachine.InexactDurationMachine
-import usonia.glass.GlassPluginConfig.DisplayType.Large
-import usonia.glass.GlassPluginConfig.DisplayType.Small
-import usonia.kotlin.collect
+import usonia.kotlin.*
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
-import usonia.kotlin.flatMapLatest
-import usonia.kotlin.map
 import usonia.server.client.BackendClient
 import java.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
@@ -28,12 +22,13 @@ internal val UPDATE_GRACE = 5.minutes
 
 internal class DisplayUpdater(
     private val client: BackendClient,
-    private val composer: DisplayComposer,
+    private val viewModelFactory: ViewModelFactory,
+    private val composer: DisplayConfigFactory,
     private val glassClient: GlassHttpClient,
     private val logger: KimchiLogger = EmptyLogger,
     clock: ZonedClock = ZonedSystemClock,
 ): Daemon {
-    private val updateTicks = InexactDurationMachine(UPDATE_RATE, clock).ticks
+    private val updateTicks = InexactDurationMachine(UPDATE_RATE, clock).ticks.asOngoing()
 
     override suspend fun startDaemon(): Nothing {
         client.site
@@ -54,16 +49,28 @@ internal class DisplayUpdater(
                         ?: return@map null.also {
                             logger.warn("No Display Type set for bridge: ${bridge.id}")
                         }
-                    val config = GlassPluginConfig(bridge.id, homeIp, psk, pin, type)
-                    when (config.type) {
-                        Large -> composer.composeLargePortrait(config)
-                        Small -> composer.composeSmallPortrait(config)
-                    }.asFlow().combine(updateTicks) { config, _ -> UpdateCommand(bridge, config) }
+                    val deviceIp = bridge.parameters["deviceIp"] ?: return@map null.also {
+                        logger.warn("No Device IP set for bridge: ${bridge.id}")
+                    }
+                    val pluginConfig = GlassPluginConfig(
+                        bridgeId = bridge.id,
+                        homeIp = homeIp,
+                        deviceIp = deviceIp,
+                        psk = psk,
+                        pin = pin,
+                        type = type
+                    )
+                    val update = viewModelFactory.create(pluginConfig)
+                        .map { composer.compose(it) }
+
+                    combine(update, updateTicks) { displayConfig, _ ->
+                        UpdateCommand(pluginConfig, displayConfig)
+                    }.asFlow()
                 }.filterNotNull().merge()
             }
             .collect {
                 try {
-                    glassClient.updateDisplay(it.config, it.bridge.parameters["deviceIp"]!!)
+                    glassClient.updateDisplay(it.displayConfig, it.pluginConfig.deviceIp)
                 } catch (e: CancellationException) {
                     logger.warn("Display update canceled", e)
                     throw e

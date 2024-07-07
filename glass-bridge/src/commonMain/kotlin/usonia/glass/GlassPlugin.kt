@@ -35,14 +35,13 @@ class GlassPlugin(
     override val daemons: List<Daemon> = listOf(
         DisplayUpdater(
             client = client,
-            composer = DisplayComposer(
+            composer = DisplayConfigFactory(),
+            viewModelFactory = ViewModelFactory(
                 client = client,
                 challengeContainer = challengeContainer,
-                pinValidator = pinValidator,
-                nonceGenerator = nonceGenerator,
                 timedArmSecurityController = timedArmSecurityController,
+                pinValidator = pinValidator,
                 clock = clock,
-                logger = logger,
             ),
             glassClient = GlassClientModule.createHttpClient(),
             logger = logger,

@@ -7,6 +7,7 @@ import usonia.foundation.Identifier
 data class GlassPluginConfig(
     val bridgeId: Identifier,
     val homeIp: String,
+    val deviceIp: String,
     val psk: Psk,
     val pin: Pin,
     val type: DisplayType,

@@ -28,6 +28,7 @@ class TimedArmSecurityController(
     logger: KimchiLogger,
     private val backgroundScope: CoroutineScope = DefaultScope(),
 ): RestController<Boolean, Status>(json, logger) {
+    val delay = 1.minutes
     private val running = MutableStateFlow<Job?>(null)
     val isActive = running.map { it?.isActive ?: false }
     override val serializer: KSerializer<Status> = Status.serializer()
@@ -41,7 +42,7 @@ class TimedArmSecurityController(
 
         if (data) {
             running.value = backgroundScope.launch {
-                delay(10.minutes)
+                delay(delay)
                 config.armSecurity()
                 running.value = null
             }
