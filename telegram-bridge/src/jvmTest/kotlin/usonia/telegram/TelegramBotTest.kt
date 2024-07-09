@@ -1,5 +1,6 @@
 package usonia.telegram
 
+import com.inkapplications.telegram.client.TelegramBotClient
 import com.inkapplications.telegram.structures.*
 import kimchi.logger.EmptyLogger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,8 +16,14 @@ import usonia.kotlin.OngoingFlow
 import usonia.kotlin.ongoingFlowOf
 import usonia.rules.Flags
 import usonia.server.DummyClient
+import usonia.server.client.BackendClient
 import usonia.server.http.HttpRequest
 import usonia.server.http.RestResponse
+import usonia.telegram.commands.*
+import usonia.telegram.commands.Command
+import usonia.telegram.commands.MovieStartCommand
+import usonia.telegram.commands.SleepCommand
+import usonia.telegram.commands.WakeCommand
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -29,6 +36,7 @@ class TelegramBotTest {
             client = DummyClient,
             telegram = spy,
             json = Json,
+            commands = emptySet(),
             logger = EmptyLogger,
         )
         val response = bot.getResponse(
@@ -42,6 +50,58 @@ class TelegramBotTest {
         successfulResponse(response)
         assertEquals(0, spy.messages.size, "No messages sent on unknown update type")
         assertEquals(0, spy.stickers.size, "No stickers sent on unknown update type")
+    }
+
+    @Test
+    fun unknownCommand() = runTest {
+        val messageSpy = MessageSpy()
+        val actionSpy = ActionPublisherSpy()
+        val setFlags = mutableListOf<Pair<String, String?>>()
+        val bot = TelegramBot(
+            client = DummyClient.copy(
+                configurationAccess = object: ConfigurationAccess by DummyClient {
+                    override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
+                        users = setOf(FakeUsers.John.copy(
+                            alertLevel = Action.Alert.Level.Debug,
+                            parameters = mapOf(
+                                CHAT_ID_KEY to "123"
+                            )
+                        ))
+                    ))
+                    override suspend fun setFlag(key: String, value: String?) {
+                        setFlags.add(key to value)
+                    }
+                },
+                actionPublisher = actionSpy,
+            ),
+            telegram = messageSpy,
+            json = Json,
+            commands = emptySet(),
+            logger = EmptyLogger,
+        )
+        val response = bot.getResponse(
+            Update.MessageUpdate(
+                id = 0L,
+                message = Message(
+                    id = ChatReference.Id(0L),
+                    date = Instant.DISTANT_PAST,
+                    chat = Chat(ChatReference.Id(123L), ChatType.Private),
+                    text = "/unknown",
+                    entities = listOf(MessageEntity(MessageEntityType.BotCommand, 0, 8)),
+                ),
+            ),
+            HttpRequest(headers = emptyMap(), parameters = emptyMap()),
+        )
+
+        successfulResponse(response)
+        assertEquals(1, messageSpy.messages.size, "Single message sent to caller")
+        assertEquals(123L, (messageSpy.messages.single().chatId as ChatReference.Id).value)
+
+        assertEquals(1, messageSpy.stickers.size, "Single sticker sent to caller")
+        assertEquals(123L, (messageSpy.stickers.single().chatId as ChatReference.Id).value)
+
+        assertEquals(0, setFlags.size, "No flags are changed")
+        assertEquals(0, actionSpy.actions.size, "No alerts should be sent")
     }
 
     @Test
@@ -64,6 +124,7 @@ class TelegramBotTest {
             ),
             telegram = messageSpy,
             json = Json,
+            commands = emptySet(),
             logger = EmptyLogger,
         )
         val response = bot.getResponse(
@@ -87,7 +148,7 @@ class TelegramBotTest {
 
     @Test
     fun commands() {
-        testCommand("/wake") {
+        testCommand(::WakeCommand) {
             assertEquals(1, messageSpy.messages.size, "Single message sent to caller")
             assertEquals(123L, (messageSpy.messages.single().chatId as ChatReference.Id).value)
 
@@ -99,7 +160,7 @@ class TelegramBotTest {
 
             assertEquals(0, actionSpy.actions.size, "No alerts should be sent")
         }
-        testCommand("/sleep") {
+        testCommand(::SleepCommand) {
             assertEquals(1, messageSpy.messages.size, "Single message sent to caller")
             assertEquals(123L, (messageSpy.messages.single().chatId as ChatReference.Id).value)
 
@@ -111,7 +172,7 @@ class TelegramBotTest {
 
             assertEquals(0, actionSpy.actions.size, "No alerts should be sent")
         }
-        testCommand("/startMovie") {
+        testCommand(::MovieStartCommand) {
             assertEquals(1, messageSpy.messages.size, "Single message sent to caller")
             assertEquals(123L, (messageSpy.messages.single().chatId as ChatReference.Id).value)
 
@@ -123,7 +184,7 @@ class TelegramBotTest {
 
             assertEquals(0, actionSpy.actions.size, "No alerts should be sent")
         }
-        testCommand("/endMovie") {
+        testCommand(::MovieEndCommand) {
             assertEquals(1, messageSpy.messages.size, "Single message sent to caller")
             assertEquals(123L, (messageSpy.messages.single().chatId as ChatReference.Id).value)
 
@@ -134,7 +195,7 @@ class TelegramBotTest {
 
             assertEquals(0, actionSpy.actions.size, "No alerts should be sent")
         }
-        testCommand("/pauselights") {
+        testCommand(::PauseLightsCommand) {
             assertEquals(1, messageSpy.messages.size, "Single message sent to caller")
             assertEquals(123L, (messageSpy.messages.single().chatId as ChatReference.Id).value)
 
@@ -145,7 +206,7 @@ class TelegramBotTest {
 
             assertEquals(0, actionSpy.actions.size, "No alerts should be sent")
         }
-        testCommand("/ReSuMeLiGhTs") {
+        testCommand(::ResumeLightsCommand) {
             assertEquals(1, messageSpy.messages.size, "Single message sent to caller")
             assertEquals(123L, (messageSpy.messages.single().chatId as ChatReference.Id).value)
 
@@ -157,44 +218,34 @@ class TelegramBotTest {
 
             assertEquals(0, actionSpy.actions.size, "No alerts should be sent")
         }
-        testCommand("/announce", text = "Test?") {
+        testCommand(::AnnounceCommand, text = "Test?") {
             assertEquals(2, actionSpy.actions.size, "Alert sent to all info users")
             assertEquals(listOf(FakeUsers.John.id, FakeUsers.Jane.id), actionSpy.actions.map { (it as? Action.Alert)?.target })
             assertEquals("Test?", (actionSpy.actions.first() as Action.Alert).message)
 
             assertEquals(0, setFlags.size, "No flags are changed")
         }
-        testCommand("/home") {
+        testCommand(::HomeCommand) {
             assertEquals(1, eventSpy.events.size, "Presence event published")
             val event = eventSpy.events.single()
             assertTrue(event is Event.Presence)
             assertEquals(PresenceState.HOME, event.state)
             assertEquals(FakeUsers.John.id, event.source)
         }
-        testCommand("/away") {
+        testCommand(::AwayCommand) {
             assertEquals(1, eventSpy.events.size, "Presence event published")
             val event = eventSpy.events.single()
             assertTrue(event is Event.Presence)
             assertEquals(PresenceState.AWAY, event.state)
             assertEquals(FakeUsers.John.id, event.source)
         }
-        testCommand("/disablealerts") {
+        testCommand(::DisableAlertsCommand) {
             assertEquals(1, setFlags.size, "Flag updated")
             assertEquals(Flags.LogAlerts to "false", setFlags.single())
         }
-        testCommand("/enablealerts") {
+        testCommand(::EnableAlertsCommand) {
             assertEquals(1, setFlags.size, "Flag updated")
             assertEquals(Flags.LogAlerts to "true", setFlags.single())
-        }
-        testCommand("/unknowncommand") {
-            assertEquals(1, messageSpy.messages.size, "Single message sent to caller")
-            assertEquals(123L, (messageSpy.messages.single().chatId as ChatReference.Id).value)
-
-            assertEquals(1, messageSpy.stickers.size, "Single sticker sent to caller")
-            assertEquals(123L, (messageSpy.stickers.single().chatId as ChatReference.Id).value)
-
-            assertEquals(0, setFlags.size, "No flags are changed")
-            assertEquals(0, actionSpy.actions.size, "No alerts should be sent")
         }
     }
 
@@ -205,39 +256,46 @@ class TelegramBotTest {
         val setFlags: List<Pair<String, String?>>,
     )
 
-    private fun testCommand(command: String, text: String? = null, assertions: TestCommandContext.() -> Unit) = runTest {
+    private fun testCommand(
+        createCommand: (TelegramBotClient, BackendClient) -> Command,
+        text: String? = null,
+        assertions: TestCommandContext.() -> Unit
+    ) = runTest {
         val messageSpy = MessageSpy()
         val actionSpy = ActionPublisherSpy()
         val eventSpy = EventPublisherSpy()
         val setFlags = mutableListOf<Pair<String, String?>>()
-        val bot = TelegramBot(
-            client = DummyClient.copy(
-                configurationAccess = object: ConfigurationAccess by DummyClient {
-                    override suspend fun setFlag(key: String, value: String?) {
-                        setFlags.add(key to value)
-                    }
-                    override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-                        users = setOf(
-                            FakeUsers.John.copy(
-                                alertLevel = Action.Alert.Level.Debug,
-                                parameters = mapOf(
-                                    CHAT_ID_KEY to "123"
-                                )
-                            ),
-                            FakeUsers.Jane.copy(
-                                alertLevel = Action.Alert.Level.Info,
-                                parameters = mapOf(
-                                    CHAT_ID_KEY to "456"
-                                )
+        val client = DummyClient.copy(
+            configurationAccess = object: ConfigurationAccess by DummyClient {
+                override suspend fun setFlag(key: String, value: String?) {
+                    setFlags.add(key to value)
+                }
+                override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
+                    users = setOf(
+                        FakeUsers.John.copy(
+                            alertLevel = Action.Alert.Level.Debug,
+                            parameters = mapOf(
+                                CHAT_ID_KEY to "123"
+                            )
+                        ),
+                        FakeUsers.Jane.copy(
+                            alertLevel = Action.Alert.Level.Info,
+                            parameters = mapOf(
+                                CHAT_ID_KEY to "456"
                             )
                         )
-                    ))
-                },
-                actionPublisher = actionSpy,
-                eventPublisher = eventSpy,
-            ),
+                    )
+                ))
+            },
+            actionPublisher = actionSpy,
+            eventPublisher = eventSpy,
+        )
+        val command = createCommand(messageSpy, client)
+        val bot = TelegramBot(
+            client = client,
             telegram = messageSpy,
             json = Json,
+            commands = setOf(command),
             logger = EmptyLogger,
         )
         val response = bot.getResponse(
@@ -247,8 +305,8 @@ class TelegramBotTest {
                     id = ChatReference.Id(0L),
                     date = Instant.DISTANT_PAST,
                     chat = Chat(ChatReference.Id(123L), ChatType.Private),
-                    text = command + text?.let { " $it" }.orEmpty(),
-                    entities = listOf(MessageEntity(MessageEntityType.BotCommand, 0, command.length)),
+                    text = command.id + text?.let { " $it" }.orEmpty(),
+                    entities = listOf(MessageEntity(MessageEntityType.BotCommand, 0, command.id.length)),
                 ),
             ),
             HttpRequest(headers = emptyMap(), parameters = emptyMap()),
