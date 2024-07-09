@@ -28,6 +28,7 @@ kotlin {
 dependencies {
     implementation(projects.clientHttp)
     implementation(projects.core)
+    implementation(projects.serverTesting)
     implementation(projects.glassBridge)
     implementation(projects.hubitatBridge)
     implementation(projects.hueBridge)

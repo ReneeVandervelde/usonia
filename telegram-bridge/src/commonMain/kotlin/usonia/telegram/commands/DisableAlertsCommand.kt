@@ -14,7 +14,6 @@ internal class DisableAlertsCommand(
 ): Command {
     override val id = "/disablealerts"
     override val description = "Disable all log Alerts"
-    override val visibility: Command.Visibility = Command.Visibility.Hidden
 
     override suspend fun onReceiveCommand(update: Update.MessageUpdate, user: User) {
         client.setFlag(Flags.LogAlerts, false)

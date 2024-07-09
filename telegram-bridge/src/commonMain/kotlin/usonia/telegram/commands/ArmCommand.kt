@@ -14,7 +14,6 @@ internal class ArmCommand(
 ): Command {
     override val id = "/arm"
     override val description = "Arm Security System"
-    override val visibility: Command.Visibility = Command.Visibility.Hidden
 
     override suspend fun onReceiveCommand(update: Update.MessageUpdate, user: User) {
         telegram.sendStickerWithMessage(

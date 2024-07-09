@@ -3,6 +3,7 @@ package usonia.cli
 import usonia.cli.client.*
 import usonia.cli.server.ServerModule
 import usonia.cli.server.ServerRunCommand
+import usonia.cli.server.TelegramCommands
 import usonia.serialization.SerializationModule
 
 object CommandModule {
@@ -18,5 +19,6 @@ object CommandModule {
         FlagSetCommand(clientModule),
         FlagRemoveCommand(clientModule),
         ConfigurationDumpCommand(clientModule),
+        TelegramCommands()
     )
 }
