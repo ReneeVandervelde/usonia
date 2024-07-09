@@ -1,6 +1,0 @@
-wake - Re-enable bedroom lighting
-sleep - Keep the bedroom lights off until morning
-startmovie - Disable living room lighting
-endmovie - Re-enable living room lighting
-pauselights - Disable ALL light controls
-resumelights - Re-enable normal light controls
