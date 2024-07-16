@@ -147,6 +147,55 @@ class TelegramBotTest {
     }
 
     @Test
+    fun newUser() = runTest {
+        val messageSpy = MessageSpy()
+        val actionSpy = ActionPublisherSpy()
+        val bot = TelegramBot(
+            client = DummyClient.copy(
+                configurationAccess = object: ConfigurationAccess by DummyClient {
+                    override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
+                        users = setOf(FakeUsers.John.copy(
+                            alertLevel = Action.Alert.Level.Debug,
+                            parameters = mapOf(
+                                CHAT_ID_KEY to "123"
+                            )
+                        ))
+                    ))
+                },
+                actionPublisher = actionSpy,
+            ),
+            telegram = messageSpy,
+            json = Json,
+            commands = emptySet(),
+            logger = EmptyLogger,
+        )
+        val response = bot.getResponse(
+            Update.MessageUpdate(
+                id = 0L,
+                message = Message(
+                    id = ChatReference.Id(0L),
+                    date = Instant.DISTANT_PAST,
+                    chat = Chat(ChatReference.Id(543L), ChatType.Private),
+                    text = "/start",
+                    entities = listOf(MessageEntity(MessageEntityType.BotCommand, 0, 6)),
+                ),
+            ),
+            HttpRequest(headers = emptyMap(), parameters = emptyMap()),
+        )
+
+        successfulResponse(response)
+        assertEquals(1, messageSpy.messages.size, "Single message sent to caller")
+        assertEquals(543L, (messageSpy.messages.single().chatId as ChatReference.Id).value)
+        assertTrue(messageSpy.messages.single().text.contains("Welcome!"))
+
+        assertEquals(1, messageSpy.stickers.size, "Single sticker sent to caller")
+        assertEquals(543L, (messageSpy.stickers.single().chatId as ChatReference.Id).value)
+
+        assertEquals(1, actionSpy.actions.size, "Alert is sent to admin about new user")
+        assertEquals(FakeUsers.John.id, actionSpy.actions.single().target)
+    }
+
+    @Test
     fun commands() {
         testCommand(::WakeCommand) {
             assertEquals(1, messageSpy.messages.size, "Single message sent to caller")

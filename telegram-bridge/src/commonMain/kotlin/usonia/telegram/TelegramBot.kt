@@ -34,18 +34,21 @@ internal class TelegramBot(
             return RestResponse(Statuses.SUCCESS)
         }
 
-        val user = client.getSite().users
-            .find { data.message.chat.id.value == it.parameters[CHAT_ID_KEY]?.toLongOrNull() }
-            ?: run {
-                onUnknownUserCommand(data)
-                return RestResponse(Statuses.SUCCESS)
-            }
-
         val commandId = data.message.entities
             ?.firstOrNull { it.type == MessageEntityType.BotCommand }
             ?.let { data.message.text?.subSequence(it.offset, it.length) }
             ?.toString()
             ?.lowercase()
+
+        val user = client.getSite().users
+            .find { data.message.chat.id.value == it.parameters[CHAT_ID_KEY]?.toLongOrNull() }
+            ?: run {
+                when (commandId) {
+                    "/start" -> newUser(data)
+                    else -> onUnknownUserCommand(data)
+                }
+                return RestResponse(Statuses.SUCCESS)
+            }
 
         val command = commands.find { it.id == commandId }
 
@@ -72,6 +75,25 @@ internal class TelegramBot(
             chat = update.message.chat.id,
             sticker = Icon.Disallowed.asSticker,
             message = "You don't have permission to use this bot! I let the admin know.",
+        )
+    }
+
+    private suspend fun newUser(update: Update.MessageUpdate) {
+        client.alertAll(
+            message = """
+                New chat started with user (@${update.message.from?.username})
+                In Chat ID: `${update.message.chat.id.value}`
+            """.trimIndent(),
+            level = Action.Alert.Level.Debug,
+        )
+        telegram.sendStickerWithMessage(
+            chat = update.message.chat.id,
+            sticker = Icon.Wave.asSticker,
+            message = """
+                Welcome!
+                This bot requires permissions to use. I let the admin know.
+                You will not be able to use commands until you are approved.
+            """.trimIndent()
         )
     }
 

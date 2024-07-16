@@ -22,7 +22,7 @@ class TelegramBridgePlugin(
     private val json = Json(SerializationModule.json) {
         ignoreUnknownKeys = true
     }
-    val commands: Set<Command> = setOf(
+    private val baseCommands: Set<Command> = setOf(
         WakeCommand(telegram, client),
         SleepCommand(telegram, client),
         MovieStartCommand(telegram, client),
@@ -36,6 +36,10 @@ class TelegramBridgePlugin(
         EnableAlertsCommand(telegram, client),
         ArmCommand(telegram, client),
         DisarmCommand(telegram, client),
+    )
+    val allCommands = setOf(
+        *baseCommands.toTypedArray(),
+        WelcomeCommand(telegram, baseCommands),
     )
 
     override val daemons: List<Daemon> = listOf(
@@ -51,6 +55,6 @@ class TelegramBridgePlugin(
         )
     )
     override val httpControllers: List<HttpController> = listOf(
-        TelegramBot(client, telegram, commands, json, logger),
+        TelegramBot(client, telegram, allCommands, json, logger),
     )
 }

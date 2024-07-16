@@ -12,7 +12,7 @@ class TelegramCommands(): CliktCommand(
 ) {
     override fun run() = runBlocking {
         TelegramBridgePlugin(DummyClient)
-            .commands
+            .allCommands
             .filter { it.visibility == Public }
             .sortedBy { it.id }
             .forEach {
