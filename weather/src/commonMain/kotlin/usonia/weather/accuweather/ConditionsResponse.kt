@@ -9,8 +9,32 @@ internal data class ConditionsResponse(
     val cloudCover: Int,
 
     @SerialName("Temperature")
-    val temperature: TemperatureTypes
+    val temperature: TemperatureTypes,
+
+    @SerialName("PrecipitationSummary")
+    val precipitation: PrecipitationSummary,
+
+    @SerialName("HasPrecipitation")
+    val hasPrecipitation: Boolean,
 ) {
+    @Serializable
+    internal data class PrecipitationSummary(
+        @SerialName("Past6Hours")
+        val pastSixHours: PrecipitationTypes,
+    ) {
+        @Serializable
+        internal data class PrecipitationTypes(
+            @SerialName("Imperial")
+            val imperial: PrecipitationData,
+        ) {
+            @Serializable
+            data class PrecipitationData(
+                @SerialName("Value")
+                val value: Float
+            )
+        }
+    }
+
     @Serializable
     internal data class TemperatureTypes(
         @SerialName("Imperial")

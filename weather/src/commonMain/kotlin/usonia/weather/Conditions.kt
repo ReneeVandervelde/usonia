@@ -1,5 +1,6 @@
 package usonia.weather
 
+import inkapplications.spondee.measure.Length
 import inkapplications.spondee.scalar.Percentage
 import kotlinx.datetime.Instant
 
@@ -9,5 +10,7 @@ import kotlinx.datetime.Instant
 data class Conditions(
     val timestamp: Instant,
     val cloudCover: Percentage,
-    val temperature: Int
+    val temperature: Int,
+    val rainInLast6Hours: Length,
+    val isRaining: Boolean,
 )

@@ -1,6 +1,11 @@
 package usonia.weather.accuweather
 
+import inkapplications.spondee.measure.us.fahrenheit
+import inkapplications.spondee.measure.us.inches
+import inkapplications.spondee.measure.us.toFeet
+import inkapplications.spondee.measure.us.toInches
 import inkapplications.spondee.scalar.percent
+import inkapplications.spondee.structure.toFloat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
@@ -43,6 +48,14 @@ class AccuweatherAccessTest {
                         snowProbability = 12,
                         rainProbability = 34,
                     ),
+                    temperature = ForecastResponse.TemperatureConditions(
+                        min = ForecastResponse.TemperatureConditions.TemperatureValues(
+                            value = 30
+                        ),
+                        max = ForecastResponse.TemperatureConditions.TemperatureValues(
+                            value = 60
+                        )
+                    )
                 )
             )
         )
@@ -53,7 +66,15 @@ class AccuweatherAccessTest {
                 imperial = ConditionsResponse.TemperatureTypes.TemperatureData(
                     temperature = 42f
                 )
-            )
+            ),
+            precipitation = ConditionsResponse.PrecipitationSummary(
+                pastSixHours = ConditionsResponse.PrecipitationSummary.PrecipitationTypes(
+                    imperial = ConditionsResponse.PrecipitationSummary.PrecipitationTypes.PrecipitationData(
+                        value = 0f
+                    )
+                )
+            ),
+            hasPrecipitation = false
         )
 
         override suspend fun getForecast(locationId: String, apiKey: String): ForecastResponse {
@@ -174,7 +195,15 @@ class AccuweatherAccessTest {
                 imperial = ConditionsResponse.TemperatureTypes.TemperatureData(
                     temperature = 99f
                 )
-            )
+            ),
+            precipitation = ConditionsResponse.PrecipitationSummary(
+                pastSixHours = ConditionsResponse.PrecipitationSummary.PrecipitationTypes(
+                    imperial = ConditionsResponse.PrecipitationSummary.PrecipitationTypes.PrecipitationData(
+                        value = 1.2f
+                    )
+                )
+            ),
+            hasPrecipitation = true
         )
         access.runCron(Clock.System.now().toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
         runCurrent()
@@ -184,9 +213,13 @@ class AccuweatherAccessTest {
 
         assertEquals(69.percent, conditions[1].cloudCover)
         assertEquals(42, conditions[1].temperature)
+        assertEquals(0.inches.toFloat(), conditions[1].rainInLast6Hours.toInches().toFloat(), 1e-10f)
+        assertEquals(false, conditions[1].isRaining)
 
         assertEquals(100.percent, conditions[2].cloudCover)
         assertEquals(99, conditions[2].temperature)
+        assertEquals(1.2.inches.toFloat(), conditions[2].rainInLast6Hours.toInches().toFloat(), 1e-10f)
+        assertEquals(true, conditions[2].isRaining)
 
         forecastCollection.cancelAndJoin()
         conditionCollection.cancelAndJoin()
@@ -223,6 +256,14 @@ class AccuweatherAccessTest {
                     day = ForecastResponse.DayConditions(
                         snowProbability = 56,
                         rainProbability = 78,
+                    ),
+                    temperature = ForecastResponse.TemperatureConditions(
+                        min = ForecastResponse.TemperatureConditions.TemperatureValues(
+                            value = 56
+                        ),
+                        max = ForecastResponse.TemperatureConditions.TemperatureValues(
+                            value = 78
+                        ),
                     )
                 )
             )
@@ -237,11 +278,15 @@ class AccuweatherAccessTest {
         assertEquals(4, forecasts[1].sunset.epochSeconds)
         assertEquals(12.percent, forecasts[1].snowChance)
         assertEquals(34.percent, forecasts[1].rainChance)
+        assertEquals(30.fahrenheit, forecasts[1].lowTemperature)
+        assertEquals(60.fahrenheit, forecasts[1].highTemperature)
 
         assertEquals(20, forecasts[2].sunrise.epochSeconds)
         assertEquals(25, forecasts[2].sunset.epochSeconds)
         assertEquals(56.percent, forecasts[2].snowChance)
         assertEquals(78.percent, forecasts[2].rainChance)
+        assertEquals(56.fahrenheit, forecasts[2].lowTemperature)
+        assertEquals(78.fahrenheit, forecasts[2].highTemperature)
 
         forecastCollection.cancelAndJoin()
         conditionCollection.cancelAndJoin()

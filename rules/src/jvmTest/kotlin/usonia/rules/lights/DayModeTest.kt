@@ -1,5 +1,7 @@
 package usonia.rules.lights
 
+import inkapplications.spondee.measure.us.fahrenheit
+import inkapplications.spondee.measure.us.inches
 import inkapplications.spondee.scalar.percent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -17,7 +19,6 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
 class DayModeTest {
     private val now = Instant.fromEpochMilliseconds(1234567)
     private val fakeClock = object: Clock {
@@ -29,11 +30,15 @@ class DayModeTest {
         sunset = now + 2.hours,
         rainChance = 0.percent,
         snowChance = 0.percent,
+        highTemperature = 0.fahrenheit,
+        lowTemperature = 0.fahrenheit,
     )
     private val idealConditions = Conditions(
         timestamp = now,
         cloudCover = 0.percent,
         temperature = 0,
+        rainInLast6Hours = 0.inches,
+        isRaining = false,
     )
 
     @Test
@@ -41,7 +46,8 @@ class DayModeTest {
         val fakeWeather = object: WeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast)
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions)
-
+            override val currentConditions: Conditions get() = TODO()
+            override val currentForecast: Forecast get() = TODO()
         }
         val picker = DayMode(fakeWeather, fakeClock)
 
@@ -56,7 +62,8 @@ class DayModeTest {
                 rainChance = 20.percent,
             ))
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions)
-
+            override val currentConditions: Conditions get() = TODO()
+            override val currentForecast: Forecast get() = TODO()
         }
         val picker = DayMode(fakeWeather, fakeClock)
 
@@ -70,7 +77,8 @@ class DayModeTest {
                 snowChance = 20.percent,
             ))
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions)
-
+            override val currentConditions: Conditions get() = TODO()
+            override val currentForecast: Forecast get() = TODO()
         }
         val picker = DayMode(fakeWeather, fakeClock)
 
@@ -84,7 +92,8 @@ class DayModeTest {
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions.copy(
                 cloudCover = 69.percent
             ))
-
+            override val currentConditions: Conditions get() = TODO()
+            override val currentForecast: Forecast get() = TODO()
         }
         val picker = DayMode(fakeWeather, fakeClock)
 
@@ -98,7 +107,8 @@ class DayModeTest {
                 sunset = now + 40.minutes
             ))
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions)
-
+            override val currentConditions: Conditions get() = TODO()
+            override val currentForecast: Forecast get() = TODO()
         }
         val picker = DayMode(fakeWeather, fakeClock)
 
@@ -112,7 +122,8 @@ class DayModeTest {
                 sunrise = now - 40.minutes
             ))
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions)
-
+            override val currentConditions: Conditions get() = TODO()
+            override val currentForecast: Forecast get() = TODO()
         }
         val picker = DayMode(fakeWeather, fakeClock)
 

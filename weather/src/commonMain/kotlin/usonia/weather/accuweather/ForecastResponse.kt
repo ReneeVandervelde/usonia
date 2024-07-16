@@ -14,7 +14,23 @@ internal data class ForecastResponse(
         val sun: SunSchedule,
         @SerialName("Day")
         val day: DayConditions,
+        @SerialName("Temperature")
+        val temperature: TemperatureConditions,
     )
+
+    @Serializable
+    internal data class TemperatureConditions(
+        @SerialName("Minimum")
+        val min: TemperatureValues,
+        @SerialName("Maximum")
+        val max: TemperatureValues,
+    ) {
+        @Serializable
+        internal data class TemperatureValues(
+            @SerialName("Value")
+            val value: Int,
+        )
+    }
 
     @Serializable
     internal data class SunSchedule(

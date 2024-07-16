@@ -12,6 +12,7 @@ import usonia.rules.charging.PowerLimitCharge
 import usonia.rules.greenhouse.FanControl
 import usonia.rules.greenhouse.HeatControl
 import usonia.rules.greenhouse.MorningPlantLight
+import usonia.rules.greenhouse.SprinklerControl
 import usonia.rules.indicator.Indicator
 import usonia.rules.lights.*
 import usonia.rules.locks.*
@@ -69,5 +70,6 @@ class RulesPlugin(
 
     override val crons: List<CronJob> = listOf(
         MorningPlantLight(client, weather, logger),
+        SprinklerControl(client, weather, logger),
     )
 }

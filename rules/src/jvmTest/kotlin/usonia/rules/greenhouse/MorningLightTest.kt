@@ -1,5 +1,6 @@
 package usonia.rules.greenhouse
 
+import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.scalar.percent
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
@@ -50,8 +51,12 @@ class MorningLightTest {
                 sunset = sunriseTime + 12.hours,
                 rainChance = 0.percent,
                 snowChance = 0.percent,
+                highTemperature = 0.fahrenheit,
+                lowTemperature = 0.fahrenheit,
             ))
             override val conditions: OngoingFlow<Conditions> get() = TODO()
+            override val currentConditions: Conditions get() = TODO()
+            override val currentForecast: Forecast get() = TODO()
         }
         val actionSpy = ActionPublisherSpy()
         val client = DummyClient.copy(
@@ -76,8 +81,12 @@ class MorningLightTest {
                 sunset = sunriseTime + 12.hours,
                 rainChance = 0.percent,
                 snowChance = 0.percent,
+                lowTemperature = 0.fahrenheit,
+                highTemperature = 0.fahrenheit,
             ))
             override val conditions: OngoingFlow<Conditions> get() = TODO()
+            override val currentConditions: Conditions get() = TODO()
+            override val currentForecast: Forecast get() = TODO()
         }
         val actionSpy = ActionPublisherSpy()
         val client = DummyClient.copy(
@@ -103,8 +112,12 @@ class MorningLightTest {
                 sunset = sunriseTime + 12.hours,
                 rainChance = 0.percent,
                 snowChance = 0.percent,
+                lowTemperature = 0.fahrenheit,
+                highTemperature = 0.fahrenheit,
             ))
             override val conditions: OngoingFlow<Conditions> get() = TODO()
+            override val currentConditions: Conditions get() = TODO()
+            override val currentForecast: Forecast get() = TODO()
         }
         val actionSpy = ActionPublisherSpy()
         val client = DummyClient.copy(

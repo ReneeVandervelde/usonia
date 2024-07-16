@@ -15,6 +15,7 @@ enum class Fixture {
     Fan,
     Charger,
     Plant,
+    MomentarySprinkler,
     Heat,
     DataExfiltrator,
 }

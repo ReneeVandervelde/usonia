@@ -1,6 +1,8 @@
 package usonia.weather.accuweather
 
 import com.inkapplications.standard.throwCancels
+import inkapplications.spondee.measure.us.fahrenheit
+import inkapplications.spondee.measure.us.inches
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
@@ -56,6 +58,8 @@ internal class AccuweatherAccess(
             sunrise = Instant.DISTANT_PAST,
             rainChance = 0.percent,
             snowChance = 0.percent,
+            highTemperature = 32.fahrenheit,
+            lowTemperature = 32.fahrenheit,
         )
     )
     private val conditionsFlow = MutableStateFlow(
@@ -63,6 +67,8 @@ internal class AccuweatherAccess(
             timestamp = Instant.DISTANT_PAST,
             cloudCover = 100.percent,
             temperature = 32,
+            rainInLast6Hours = 0.inches,
+            isRaining = false,
         )
     )
     override val forecast: OngoingFlow<Forecast> = forecastFlow.asOngoing()
@@ -71,6 +77,8 @@ internal class AccuweatherAccess(
     override val schedule: Schedule = Schedule(
         minutes = setOf(0)
     )
+    override val currentConditions: Conditions get() = conditionsFlow.value
+    override val currentForecast: Forecast get() = forecastFlow.value
 
     override suspend fun runCron(time: LocalDateTime, zone: TimeZone) {
         val (location, token) = getConfig() ?: return
@@ -134,6 +142,8 @@ internal class AccuweatherAccess(
                 timestamp = clock.now(),
                 cloudCover = conditionsResponse.cloudCover.percent,
                 temperature = conditionsResponse.temperature.imperial.temperature.toInt(),
+                rainInLast6Hours = conditionsResponse.precipitation.pastSixHours.imperial.value.inches,
+                isRaining = conditionsResponse.hasPrecipitation,
             ).also {
                 logger.debug("New Conditions: <$it>")
             }
@@ -167,6 +177,8 @@ internal class AccuweatherAccess(
                 sunset = forecastResponse.daily.single().sun.set.let(Instant.Companion::fromEpochSeconds),
                 rainChance = forecastResponse.daily.single().day.rainProbability.percent,
                 snowChance = forecastResponse.daily.single().day.snowProbability.percent,
+                highTemperature = forecastResponse.daily.single().temperature.max.value.fahrenheit,
+                lowTemperature = forecastResponse.daily.single().temperature.min.value.fahrenheit,
             ).also {
                 logger.debug("New Forecast: <$it>")
             }

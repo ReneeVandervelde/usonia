@@ -1,6 +1,8 @@
 package usonia.rules.indicator
 
 import com.github.ajalt.colormath.model.RGB
+import inkapplications.spondee.measure.us.fahrenheit
+import inkapplications.spondee.measure.us.inches
 import inkapplications.spondee.scalar.percent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
@@ -50,17 +52,23 @@ class IndicatorTest {
         sunset = Instant.DISTANT_FUTURE,
         rainChance = 0.percent,
         snowChance = 0.percent,
+        lowTemperature = 0.fahrenheit,
+        highTemperature = 0.fahrenheit,
     )
 
     val fakeConditions = Conditions(
         timestamp = Clock.System.now(),
         cloudCover = 0.percent,
         temperature = 0,
+        rainInLast6Hours = 0.inches,
+        isRaining = false,
     )
 
     val fakeWeather = object: WeatherAccess {
         override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(fakeForecast)
         override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(fakeConditions)
+        override val currentConditions: Conditions get() = TODO()
+        override val currentForecast: Forecast get() = TODO()
     }
 
     @Test

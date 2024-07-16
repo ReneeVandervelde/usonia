@@ -13,7 +13,6 @@ import kotlin.time.ExperimentalTime
 /**
  * Ktor client implementation of the accuweather API.
  */
-@OptIn(ExperimentalTime::class)
 internal class AccuweatherApiClient: AccuweatherApi {
     private val client = HttpClient {
         install(HttpTimeout) {

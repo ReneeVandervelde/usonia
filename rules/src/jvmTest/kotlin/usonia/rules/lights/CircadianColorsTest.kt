@@ -1,5 +1,6 @@
 package usonia.rules.lights
 
+import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.scalar.percent
 import inkapplications.spondee.scalar.toWholePercentage
 import inkapplications.spondee.structure.div
@@ -46,8 +47,12 @@ class CircadianColorsTest {
             sunset = sunset,
             rainChance = 0.percent,
             snowChance = 0.percent,
+            highTemperature = 0.fahrenheit,
+            lowTemperature = 0.fahrenheit,
         ))
         override val conditions: OngoingFlow<Conditions> get() = TODO()
+        override val currentConditions: Conditions get() = TODO()
+        override val currentForecast: Forecast get() = TODO()
     }
 
     val config = object: ConfigurationAccess by ConfigurationAccessStub {
@@ -80,8 +85,12 @@ class CircadianColorsTest {
                 sunset = sunset,
                 rainChance = 0.percent,
                 snowChance = 0.percent,
+                highTemperature = 0.fahrenheit,
+                lowTemperature = 0.fahrenheit,
             ))
             override val conditions: OngoingFlow<Conditions> get() = TODO()
+            override val currentConditions: Conditions get() = TODO()
+            override val currentForecast: Forecast get() = TODO()
         }
         val colors = CircadianColors(config, weather, clock)
 
@@ -238,8 +247,12 @@ class CircadianColorsTest {
                 sunset = nightStart,
                 rainChance = 0.percent,
                 snowChance = 0.percent,
+                highTemperature = 0.fahrenheit,
+                lowTemperature = 0.fahrenheit,
             ))
             override val conditions: OngoingFlow<Conditions> get() = TODO()
+            override val currentConditions: Conditions get() = TODO()
+            override val currentForecast: Forecast get() = TODO()
         }
         val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = nightStart

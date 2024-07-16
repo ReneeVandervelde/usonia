@@ -9,6 +9,8 @@ import usonia.kotlin.combineToPair
 interface WeatherAccess {
     val forecast: OngoingFlow<Forecast>
     val conditions: OngoingFlow<Conditions>
+    val currentConditions: Conditions
+    val currentForecast: Forecast
 }
 
 /**
