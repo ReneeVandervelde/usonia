@@ -14,7 +14,6 @@ internal class DisarmCommand(
 ): Command {
     override val id = "/disarm"
     override val description = "Disarm Security System"
-    override val visibility: Command.Visibility = Command.Visibility.Hidden
 
     override suspend fun onReceiveCommand(update: Update.MessageUpdate, user: User) {
         telegram.sendStickerWithMessage(
