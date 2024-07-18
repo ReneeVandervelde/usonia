@@ -16,14 +16,15 @@ class HelpCommand(
     override suspend fun onReceiveCommand(update: Update.MessageUpdate, user: User) {
         val commandList = commands
             .filter { it.visibility == Command.Visibility.Public }
-            .map { "${it.id} - ${it.description}\n" }
+            .joinToString("\r\n") { "${it.id} - ${it.description}" }
+            .trim()
 
         telegram.sendMessage(MessageParameters(
             chatId = update.message.chat.id,
             text = """
-                Here are the available commands:
-                
-                $commandList
+Here are the available commands:
+
+$commandList
             """.trimIndent(),
         ))
     }

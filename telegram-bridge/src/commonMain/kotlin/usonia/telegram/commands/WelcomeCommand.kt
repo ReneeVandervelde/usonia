@@ -34,20 +34,21 @@ class WelcomeCommand(
 
         val commandList = commands
             .filter { it.visibility == Command.Visibility.Public }
-            .map { "${it.id} - ${it.description}\n" }
+            .joinToString("\n") { "${it.id} - ${it.description}" }
+            .trim()
 
         telegram.sendMessage(MessageParameters(
             chatId = chatId,
             text = """
-                Your account is now set up!
-                I'll send you notifications and alerts as they happen.
-                
-                Here's a list of commands you can use:
-                
-                $commandList
-                
-                These commands are also available in the menu.
-                You can also see them again by typing /help
+Your account is now set up!
+I'll send you notifications and alerts as they happen.
+
+Here's a list of commands you can use:
+
+$commandList
+
+These commands are also available in the menu.
+You can also see them again by typing /help
             """.trimIndent(),
         ))
     }
