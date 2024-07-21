@@ -31,28 +31,16 @@ internal class ViewModelFactory(
 
     fun create(config: GlassPluginConfig): OngoingFlow<DisplayViewModel> {
         return combine(flags, doorStates, challenge(config), isArming) { flags, doors, challenge, isArming ->
-            when (config.type) {
-                GlassPluginConfig.DisplayType.Large -> DisplayViewModel.Large(
-                    config = config,
-                    flags = flags,
-                    doorStates = doors,
-                    challenge = challenge,
-                    security = DisplayViewModel.SecurityInfo(
-                        isArming = isArming,
-                        armDelayMinutes = timedArmSecurityController.delay.inWholeMinutes.toInt()
-                    ),
-                )
-                GlassPluginConfig.DisplayType.Small -> DisplayViewModel.Small(
-                    config = config,
-                    flags = flags,
-                    doorStates = doors,
-                    challenge = challenge,
-                    security = DisplayViewModel.SecurityInfo(
-                        isArming = isArming,
-                        armDelayMinutes = timedArmSecurityController.delay.inWholeMinutes.toInt()
-                    ),
-                )
-            }
+            DisplayViewModel(
+                config = config,
+                flags = flags,
+                doorStates = doors,
+                challenge = challenge,
+                security = DisplayViewModel.SecurityInfo(
+                    isArming = isArming,
+                    armDelayMinutes = timedArmSecurityController.delay.inWholeMinutes.toInt()
+                ),
+            )
         }
     }
 
