@@ -2,7 +2,7 @@
 kimchi = "2.0.3"
 watermelon = "1.0.1"
 regolith = "1.6.0"
-glass = "0.12.3"
+glass = "0.13.0"
 
 [libraries.kimchi-core]
 version.ref = "kimchi"

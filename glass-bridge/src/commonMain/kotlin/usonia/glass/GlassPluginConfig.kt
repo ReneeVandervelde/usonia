@@ -11,9 +11,16 @@ data class GlassPluginConfig(
     val psk: Psk,
     val pin: Pin,
     val type: DisplayType,
+    val sleepMode: DisplayMode,
+    val movieMode: DisplayMode,
 ) {
     enum class DisplayType {
         Large,
         Small,
+    }
+    enum class DisplayMode {
+        Off,
+        Dim,
+        Normal,
     }
 }

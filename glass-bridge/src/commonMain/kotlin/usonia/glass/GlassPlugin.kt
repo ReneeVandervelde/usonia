@@ -35,7 +35,7 @@ class GlassPlugin(
     override val daemons: List<Daemon> = listOf(
         DisplayUpdater(
             client = client,
-            composer = DisplayConfigFactory(),
+            composer = DisplayConfigFactory(logger),
             viewModelFactory = ViewModelFactory(
                 client = client,
                 challengeContainer = challengeContainer,

@@ -8,14 +8,19 @@ import ink.ui.structures.elements.EmptyElement
 import ink.ui.structures.elements.StatusIndicatorElement
 import ink.ui.structures.elements.TextElement
 import ink.ui.structures.elements.ThrobberElement
+import inkapplications.spondee.scalar.percent
+import kimchi.logger.KimchiLogger
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import usonia.foundation.LatchState
+import usonia.glass.GlassPluginConfig.DisplayMode
 import usonia.glass.GlassPluginConfig.DisplayType.Large
 import usonia.glass.GlassPluginConfig.DisplayType.Small
 import usonia.rules.Flags
 
-internal class DisplayConfigFactory {
+internal class DisplayConfigFactory(
+    private val logger: KimchiLogger,
+) {
     private val json = Json { ignoreUnknownKeys = true; isLenient = true; prettyPrint = true }
 
     fun compose(viewModel: DisplayViewModel): DisplayConfig {
@@ -45,7 +50,6 @@ internal class DisplayConfigFactory {
             ),
             expiration = UPDATE_RATE + UPDATE_GRACE,
         )
-
     }
 
     private fun pinScreen(viewModel: DisplayViewModel, challenge: DisplayViewModel.ChallengeData): DisplayConfig {
@@ -76,6 +80,15 @@ internal class DisplayConfigFactory {
             ).toList(),
             layout = LayoutType.VerticalGrid(viewModel.totalSpan),
             expiration = UPDATE_RATE + UPDATE_GRACE,
+            backlight = with(viewModel) {
+                when {
+                    config.movieMode.takeIf { flags.movieEnabled } == DisplayMode.Off -> BacklightConfig.Off()
+                    config.sleepMode.takeIf { flags.sleepEnabled } == DisplayMode.Off -> BacklightConfig.Off()
+                    config.movieMode.takeIf { flags.movieEnabled } == DisplayMode.Dim -> BacklightConfig.Fixed(10.percent)
+                    config.sleepMode.takeIf { flags.sleepEnabled } == DisplayMode.Dim -> BacklightConfig.Fixed(10.percent)
+                    else -> BacklightConfig.Auto
+                }
+            },
         )
     }
 

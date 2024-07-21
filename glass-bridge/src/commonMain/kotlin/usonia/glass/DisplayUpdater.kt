@@ -52,13 +52,29 @@ internal class DisplayUpdater(
                     val deviceIp = bridge.parameters["deviceIp"] ?: return@map null.also {
                         logger.warn("No Device IP set for bridge: ${bridge.id}")
                     }
+                    val sleepMode = bridge.parameters["mode_sleep"]
+                        ?.let {
+                            runCatching { GlassPluginConfig.DisplayMode.valueOf(it) }
+                                .onFailure { logger.error("Illegal Display Mode", it) }
+                                .getOrNull()
+                        }
+                        ?: GlassPluginConfig.DisplayMode.Normal
+                    val movieMode = bridge.parameters["mode_movie"]
+                        ?.let {
+                            runCatching { GlassPluginConfig.DisplayMode.valueOf(it) }
+                                .onFailure { logger.error("Illegal Display Mode", it) }
+                                .getOrNull()
+                        }
+                        ?: GlassPluginConfig.DisplayMode.Normal
                     val pluginConfig = GlassPluginConfig(
                         bridgeId = bridge.id,
                         homeIp = homeIp,
                         deviceIp = deviceIp,
                         psk = psk,
                         pin = pin,
-                        type = type
+                        type = type,
+                        sleepMode = sleepMode,
+                        movieMode = movieMode,
                     )
                     val update = viewModelFactory.create(pluginConfig)
                         .map { composer.compose(it) }
