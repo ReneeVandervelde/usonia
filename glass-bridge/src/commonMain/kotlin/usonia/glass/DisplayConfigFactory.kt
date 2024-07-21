@@ -24,7 +24,7 @@ internal class DisplayConfigFactory(
     private val json = Json { ignoreUnknownKeys = true; isLenient = true; prettyPrint = true }
 
     fun compose(viewModel: DisplayViewModel): DisplayConfig {
-        val challenge = viewModel.challenge
+        val challenge = viewModel.security.challenge
         return when {
             challenge != null -> pinScreen(viewModel, challenge)
             viewModel.security.isArming -> armingScreen(viewModel)

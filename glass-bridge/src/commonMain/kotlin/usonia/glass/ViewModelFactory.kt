@@ -30,16 +30,20 @@ internal class ViewModelFactory(
     private val isArming = timedArmSecurityController.isActive.asOngoing()
 
     fun create(config: GlassPluginConfig): OngoingFlow<DisplayViewModel> {
-        return combine(flags, doorStates, challenge(config), isArming) { flags, doors, challenge, isArming ->
+        val securityInfo = combine(challenge(config), isArming) { challenge, isArming ->
+            DisplayViewModel.SecurityInfo(
+                challenge = challenge,
+                isArming = isArming,
+                armDelayMinutes = timedArmSecurityController.delay.inWholeMinutes.toInt()
+            )
+        }
+
+        return combine(flags, doorStates, securityInfo) { flags, doors, security ->
             DisplayViewModel(
                 config = config,
                 flags = flags,
                 doorStates = doors,
-                challenge = challenge,
-                security = DisplayViewModel.SecurityInfo(
-                    isArming = isArming,
-                    armDelayMinutes = timedArmSecurityController.delay.inWholeMinutes.toInt()
-                ),
+                security = security,
             )
         }
     }

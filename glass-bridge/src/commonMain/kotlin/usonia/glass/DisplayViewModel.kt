@@ -9,7 +9,6 @@ internal data class DisplayViewModel(
     val config: GlassPluginConfig,
     val flags: Flags,
     val doorStates: List<DeviceProperty<Event.Latch?>>,
-    val challenge: ChallengeData?,
     val security: SecurityInfo,
 ) {
     data class Flags(
@@ -23,6 +22,7 @@ internal data class DisplayViewModel(
     )
 
     data class SecurityInfo(
+        val challenge: ChallengeData?,
         val isArming: Boolean,
         val armDelayMinutes: Int,
     )
