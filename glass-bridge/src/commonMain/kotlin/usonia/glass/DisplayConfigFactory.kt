@@ -3,11 +3,9 @@ package usonia.glass
 import com.inkapplications.glassconsole.structures.*
 import ink.ui.structures.Positioning
 import ink.ui.structures.Sentiment
+import ink.ui.structures.Symbol
 import ink.ui.structures.TextStyle
-import ink.ui.structures.elements.EmptyElement
-import ink.ui.structures.elements.StatusIndicatorElement
-import ink.ui.structures.elements.TextElement
-import ink.ui.structures.elements.ThrobberElement
+import ink.ui.structures.elements.*
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.encodeToString
@@ -42,6 +40,7 @@ internal class DisplayConfigFactory(
                 ),
                 ButtonItem(
                     text = "Cancel",
+                    leadingSymbol = Symbol.Close,
                     action = Action.Put("http://${viewModel.config.homeIp}/glass/arm", "false"),
                     position = Positioning.Center,
                     latching = true,
@@ -99,7 +98,8 @@ internal class DisplayConfigFactory(
         }
         val controls = arrayOfNotNull(
             ButtonItem(
-                text = "Sleep",
+                text = "Sleep".takeIf { viewModel.config.type == Large }.orEmpty(),
+                leadingSymbol = Symbol.Bed,
                 action = Action.Put("http://${viewModel.config.homeIp}/flags/${Flags.SleepMode}", json.encodeToString(viewModel.flags.sleepEnabled.not().toString())),
                 latching = true,
                 sentiment = if (viewModel.flags.sleepEnabled) Sentiment.Primary else Sentiment.Idle,
@@ -107,7 +107,8 @@ internal class DisplayConfigFactory(
                 span = controlSpan,
             ),
             ButtonItem(
-                text = "Movie",
+                text = "Movie".takeIf { viewModel.config.type == Large }.orEmpty(),
+                leadingSymbol = Symbol.Movie,
                 action = Action.Put("http://${viewModel.config.homeIp}/flags/${Flags.MovieMode}", json.encodeToString(viewModel.flags.movieEnabled.not().toString())),
                 latching = true,
                 sentiment = if (viewModel.flags.movieEnabled) Sentiment.Primary else Sentiment.Idle,
@@ -115,7 +116,8 @@ internal class DisplayConfigFactory(
                 span = controlSpan,
             ),
             ButtonItem(
-                text = "Lock",
+                text = "Lock".takeIf { viewModel.config.type == Large }.orEmpty(),
+                leadingSymbol = Symbol.Lock,
                 action = Action.Put("http://${viewModel.config.homeIp}/glass/arm", "true"),
                 latching = true,
                 sentiment = Sentiment.Caution,
