@@ -185,7 +185,7 @@ internal class AccuweatherAccess(
         }
 
         forecastResult.onFailure { error ->
-            logger.error("Failed to get fresh conditions.", error)
+            logger.error("Failed to get fresh forecast.", error)
         }
 
         return forecastFlow.value

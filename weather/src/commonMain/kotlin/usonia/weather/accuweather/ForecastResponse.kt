@@ -28,7 +28,7 @@ internal data class ForecastResponse(
         @Serializable
         internal data class TemperatureValues(
             @SerialName("Value")
-            val value: Int,
+            val value: Float,
         )
     }
 
