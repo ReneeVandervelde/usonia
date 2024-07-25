@@ -9,6 +9,7 @@ kotlin {
                 api(projects.kotlinExtensions)
                 api(projects.core)
                 api(projects.server)
+                implementation(projects.weather)
                 implementation(projects.foundation)
                 implementation(projects.rules)
                 api(kotlinLibraries.coroutines.core)

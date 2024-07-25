@@ -26,7 +26,7 @@ class PluginsModule(
     val weatherPlugin = WeatherPlugin(client, logger)
     val plugins = setOf(
         WebPlugin(client, logger),
-        GlassPlugin(client, logger, json, clock),
+        GlassPlugin(client, weatherPlugin.weatherAccess, logger, json, clock),
         weatherPlugin,
         TodoistBridgePlugin(client, logger),
         RulesPlugin(client, weatherPlugin.weatherAccess, logger),

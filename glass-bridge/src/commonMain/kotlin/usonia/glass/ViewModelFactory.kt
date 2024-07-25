@@ -10,12 +10,15 @@ import usonia.foundation.*
 import usonia.kotlin.*
 import usonia.rules.Flags
 import usonia.server.client.BackendClient
+import usonia.weather.WeatherAccess
+import usonia.weather.combinedData
 
 internal class ViewModelFactory(
     private val client: BackendClient,
     private val challengeContainer: ChallengeContainer,
     private val timedArmSecurityController: TimedArmSecurityController,
     private val pinValidator: PinValidator,
+    private val weatherAccess: WeatherAccess,
     private val clock: Clock = Clock.System,
 ) {
     private val sleepMode = client.booleanFlags.map { it[Flags.SleepMode] ?: false }
@@ -28,6 +31,12 @@ internal class ViewModelFactory(
                 .let { if (it.isEmpty()) flowOf(emptyList()) else combine(*it.toTypedArray()) { it.toList() } }
         }
     private val isArming = timedArmSecurityController.isActive.asOngoing()
+    private val weatherInfo = weatherAccess.combinedData.map { (conditions, forecast) ->
+        DisplayViewModel.WeatherInfo(
+            forecast = forecast,
+            conditions = conditions
+        )
+    }
 
     fun create(config: GlassPluginConfig): OngoingFlow<DisplayViewModel> {
         val securityInfo = combine(challenge(config), isArming) { challenge, isArming ->
@@ -38,12 +47,13 @@ internal class ViewModelFactory(
             )
         }
 
-        return combine(flags, doorStates, securityInfo) { flags, doors, security ->
+        return combine(flags, doorStates, securityInfo, weatherInfo) { flags, doors, security, weather ->
             DisplayViewModel(
                 config = config,
                 flags = flags,
                 doorStates = doors,
                 security = security,
+                weather = weather,
             )
         }
     }

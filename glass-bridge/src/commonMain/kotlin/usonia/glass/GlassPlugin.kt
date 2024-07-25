@@ -9,9 +9,11 @@ import regolith.processes.daemon.Daemon
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
 import usonia.server.http.HttpController
+import usonia.weather.WeatherAccess
 
 class GlassPlugin(
     client: BackendClient,
+    weatherAccess: WeatherAccess,
     logger: KimchiLogger,
     json: Json,
     clock: Clock,
@@ -38,6 +40,7 @@ class GlassPlugin(
             composer = DisplayConfigFactory(logger),
             viewModelFactory = ViewModelFactory(
                 client = client,
+                weatherAccess = weatherAccess,
                 challengeContainer = challengeContainer,
                 timedArmSecurityController = timedArmSecurityController,
                 pinValidator = pinValidator,
