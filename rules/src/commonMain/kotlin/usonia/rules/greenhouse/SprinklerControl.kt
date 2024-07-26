@@ -8,6 +8,9 @@ import inkapplications.spondee.scalar.percent
 import inkapplications.spondee.structure.compareTo
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import regolith.processes.cron.CronJob
@@ -16,14 +19,17 @@ import usonia.core.state.findDevicesBy
 import usonia.core.state.publishAll
 import usonia.foundation.*
 import usonia.foundation.unit.compareTo
+import usonia.kotlin.DefaultScope
 import usonia.server.client.BackendClient
 import usonia.weather.WeatherAccess
 import java.time.DayOfWeek.*
+import kotlin.time.Duration.Companion.minutes
 
 class SprinklerControl(
     private val client: BackendClient,
     private val weatherAccess: WeatherAccess,
     private val logger: KimchiLogger = EmptyLogger,
+    private val backgroundScope: CoroutineScope = DefaultScope(),
 ): CronJob {
 
     override val schedule: Schedule = Schedule(
@@ -71,6 +77,13 @@ class SprinklerControl(
             .also { logger.info("Turning on ${it.size} sprinklers") }
             .map { Action.Switch(it.id, SwitchState.ON) }
             .run { client.publishAll(this) }
+        backgroundScope.launch {
+            delay(10.minutes)
+            client.getSprinklers()
+                .also { logger.info("Turning off ${it.size} sprinklers") }
+                .map { Action.Switch(it.id, SwitchState.OFF) }
+                .run { client.publishAll(this) }
+        }
     }
 
     private suspend fun BackendClient.getSprinklers() = findDevicesBy {
