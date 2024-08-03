@@ -34,7 +34,7 @@ class SprinklerControl(
 
     override val schedule: Schedule = Schedule(
         months = setOf(4, 5, 6, 7, 8, 9, 10),
-        hours = setOf(5, 6, 7),
+        hours = setOf(6, 7),
         minutes = setOf(0),
     )
 
@@ -60,7 +60,7 @@ class SprinklerControl(
                 logger.debug("Skipping Sprinkler for cold forecast")
                 return
             }
-            time.dayOfWeek in setOf(MONDAY, THURSDAY, SUNDAY) -> {
+            time.date.toEpochDays() % 3 == 0 -> {
                 logger.debug("Starting Sprinkler for scheduled watering")
                 sprinkle()
             }
