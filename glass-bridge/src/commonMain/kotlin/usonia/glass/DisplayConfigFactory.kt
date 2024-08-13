@@ -167,7 +167,7 @@ internal class DisplayConfigFactory(
                 style = TextStyle.H2,
             ).asDisplayItem(
                 span = viewModel.totalSpan,
-            ),
+            ).takeIf { items.isNotEmpty() },
             *items.toTypedArray(),
             EmptyElement.asDisplayItem(span = remainingSpace).takeIf { remainingSpace > 0 },
         )
