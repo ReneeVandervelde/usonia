@@ -65,7 +65,7 @@ class SprinklerControlTest {
         val rule = SprinklerControl(client, weather)
 
         rule.runCron(
-            time = LocalDateTime(2024, 7,14, 6, 0, 0),
+            time = LocalDateTime(2024, 7, 13, 6, 0, 0),
             zone = TimeZone.UTC,
         )
 
@@ -88,7 +88,7 @@ class SprinklerControlTest {
         val rule = SprinklerControl(client, weather)
 
         rule.runCron(
-            time = LocalDateTime(2024, 7, 14, 6, 0, 0),
+            time = LocalDateTime(2024, 7, 13, 6, 0, 0),
             zone = TimeZone.UTC,
         )
 
@@ -111,7 +111,7 @@ class SprinklerControlTest {
         val rule = SprinklerControl(client, weather)
 
         rule.runCron(
-            time = LocalDateTime(2024, 7, 14, 6, 0, 0),
+            time = LocalDateTime(2024, 7, 13, 6, 0, 0),
             zone = TimeZone.UTC,
         )
 
@@ -134,7 +134,7 @@ class SprinklerControlTest {
         val rule = SprinklerControl(client, weather)
 
         rule.runCron(
-            time = LocalDateTime(2024, 7,14, 6, 0, 0),
+            time = LocalDateTime(2024, 7, 13, 6, 0, 0),
             zone = TimeZone.UTC,
         )
 
@@ -157,7 +157,7 @@ class SprinklerControlTest {
         val rule = SprinklerControl(client, weather)
 
         rule.runCron(
-            time = LocalDateTime(2024, 7,14, 6, 0, 0),
+            time = LocalDateTime(2024, 7, 13, 6, 0, 0),
             zone = TimeZone.UTC,
         )
 
@@ -180,7 +180,7 @@ class SprinklerControlTest {
         val rule = SprinklerControl(client, weather)
 
         rule.runCron(
-            time = LocalDateTime(2024, 7,14, 6, 0, 0),
+            time = LocalDateTime(2024, 7, 13, 6, 0, 0),
             zone = TimeZone.UTC,
         )
 
@@ -201,7 +201,7 @@ class SprinklerControlTest {
         val rule = SprinklerControl(client, weather)
 
         rule.runCron(
-            time = LocalDateTime(2024, 7,13, 6, 0, 0),
+            time = LocalDateTime(2024, 7, 14, 6, 0, 0),
             zone = TimeZone.UTC,
         )
 
@@ -224,7 +224,7 @@ class SprinklerControlTest {
         val rule = SprinklerControl(client, weather)
 
         rule.runCron(
-            time = LocalDateTime(2024, 7,13, 6, 0, 0),
+            time = LocalDateTime(2024, 7, 14, 6, 0, 0),
             zone = TimeZone.UTC,
         )
 
