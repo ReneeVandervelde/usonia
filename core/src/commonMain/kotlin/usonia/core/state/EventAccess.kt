@@ -45,6 +45,11 @@ interface EventAccess {
     fun deviceEventHistory(id: Identifier, size: Int? = null): OngoingFlow<List<Event>>
 
     /**
+     * The number of events of a specific category that have occurred for a device.
+     */
+    fun eventCount(id: Identifier, category: EventCategory): OngoingFlow<Long>
+
+    /**
      * History of hourly temperatures reported for a group of devices.
      *
      * Multiple reports by one or more devices are averaged into a single data point.

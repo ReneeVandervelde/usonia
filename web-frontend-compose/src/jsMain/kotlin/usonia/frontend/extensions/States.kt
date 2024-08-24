@@ -5,4 +5,4 @@ import androidx.compose.runtime.collectAsState
 import usonia.kotlin.OngoingFlow
 
 @Composable
-fun <T> OngoingFlow<T>.collectAsState(initial: T) = asFlow().collectAsState(initial)
+fun <T : R, R>  OngoingFlow<T>.collectAsState(initial: R) = asFlow().collectAsState(initial)

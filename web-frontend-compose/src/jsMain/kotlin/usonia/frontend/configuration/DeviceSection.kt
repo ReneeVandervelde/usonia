@@ -67,6 +67,11 @@ class DeviceSection(
         Br()
 
         H2 { Text("Recent Events") }
+        val physicalEvents = client.eventCount(device.id, EventCategory.Physical).collectAsState(null).value
+        if (physicalEvents != null && physicalEvents != 0L) {
+            KeyValue("Physical Events", physicalEvents.toString())
+        }
+        Br()
         Table {
             Tr {
                 Th {

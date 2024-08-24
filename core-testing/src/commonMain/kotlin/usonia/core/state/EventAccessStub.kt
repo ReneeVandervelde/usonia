@@ -3,6 +3,7 @@ package usonia.core.state
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import usonia.foundation.Event
+import usonia.foundation.EventCategory
 import usonia.foundation.Identifier
 import usonia.foundation.TemperatureSnapshot
 import usonia.kotlin.OngoingFlow
@@ -19,4 +20,5 @@ object EventAccessStub: EventAccess {
     override fun deviceEventHistory(id: Identifier, size: Int?): OngoingFlow<List<Event>> = ongoingFlowOf()
     override fun temperatureHistorySnapshots(devices: Collection<Identifier>, limit: Duration?): OngoingFlow<List<TemperatureSnapshot>> = ongoingFlowOf()
     override fun getLatestEvent(id: Identifier): OngoingFlow<Event> = ongoingFlowOf()
+    override fun eventCount(id: Identifier, category: EventCategory): OngoingFlow<Long> = ongoingFlowOf()
 }

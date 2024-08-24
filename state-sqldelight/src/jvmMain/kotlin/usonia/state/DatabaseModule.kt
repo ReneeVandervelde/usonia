@@ -21,6 +21,7 @@ class DatabaseModule(
                 .also { Database.Schema.create(it) }
                 .also { Database.Schema.migrate(it, 1, 2)}
                 .also { Database.Schema.migrate(it, 2, 3)}
+                .also { Database.Schema.migrate(it, 3, 4) }
                 .let { Database(it) }
         }
         return DatabaseStateAccess(

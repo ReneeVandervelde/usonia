@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS Event (
   timestamp INTEGER NOT NULL,
   source TEXT NOT NULL,
   type TEXT NOT NULL,
+  category TEXT NOT NULL,
   data BLOB NOT NULL
 );
 
@@ -13,19 +14,16 @@ CREATE INDEX IF NOT EXISTS OrderedEvents
 ON Event (timestamp);
 
 CREATE TRIGGER IF NOT EXISTS EventRecordLimit AFTER INSERT ON Event
-WHEN (SELECT count(*) FROM Event) > 100000
 BEGIN
-    DELETE FROM Event WHERE id IN (
-        SELECT id FROM Event ORDER BY timestamp ASC LIMIT (SELECT count(*) FROM Event) - 100000
-    );
+    DELETE FROM Event WHERE timestamp < strftime('%s', 'now', '-2 years') * 1000;
 END;
 
 insert:
-INSERT INTO Event(timestamp, source, type, data)
-VALUES (?, ?, ?, ?);
+INSERT INTO Event(timestamp, source, type, category, data)
+VALUES (?, ?, ?, ?, ?);
 
 latest:
-SELECT *
+SELECT id, timestamp, source, type, category, data
 FROM Event
 WHERE type = ? AND source = ?
 ORDER BY timestamp DESC
@@ -50,6 +48,12 @@ SELECT
 data
 FROM Event
 WHERE source IN ? AND type = ? AND timestamp >= ?;
+
+eventCountByDeviceAndCategory:
+SELECT
+count(id)
+FROM Event
+WHERE source = ? AND category = ?;
 
 eventsBySource:
 SELECT data

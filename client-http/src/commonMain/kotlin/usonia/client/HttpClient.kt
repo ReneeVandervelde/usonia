@@ -322,6 +322,26 @@ class HttpClient(
         }
     }
 
+    override fun eventCount(id: Identifier, category: EventCategory): OngoingFlow<Long> {
+        return ongoingFlow {
+            httpClient.ws(
+                host = host,
+                port = port,
+                path = "events/count/${id.value}/${category.name}",
+            ) {
+                incoming.consumeEach {
+                    if (it !is Frame.Text) return@consumeEach
+
+                    try {
+                        emit(json.decodeFromString(it.readText()))
+                    } catch (error: Throwable) {
+                        logger.error("Failed to deserialize event count", error)
+                    }
+                }
+            }
+        }
+    }
+
     override suspend fun publishAction(action: Action) {
         val request = HttpRequestBuilder(
             host = host,

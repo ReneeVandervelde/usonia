@@ -46,5 +46,6 @@ class WebPlugin(
         LatestEventSocket(client, json, logger),
         EventHistorySocket(client, json, logger),
         SecurityStateSocket(client, json),
+        EventCountSocket(client, json, logger),
     )
 }

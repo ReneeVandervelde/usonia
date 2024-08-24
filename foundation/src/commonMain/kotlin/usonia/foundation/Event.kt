@@ -1,6 +1,5 @@
 package usonia.foundation
 
-import inkapplications.spondee.measure.Temperature
 import inkapplications.spondee.measure.metric.watts
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.measure.us.toFahrenheit
@@ -49,12 +48,15 @@ sealed class Event {
      */
     abstract val timestamp: Instant
 
+    abstract val category: EventCategory
+
     @Serializable(with = EventSerializer::class)
     data class Motion(
         override val source: Identifier,
         override val timestamp: Instant,
         val state: MotionState
     ): Event() {
+        override val category: EventCategory = EventCategory.Sensor
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
@@ -64,6 +66,7 @@ sealed class Event {
         override val timestamp: Instant,
         val state: SwitchState
     ): Event() {
+        override val category: EventCategory = EventCategory.Sensor
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
@@ -73,6 +76,7 @@ sealed class Event {
         override val timestamp: Instant,
         val temperature: inkapplications.spondee.measure.Temperature
     ): Event() {
+        override val category: EventCategory = EventCategory.Sensor
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
@@ -82,6 +86,7 @@ sealed class Event {
         override val timestamp: Instant,
         val humidity: Percentage
     ): Event() {
+        override val category: EventCategory = EventCategory.Sensor
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
@@ -93,6 +98,10 @@ sealed class Event {
         val method: LockMethod? = null,
         val code: String?
     ): Event() {
+        override val category: EventCategory = when (method) {
+            null, LockMethod.MANUAL -> EventCategory.Sensor
+            else -> EventCategory.Physical
+        }
         override fun withSource(source: Identifier): Event = copy(source = source)
 
         enum class LockMethod { MANUAL, KEYPAD, AUTO, COMMAND }
@@ -104,6 +113,7 @@ sealed class Event {
         override val timestamp: Instant,
         val state: WaterState
     ): Event() {
+        override val category: EventCategory = EventCategory.Sensor
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
@@ -113,6 +123,7 @@ sealed class Event {
         override val timestamp: Instant,
         val state: LatchState
     ): Event() {
+        override val category: EventCategory = EventCategory.Sensor
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
@@ -122,6 +133,7 @@ sealed class Event {
         override val timestamp: Instant,
         val state: ValveState
     ): Event() {
+        override val category: EventCategory = EventCategory.Physical
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
@@ -131,6 +143,7 @@ sealed class Event {
         override val timestamp: Instant,
         val state: PresenceState
     ): Event() {
+        override val category: EventCategory = EventCategory.Sensor
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
@@ -140,6 +153,7 @@ sealed class Event {
         override val timestamp: Instant,
         val percentage: Percentage
     ): Event() {
+        override val category: EventCategory = EventCategory.Sensor
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
@@ -151,6 +165,7 @@ sealed class Event {
         val y: Float,
         val z: Float
     ): Event() {
+        override val category: EventCategory = EventCategory.Sensor
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
@@ -160,6 +175,7 @@ sealed class Event {
         override val timestamp: Instant,
         val state: MovementState
     ): Event() {
+        override val category: EventCategory = EventCategory.Sensor
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
@@ -169,6 +185,7 @@ sealed class Event {
         override val timestamp: Instant,
         val pressure: Float,
     ): Event() {
+        override val category: EventCategory = EventCategory.Sensor
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 
@@ -178,6 +195,7 @@ sealed class Event {
         override val timestamp: Instant,
         val power: PowerUnit,
     ): Event() {
+        override val category: EventCategory = EventCategory.Sensor
         override fun withSource(source: Identifier): Event = copy(source = source)
     }
 }

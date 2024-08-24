@@ -131,12 +131,13 @@ internal class DatabaseStateAccess(
             timestamp = event.timestamp.toEpochMilliseconds(),
             source = event.source.value,
             type = event::class.simpleName!!,
+            category = event.category.name,
             data_ = json.encodeToString(Event.serializer(), event).toByteArray(),
         )
     }
 
     override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
-        return eventQueries.value.latest(type.simpleName!!, id.value) { _, _, _, _, data ->
+        return eventQueries.value.latest(type.simpleName!!, id.value) { _, _, _, _, _, data ->
             json.decodeFromString(Event.serializer(), String(data))
         }.executeAsOneOrNull() as T?
     }
@@ -175,6 +176,14 @@ internal class DatabaseStateAccess(
             .onItemFailure { logger.warn("Failed to deserialize event", it) }
             .filterItemSuccess()
             .map { it.toList() }
+            .asOngoing()
+    }
+
+    override fun eventCount(id: Identifier, category: EventCategory): OngoingFlow<Long> {
+        return eventQueries.value.eventCountByDeviceAndCategory(id.value, category.name)
+            .asFlow()
+            .mapToOneOrNull()
+            .map { it ?: 0 }
             .asOngoing()
     }
 
