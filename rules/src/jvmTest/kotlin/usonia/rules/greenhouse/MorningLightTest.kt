@@ -2,10 +2,7 @@ package usonia.rules.greenhouse
 
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.scalar.percent
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.*
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -14,17 +11,14 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
-import usonia.kotlin.datetime.withZone
 import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import usonia.weather.Conditions
 import usonia.weather.Forecast
-import usonia.weather.WeatherAccess
+import usonia.weather.LocalWeatherAccess
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.seconds
 
 class MorningLightTest {
     private val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
@@ -44,7 +38,7 @@ class MorningLightTest {
     fun before() = runTest {
         val sunriseTime = Instant.fromEpochMilliseconds(currentTime + 20.hours.inWholeMilliseconds)
         val now = Instant.fromEpochMilliseconds(currentTime)
-        val weatherAccess = object: WeatherAccess {
+        val weatherAccess = object: LocalWeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(Forecast(
                 timestamp = Instant.DISTANT_PAST,
                 sunrise = sunriseTime,
@@ -74,7 +68,7 @@ class MorningLightTest {
     fun afterStart() = runTest {
         val sunriseTime = Instant.fromEpochMilliseconds(currentTime + 20.hours.inWholeMilliseconds)
         val now = sunriseTime - 3.hours
-        val weatherAccess = object: WeatherAccess {
+        val weatherAccess = object: LocalWeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(Forecast(
                 timestamp = Instant.DISTANT_PAST,
                 sunrise = sunriseTime,
@@ -105,7 +99,7 @@ class MorningLightTest {
     fun afterEnd() = runTest {
         val sunriseTime = Instant.fromEpochMilliseconds(currentTime + 20.hours.inWholeMilliseconds)
         val now = sunriseTime + 3.hours
-        val weatherAccess = object: WeatherAccess {
+        val weatherAccess = object: LocalWeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(Forecast(
                 timestamp = Instant.DISTANT_PAST,
                 sunrise = sunriseTime,

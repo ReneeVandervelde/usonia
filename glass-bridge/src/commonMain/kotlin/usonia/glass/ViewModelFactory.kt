@@ -10,7 +10,7 @@ import usonia.foundation.*
 import usonia.kotlin.*
 import usonia.rules.Flags
 import usonia.server.client.BackendClient
-import usonia.weather.WeatherAccess
+import usonia.weather.LocalWeatherAccess
 import usonia.weather.combinedData
 
 internal class ViewModelFactory(
@@ -18,7 +18,7 @@ internal class ViewModelFactory(
     private val challengeContainer: ChallengeContainer,
     private val timedArmSecurityController: TimedArmSecurityController,
     private val pinValidator: PinValidator,
-    private val weatherAccess: WeatherAccess,
+    private val weatherAccess: LocalWeatherAccess,
     private val clock: Clock = Clock.System,
 ) {
     private val sleepMode = client.booleanFlags.map { it[Flags.SleepMode] ?: false }

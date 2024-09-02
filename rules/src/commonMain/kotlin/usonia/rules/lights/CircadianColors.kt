@@ -17,7 +17,7 @@ import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.kotlin.datetime.current
 import usonia.kotlin.datetime.withZone
 import usonia.kotlin.first
-import usonia.weather.WeatherAccess
+import usonia.weather.LocalWeatherAccess
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
@@ -43,7 +43,7 @@ internal val DEFAULT_PERIOD = 2.hours
 @OptIn(ExperimentalTime::class)
 internal class CircadianColors(
     private val configurationAccess: ConfigurationAccess,
-    private val weather: WeatherAccess,
+    private val weather: LocalWeatherAccess,
     private val clock: ZonedClock = ZonedSystemClock,
     private val logger: KimchiLogger = EmptyLogger,
 ): LightSettingsPicker {

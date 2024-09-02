@@ -7,14 +7,13 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import regolith.processes.daemon.Daemon
-import usonia.core.state.getSecurityState
 import usonia.foundation.*
 import usonia.foundation.unit.compareTo
 import usonia.kotlin.*
 import usonia.server.client.BackendClient
 import usonia.weather.Conditions
 import usonia.weather.Forecast
-import usonia.weather.WeatherAccess
+import usonia.weather.LocalWeatherAccess
 import usonia.weather.combinedData
 import kotlin.math.max
 import kotlin.math.min
@@ -24,7 +23,7 @@ import kotlin.math.min
  */
 internal class Indicator(
     private val client: BackendClient,
-    private val weatherAccess: WeatherAccess,
+    private val weatherAccess: LocalWeatherAccess,
     private val logger: KimchiLogger = EmptyLogger,
 ): Daemon {
     private val hotIndicator = RGB(255, 0 , 0)

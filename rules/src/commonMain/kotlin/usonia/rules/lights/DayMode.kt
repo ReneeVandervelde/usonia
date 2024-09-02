@@ -5,7 +5,7 @@ import kotlinx.datetime.Clock
 import usonia.foundation.Room
 import usonia.foundation.unit.compareTo
 import usonia.kotlin.first
-import usonia.weather.WeatherAccess
+import usonia.weather.LocalWeatherAccess
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
 
@@ -14,7 +14,7 @@ import kotlin.time.ExperimentalTime
  */
 @OptIn(ExperimentalTime::class)
 internal class DayMode(
-    private val weatherAccess: WeatherAccess,
+    private val weatherAccess: LocalWeatherAccess,
     private val clock: Clock = Clock.System,
 ): LightSettingsPicker {
     override suspend fun getActiveSettings(room: Room): LightSettings {

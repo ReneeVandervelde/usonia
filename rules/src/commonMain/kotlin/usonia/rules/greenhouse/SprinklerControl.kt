@@ -21,13 +21,12 @@ import usonia.foundation.*
 import usonia.foundation.unit.compareTo
 import usonia.kotlin.DefaultScope
 import usonia.server.client.BackendClient
-import usonia.weather.WeatherAccess
-import java.time.DayOfWeek.*
+import usonia.weather.LocalWeatherAccess
 import kotlin.time.Duration.Companion.minutes
 
 class SprinklerControl(
     private val client: BackendClient,
-    private val weatherAccess: WeatherAccess,
+    private val weatherAccess: LocalWeatherAccess,
     private val logger: KimchiLogger = EmptyLogger,
     private val backgroundScope: CoroutineScope = DefaultScope(),
 ): CronJob {

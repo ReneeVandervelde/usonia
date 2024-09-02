@@ -22,11 +22,10 @@ import usonia.kotlin.*
 import usonia.server.client.BackendClient
 import usonia.weather.Conditions
 import usonia.weather.Forecast
-import usonia.weather.WeatherAccess
+import usonia.weather.LocalWeatherAccess
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 
 private const val SERVICE = "accuweather"
 private const val LOCATION = "location"
@@ -45,7 +44,7 @@ internal class AccuweatherAccess(
     private val client: BackendClient,
     private val clock: Clock = Clock.System,
     private val logger: KimchiLogger = EmptyLogger,
-): WeatherAccess, CronJob, Initializer {
+): LocalWeatherAccess, CronJob, Initializer {
     private val retryStrategy = RetryStrategy.Bracket(
         attempts = 4,
         timeouts = listOf(200.milliseconds, 1.seconds, 5.seconds),

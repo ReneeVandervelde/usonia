@@ -20,7 +20,7 @@ class WeatherPlugin(
         logger = logger,
     )
 
-    val weatherAccess: WeatherAccess = accuweather
+    val weatherAccess: LocalWeatherAccess = accuweather
 
     override val crons: List<CronJob> = listOf(accuweather)
     override val initializers: List<Initializer> = listOf(accuweather)

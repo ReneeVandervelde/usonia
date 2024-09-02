@@ -20,7 +20,7 @@ import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import usonia.weather.Conditions
 import usonia.weather.Forecast
-import usonia.weather.WeatherAccess
+import usonia.weather.LocalWeatherAccess
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -64,7 +64,7 @@ class IndicatorTest {
         isRaining = false,
     )
 
-    val fakeWeather = object: WeatherAccess {
+    val fakeWeather = object: LocalWeatherAccess {
         override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(fakeForecast)
         override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(fakeConditions)
         override val currentConditions: Conditions get() = TODO()
@@ -99,7 +99,7 @@ class IndicatorTest {
         val client = testClient.copy(
             actionPublisher = spyPublisher,
         )
-        val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
+        val fakeWeather = object: LocalWeatherAccess by this@IndicatorTest.fakeWeather {
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(fakeConditions.copy(
                 temperature = 100,
             ))
@@ -126,7 +126,7 @@ class IndicatorTest {
         val client = testClient.copy(
             actionPublisher = spyPublisher,
         )
-        val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
+        val fakeWeather = object: LocalWeatherAccess by this@IndicatorTest.fakeWeather {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(fakeForecast.copy(
                 snowChance = 25.percent
             ))
@@ -153,7 +153,7 @@ class IndicatorTest {
         val client = testClient.copy(
             actionPublisher = spyPublisher,
         )
-        val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
+        val fakeWeather = object: LocalWeatherAccess by this@IndicatorTest.fakeWeather {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(fakeForecast.copy(
                 rainChance = 25.percent
             ))
@@ -180,7 +180,7 @@ class IndicatorTest {
         val client = testClient.copy(
             actionPublisher = spyPublisher,
         )
-        val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
+        val fakeWeather = object: LocalWeatherAccess by this@IndicatorTest.fakeWeather {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(fakeForecast.copy(
                 rainChance = 25.percent,
                 snowChance = 25.percent,
@@ -212,7 +212,7 @@ class IndicatorTest {
                 override val securityState = securityState.asOngoing()
             },
         )
-        val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
+        val fakeWeather = object: LocalWeatherAccess by this@IndicatorTest.fakeWeather {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf()
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf()
         }
@@ -247,7 +247,7 @@ class IndicatorTest {
                 override val securityState = securityState.asOngoing()
             },
         )
-        val fakeWeather = object: WeatherAccess by this@IndicatorTest.fakeWeather {
+        val fakeWeather = object: LocalWeatherAccess by this@IndicatorTest.fakeWeather {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf()
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf()
         }

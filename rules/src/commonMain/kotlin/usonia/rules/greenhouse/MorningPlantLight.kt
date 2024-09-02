@@ -20,7 +20,7 @@ import usonia.kotlin.datetime.ZonedDateTime
 import usonia.kotlin.datetime.withZone
 import usonia.server.client.BackendClient
 import usonia.weather.Forecast
-import usonia.weather.WeatherAccess
+import usonia.weather.LocalWeatherAccess
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
@@ -28,7 +28,7 @@ private val TARGET_LIGHT_TIME = 18.hours
 
 class MorningPlantLight(
     private val client: BackendClient,
-    private val weatherAccess: WeatherAccess,
+    private val weatherAccess: LocalWeatherAccess,
     private val logger: KimchiLogger = EmptyLogger,
 ): CronJob {
     override val schedule: Schedule = Schedule().withMinutes { it % 10 == 0 }

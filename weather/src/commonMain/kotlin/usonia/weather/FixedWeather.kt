@@ -10,7 +10,7 @@ import usonia.kotlin.asOngoing
 class FixedWeather(
     initialConditions: Conditions,
     initialForecast: Forecast,
-): WeatherAccess {
+): LocalWeatherAccess {
     private val mutableForecast = MutableStateFlow(initialForecast)
     private val mutableConditions = MutableStateFlow(initialConditions)
     override val forecast: OngoingFlow<Forecast> = mutableForecast.asOngoing()

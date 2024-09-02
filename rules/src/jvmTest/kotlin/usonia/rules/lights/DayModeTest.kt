@@ -3,7 +3,6 @@ package usonia.rules.lights
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.measure.us.inches
 import inkapplications.spondee.scalar.percent
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -12,12 +11,11 @@ import usonia.kotlin.OngoingFlow
 import usonia.kotlin.ongoingFlowOf
 import usonia.weather.Conditions
 import usonia.weather.Forecast
-import usonia.weather.WeatherAccess
+import usonia.weather.LocalWeatherAccess
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.ExperimentalTime
 
 class DayModeTest {
     private val now = Instant.fromEpochMilliseconds(1234567)
@@ -43,7 +41,7 @@ class DayModeTest {
 
     @Test
     fun dayModeTest() = runTest {
-        val fakeWeather = object: WeatherAccess {
+        val fakeWeather = object: LocalWeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast)
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions)
             override val currentConditions: Conditions get() = TODO()
@@ -57,7 +55,7 @@ class DayModeTest {
 
     @Test
     fun rainy() = runTest {
-        val fakeWeather = object: WeatherAccess {
+        val fakeWeather = object: LocalWeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast.copy(
                 rainChance = 20.percent,
             ))
@@ -72,7 +70,7 @@ class DayModeTest {
 
     @Test
     fun snowy() = runTest {
-        val fakeWeather = object: WeatherAccess {
+        val fakeWeather = object: LocalWeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast.copy(
                 snowChance = 20.percent,
             ))
@@ -87,7 +85,7 @@ class DayModeTest {
 
     @Test
     fun cloudy() = runTest {
-        val fakeWeather = object: WeatherAccess {
+        val fakeWeather = object: LocalWeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast)
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions.copy(
                 cloudCover = 69.percent
@@ -102,7 +100,7 @@ class DayModeTest {
 
     @Test
     fun evening() = runTest {
-        val fakeWeather = object: WeatherAccess {
+        val fakeWeather = object: LocalWeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast.copy(
                 sunset = now + 40.minutes
             ))
@@ -117,7 +115,7 @@ class DayModeTest {
 
     @Test
     fun morning() = runTest {
-        val fakeWeather = object: WeatherAccess {
+        val fakeWeather = object: LocalWeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(idealForecast.copy(
                 sunrise = now - 40.minutes
             ))

@@ -22,11 +22,11 @@ import usonia.rules.locks.LockOnSleep
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
 import usonia.server.daemons.ThrottledFailureHandler
-import usonia.weather.WeatherAccess
+import usonia.weather.LocalWeatherAccess
 
 class RulesPlugin(
     client: BackendClient,
-    weather: WeatherAccess,
+    weather: LocalWeatherAccess,
     logger: KimchiLogger = EmptyLogger,
 ): ServerPlugin {
     private val failureHandler = ThrottledFailureHandler()

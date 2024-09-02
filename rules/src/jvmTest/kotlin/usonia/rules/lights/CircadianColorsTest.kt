@@ -23,7 +23,7 @@ import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.kotlin.ongoingFlowOf
 import usonia.weather.Conditions
 import usonia.weather.Forecast
-import usonia.weather.WeatherAccess
+import usonia.weather.LocalWeatherAccess
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -40,7 +40,7 @@ class CircadianColorsTest {
     private val sunset = startOfDay.plus(18.hours)
     private val nightStart = startOfDay.plus(DEFAULT_NIGHT_START.minutes)
 
-    val weather = object: WeatherAccess {
+    val weather = object: LocalWeatherAccess {
         override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(Forecast(
             timestamp = Instant.DISTANT_PAST,
             sunrise = sunrise,
@@ -78,7 +78,7 @@ class CircadianColorsTest {
         val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = startOfDay.plus(1.days)
         }
-        val weather = object: WeatherAccess {
+        val weather = object: LocalWeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(Forecast(
                 timestamp = Instant.DISTANT_PAST,
                 sunrise = sunrise,
@@ -240,7 +240,7 @@ class CircadianColorsTest {
 
     @Test
     fun overlapStart() = runTest {
-        val weather = object: WeatherAccess {
+        val weather = object: LocalWeatherAccess {
             override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(Forecast(
                 timestamp = Instant.DISTANT_PAST,
                 sunrise = sunrise,

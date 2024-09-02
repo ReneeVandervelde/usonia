@@ -9,11 +9,11 @@ import regolith.processes.daemon.Daemon
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
 import usonia.server.http.HttpController
-import usonia.weather.WeatherAccess
+import usonia.weather.LocalWeatherAccess
 
 class GlassPlugin(
     client: BackendClient,
-    weatherAccess: WeatherAccess,
+    weatherAccess: LocalWeatherAccess,
     logger: KimchiLogger,
     json: Json,
     clock: Clock,
