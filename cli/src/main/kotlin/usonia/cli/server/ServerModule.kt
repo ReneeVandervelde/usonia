@@ -8,6 +8,7 @@ import usonia.cli.ColorWriter
 import usonia.core.state.memory.InMemoryActionAccess
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
+import usonia.kotlin.map
 import usonia.rules.alerts.LogErrorAlerts
 import usonia.server.UsoniaServer
 import usonia.server.client.BackendClient
@@ -59,9 +60,9 @@ class ServerModule(
         settingsFile: File,
         databasePath: String?,
     ): UsoniaServer {
-        val server = KtorWebServer(port, logger)
         val client = databaseBackendClient(databasePath, settingsFile)
         val pluginsModule = createPluginsModule(client)
+        val server = KtorWebServer(client, port, logger)
 
         return UsoniaServer(
             plugins = pluginsModule.plugins,

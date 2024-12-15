@@ -9,6 +9,7 @@ import usonia.kotlin.datetime.ZonedClock
 import usonia.notion.NotionBridgePlugin
 import usonia.rules.RulesPlugin
 import usonia.server.client.BackendClient
+import usonia.server.ktor.KtorServerPlugin
 import usonia.telegram.TelegramBridgePlugin
 import usonia.todoist.TodoistBridgePlugin
 import usonia.weather.WeatherPlugin
@@ -25,6 +26,7 @@ class PluginsModule(
 ) {
     val weatherPlugin = WeatherPlugin(client, clock, logger)
     val plugins = setOf(
+        KtorServerPlugin,
         WebPlugin(client, logger),
         GlassPlugin(
             client = client,

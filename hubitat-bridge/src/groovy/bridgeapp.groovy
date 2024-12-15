@@ -1,5 +1,7 @@
 import groovy.json.JsonSlurper
 
+import java.security.MessageDigest
+
 definition(
         name: "Usonia Bridge",
         namespace: "usonia.hubitat",
@@ -24,6 +26,7 @@ preferences {
     section("Config") {
         input "bridgeUrl", "text", title: "Bridge URL"
         input "bridgeId", "text", title: "Bridge ID"
+        input "psk", "text", title: "Bridge PSK"
     }
 }
 
@@ -118,10 +121,11 @@ def cannonicalType(event) {
 }
 
 def onEvent(event) {
+    def timestamp = event.getDate().getTime()
     def eventJson = [
-            "type": cannonicalType(event),
-            "timestamp": event.getDate().getTime(),
-            "source": event.getDevice().id
+        "type": cannonicalType(event),
+        "timestamp": timestamp,
+        "source": event.getDevice().id
     ]
 
     switch (event.name) {
@@ -185,16 +189,29 @@ def onEvent(event) {
             return;
     }
 
+    postAuthorized("$bridgeUrl/bridges/$bridgeId/events", timestamp, eventJson)
+}
+
+def postAuthorized(uri, timestamp, json) {
+    def jsonString = new groovy.json.JsonBuilder(json).toString()
+    def hash = MessageDigest.getInstance("SHA-256").digest((jsonString + timestamp + psk).getBytes("UTF-8")).encodeHex().toString()
+    def shortHash = hash.substring(0, 8)
+
     def requestParams = [
-            "uri": "$bridgeUrl/bridges/$bridgeId/events",
-            "query": null,
-            "requestContentType": "application/json",
-            "body": eventJson
+        "uri": uri,
+        "query": null,
+        "requestContentType": "application/json",
+        "body": jsonString,
+        "headers": [
+            "X-Signature": "$hash",
+            "X-Timestamp": timestamp,
+            "X-Bridge-Id": bridgeId
+        ]
     ]
 
-    log.debug "Sending event with params: $requestParams"
+    log.trace "--> POST[$shortHash]: $requestParams"
     httpPost(requestParams) { resp ->
-        log.debug "Request sent, response ${resp?.status}"
+        log.trace "<-- POST[$shortHash]: ${resp?.status}"
     }
 }
 
@@ -204,20 +221,9 @@ def devices() {
 
 def telegram() {
     def data = request.JSON
+    def timestamp = now()
 
-    def requestParams = [
-            "uri": "$bridgeUrl/telegram-bridge",
-            "query": null,
-            "requestContentType": "application/json",
-            "body": data
-    ]
-
-    log.debug "Sending event with params: $requestParams"
-    httpPost(requestParams)  { resp ->
-        log.debug "Request sent, response ${resp?.status}"
-    }
-
-    log.debug "Telegram: $data"
+    postAuthorized("$bridgeUrl/telegram-bridge", timestamp, data)
 
     return [success: true]
 }
@@ -277,15 +283,6 @@ def actions() {
 }
 
 def sendBridgeAction(actionJson) {
-    def requestParams = [
-            "uri": "$bridgeUrl/actions",
-            "query": null,
-            "requestContentType": "application/json",
-            "body": actionJson
-    ]
-
-    log.debug "Sending event with params: $requestParams"
-    httpPost(requestParams) { resp ->
-        log.debug "Request sent, response ${resp?.status}"
-    }
+    def timestamp = now()
+    postAuthorized("$bridgeUrl/actions", timestamp, actionJson)
 }

@@ -8,4 +8,5 @@ data class Bridge(
     val name: String,
     val service: String,
     val parameters: Map<String, String> = emptyMap(),
+    val serverToken: ServerAuthPsk? = null,
 )

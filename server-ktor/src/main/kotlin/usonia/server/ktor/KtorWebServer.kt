@@ -1,5 +1,8 @@
 package usonia.server.ktor
 
+import com.ionspin.kotlin.crypto.hash.Hash
+import com.ionspin.kotlin.crypto.util.encodeToUByteArray
+import com.ionspin.kotlin.crypto.util.toHexString
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -16,12 +19,17 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import usonia.core.state.findBridgeAuthById
+import usonia.foundation.Identifier
 import usonia.server.AppConfig
 import usonia.server.WebServer
+import usonia.server.client.BackendClient
 import usonia.server.http.HttpRequest
 import kotlin.coroutines.suspendCoroutine
 
 class KtorWebServer(
+    private val client: BackendClient,
     private val port: Int = 80,
     private val logger: KimchiLogger = EmptyLogger
 ): WebServer {
@@ -84,6 +92,36 @@ class KtorWebServer(
                                     headers = call.request.headers.toMap(),
                                     parameters = call.parameters.toMap(),
                                 )
+                                if (controller.authorized) {
+                                    val auth = request.headers["X-Signature"]
+                                        ?.singleOrNull()
+                                        ?: return@handle call.respond(HttpStatusCode.Unauthorized, "Illegal/Missing Authorization")
+                                            .also { logger.trace("Rejecting Request with no signature") }
+                                    val timestamp = request.headers["X-Timestamp"]
+                                        ?.singleOrNull()
+                                        ?.toLongOrNull()
+                                        ?.let { Instant.fromEpochMilliseconds(it) }
+                                        ?: return@handle call.respond(HttpStatusCode.Unauthorized, "Illegal/Missing timestamp")
+                                            .also { logger.trace("Rejecting Request with no timestamp") }
+                                    val bridge = request.headers["X-Bridge-Id"]
+                                        ?.singleOrNull()
+                                        ?.let(::Identifier)
+                                        ?: return@handle call.respond(HttpStatusCode.Unauthorized, "Illegal/Missing bridge id")
+                                            .also { logger.trace("Rejecting Request with no ID") }
+                                    val bridgePsk = client.findBridgeAuthById(bridge)
+                                        ?.psk
+                                        ?: return@handle call.respond(HttpStatusCode.Unauthorized, "Bridge not authorized")
+                                            .also { logger.trace("Rejecting Request with no bridge config") }
+                                    val expectedAuth = (request.body.orEmpty() + timestamp.toEpochMilliseconds().toString() + bridgePsk)
+                                        .encodeToUByteArray()
+                                        .let(Hash::sha256)
+                                        .toHexString()
+
+                                    if (auth != expectedAuth) {
+                                        logger.trace("Rejecting Request with invalid auth. Expected <$expectedAuth> but got <$auth>")
+                                        return@handle call.respond(HttpStatusCode.Unauthorized, "Invalid Authorization")
+                                    }
+                                }
                                 val response = runCatching { controller.getResponse(request) }
                                     .onFailure {
                                         logger.error("Failed to get response", it)

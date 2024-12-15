@@ -152,6 +152,10 @@ module = "com.squareup.sqldelight:sqlite-driver"
 version.ref = "sqldelight"
 module = "com.squareup.sqldelight:coroutines-extensions"
 
+[libraries.iospin-libsodium]
+version = "0.9.2"
+module = "com.ionspin.kotlin:multiplatform-crypto-libsodium-bindings"
+
 [libraries.junit]
 version = "4.12"
 module = "junit:junit"
