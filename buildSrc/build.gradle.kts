@@ -6,7 +6,7 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    implementation(kotlinLibraries.gradle)
-    implementation(libraries.sqldelight.gradle)
-    implementation(kotlinLibraries.serialization.gradle)
+    implementation(libs.kotlin.gradle)
+    implementation(libs.sqldelight.gradle)
+    implementation(libs.kotlin.serialization.gradle)
 }

@@ -9,17 +9,17 @@ kotlin {
             dependencies {
                 api("com.github.ajalt.colormath:colormath:3.2.0")
                 api(projects.kotlinExtensions)
-                api(kotlinLibraries.datetime)
-                api(inkLibraries.kimchi.logger)
-                implementation(kotlinLibraries.serialization.json)
-                api(inkLibraries.spondee)
+                api(libs.kotlin.datetime)
+                api(libs.kimchi.logger)
+                implementation(libs.kotlin.serialization.json)
+                api(libs.spondee)
             }
         }
 
         val jvmTest by getting {
             dependencies {
-                implementation(kotlinLibraries.test.junit)
-                implementation(libraries.junit)
+                implementation(libs.kotlin.test.junit)
+                implementation(libs.junit)
             }
         }
     }

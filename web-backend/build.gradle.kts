@@ -24,7 +24,7 @@ kotlin {
                 api(projects.core)
                 api(projects.server)
                 api(projects.serialization)
-                api(inkLibraries.kimchi.logger)
+                api(libs.kimchi.logger)
             }
         }
     }

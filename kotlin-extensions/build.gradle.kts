@@ -6,16 +6,16 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(kotlinLibraries.coroutines.core)
-                api(kotlinLibraries.datetime)
-                api(inkLibraries.bundles.watermelon.kotlin)
+                api(libs.kotlin.coroutines.core)
+                api(libs.kotlin.datetime)
+                api(libs.bundles.watermelon.kotlin)
             }
         }
 
         val jvmTest by getting {
             dependencies {
-                implementation(kotlinLibraries.test.junit)
-                implementation(libraries.junit)
+                implementation(libs.kotlin.test.junit)
+                implementation(libs.junit)
             }
         }
     }

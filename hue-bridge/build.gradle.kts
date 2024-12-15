@@ -8,7 +8,7 @@ kotlin {
             dependencies {
                 api(projects.kotlinExtensions)
                 implementation(projects.foundation)
-                api(kotlinLibraries.coroutines.core)
+                api(libs.kotlin.coroutines.core)
             }
         }
 
@@ -23,7 +23,7 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
-                implementation(kotlinLibraries.coroutines.test)
+                implementation(libs.kotlin.coroutines.test)
                 implementation(projects.coreTesting)
                 implementation(projects.serverTesting)
                 implementation(projects.foundationTesting)

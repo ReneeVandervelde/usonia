@@ -11,15 +11,15 @@ kotlin {
                 api(projects.server)
                 implementation(projects.foundation)
                 implementation(projects.weather)
-                api(kotlinLibraries.coroutines.core)
-                implementation(ktorLibraries.client.core)
+                api(libs.kotlin.coroutines.core)
+                implementation(libs.ktor.client.core)
             }
         }
 
         val jvmTest by getting {
             dependencies {
-                implementation(kotlinLibraries.test.junit)
-                implementation(kotlinLibraries.coroutines.test)
+                implementation(libs.kotlin.test.junit)
+                implementation(libs.kotlin.coroutines.test)
                 implementation(projects.coreTesting)
                 implementation(projects.serverTesting)
                 implementation(projects.foundationTesting)

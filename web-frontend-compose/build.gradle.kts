@@ -19,8 +19,8 @@ kotlin {
             dependencies {
                 implementation(compose.web.core)
                 implementation(compose.runtime)
-                implementation(kotlinLibraries.coroutines.js)
-                implementation(inkLibraries.kimchi.core)
+                implementation(libs.kotlin.coroutines.js)
+                implementation(libs.kimchi.core)
                 implementation(projects.kotlinExtensions)
                 implementation(projects.clientHttp)
                 implementation(projects.serialization)

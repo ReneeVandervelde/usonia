@@ -8,34 +8,34 @@ kotlin {
             dependencies {
                 api(projects.foundation)
                 api(projects.core)
-                api(kotlinLibraries.serialization.json)
-                api(kotlinLibraries.coroutines.core)
+                api(libs.kotlin.serialization.json)
+                api(libs.kotlin.coroutines.core)
                 implementation(projects.clientKtor)
-                implementation(ktorLibraries.client.core)
-                implementation(ktorLibraries.client.websockets)
-                implementation(ktorLibraries.client.contentnegotiation)
-                implementation(ktorLibraries.client.serialization)
-                implementation(ktorLibraries.serialization.json)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.websockets)
+                implementation(libs.ktor.client.contentnegotiation)
+                implementation(libs.ktor.client.serialization)
+                implementation(libs.ktor.serialization.json)
             }
         }
 
         val jvmMain by getting {
             dependencies {
-                implementation(ktorLibraries.client.okhttp)
+                implementation(libs.ktor.client.okhttp)
             }
         }
 
         val jvmTest by getting {
             dependencies {
-                implementation(kotlinLibraries.test.junit)
-                implementation(libraries.junit)
+                implementation(libs.kotlin.test.junit)
+                implementation(libs.junit)
             }
         }
 
         val jsMain by getting {
             dependencies {
-                implementation(ktorLibraries.client.js.core)
-                implementation(ktorLibraries.client.js.json)
+                implementation(libs.ktor.client.js.core)
+                implementation(libs.ktor.client.js.json)
             }
         }
     }

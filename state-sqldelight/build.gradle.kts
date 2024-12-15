@@ -15,26 +15,26 @@ kotlin {
             dependencies {
                 api(projects.core)
                 api(projects.foundation)
-                api(kotlinLibraries.coroutines.core)
-                api(kotlinLibraries.serialization.json)
-                implementation(inkLibraries.regolith.data)
+                api(libs.kotlin.coroutines.core)
+                api(libs.kotlin.serialization.json)
+                implementation(libs.regolith.data)
             }
         }
 
         val jvmMain by getting {
             dependencies {
-                implementation(inkLibraries.regolith.data)
-                implementation(libraries.bundles.sqldelight)
+                implementation(libs.regolith.data)
+                implementation(libs.bundles.sqldelight)
             }
         }
 
         val jvmTest by getting {
             dependencies {
-                implementation(kotlinLibraries.coroutines.test)
+                implementation(libs.kotlin.coroutines.test)
                 implementation(projects.foundationTesting)
                 implementation(projects.coreTesting)
-                implementation(kotlinLibraries.test.junit)
-                implementation(libraries.junit)
+                implementation(libs.kotlin.test.junit)
+                implementation(libs.junit)
             }
         }
     }

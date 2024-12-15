@@ -9,10 +9,10 @@ kotlin {
                 implementation(projects.kotlinExtensions)
                 implementation(projects.foundation)
                 implementation(projects.core)
-                api(kotlinLibraries.datetime)
-                api(kotlinLibraries.serialization.json)
-                api(inkLibraries.kimchi.logger)
-                api(inkLibraries.regolith.processes)
+                api(libs.kotlin.datetime)
+                api(libs.kotlin.serialization.json)
+                api(libs.kimchi.logger)
+                api(libs.regolith.processes)
             }
         }
     }
