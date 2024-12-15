@@ -6,6 +6,7 @@ import kotlinx.serialization.json.Json
 import usonia.glass.GlassPlugin
 import usonia.hubitat.HubitatPlugin
 import usonia.hue.HueBridgePlugin
+import usonia.kotlin.datetime.ZonedClock
 import usonia.notion.NotionBridgePlugin
 import usonia.rules.RulesPlugin
 import usonia.server.client.BackendClient
@@ -21,12 +22,19 @@ class PluginsModule(
     client: BackendClient,
     logger: KimchiLogger,
     json: Json,
-    clock: Clock,
+    clock: ZonedClock,
 ) {
-    val weatherPlugin = WeatherPlugin(client, logger)
+    val weatherPlugin = WeatherPlugin(client, clock, logger)
     val plugins = setOf(
         WebPlugin(client, logger),
-        GlassPlugin(client, weatherPlugin.weatherAccess, logger, json, clock),
+        GlassPlugin(
+            client = client,
+            weatherAccess = weatherPlugin.weatherAccess,
+            locationWeatherAccess = weatherPlugin.locationWeatherAccess,
+            logger = logger,
+            json = json,
+            clock = clock
+        ),
         weatherPlugin,
         TodoistBridgePlugin(client, logger),
         RulesPlugin(client, weatherPlugin.weatherAccess, logger),

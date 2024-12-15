@@ -7,10 +7,10 @@ import usonia.kotlin.combineToPair
  * Provides access to weather information updates.
  */
 interface LocalWeatherAccess {
-    val forecast: OngoingFlow<Forecast>
+    val forecast: OngoingFlow<FullForecast>
     val conditions: OngoingFlow<Conditions>
     val currentConditions: Conditions
-    val currentForecast: Forecast
+    val currentForecast: FullForecast
 }
 
 /**

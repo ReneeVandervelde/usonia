@@ -19,14 +19,11 @@ import usonia.foundation.FakeSite
 import usonia.foundation.Site
 import usonia.kotlin.OngoingFlow
 import usonia.kotlin.collect
-import usonia.kotlin.datetime.UtcClock
-import usonia.kotlin.datetime.current
-import usonia.kotlin.datetime.withZone
 import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import usonia.server.test.DummyManager
 import usonia.weather.Conditions
-import usonia.weather.Forecast
+import usonia.weather.FullForecast
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.hours
@@ -117,7 +114,7 @@ class AccuweatherAccessTest {
             client = client,
         )
 
-        val forecasts = mutableListOf<Forecast>()
+        val forecasts = mutableListOf<FullForecast>()
         val conditions = mutableListOf<Conditions>()
 
         val forecastCollection = launch { access.forecast.collect { forecasts += it } }
@@ -143,7 +140,7 @@ class AccuweatherAccessTest {
             clock = stubClock,
         )
 
-        val forecasts = mutableListOf<Forecast>()
+        val forecasts = mutableListOf<FullForecast>()
         val conditions = mutableListOf<Conditions>()
 
         val forecastCollection = launch { access.forecast.collect { forecasts += it } }
@@ -178,7 +175,7 @@ class AccuweatherAccessTest {
             clock = stubClock,
         )
 
-        val forecasts = mutableListOf<Forecast>()
+        val forecasts = mutableListOf<FullForecast>()
         val conditions = mutableListOf<Conditions>()
 
         val forecastCollection = launch { access.forecast.collect { forecasts += it } }
@@ -234,7 +231,7 @@ class AccuweatherAccessTest {
             clock = fakeClock
         )
 
-        val forecasts = mutableListOf<Forecast>()
+        val forecasts = mutableListOf<FullForecast>()
         val conditions = mutableListOf<Conditions>()
 
         val forecastCollection = launch { access.forecast.collect { forecasts += it } }

@@ -21,7 +21,7 @@ import usonia.core.state.findBridgeByServiceTag
 import usonia.kotlin.*
 import usonia.server.client.BackendClient
 import usonia.weather.Conditions
-import usonia.weather.Forecast
+import usonia.weather.FullForecast
 import usonia.weather.LocalWeatherAccess
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
@@ -51,7 +51,7 @@ internal class AccuweatherAccess(
     )
     private val timeout = 60.seconds
     private val forecastFlow = MutableStateFlow(
-        Forecast(
+        FullForecast(
             timestamp = Instant.DISTANT_PAST,
             sunset = Instant.DISTANT_FUTURE,
             sunrise = Instant.DISTANT_PAST,
@@ -70,14 +70,14 @@ internal class AccuweatherAccess(
             isRaining = false,
         )
     )
-    override val forecast: OngoingFlow<Forecast> = forecastFlow.asOngoing()
+    override val forecast: OngoingFlow<FullForecast> = forecastFlow.asOngoing()
     override val conditions: OngoingFlow<Conditions> = conditionsFlow.asOngoing()
 
     override val schedule: Schedule = Schedule(
         minutes = setOf(0)
     )
     override val currentConditions: Conditions get() = conditionsFlow.value
-    override val currentForecast: Forecast get() = forecastFlow.value
+    override val currentForecast: FullForecast get() = forecastFlow.value
 
     override suspend fun runCron(time: LocalDateTime, zone: TimeZone) {
         val (location, token) = getConfig() ?: return
@@ -158,7 +158,7 @@ internal class AccuweatherAccess(
     private suspend fun getFreshForecast(
         location: String,
         token: String,
-    ): Forecast {
+    ): FullForecast {
         logger.debug("Refreshing Conditions")
 
         val forecastResult = runRetryable(
@@ -170,7 +170,7 @@ internal class AccuweatherAccess(
         }.throwCancels()
 
         forecastResult.onSuccess { forecastResponse ->
-            return Forecast(
+            return FullForecast(
                 timestamp = clock.now(),
                 sunrise = forecastResponse.daily.single().sun.rise.let(Instant.Companion::fromEpochSeconds),
                 sunset = forecastResponse.daily.single().sun.set.let(Instant.Companion::fromEpochSeconds),

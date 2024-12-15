@@ -6,11 +6,15 @@ import ink.ui.structures.Sentiment
 import ink.ui.structures.Symbol
 import ink.ui.structures.TextStyle
 import ink.ui.structures.elements.*
+import inkapplications.spondee.measure.us.toFahrenheit
 import inkapplications.spondee.scalar.percent
+import inkapplications.spondee.scalar.toWholePercentage
+import inkapplications.spondee.structure.roundToInt
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import usonia.foundation.LatchState
+import usonia.foundation.unit.compareTo
 import usonia.glass.GlassPluginConfig.DisplayMode
 import usonia.glass.GlassPluginConfig.DisplayType.Large
 import usonia.glass.GlassPluginConfig.DisplayType.Small
@@ -76,6 +80,7 @@ internal class DisplayConfigFactory(
             items = arrayOfNotNull(
                 *controlRows(viewModel),
                 *doorRows(viewModel),
+                *weatherRows(viewModel),
             ).toList(),
             layout = LayoutType.VerticalGrid(viewModel.totalSpan),
             expiration = UPDATE_RATE + UPDATE_GRACE,
@@ -139,13 +144,44 @@ internal class DisplayConfigFactory(
         )
     }
 
+    private fun weatherRows(viewModel: DisplayViewModel): Array<out DisplayItem> {
+        if (viewModel.config.type == Small) return emptyArray()
+        return viewModel.expandedWeather.map { location ->
+            val weatherElementSpan = viewModel.totalSpan / location.forecasts.size
+            listOf(
+                TextElement(
+                    text = location.name,
+                    style = TextStyle.H3,
+                ).asDisplayItem(
+                    span = viewModel.totalSpan,
+                ),
+                *(0 until (viewModel.totalSpan - (location.forecasts.size * weatherElementSpan))).map {
+                    EmptyElement.asDisplayItem()
+                }.toTypedArray(),
+                *location.forecasts.map { forecast ->
+                    WeatherElement(
+                        temperature = forecast.forecast.temperature.toFahrenheit().roundToInt().let { "$it°" },
+                        condition = when {
+                            forecast.forecast.precipitation.toWholePercentage() > 20.percent -> WeatherElement.Condition.Rainy
+                            else -> WeatherElement.Condition.Clear
+                        },
+                        title = forecast.title.orEmpty(),
+                        secondaryText = forecast.forecast.precipitation.toWholePercentage().takeIf { it > 15.percent }?.roundToInt()?.let { "$it%" },
+                    ).asDisplayItem(
+                        span = weatherElementSpan,
+                    )
+                }.toTypedArray()
+            )
+        }.flatten().toTypedArray()
+    }
+
     private fun doorRows(viewModel: DisplayViewModel): Array<out DisplayItem> {
         val indicatorSpan = when (viewModel.config.type) {
             Large -> viewModel.totalSpan / 2
             Small -> viewModel.totalSpan
         }
         val items = viewModel.doorStates
-            .filter { viewModel.config.type == Large || it.event?.state != LatchState.CLOSED }
+            .filter { it.event?.state != LatchState.CLOSED }
             .sortedBy { it.device.name }
             .map { (device, event) ->
                 StatusIndicatorElement(

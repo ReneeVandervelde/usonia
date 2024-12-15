@@ -12,7 +12,7 @@ import usonia.foundation.unit.compareTo
 import usonia.kotlin.*
 import usonia.server.client.BackendClient
 import usonia.weather.Conditions
-import usonia.weather.Forecast
+import usonia.weather.FullForecast
 import usonia.weather.LocalWeatherAccess
 import usonia.weather.combinedData
 import kotlin.math.max
@@ -71,7 +71,7 @@ internal class Indicator(
             }
     }
 
-    private fun getColor(forecast: Forecast, conditions: Conditions): RGB {
+    private fun getColor(forecast: FullForecast, conditions: Conditions): RGB {
         return when {
             forecast.snowChance > 20.percent -> snowColor
             forecast.rainChance > 20.percent -> rainColor

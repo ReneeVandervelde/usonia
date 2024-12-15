@@ -5,7 +5,7 @@ import com.inkapplications.glassconsole.structures.pin.Nonce
 import usonia.core.client.DeviceProperty
 import usonia.foundation.Event
 import usonia.weather.Conditions
-import usonia.weather.Forecast
+import usonia.weather.FullForecast
 
 internal data class DisplayViewModel(
     val config: GlassPluginConfig,
@@ -13,6 +13,7 @@ internal data class DisplayViewModel(
     val doorStates: List<DeviceProperty<Event.Latch?>>,
     val security: SecurityInfo,
     val weather: WeatherInfo,
+    val expandedWeather: List<ExpandedLocationForecast>,
 ) {
     data class Flags(
         val sleepEnabled: Boolean,
@@ -31,7 +32,7 @@ internal data class DisplayViewModel(
     )
 
     data class WeatherInfo(
-        val forecast: Forecast,
+        val forecast: FullForecast,
         val conditions: Conditions,
     )
 }

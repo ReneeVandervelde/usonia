@@ -86,12 +86,13 @@ internal class DisplayUpdater(
             }
             .collect {
                 try {
+                    logger.trace("Updating display: ${it.pluginConfig.deviceIp} with config: ${it.displayConfig}")
                     glassClient.updateDisplay(it.displayConfig, it.pluginConfig.deviceIp)
                 } catch (e: CancellationException) {
                     logger.warn("Display update canceled", e)
                     throw e
                 } catch (e: HttpException) {
-                    logger.error("HTTP Request to display failed with code: ${e.statusCode}")
+                    logger.error("HTTP Request to display failed with code: ${e.statusCode}", e)
                 } catch (e: IOException) {
                     logger.warn("Display update request failed", e)
                 } catch (error: Throwable) {

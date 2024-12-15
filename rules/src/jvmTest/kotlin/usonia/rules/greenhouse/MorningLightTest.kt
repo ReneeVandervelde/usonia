@@ -14,7 +14,7 @@ import usonia.kotlin.OngoingFlow
 import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import usonia.weather.Conditions
-import usonia.weather.Forecast
+import usonia.weather.FullForecast
 import usonia.weather.LocalWeatherAccess
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -39,7 +39,7 @@ class MorningLightTest {
         val sunriseTime = Instant.fromEpochMilliseconds(currentTime + 20.hours.inWholeMilliseconds)
         val now = Instant.fromEpochMilliseconds(currentTime)
         val weatherAccess = object: LocalWeatherAccess {
-            override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(Forecast(
+            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(FullForecast(
                 timestamp = Instant.DISTANT_PAST,
                 sunrise = sunriseTime,
                 sunset = sunriseTime + 12.hours,
@@ -50,7 +50,7 @@ class MorningLightTest {
             ))
             override val conditions: OngoingFlow<Conditions> get() = TODO()
             override val currentConditions: Conditions get() = TODO()
-            override val currentForecast: Forecast get() = TODO()
+            override val currentForecast: FullForecast get() = TODO()
         }
         val actionSpy = ActionPublisherSpy()
         val client = DummyClient.copy(
@@ -69,7 +69,7 @@ class MorningLightTest {
         val sunriseTime = Instant.fromEpochMilliseconds(currentTime + 20.hours.inWholeMilliseconds)
         val now = sunriseTime - 3.hours
         val weatherAccess = object: LocalWeatherAccess {
-            override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(Forecast(
+            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(FullForecast(
                 timestamp = Instant.DISTANT_PAST,
                 sunrise = sunriseTime,
                 sunset = sunriseTime + 12.hours,
@@ -80,7 +80,7 @@ class MorningLightTest {
             ))
             override val conditions: OngoingFlow<Conditions> get() = TODO()
             override val currentConditions: Conditions get() = TODO()
-            override val currentForecast: Forecast get() = TODO()
+            override val currentForecast: FullForecast get() = TODO()
         }
         val actionSpy = ActionPublisherSpy()
         val client = DummyClient.copy(
@@ -100,7 +100,7 @@ class MorningLightTest {
         val sunriseTime = Instant.fromEpochMilliseconds(currentTime + 20.hours.inWholeMilliseconds)
         val now = sunriseTime + 3.hours
         val weatherAccess = object: LocalWeatherAccess {
-            override val forecast: OngoingFlow<Forecast> = ongoingFlowOf(Forecast(
+            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(FullForecast(
                 timestamp = Instant.DISTANT_PAST,
                 sunrise = sunriseTime,
                 sunset = sunriseTime + 12.hours,
@@ -111,7 +111,7 @@ class MorningLightTest {
             ))
             override val conditions: OngoingFlow<Conditions> get() = TODO()
             override val currentConditions: Conditions get() = TODO()
-            override val currentForecast: Forecast get() = TODO()
+            override val currentForecast: FullForecast get() = TODO()
         }
         val actionSpy = ActionPublisherSpy()
         val client = DummyClient.copy(

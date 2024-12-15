@@ -2,21 +2,23 @@ package usonia.glass
 
 import com.inkapplications.glassconsole.client.GlassClientModule
 import kimchi.logger.KimchiLogger
-import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import regolith.init.Initializer
 import regolith.processes.daemon.Daemon
+import usonia.kotlin.datetime.ZonedClock
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
 import usonia.server.http.HttpController
 import usonia.weather.LocalWeatherAccess
+import usonia.weather.LocationWeatherAccess
 
 class GlassPlugin(
     client: BackendClient,
     weatherAccess: LocalWeatherAccess,
+    locationWeatherAccess: LocationWeatherAccess,
     logger: KimchiLogger,
     json: Json,
-    clock: Clock,
+    clock: ZonedClock,
 ): ServerPlugin {
     private val nonceGenerator = GlassClientModule.createNonceGenerator()
     private val challengeContainer = ChallengeContainer(nonceGenerator)
@@ -40,11 +42,12 @@ class GlassPlugin(
             composer = DisplayConfigFactory(logger),
             viewModelFactory = ViewModelFactory(
                 client = client,
-                weatherAccess = weatherAccess,
+                localWeatherAccess = weatherAccess,
                 challengeContainer = challengeContainer,
                 timedArmSecurityController = timedArmSecurityController,
                 pinValidator = pinValidator,
                 clock = clock,
+                locationWeatherAccess = locationWeatherAccess,
             ),
             glassClient = GlassClientModule.createHttpClient(),
             logger = logger,

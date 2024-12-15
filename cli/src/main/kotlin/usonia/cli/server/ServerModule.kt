@@ -7,6 +7,8 @@ import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import usonia.cli.ColorWriter
 import usonia.core.state.memory.InMemoryActionAccess
+import usonia.kotlin.datetime.ZonedClock
+import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.rules.alerts.LogErrorAlerts
 import usonia.server.UsoniaServer
 import usonia.server.client.BackendClient
@@ -21,6 +23,7 @@ import java.io.File
  */
 class ServerModule(
     private val json: Json,
+    private val clock: ZonedClock = ZonedSystemClock,
 ) {
     val logger: KimchiLogger = setOf(
             LogSocket,
@@ -32,7 +35,7 @@ class ServerModule(
 
     fun createPluginsModule(
         client: BackendClient,
-    ) = PluginsModule(client, logger, json, Clock.System)
+    ) = PluginsModule(client, logger, json, clock)
 
     fun databaseBackendClient(
         databasePath: String?,
