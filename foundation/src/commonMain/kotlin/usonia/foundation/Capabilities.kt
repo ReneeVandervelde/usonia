@@ -2,7 +2,6 @@ package usonia.foundation
 
 import kotlin.reflect.KClass
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
 
 /**
  * Describes the Actions and Events that a device is capable of.

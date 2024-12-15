@@ -16,9 +16,6 @@ import usonia.rules.greenhouse.SprinklerControl
 import usonia.rules.indicator.Indicator
 import usonia.rules.lights.*
 import usonia.rules.locks.*
-import usonia.rules.locks.LockJammed
-import usonia.rules.locks.LockOnSecure
-import usonia.rules.locks.LockOnSleep
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
 import usonia.server.daemons.ThrottledFailureHandler

@@ -21,10 +21,6 @@ import usonia.notion.api.structures.database.DatabaseId
 import usonia.notion.api.structures.page.Page
 import usonia.notion.api.structures.page.PageId
 import usonia.notion.api.structures.property.*
-import usonia.notion.api.structures.property.MultiSelectOption
-import usonia.notion.api.structures.property.Property
-import usonia.notion.api.structures.property.PropertyArgument
-import usonia.notion.api.structures.property.PropertyId
 import usonia.server.DummyClient
 import kotlin.reflect.KClass
 import kotlin.test.Test

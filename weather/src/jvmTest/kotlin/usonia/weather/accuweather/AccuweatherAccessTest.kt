@@ -1,6 +1,9 @@
 package usonia.weather.accuweather
 
-import inkapplications.spondee.measure.us.*
+import inkapplications.spondee.measure.us.fahrenheit
+import inkapplications.spondee.measure.us.inches
+import inkapplications.spondee.measure.us.toFahrenheit
+import inkapplications.spondee.measure.us.toInches
 import inkapplications.spondee.scalar.percent
 import inkapplications.spondee.structure.toFloat
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -12,9 +12,11 @@ import usonia.foundation.Action
 import usonia.foundation.Fixture
 import usonia.foundation.SwitchState
 import usonia.foundation.findDevicesBy
-import usonia.kotlin.*
+import usonia.kotlin.combineToPair
 import usonia.kotlin.datetime.ZonedDateTime
 import usonia.kotlin.datetime.withZone
+import usonia.kotlin.first
+import usonia.kotlin.map
 import usonia.server.client.BackendClient
 import usonia.weather.FullForecast
 import usonia.weather.LocalWeatherAccess

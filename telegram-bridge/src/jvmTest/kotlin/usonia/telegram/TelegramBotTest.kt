@@ -20,10 +20,6 @@ import usonia.server.client.BackendClient
 import usonia.server.http.HttpRequest
 import usonia.server.http.RestResponse
 import usonia.telegram.commands.*
-import usonia.telegram.commands.Command
-import usonia.telegram.commands.MovieStartCommand
-import usonia.telegram.commands.SleepCommand
-import usonia.telegram.commands.WakeCommand
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 

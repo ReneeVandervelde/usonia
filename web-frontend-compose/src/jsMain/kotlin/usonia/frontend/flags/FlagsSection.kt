@@ -1,6 +1,6 @@
 package usonia.frontend.flags
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock

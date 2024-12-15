@@ -6,7 +6,9 @@ import kotlinx.serialization.json.Json
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.toggleBooleanFlag
 import usonia.foundation.Statuses
-import usonia.server.http.*
+import usonia.server.http.HttpController
+import usonia.server.http.HttpRequest
+import usonia.server.http.HttpResponse
 
 /**
  * Toggles a boolean flag from its current state.

@@ -27,10 +27,6 @@ import usonia.notion.api.structures.block.BlockArgument
 import usonia.notion.api.structures.database.DatabaseId
 import usonia.notion.api.structures.database.DatabaseQuery
 import usonia.notion.api.structures.page.*
-import usonia.notion.api.structures.page.FilterQuery
-import usonia.notion.api.structures.page.NewPage
-import usonia.notion.api.structures.page.Page
-import usonia.notion.api.structures.page.PageFilter
 import usonia.notion.api.structures.property.MultiSelectArgument
 import usonia.notion.api.structures.property.Property
 import usonia.notion.api.structures.property.PropertyArgument

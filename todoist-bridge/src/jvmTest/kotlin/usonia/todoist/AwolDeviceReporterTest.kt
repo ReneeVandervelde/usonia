@@ -17,7 +17,6 @@ import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import usonia.todoist.ApiStub.StubTask
 import usonia.todoist.api.Task
-import usonia.todoist.api.TaskCreateParameters
 import usonia.todoist.api.TodoistApi
 import kotlin.reflect.KClass
 import kotlin.test.Test

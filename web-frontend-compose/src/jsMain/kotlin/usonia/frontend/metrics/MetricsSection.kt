@@ -1,11 +1,11 @@
 package usonia.frontend.metrics
 
 import androidx.compose.runtime.Composable
-import chart.*
+import chart.LineChart
+import chart.LineChartConfig
 import inkapplications.spondee.measure.us.toFahrenheit
 import kimchi.logger.KimchiLogger
 import org.jetbrains.compose.web.dom.*
-import org.jetbrains.compose.web.dom.H2
 import usonia.client.FrontendClient
 import usonia.core.state.roomTemperatureHistory
 import usonia.core.state.rooms

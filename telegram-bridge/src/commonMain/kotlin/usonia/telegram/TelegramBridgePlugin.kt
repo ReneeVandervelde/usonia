@@ -9,10 +9,6 @@ import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
 import usonia.server.http.HttpController
 import usonia.telegram.commands.*
-import usonia.telegram.commands.Command
-import usonia.telegram.commands.MovieStartCommand
-import usonia.telegram.commands.SleepCommand
-import usonia.telegram.commands.WakeCommand
 
 class TelegramBridgePlugin(
     client: BackendClient,

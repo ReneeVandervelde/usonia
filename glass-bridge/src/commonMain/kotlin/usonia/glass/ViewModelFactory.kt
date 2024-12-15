@@ -24,8 +24,6 @@ import usonia.weather.LocalWeatherAccess
 import usonia.weather.LocationWeatherAccess
 import usonia.weather.combinedData
 import kotlin.coroutines.coroutineContext
-import kotlin.math.exp
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
 data class ExpandedLocationForecast(

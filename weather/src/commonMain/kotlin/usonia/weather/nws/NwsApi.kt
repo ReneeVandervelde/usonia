@@ -1,6 +1,5 @@
 package usonia.weather.nws
 
-import com.inkapplications.standard.throwCancels
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.scalar.percent
 import inkapplications.spondee.spatial.GeoCoordinates
@@ -11,7 +10,6 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
 import kimchi.logger.KimchiLogger
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.serializers.InstantIso8601Serializer
@@ -22,11 +20,9 @@ import usonia.kotlin.RetryStrategy
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.runRetryable
 import usonia.weather.Forecast
-import usonia.weather.FullForecast
 import usonia.weather.LocationWeatherAccess
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 interface NwsApi {

@@ -1,10 +1,11 @@
 package usonia.core.client
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onStart
-import usonia.foundation.*
+import usonia.foundation.Device
+import usonia.foundation.Event
+import usonia.foundation.Identifier
+import usonia.foundation.getDevice
 import usonia.kotlin.*
-import kotlin.reflect.KClass
 
 /**
  * Listen to a device's latest events

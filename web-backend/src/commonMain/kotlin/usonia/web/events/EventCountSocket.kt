@@ -5,7 +5,6 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.serialization.json.Json
-import usonia.foundation.Event
 import usonia.foundation.EventCategory
 import usonia.foundation.Identifier
 import usonia.kotlin.collectLatest

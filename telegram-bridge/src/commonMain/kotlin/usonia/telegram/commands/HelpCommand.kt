@@ -1,7 +1,6 @@
 package usonia.telegram.commands
 
 import com.inkapplications.telegram.client.TelegramBotClient
-import com.inkapplications.telegram.structures.ChatReference
 import com.inkapplications.telegram.structures.MessageParameters
 import com.inkapplications.telegram.structures.Update
 import usonia.foundation.User

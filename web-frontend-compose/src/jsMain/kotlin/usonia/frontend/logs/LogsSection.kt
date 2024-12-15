@@ -1,6 +1,7 @@
 package usonia.frontend.logs
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import kotlinx.coroutines.flow.scan
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.H1
