@@ -17,7 +17,7 @@ jobs:
                     java-version: '15'
             -
                 name: JVM Tests
-                run: ./gradlew jvmTest
+                run: bin/gradlew jvmTest
             -
                 name: Build
-                run: ./gradlew build
+                run: bin/gradlew build
