@@ -1,14 +1,14 @@
 import groovy.json.JsonSlurper
 
 definition(
-    name: "Usonia Bridge",
-    namespace: "usonia.hubitat",
-    author: "Renee Vandervelde",
-    description: "Bridge devices to a Usonia Application",
-    category: "My Apps",
-    iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
-    iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
-    oauth: true
+        name: "Usonia Bridge",
+        namespace: "usonia.hubitat",
+        author: "Renee Vandervelde",
+        description: "Bridge devices to a Usonia Application",
+        category: "My Apps",
+        iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
+        iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
+        oauth: true
 )
 
 preferences {
@@ -119,9 +119,9 @@ def cannonicalType(event) {
 
 def onEvent(event) {
     def eventJson = [
-        "type": cannonicalType(event),
-        "timestamp": event.getDate().getTime(),
-        "source": event.getDevice().id
+            "type": cannonicalType(event),
+            "timestamp": event.getDate().getTime(),
+            "source": event.getDevice().id
     ]
 
     switch (event.name) {
@@ -143,9 +143,16 @@ def onEvent(event) {
             break;
         case "lock":
             log.info "Lock Event: " + event.data
+            log.info "Event Type: " + event.type
             eventJson.lockState = event.value.toUpperCase()
             def slurper = new JsonSlurper()
-            eventJson.lockMethod = event.data == null ? "MANUAL" : "KEYPAD"
+            if (event.data != null) {
+                eventJson.lockMethod = "KEYPAD"
+            } else if (event.type == "physical") {
+                eventJson.lockMethod = "MANUAL"
+            } else {
+                eventJson.lockMethod = "COMMAND"
+            }
             eventJson.lockCode = slurper.parseText(event.data ?: "null")?.keySet()?.first()
             break;
         case "contact":
@@ -179,10 +186,10 @@ def onEvent(event) {
     }
 
     def requestParams = [
-        "uri": "$bridgeUrl/bridges/$bridgeId/events",
-        "query": null,
-        "requestContentType": "application/json",
-        "body": eventJson
+            "uri": "$bridgeUrl/bridges/$bridgeId/events",
+            "query": null,
+            "requestContentType": "application/json",
+            "body": eventJson
     ]
 
     log.debug "Sending event with params: $requestParams"
@@ -199,10 +206,10 @@ def telegram() {
     def data = request.JSON
 
     def requestParams = [
-        "uri": "$bridgeUrl/telegram-bridge",
-        "query": null,
-        "requestContentType": "application/json",
-        "body": data
+            "uri": "$bridgeUrl/telegram-bridge",
+            "query": null,
+            "requestContentType": "application/json",
+            "body": data
     ]
 
     log.debug "Sending event with params: $requestParams"
@@ -260,9 +267,9 @@ def actions() {
             break
         case "Intent":
             sendBridgeAction([
-                "type": "Intent",
-                "target": action.target,
-                "intentAction": action.action,
+                    "type": "Intent",
+                    "target": action.target,
+                    "intentAction": action.action,
             ])
             break
     }
@@ -271,10 +278,10 @@ def actions() {
 
 def sendBridgeAction(actionJson) {
     def requestParams = [
-        "uri": "$bridgeUrl/actions",
-        "query": null,
-        "requestContentType": "application/json",
-        "body": actionJson
+            "uri": "$bridgeUrl/actions",
+            "query": null,
+            "requestContentType": "application/json",
+            "body": actionJson
     ]
 
     log.debug "Sending event with params: $requestParams"
