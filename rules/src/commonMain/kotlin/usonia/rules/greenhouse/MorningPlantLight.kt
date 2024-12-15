@@ -4,10 +4,7 @@ import inkapplications.spondee.measure.metric.kelvin
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
+import kotlinx.datetime.*
 import regolith.processes.cron.CronJob
 import regolith.processes.cron.Schedule
 import usonia.core.state.publishAll
@@ -19,12 +16,13 @@ import usonia.kotlin.*
 import usonia.kotlin.datetime.ZonedDateTime
 import usonia.kotlin.datetime.withZone
 import usonia.server.client.BackendClient
-import usonia.weather.Forecast
+import usonia.weather.FullForecast
 import usonia.weather.LocalWeatherAccess
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
-private val TARGET_LIGHT_TIME = 18.hours
+private val TARGET_LIGHT_TIME = 15.hours
 
 class MorningPlantLight(
     private val client: BackendClient,
@@ -41,10 +39,11 @@ class MorningPlantLight(
 
         // Fix for late forecast updates in the morning.
         val sunrise = forecast.sunriseToday(time.withZone(zone))
-        val sunset = forecast.nextSunset(time.withZone(zone))
-        val additionalTime = TARGET_LIGHT_TIME - (sunset - sunrise)
-        val onTime = sunrise - (additionalTime - 3.hours)
-        val offTime = sunrise + 3.hours
+        val sunset = forecast.sunsetToday(time.withZone(zone))
+        val additionalTime = (TARGET_LIGHT_TIME - (sunset - sunrise)).takeIf { it > 0.hours } ?: 0.hours
+        val offset = 30.minutes
+        val onTime = sunrise - additionalTime + offset
+        val offTime = sunset + offset
         val instant = time.toInstant(zone)
 
         logger.trace("Sunrise is ${sunrise} onTime: $onTime offTime: $offTime")
@@ -73,18 +72,19 @@ class MorningPlantLight(
         }
     }
 
-    private fun Forecast.sunriseToday(now: ZonedDateTime): Instant {
+    private fun FullForecast.sunriseToday(now: ZonedDateTime): Instant {
         return when {
-            sunrise < now.instant && sunset < now.instant -> sunrise + 1.days
+            sunrise.toLocalDateTime(now.zone).date > now.localDate -> sunrise - 1.days
+            sunrise.toLocalDateTime(now.zone).date < now.localDate -> sunrise + 1.days
             else -> sunrise
         }
     }
 
-    private fun Forecast.nextSunset(now: ZonedDateTime): Instant {
+    private fun FullForecast.sunsetToday(now: ZonedDateTime): Instant {
         return when {
-            sunrise < now.instant && sunset < now.instant -> sunset + 1.days
+            sunset.toLocalDateTime(now.zone).date > now.localDate -> sunset - 1.days
+            sunset.toLocalDateTime(now.zone).date < now.localDate -> sunset + 1.days
             else -> sunset
         }
     }
-
 }
