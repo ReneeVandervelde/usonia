@@ -21,8 +21,9 @@ import usonia.weather.LocalWeatherAccess
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
-class MorningLightTest {
+class MorningPlantLightTest {
     private val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
         override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
             rooms = setOf(
@@ -38,7 +39,7 @@ class MorningLightTest {
 
     @Test
     fun before() = runTest {
-        val sunriseTime = Instant.fromEpochMilliseconds(currentTime + 20.hours.inWholeMilliseconds)
+        val sunriseTime = Instant.fromEpochMilliseconds(currentTime + 4.hours.inWholeMilliseconds)
         val now = Instant.fromEpochMilliseconds(currentTime)
         val weatherAccess = object: LocalWeatherAccess {
             override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(FullForecast(
@@ -68,8 +69,8 @@ class MorningLightTest {
 
     @Test
     fun afterStart() = runTest {
-        val sunriseTime = Instant.fromEpochMilliseconds(currentTime + 20.hours.inWholeMilliseconds)
-        val now = sunriseTime - 3.hours
+        val sunriseTime = Instant.fromEpochMilliseconds(currentTime + 4.hours.inWholeMilliseconds)
+        val now = sunriseTime - 20.minutes
         val weatherAccess = object: LocalWeatherAccess {
             override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(FullForecast(
                 timestamp = Instant.DISTANT_PAST,

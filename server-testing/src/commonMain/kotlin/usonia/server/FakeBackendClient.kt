@@ -22,6 +22,8 @@ val DummyClient = ComposedBackendClient(
         override val oldestEventTime: OngoingFlow<Instant?> get() = TODO()
         override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? = TODO("Not yet implemented")
         override fun deviceEventHistory(id: Identifier, size: Int?): OngoingFlow<List<Event>> = TODO()
+        override fun eventCount(id: Identifier, category: EventCategory): OngoingFlow<Long> = TODO()
+
         override fun temperatureHistorySnapshots(devices: Collection<Identifier>, limit: Duration?): OngoingFlow<List<TemperatureSnapshot>> = TODO()
         override fun getLatestEvent(id: Identifier): OngoingFlow<Event> = TODO()
     },
