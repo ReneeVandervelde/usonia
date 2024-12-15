@@ -16,7 +16,7 @@ kotlin {
             dependencies {
                 api(projects.core)
                 api(projects.server)
-                implementation("com.inkapplications.shade:core:2.0.0-alpha")
+                implementation("com.inkapplications.shade:core:2.2.0")
             }
         }
 
