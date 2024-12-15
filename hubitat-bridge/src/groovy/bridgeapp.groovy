@@ -199,7 +199,7 @@ def onEvent(event) {
 }
 
 def devices() {
-    return motion + temp + locks + switches + water + doors
+    return motion + temp + locks + switches + water + doors + power
 }
 
 def telegram() {
