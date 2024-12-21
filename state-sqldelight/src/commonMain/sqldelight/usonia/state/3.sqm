@@ -3,20 +3,3 @@ CREATE TRIGGER EventRecordLimit AFTER INSERT ON Event
 BEGIN
     DELETE FROM Event WHERE timestamp < strftime('%s', 'now', '-2 years') * 1000;
 END;
-
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pragma_table_info('Event') WHERE name = 'category') THEN
-        -- Add the column 'category' if it does not exist
-        EXECUTE IMMEDIATE 'ALTER TABLE Event ADD COLUMN category TEXT';
-
-        -- Update the 'category' column based on the 'type' column
-        EXECUTE IMMEDIATE '
-            UPDATE Event
-            SET category = CASE
-                WHEN type = ''Lock'' THEN ''Physical''
-                ELSE ''Sensor''
-            END';
-    END IF;
-END;
-$$;
