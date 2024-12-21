@@ -8,8 +8,8 @@ import usonia.cli.ColorWriter
 import usonia.core.state.memory.InMemoryActionAccess
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
-import usonia.kotlin.map
 import usonia.rules.alerts.LogErrorAlerts
+import usonia.server.auth.ServerAuthPlugin
 import usonia.server.UsoniaServer
 import usonia.server.client.BackendClient
 import usonia.server.client.ComposedBackendClient
@@ -21,7 +21,7 @@ import java.io.File
 /**
  * Create instances on the backend client based on runtime parameters.
  */
-class ServerModule(
+class CliServerModule(
     private val json: Json,
     private val clock: ZonedClock = ZonedSystemClock,
 ) {
@@ -62,7 +62,11 @@ class ServerModule(
     ): UsoniaServer {
         val client = databaseBackendClient(databasePath, settingsFile)
         val pluginsModule = createPluginsModule(client)
-        val server = KtorWebServer(client, port, logger)
+        val server = KtorWebServer(
+            authorization = pluginsModule.serverAuthPlugin.auth,
+            port = port,
+            logger = logger
+        )
 
         return UsoniaServer(
             plugins = pluginsModule.plugins,

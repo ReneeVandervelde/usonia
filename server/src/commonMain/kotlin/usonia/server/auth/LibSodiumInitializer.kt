@@ -1,4 +1,4 @@
-package usonia.server.ktor
+package usonia.server.auth
 
 import com.ionspin.kotlin.crypto.LibsodiumInitializer
 import regolith.init.Initializer

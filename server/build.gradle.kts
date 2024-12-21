@@ -9,6 +9,7 @@ kotlin {
                 implementation(projects.kotlinExtensions)
                 implementation(projects.foundation)
                 api(projects.core)
+                implementation(libs.iospin.libsodium)
                 api(libs.kotlin.datetime)
                 api(libs.kotlin.serialization.json)
                 api(libs.kimchi.logger)

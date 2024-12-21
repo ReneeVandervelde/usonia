@@ -3,8 +3,8 @@ plugins {
 }
 
 java {
-    sourceCompatibility = org.gradle.api.JavaVersion.VERSION_15
-    targetCompatibility = org.gradle.api.JavaVersion.VERSION_15
+    sourceCompatibility = JavaVersion.VERSION_15
+    targetCompatibility = JavaVersion.VERSION_15
 }
 
 dependencies {
@@ -13,6 +13,5 @@ dependencies {
     api(libs.kotlin.coroutines.core)
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.websockets)
-    implementation(libs.iospin.libsodium)
     implementation("org.slf4j:slf4j-nop:1.7.30")
 }
