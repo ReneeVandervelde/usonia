@@ -24,7 +24,7 @@ class PluginsModule(
     json: Json,
     clock: ZonedClock,
 ) {
-    val serverAuthPlugin = ServerAuthPlugin(client, logger)
+    val serverAuthPlugin = ServerAuthPlugin(client, clock, logger)
     val weatherPlugin = WeatherPlugin(client, clock, logger)
     val plugins = setOf(
         serverAuthPlugin,

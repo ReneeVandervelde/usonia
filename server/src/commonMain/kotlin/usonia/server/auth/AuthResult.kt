@@ -8,7 +8,9 @@ sealed interface AuthResult
         data object IllegalTimestamp: Failure("Illegal/Missing Timestamp")
         data object IllegalBridgeId: Failure("Illegal/Missing Bridge ID")
         data object UnauthorizedBridge: Failure("Bridge not authorized")
-        data object InvalidAuthorization: Failure("Invalid Authorization.")
+        data object InvalidAuthorization: Failure("Invalid Authorization")
+        data object StaleAuth: Failure("Authorization is no longer valid")
+        data object AlreadyConsumed: Failure("Authorization is no longer valid")
 
         override fun toString(): String = "Failure($message)"
     }

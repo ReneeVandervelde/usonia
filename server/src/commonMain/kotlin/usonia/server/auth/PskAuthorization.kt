@@ -12,6 +12,7 @@ import usonia.server.http.HttpRequest
 
 internal class PskAuthorization(
     private val client: BackendClient,
+    private val authTracker: AuthTracker,
     private val logger: KimchiLogger,
 ): Authorization {
     override suspend fun validate(request: HttpRequest): AuthResult
@@ -43,6 +44,16 @@ internal class PskAuthorization(
             .encodeToUByteArray()
             .let(Hash::sha256)
             .toHexString()
+
+        try {
+            authTracker.consume(AuthToken(auth, timestamp))
+        } catch (e: AuthTracker.StaleToken) {
+            logger.trace("Auth is stale", e)
+            return AuthResult.Failure.StaleAuth
+        } catch (e: AuthTracker.AlreadyConsumed) {
+            logger.trace("Auth already consumed", e)
+            return AuthResult.Failure.AlreadyConsumed
+        }
 
         if (auth != expectedAuth) {
             logger.trace("Rejecting Request with invalid auth. Expected <$expectedAuth> but got <$auth>")
