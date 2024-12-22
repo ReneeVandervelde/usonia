@@ -1,5 +1,7 @@
 package usonia.client
 
+import com.ionspin.kotlin.crypto.hash.Hash
+import com.ionspin.kotlin.crypto.util.encodeToUByteArray
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.websocket.*
@@ -11,16 +13,19 @@ import io.ktor.websocket.*
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
+import usonia.auth.Auth
 import usonia.client.ktor.PlatformEngine
 import usonia.foundation.*
 import usonia.kotlin.OngoingFlow
 import usonia.kotlin.ongoingFlow
+import kotlin.random.Random
 import kotlin.reflect.KClass
 import kotlin.time.Duration
 
@@ -28,9 +33,11 @@ import kotlin.time.Duration
  * HTTP Client for interacting with a Usonia server.
  */
 class HttpClient(
+    private val authenticationProvider: AuthenticationProvider,
     private val host: String,
     private val port: Int = 80,
     private val json: Json,
+    private val clock: Clock,
     private val logger: KimchiLogger = EmptyLogger,
 ): FrontendClient {
     private val httpClient = HttpClient(PlatformEngine) {
@@ -62,7 +69,10 @@ class HttpClient(
         httpClient.ws(
             host = host,
             port = port,
-            path = "logs"
+            path = "logs",
+            request = {
+                withSocketAuth()
+            }
         ) {
             incoming.consumeEach {
                 if (it !is Frame.Text) return@consumeEach
@@ -82,6 +92,7 @@ class HttpClient(
             port = port,
             path = "logs",
             request = {
+                withSocketAuth()
                 parameter("bufferCount", limit)
             }
         ) {
@@ -366,5 +377,21 @@ class HttpClient(
         }
 
         httpClient.post(request)
+    }
+
+    private fun HttpRequestBuilder.withSocketAuth() {
+        val timestamp = Auth.Timestamp(clock.now())
+        val nonce = Auth.Nonce(Random.nextLong().toString())
+        val psk = authenticationProvider.auth ?: throw IllegalStateException("Authentication not configured")
+        val hash = Auth.createSignature(
+            body = null,
+            timestamp = timestamp,
+            psk = psk,
+            nonce = nonce,
+        )
+        parameter(Auth.Timestamp.HEADER, timestamp.instant.toEpochMilliseconds().toString())
+        parameter(Auth.Nonce.HEADER, nonce.value)
+        parameter(Auth.Bridge.HEADER, authenticationProvider.bridgeIdentifier)
+        parameter(Auth.Signature.HEADER, hash.value)
     }
 }

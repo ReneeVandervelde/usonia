@@ -1,14 +1,16 @@
 import groovy.json.JsonSlurper
 
+import java.security.MessageDigest
+
 definition(
-    name: "Usonia Bridge",
-    namespace: "usonia.hubitat",
-    author: "Renee Vandervelde",
-    description: "Bridge devices to a Usonia Application",
-    category: "My Apps",
-    iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
-    iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
-    oauth: true
+        name: "Usonia Bridge",
+        namespace: "usonia.hubitat",
+        author: "Renee Vandervelde",
+        description: "Bridge devices to a Usonia Application",
+        category: "My Apps",
+        iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
+        iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
+        oauth: true
 )
 
 preferences {
@@ -24,6 +26,7 @@ preferences {
     section("Config") {
         input "bridgeUrl", "text", title: "Bridge URL"
         input "bridgeId", "text", title: "Bridge ID"
+        input "psk", "text", title: "Bridge PSK"
     }
 }
 
@@ -118,9 +121,10 @@ def cannonicalType(event) {
 }
 
 def onEvent(event) {
+    def timestamp = event.getDate().getTime()
     def eventJson = [
         "type": cannonicalType(event),
-        "timestamp": event.getDate().getTime(),
+        "timestamp": timestamp,
         "source": event.getDevice().id
     ]
 
@@ -143,9 +147,16 @@ def onEvent(event) {
             break;
         case "lock":
             log.info "Lock Event: " + event.data
+            log.info "Event Type: " + event.type
             eventJson.lockState = event.value.toUpperCase()
             def slurper = new JsonSlurper()
-            eventJson.lockMethod = event.data == null ? "MANUAL" : "KEYPAD"
+            if (event.data != null) {
+                eventJson.lockMethod = "KEYPAD"
+            } else if (event.type == "physical") {
+                eventJson.lockMethod = "MANUAL"
+            } else {
+                eventJson.lockMethod = "COMMAND"
+            }
             eventJson.lockCode = slurper.parseText(event.data ?: "null")?.keySet()?.first()
             break;
         case "contact":
@@ -178,39 +189,41 @@ def onEvent(event) {
             return;
     }
 
+    postAuthorized("$bridgeUrl/bridges/$bridgeId/events", timestamp, eventJson)
+}
+
+def postAuthorized(uri, timestamp, json) {
+    def jsonString = new groovy.json.JsonBuilder(json).toString()
+    def hash = MessageDigest.getInstance("SHA-256").digest((jsonString + timestamp + psk).getBytes("UTF-8")).encodeHex().toString()
+    def shortHash = hash.substring(0, 8)
+
     def requestParams = [
-        "uri": "$bridgeUrl/bridges/$bridgeId/events",
+        "uri": uri,
         "query": null,
         "requestContentType": "application/json",
-        "body": eventJson
+        "body": jsonString,
+        "headers": [
+            "X-Signature": "$hash",
+            "X-Timestamp": timestamp,
+            "X-Bridge-Id": bridgeId
+        ]
     ]
 
-    log.debug "Sending event with params: $requestParams"
+    log.trace "--> POST[$shortHash]: $requestParams"
     httpPost(requestParams) { resp ->
-        log.debug "Request sent, response ${resp?.status}"
+        log.trace "<-- POST[$shortHash]: ${resp?.status}"
     }
 }
 
 def devices() {
-    return motion + temp + locks + switches + water + doors
+    return motion + temp + locks + switches + water + doors + power
 }
 
 def telegram() {
     def data = request.JSON
+    def timestamp = now()
 
-    def requestParams = [
-        "uri": "$bridgeUrl/telegram-bridge",
-        "query": null,
-        "requestContentType": "application/json",
-        "body": data
-    ]
-
-    log.debug "Sending event with params: $requestParams"
-    httpPost(requestParams)  { resp ->
-        log.debug "Request sent, response ${resp?.status}"
-    }
-
-    log.debug "Telegram: $data"
+    postAuthorized("$bridgeUrl/telegram-bridge", timestamp, data)
 
     return [success: true]
 }
@@ -260,9 +273,9 @@ def actions() {
             break
         case "Intent":
             sendBridgeAction([
-                "type": "Intent",
-                "target": action.target,
-                "intentAction": action.action,
+                    "type": "Intent",
+                    "target": action.target,
+                    "intentAction": action.action,
             ])
             break
     }
@@ -270,15 +283,6 @@ def actions() {
 }
 
 def sendBridgeAction(actionJson) {
-    def requestParams = [
-        "uri": "$bridgeUrl/actions",
-        "query": null,
-        "requestContentType": "application/json",
-        "body": actionJson
-    ]
-
-    log.debug "Sending event with params: $requestParams"
-    httpPost(requestParams) { resp ->
-        log.debug "Request sent, response ${resp?.status}"
-    }
+    def timestamp = now()
+    postAuthorized("$bridgeUrl/actions", timestamp, actionJson)
 }

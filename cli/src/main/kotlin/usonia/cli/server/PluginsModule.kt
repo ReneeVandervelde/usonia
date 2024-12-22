@@ -8,6 +8,7 @@ import usonia.hue.HueBridgePlugin
 import usonia.kotlin.datetime.ZonedClock
 import usonia.notion.NotionBridgePlugin
 import usonia.rules.RulesPlugin
+import usonia.server.auth.ServerAuthPlugin
 import usonia.server.client.BackendClient
 import usonia.telegram.TelegramBridgePlugin
 import usonia.todoist.TodoistBridgePlugin
@@ -23,8 +24,10 @@ class PluginsModule(
     json: Json,
     clock: ZonedClock,
 ) {
+    val serverAuthPlugin = ServerAuthPlugin(client, clock, logger)
     val weatherPlugin = WeatherPlugin(client, clock, logger)
     val plugins = setOf(
+        serverAuthPlugin,
         WebPlugin(client, logger),
         GlassPlugin(
             client = client,

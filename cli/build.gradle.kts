@@ -6,7 +6,7 @@ plugins {
 
 application {
     applicationName = "usonia"
-    mainClassName = "usonia.cli.MainKt"
+    mainClass.set("usonia.cli.MainKt")
 }
 
 sourceSets {

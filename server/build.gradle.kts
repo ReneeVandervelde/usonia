@@ -8,7 +8,9 @@ kotlin {
             dependencies {
                 implementation(projects.kotlinExtensions)
                 implementation(projects.foundation)
-                implementation(projects.core)
+                api(projects.core)
+                implementation(projects.auth)
+                implementation(libs.iospin.libsodium)
                 api(libs.kotlin.datetime)
                 api(libs.kotlin.serialization.json)
                 api(libs.kimchi.logger)

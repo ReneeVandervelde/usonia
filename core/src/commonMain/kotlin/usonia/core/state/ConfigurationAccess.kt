@@ -138,3 +138,7 @@ suspend fun ConfigurationAccess.toggleBooleanFlag(
  * Set the value of a boolean flag.
  */
 suspend fun ConfigurationAccess.setFlag(key: String, value: Boolean) = setFlag(key, value.toString())
+
+suspend fun ConfigurationAccess.findBridgeAuthById(
+    id: Identifier
+): ServerAuthPsk? = getSite().bridges.find { it.id == id }?.serverToken

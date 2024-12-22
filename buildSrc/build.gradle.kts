@@ -1,6 +1,12 @@
 plugins {
     `kotlin-dsl`
 }
+kotlin {
+    jvmToolchain {
+        languageVersion = JavaLanguageVersion.of(15)
+        vendor = JvmVendorSpec.ADOPTOPENJDK
+    }
+}
 repositories {
     gradlePluginPortal()
     mavenCentral()

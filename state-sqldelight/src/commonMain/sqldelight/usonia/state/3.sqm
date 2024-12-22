@@ -3,10 +3,3 @@ CREATE TRIGGER EventRecordLimit AFTER INSERT ON Event
 BEGIN
     DELETE FROM Event WHERE timestamp < strftime('%s', 'now', '-2 years') * 1000;
 END;
-
-ALTER TABLE Event ADD COLUMN category TEXT;
-UPDATE Event
-SET category = CASE
-    WHEN type = 'Lock' THEN 'Physical'
-    ELSE 'Sensor'
-END;

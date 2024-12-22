@@ -9,7 +9,7 @@ import kotlinx.coroutines.runBlocking
 import java.io.File
 
 class ServerRunCommand(
-    private val serverModule: ServerModule,
+    private val serverModule: CliServerModule,
 ): CliktCommand(
     name = "run",
     help = "Runs the main server application."

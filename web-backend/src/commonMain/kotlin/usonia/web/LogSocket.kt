@@ -19,6 +19,7 @@ object LogSocket: WebSocketController, LogWriter {
         replay = 500,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
+    override val authorized: Boolean = true
 
     override suspend fun start(
         input: ReceiveChannel<String>,

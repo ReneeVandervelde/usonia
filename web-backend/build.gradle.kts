@@ -5,10 +5,10 @@ plugins {
 tasks {
     val copyResources = create("copyResources", Sync::class) {
         dependsOn(":${project.projects.webFrontendCompose.name}:jsBrowserDistribution")
-        from(project(":web-frontend-compose").file("${project(":web-frontend-compose").buildDir}/dist/js/productionExecutable"))
-        into("$buildDir/imported-resources")
+        from(project(":web-frontend-compose").file(project(":web-frontend-compose").layout.buildDirectory.dir("dist/js/productionExecutable")))
+        into(layout.buildDirectory.dir("imported-resources"))
     }
-    all {
+    jvmProcessResources {
         if (this != copyResources) {
             dependsOn(copyResources)
         }
@@ -18,7 +18,7 @@ tasks {
 kotlin {
     sourceSets {
         val commonMain by getting {
-            resources.srcDirs("$buildDir/imported-resources")
+            resources.srcDirs(layout.buildDirectory.dir("imported-resources"))
 
             dependencies {
                 api(projects.core)

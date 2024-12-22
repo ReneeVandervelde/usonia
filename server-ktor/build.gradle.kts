@@ -2,9 +2,11 @@ plugins {
     kotlin("jvm")
 }
 
-java {
-    sourceCompatibility = org.gradle.api.JavaVersion.VERSION_15
-    targetCompatibility = org.gradle.api.JavaVersion.VERSION_15
+kotlin {
+    jvmToolchain {
+        languageVersion = JavaLanguageVersion.of(15)
+        vendor = JvmVendorSpec.ADOPTOPENJDK
+    }
 }
 
 dependencies {
