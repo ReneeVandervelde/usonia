@@ -1,7 +1,7 @@
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.compose") version "1.6.10"
-    id("org.jetbrains.kotlin.plugin.compose") version "2.0.0"
+    id("org.jetbrains.compose") version "1.7.3"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.1.0"
 }
 
 repositories {
@@ -17,13 +17,15 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(compose.web.core)
+                implementation(compose.html.core)
                 implementation(compose.runtime)
                 implementation(libs.kotlin.coroutines.js)
                 implementation(libs.kimchi.core)
                 implementation(projects.kotlinExtensions)
                 implementation(projects.clientHttp)
                 implementation(projects.serialization)
+                implementation(libs.regolith.processes)
+                implementation(libs.iospin.libsodium)
                 implementation(npm("chart.js", "4.2.0"))
             }
         }

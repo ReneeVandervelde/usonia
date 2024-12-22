@@ -14,7 +14,7 @@ import kotlinx.coroutines.runBlocking
  * Default Client can be configured with the `--host` and `--port` options.
  */
 abstract class ClientCommand(
-    clientModule: ClientModule,
+    private val clientModule: ClientModule,
     help: String,
 ): CliktCommand(
     help = help,
@@ -30,6 +30,7 @@ abstract class ClientCommand(
     protected val logger: KimchiLogger by lazy { clientModule.logger }
 
     final override fun run() = runBlocking {
+        clientModule.initializer.initialize().join()
         execute()
     }
 

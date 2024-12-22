@@ -10,19 +10,19 @@ internal class AuthTracker (
 ) {
     private val allowedWindow = 1.minutes
     private val replayCacheWindow = 5.minutes
-    private val auths = MutableStateFlow(emptySet<AuthToken>())
+    private val auths = MutableStateFlow(emptySet<AuthParamToken>())
 
-    fun consume(token: AuthToken)
+    fun consume(token: AuthParamToken)
     {
         val now = clock.now()
-        if (token.timestamp < now.minus(allowedWindow)) {
+        if (token.timestamp.instant < now.minus(allowedWindow)) {
             throw StaleToken
         }
         auths.getAndUpdate { previous ->
             if (token in previous) throw AlreadyConsumed
 
             (previous + token)
-                .filter { it.timestamp > now.minus(replayCacheWindow) }
+                .filter { it.timestamp.instant > now.minus(replayCacheWindow) }
                 .toSet()
         }
     }

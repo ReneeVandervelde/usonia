@@ -21,6 +21,7 @@ import usonia.server.WebServer
 import usonia.server.auth.AuthResult
 import usonia.server.auth.Authorization
 import usonia.server.http.HttpRequest
+import usonia.server.http.SocketCall
 import kotlin.coroutines.suspendCoroutine
 
 class KtorWebServer(
@@ -48,8 +49,17 @@ class KtorWebServer(
                             logger.trace { "OPEN: ${controller::class.simpleName}" }
                             val input = Channel<String>(Channel.RENDEZVOUS)
                             val output = Channel<String>(Channel.RENDEZVOUS)
+                            val socketRequest = SocketCall(
+                                parameters = call.parameters.toMap(),
+                            )
+                            val authResult = authorization.validate(socketRequest)
+                            if (controller.authorized && authResult is AuthResult.Failure) {
+                                logger.info("Rejecting Request after failed auth.")
+                                close()
+                                return@webSocket
+                            }
                             val controllerJob = launch {
-                                controller.start(input, output, call.parameters.toMap())
+                                controller.start(input, output, socketRequest.parameters)
                             }
                             val incomingJob = launch {
                                 incoming.consumeEach { frame ->

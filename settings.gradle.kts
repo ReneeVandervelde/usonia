@@ -1,7 +1,9 @@
-enableFeaturePreview("VERSION_CATALOGS")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
+rootProject.name = "usonia"
+
 include("archetypes")
+include("auth")
 include("cli")
 include("client-http")
 include("client-ktor")

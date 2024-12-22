@@ -8,6 +8,7 @@ kotlin {
             dependencies {
                 api(projects.foundation)
                 api(projects.core)
+                api(projects.auth)
                 api(libs.kotlin.serialization.json)
                 api(libs.kotlin.coroutines.core)
                 implementation(projects.clientKtor)
@@ -16,6 +17,7 @@ kotlin {
                 implementation(libs.ktor.client.contentnegotiation)
                 implementation(libs.ktor.client.serialization)
                 implementation(libs.ktor.serialization.json)
+                implementation(libs.iospin.libsodium)
             }
         }
 
