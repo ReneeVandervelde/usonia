@@ -10,6 +10,7 @@ class StaticResourceController(
     private val contentType: String,
 ): HttpController {
     override val path: String = "/{name}.$extension"
+    override val authorized: Boolean = false
 
     override suspend fun getResponse(request: HttpRequest): HttpResponse {
         return HttpResponse(

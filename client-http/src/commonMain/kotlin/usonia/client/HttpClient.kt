@@ -52,6 +52,9 @@ class HttpClient(
             host = host,
             port = port,
             path = "security",
+            request = {
+                withSocketAuth()
+            },
         ) {
             incoming.consumeEach {
                 if (it !is Frame.Text) return@consumeEach
@@ -72,7 +75,7 @@ class HttpClient(
             path = "logs",
             request = {
                 withSocketAuth()
-            }
+            },
         ) {
             incoming.consumeEach {
                 if (it !is Frame.Text) return@consumeEach
@@ -94,7 +97,7 @@ class HttpClient(
             request = {
                 withSocketAuth()
                 parameter("bufferCount", limit)
-            }
+            },
         ) {
             incoming.consumeEach {
                 if (it !is Frame.Text) return@consumeEach
@@ -112,7 +115,10 @@ class HttpClient(
         httpClient.ws(
             host = host,
             port = port,
-            path = "events"
+            path = "events",
+            request = {
+                withSocketAuth()
+            },
         ) {
             incoming.consumeEach {
                 if (it !is Frame.Text) return@consumeEach
@@ -129,7 +135,10 @@ class HttpClient(
         httpClient.ws(
             host = host,
             port = port,
-            path = "events/by-day"
+            path = "events/by-day",
+            request = {
+                withSocketAuth()
+            },
         ) {
             incoming.consumeEach {
                 if (it !is Frame.Text) return@consumeEach
@@ -145,7 +154,10 @@ class HttpClient(
         httpClient.ws(
             host = host,
             port = port,
-            path = "events/metric-oldest"
+            path = "events/metric-oldest",
+            request = {
+                withSocketAuth()
+            },
         ) {
             incoming.consumeEach {
                 if (it !is Frame.Text) return@consumeEach
@@ -163,6 +175,9 @@ class HttpClient(
             host = host,
             port = port,
             path = "config",
+            request = {
+                withSocketAuth()
+            },
         ) {
             incoming.consumeEach {
                 if (it !is Frame.Text) return@consumeEach
@@ -181,6 +196,9 @@ class HttpClient(
             host = host,
             port = port,
             path = "flags",
+            request = {
+                withSocketAuth()
+            },
         ) {
             incoming.consumeEach {
                 if (it !is Frame.Text) return@consumeEach
@@ -200,6 +218,7 @@ class HttpClient(
             port = port,
             path = "/site",
         ).apply {
+            withAuthHeaders()
             accept(ContentType.Application.Json)
             setBody(json.encodeToString(Site.serializer(), site))
         }
@@ -213,6 +232,7 @@ class HttpClient(
             port = port,
             path = "/flags/$key",
         ).apply {
+            withAuthHeaders()
             accept(ContentType.Application.Json)
             setBody(json.encodeToString(String.serializer().nullable, value))
         }
@@ -226,6 +246,7 @@ class HttpClient(
             port = port,
             path = "/flags/$key",
         ).apply {
+            withAuthHeaders()
             accept(ContentType.Application.Json)
         }
 
@@ -239,6 +260,7 @@ class HttpClient(
             port = port,
             path = "/security/arm",
         ).apply {
+            withAuthHeaders()
             accept(ContentType.Application.Json)
         }
 
@@ -251,6 +273,7 @@ class HttpClient(
             port = port,
             path = "/events/latest/${id.value}/${type.simpleName}",
         ).apply {
+            withAuthHeaders()
             accept(ContentType.Application.Json)
         }
 
@@ -273,6 +296,7 @@ class HttpClient(
                 port = port,
                 path = "events/temperature-history-snapshots",
                 request = {
+                    withSocketAuth()
                     devices.forEach { parameter("devices", it.value) }
                     if (limit != null) parameter("limit", limit.inWholeMilliseconds)
                 }
@@ -296,6 +320,9 @@ class HttpClient(
                 host = host,
                 port = port,
                 path = "events/latest/${id.value}",
+                request = {
+                    withSocketAuth()
+                },
             ) {
                 incoming.consumeEach {
                     if (it !is Frame.Text) return@consumeEach
@@ -317,6 +344,7 @@ class HttpClient(
                 port = port,
                 path = "events/history/${id.value}",
                 request = {
+                    withSocketAuth()
                     if (size != null) parameter("count", size)
                 },
             ) {
@@ -339,6 +367,9 @@ class HttpClient(
                 host = host,
                 port = port,
                 path = "events/count/${id.value}/${category.name}",
+                request = {
+                    withSocketAuth()
+                },
             ) {
                 incoming.consumeEach {
                     if (it !is Frame.Text) return@consumeEach
@@ -359,6 +390,7 @@ class HttpClient(
             port = port,
             path = "/actions",
         ).apply {
+            withAuthHeaders()
             accept(ContentType.Application.Json)
             setBody(json.encodeToString(ActionSerializer, action))
         }
@@ -372,6 +404,7 @@ class HttpClient(
             port = port,
             path = "/events",
         ).apply {
+            withAuthHeaders()
             accept(ContentType.Application.Json)
             setBody(json.encodeToString(EventSerializer, event))
         }
@@ -393,5 +426,21 @@ class HttpClient(
         parameter(Auth.Nonce.HEADER, nonce.value)
         parameter(Auth.Bridge.HEADER, authenticationProvider.bridgeIdentifier)
         parameter(Auth.Signature.HEADER, hash.value)
+    }
+
+    private fun HttpMessageBuilder.withAuthHeaders() {
+        val timestamp = Auth.Timestamp(clock.now())
+        val nonce = Auth.Nonce(Random.nextLong().toString())
+        val psk = authenticationProvider.auth ?: throw IllegalStateException("Authentication not configured")
+        val hash = Auth.createSignature(
+            body = null,
+            timestamp = timestamp,
+            psk = psk,
+            nonce = nonce,
+        )
+        header(Auth.Timestamp.HEADER, timestamp.instant.toEpochMilliseconds().toString())
+        header(Auth.Nonce.HEADER, nonce.value)
+        header(Auth.Bridge.HEADER, authenticationProvider.bridgeIdentifier)
+        header(Auth.Signature.HEADER, hash.value)
     }
 }

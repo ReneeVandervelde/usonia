@@ -8,7 +8,7 @@ import kotlinx.coroutines.channels.SendChannel
  */
 interface WebSocketController {
     val path: String
-    val authorized: Boolean get() = false
+    val authorized: Boolean get() = true
 
     /**
      * Called when a websocket is opened by a client.
