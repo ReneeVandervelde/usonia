@@ -1,7 +1,5 @@
 package usonia.client
 
-import com.ionspin.kotlin.crypto.hash.Hash
-import com.ionspin.kotlin.crypto.util.encodeToUByteArray
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.websocket.*
@@ -218,9 +216,10 @@ class HttpClient(
             port = port,
             path = "/site",
         ).apply {
-            withAuthHeaders()
             accept(ContentType.Application.Json)
-            setBody(json.encodeToString(Site.serializer(), site))
+            val data = json.encodeToString(Site.serializer(), site)
+            setBody(data)
+            withAuthHeaders(data)
         }
 
         httpClient.post(request)
@@ -232,9 +231,10 @@ class HttpClient(
             port = port,
             path = "/flags/$key",
         ).apply {
-            withAuthHeaders()
             accept(ContentType.Application.Json)
-            setBody(json.encodeToString(String.serializer().nullable, value))
+            val data = json.encodeToString(String.serializer().nullable, value)
+            setBody(data)
+            withAuthHeaders(data)
         }
 
         httpClient.put(request)
@@ -246,7 +246,7 @@ class HttpClient(
             port = port,
             path = "/flags/$key",
         ).apply {
-            withAuthHeaders()
+            withAuthHeaders(null)
             accept(ContentType.Application.Json)
         }
 
@@ -260,7 +260,7 @@ class HttpClient(
             port = port,
             path = "/security/arm",
         ).apply {
-            withAuthHeaders()
+            withAuthHeaders(null)
             accept(ContentType.Application.Json)
         }
 
@@ -273,7 +273,7 @@ class HttpClient(
             port = port,
             path = "/events/latest/${id.value}/${type.simpleName}",
         ).apply {
-            withAuthHeaders()
+            withAuthHeaders(null)
             accept(ContentType.Application.Json)
         }
 
@@ -390,9 +390,10 @@ class HttpClient(
             port = port,
             path = "/actions",
         ).apply {
-            withAuthHeaders()
             accept(ContentType.Application.Json)
-            setBody(json.encodeToString(ActionSerializer, action))
+            val data = json.encodeToString(ActionSerializer, action)
+            setBody(data)
+            withAuthHeaders(data)
         }
 
         httpClient.post(request)
@@ -404,9 +405,10 @@ class HttpClient(
             port = port,
             path = "/events",
         ).apply {
-            withAuthHeaders()
             accept(ContentType.Application.Json)
-            setBody(json.encodeToString(EventSerializer, event))
+            val data = json.encodeToString(EventSerializer, event)
+            setBody(data)
+            withAuthHeaders(data)
         }
 
         httpClient.post(request)
@@ -428,12 +430,12 @@ class HttpClient(
         parameter(Auth.Signature.HEADER, hash.value)
     }
 
-    private fun HttpMessageBuilder.withAuthHeaders() {
+    private fun HttpMessageBuilder.withAuthHeaders(data: String?) {
         val timestamp = Auth.Timestamp(clock.now())
         val nonce = Auth.Nonce(Random.nextLong().toString())
         val psk = authenticationProvider.auth ?: throw IllegalStateException("Authentication not configured")
         val hash = Auth.createSignature(
-            body = null,
+            body = data,
             timestamp = timestamp,
             psk = psk,
             nonce = nonce,

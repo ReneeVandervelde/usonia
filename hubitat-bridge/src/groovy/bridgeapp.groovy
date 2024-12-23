@@ -194,7 +194,8 @@ def onEvent(event) {
 
 def postAuthorized(uri, timestamp, json) {
     def jsonString = new groovy.json.JsonBuilder(json).toString()
-    def hash = MessageDigest.getInstance("SHA-256").digest((jsonString + timestamp + psk).getBytes("UTF-8")).encodeHex().toString()
+    def nonce = new Random().nextLong().toString()
+    def hash = MessageDigest.getInstance("SHA-256").digest((jsonString + timestamp + psk + nonce).getBytes("UTF-8")).encodeHex().toString()
     def shortHash = hash.substring(0, 8)
 
     def requestParams = [
@@ -205,7 +206,8 @@ def postAuthorized(uri, timestamp, json) {
         "headers": [
             "X-Signature": "$hash",
             "X-Timestamp": timestamp,
-            "X-Bridge-Id": bridgeId
+            "X-Bridge-Id": bridgeId,
+            "X-Nonce": nonce
         ]
     ]
 
