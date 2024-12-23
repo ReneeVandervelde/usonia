@@ -27,7 +27,6 @@ internal class EventBridgeHttpPublisher(
     override val path: String = "/bridges/{$BRIDGE_PARAM}/events"
     override val deserializer = EventSerializer
     override val serializer = Status.serializer()
-    override val authorized: Boolean = true
 
     override suspend fun getResponse(data: Event, request: HttpRequest): RestResponse<Status> {
         val bridgeId = request.parameters[BRIDGE_PARAM]?.first()?.let(::Identifier) ?: return RestResponse(Statuses.missingRequired(BRIDGE_PARAM), status = 400)
