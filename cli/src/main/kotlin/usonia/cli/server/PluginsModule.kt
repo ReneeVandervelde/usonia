@@ -11,7 +11,6 @@ import usonia.rules.RulesPlugin
 import usonia.server.auth.ServerAuthPlugin
 import usonia.server.client.BackendClient
 import usonia.telegram.TelegramBridgePlugin
-import usonia.todoist.TodoistBridgePlugin
 import usonia.weather.WeatherPlugin
 import usonia.web.WebPlugin
 
@@ -38,7 +37,6 @@ class PluginsModule(
             clock = clock
         ),
         weatherPlugin,
-        TodoistBridgePlugin(client, logger),
         RulesPlugin(client, weatherPlugin.weatherAccess, logger),
         HubitatPlugin(client, logger),
         HueBridgePlugin(client, logger),
