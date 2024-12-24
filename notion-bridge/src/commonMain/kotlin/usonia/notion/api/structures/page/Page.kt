@@ -10,4 +10,5 @@ internal data class Page(
     val id: PageId,
     val parent: Parent,
     val properties: Map<PropertyName, Property>,
+    val icon: PageIcon? = null,
 )

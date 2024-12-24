@@ -19,6 +19,7 @@ import usonia.notion.api.structures.block.Block
 import usonia.notion.api.structures.block.BlockArgument
 import usonia.notion.api.structures.database.DatabaseId
 import usonia.notion.api.structures.page.Page
+import usonia.notion.api.structures.page.PageIcon
 import usonia.notion.api.structures.page.PageId
 import usonia.notion.api.structures.property.*
 import usonia.server.DummyClient
@@ -489,6 +490,7 @@ class AwolDeviceReporterTest {
         results = listOf(
             Page(
                 id = id,
+                icon = PageIcon.Emoji("\uD83D\uDD0B"),
                 parent = Parent.Database(parent),
                 properties = mapOf(
                     NotionConfig.Properties.REF to Property.RichText(
