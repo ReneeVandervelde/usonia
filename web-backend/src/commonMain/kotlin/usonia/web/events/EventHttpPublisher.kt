@@ -26,6 +26,10 @@ internal class EventHttpPublisher(
     override val deserializer = EventSerializer
     override val serializer = Status.serializer()
 
+    override suspend fun requiresAuthorization(data: Event, request: HttpRequest): Boolean {
+        return data.isSensitive
+    }
+
     override suspend fun getResponse(data: Event, request: HttpRequest): RestResponse<Status> {
         client.publishEvent(client.adjustForOffsets(data))
         return RestResponse(Statuses.SUCCESS)

@@ -36,6 +36,10 @@ class TimedArmSecurityController(
     override val path: String = "/glass/arm"
     override val method: String = "PUT"
 
+    override suspend fun requiresAuthorization(data: Boolean, request: HttpRequest): Boolean {
+        return false
+    }
+
     override suspend fun getResponse(data: Boolean, request: HttpRequest): RestResponse<Status> {
         running.value?.cancel()
         running.value = null
