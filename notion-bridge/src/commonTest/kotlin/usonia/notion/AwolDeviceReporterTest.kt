@@ -490,7 +490,7 @@ class AwolDeviceReporterTest {
         results = listOf(
             Page(
                 id = id,
-                icon = PageIcon.Emoji("\uD83D\uDD0B"),
+                icon = PageIcon.Emoji("\uD83E\uDEAB"),
                 parent = Parent.Database(parent),
                 properties = mapOf(
                     NotionConfig.Properties.REF to Property.RichText(
