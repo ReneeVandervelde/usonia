@@ -19,6 +19,7 @@ import usonia.notion.api.structures.block.Block
 import usonia.notion.api.structures.block.BlockArgument
 import usonia.notion.api.structures.database.DatabaseId
 import usonia.notion.api.structures.page.Page
+import usonia.notion.api.structures.page.PageIcon
 import usonia.notion.api.structures.page.PageId
 import usonia.notion.api.structures.property.*
 import usonia.server.DummyClient
@@ -109,7 +110,7 @@ class AwolDeviceReporterTest {
         apiSpy.createdPages.first().run {
             assertTrue(parent is Parent.Database)
             assertEquals("666", parent.database_id.value)
-            assertEquals(3, properties.size)
+            assertEquals(5, properties.size)
             properties[NotionConfig.Properties.REF]?.let {
                 assertEquals("fake-sensor", it.richTextPropertyText)
             }
@@ -118,6 +119,12 @@ class AwolDeviceReporterTest {
             }
             properties[NotionConfig.Properties.TITLE]?.let {
                 assertEquals("Replace batteries in Fake Sensor", it.titlePropertyText)
+            }
+            properties[NotionConfig.Properties.IMPACT]?.let {
+                assertEquals("Medium", (it as PropertyArgument.Select).select.name)
+            }
+            properties[NotionConfig.Properties.URGENCY]?.let {
+                assertEquals("High", (it as PropertyArgument.Select).select.name)
             }
         }
     }
@@ -483,6 +490,7 @@ class AwolDeviceReporterTest {
         results = listOf(
             Page(
                 id = id,
+                icon = PageIcon.Emoji("\uD83E\uDEAB"),
                 parent = Parent.Database(parent),
                 properties = mapOf(
                     NotionConfig.Properties.REF to Property.RichText(

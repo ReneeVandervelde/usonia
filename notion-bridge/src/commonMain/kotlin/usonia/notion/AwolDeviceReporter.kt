@@ -27,9 +27,11 @@ import usonia.notion.api.structures.block.BlockArgument
 import usonia.notion.api.structures.database.DatabaseId
 import usonia.notion.api.structures.database.DatabaseQuery
 import usonia.notion.api.structures.page.*
+import usonia.notion.api.structures.property.*
 import usonia.notion.api.structures.property.MultiSelectArgument
 import usonia.notion.api.structures.property.Property
 import usonia.notion.api.structures.property.PropertyArgument
+import usonia.notion.api.structures.property.SelectArgument
 import usonia.notion.api.structures.property.StatusArgument
 import usonia.server.client.BackendClient
 import kotlin.time.Duration.Companion.milliseconds
@@ -302,6 +304,16 @@ internal class AwolDeviceReporter(
                             MultiSelectArgument(
                                 name = tag,
                             )
+                        )
+                    ),
+                    NotionConfig.Properties.IMPACT to PropertyArgument.Select(
+                        select = SelectArgument(
+                            name = NotionConfig.ImpactValues.MEDIUM
+                        )
+                    ),
+                    NotionConfig.Properties.URGENCY to PropertyArgument.Select(
+                        select = SelectArgument(
+                            name = NotionConfig.UrgencyValues.HIGH
                         )
                     )
                 )

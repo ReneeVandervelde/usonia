@@ -12,6 +12,20 @@ internal object NotionConfig {
         val TITLE = PropertyName("Name")
         val TAGS = PropertyName("Tags")
         val STATUS = PropertyName("Complete")
+        val URGENCY = PropertyName("Urgency")
+        val IMPACT = PropertyName("Impact")
+    }
+
+    object UrgencyValues {
+        val LOW = "Low"
+        val MEDIUM = "Medium"
+        val HIGH = "High"
+    }
+
+    object ImpactValues {
+        val LOW = "Low"
+        val MEDIUM = "Medium"
+        val HIGH = "High"
     }
 
     object PropertyValues {
