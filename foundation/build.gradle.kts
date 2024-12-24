@@ -7,7 +7,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api("com.github.ajalt.colormath:colormath:3.2.0")
+                api("com.github.ajalt.colormath:colormath:3.6.0")
                 api(projects.kotlinExtensions)
                 api(libs.kotlin.datetime)
                 api(libs.kimchi.logger)
