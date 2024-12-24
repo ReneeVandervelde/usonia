@@ -12,6 +12,9 @@ internal sealed interface PropertyArgument {
     data class MultiSelect(
         val multi_select: List<MultiSelectArgument>
     ): PropertyArgument
+    data class Select(
+        val select: SelectArgument
+    ): PropertyArgument
     data class Title(
         val title: List<BlockArgument>,
     ): PropertyArgument
@@ -27,6 +30,7 @@ internal class PropertyArgumentSerializer: KSerializer<PropertyArgument> {
     @Serializable
     private data class Surrogate(
         val multi_select: List<MultiSelectArgument>? = null,
+        val select: SelectArgument? = null,
         val title: List<BlockArgument>? = null,
         val rich_text: List<BlockArgument>? = null,
         val status: StatusArgument? = null,
@@ -42,6 +46,9 @@ internal class PropertyArgumentSerializer: KSerializer<PropertyArgument> {
         val surrogate = when (value) {
             is PropertyArgument.MultiSelect -> Surrogate(
                 multi_select = value.multi_select,
+            )
+            is PropertyArgument.Select -> Surrogate(
+                select = value.select,
             )
             is PropertyArgument.Title -> Surrogate(
                 title = value.title,
