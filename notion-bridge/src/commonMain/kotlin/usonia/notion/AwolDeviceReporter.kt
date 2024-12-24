@@ -308,7 +308,7 @@ internal class AwolDeviceReporter(
                     ),
                     NotionConfig.Properties.IMPACT to PropertyArgument.Select(
                         select = SelectArgument(
-                            name = NotionConfig.ImpactValues.HIGH
+                            name = NotionConfig.ImpactValues.MEDIUM
                         )
                     ),
                     NotionConfig.Properties.URGENCY to PropertyArgument.Select(

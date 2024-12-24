@@ -121,7 +121,7 @@ class AwolDeviceReporterTest {
                 assertEquals("Replace batteries in Fake Sensor", it.titlePropertyText)
             }
             properties[NotionConfig.Properties.IMPACT]?.let {
-                assertEquals("High", (it as PropertyArgument.Select).select.name)
+                assertEquals("Medium", (it as PropertyArgument.Select).select.name)
             }
             properties[NotionConfig.Properties.URGENCY]?.let {
                 assertEquals("High", (it as PropertyArgument.Select).select.name)
