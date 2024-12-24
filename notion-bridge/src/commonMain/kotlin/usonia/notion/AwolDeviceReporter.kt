@@ -252,10 +252,10 @@ internal class AwolDeviceReporter(
             token = token,
             database = database,
             query = DatabaseQuery(
-                filter = PageFilter.MultiSelect(
+                filter = PageFilter.Text(
                     property = NotionConfig.Properties.REF,
-                    filter = FilterQuery.Contains(
-                        contains = ref.value
+                    filter = TextFilter.Equals(
+                        equals = ref.value
                     )
                 )
             )
