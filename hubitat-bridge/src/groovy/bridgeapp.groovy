@@ -184,7 +184,8 @@ def onEvent(event) {
             break;
         case "valve":
             eventJson.valveState = event.value.toUpperCase()
-        case "lastCodeName":
+            break;
+        default:
             log.debug "Ignoring event ${event.name}"
             return;
     }

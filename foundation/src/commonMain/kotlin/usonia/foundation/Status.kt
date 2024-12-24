@@ -48,4 +48,9 @@ object Statuses {
         code = 7,
         message = "Bridge $bridgeId is not configured properly",
     )
+
+    val ILLEGAL_BODY = Status(
+        code = 8,
+        message = "Unable to parse request body",
+    )
 }

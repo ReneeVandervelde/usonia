@@ -19,6 +19,9 @@ internal class FlagToggleController(
     private val logger: KimchiLogger,
 ): HttpController {
     override val path: String = "/flags/{key}/toggle"
+
+    override suspend fun requiresAuthorization(request: HttpRequest): Boolean = false
+
     override suspend fun getResponse(request: HttpRequest): HttpResponse {
         val key = request.parameters["key"]?.firstOrNull() ?: return HttpResponse(
             status = 400,

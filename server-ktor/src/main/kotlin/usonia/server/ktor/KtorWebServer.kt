@@ -1,5 +1,6 @@
 package usonia.server.ktor
 
+import com.inkapplications.standard.throwCancels
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -16,10 +17,14 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import usonia.foundation.Status
+import usonia.foundation.Statuses
 import usonia.server.AppConfig
 import usonia.server.WebServer
 import usonia.server.auth.AuthResult
 import usonia.server.auth.Authorization
+import usonia.server.http.BodyDecodeFailure
 import usonia.server.http.HttpRequest
 import usonia.server.http.SocketCall
 import kotlin.coroutines.suspendCoroutine
@@ -97,27 +102,39 @@ class KtorWebServer(
                                     headers = call.request.headers.toMap(),
                                     parameters = call.parameters.toMap(),
                                 )
-                                if (controller.authorized) {
-                                    when (val authResult = authorization.validate(request)) {
-                                        is AuthResult.Failure -> {
-                                            logger.info("Rejecting Request after failed auth.")
-                                            return@handle call.respond(HttpStatusCode.Unauthorized, authResult)
+                                runCatching {
+                                    if (controller.requiresAuthorization(request)) {
+                                        when (val authResult = authorization.validate(request)) {
+                                            is AuthResult.Failure -> {
+                                                logger.info("Rejecting Request after failed auth.")
+                                                return@handle call.respond(HttpStatusCode.Unauthorized, authResult)
+                                            }
+
+                                            AuthResult.Success -> {
+                                                logger.trace("Request authorized")
+                                            }
                                         }
-                                        AuthResult.Success -> {
-                                            logger.trace("Request authorized")
+                                    }
+                                    val response = runCatching { controller.getResponse(request) }
+                                        .onFailure {
+                                            logger.error("Failed to get response", it)
                                         }
+                                        .getOrThrow()
+                                    call.respondText(
+                                        text = response.body,
+                                        contentType = response.contentType.split('/').let { ContentType(it[0], it.getOrNull(1).orEmpty()) },
+                                        status = HttpStatusCode(response.status, "")
+                                    )
+                                }.throwCancels().onFailure { error ->
+                                    when (error) {
+                                        is BodyDecodeFailure -> call.respondText(
+                                            text = Statuses.ILLEGAL_BODY.let { Json.encodeToString(Status.serializer(), it) },
+                                        )
+                                        else -> call.respondText(
+                                            text = Statuses.UNKNOWN.let { Json.encodeToString(Status.serializer(), it) },
+                                        )
                                     }
                                 }
-                                val response = runCatching { controller.getResponse(request) }
-                                    .onFailure {
-                                        logger.error("Failed to get response", it)
-                                    }
-                                    .getOrThrow()
-                                call.respondText(
-                                    text = response.body,
-                                    contentType = response.contentType.split('/').let { ContentType(it[0], it.getOrNull(1).orEmpty()) },
-                                    status = HttpStatusCode(response.status, "")
-                                )
                             }
                         }
                     }

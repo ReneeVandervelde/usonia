@@ -7,7 +7,7 @@ import usonia.server.http.HttpResponse
 
 object DefaultController: HttpController {
     override val path: String = "/"
-    override val authorized: Boolean = false
+    override suspend fun requiresAuthorization(request: HttpRequest): Boolean = false
 
     override suspend fun getResponse(request: HttpRequest): HttpResponse {
         return HttpResponse(

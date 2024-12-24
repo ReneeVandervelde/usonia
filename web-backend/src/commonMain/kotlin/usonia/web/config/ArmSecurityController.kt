@@ -18,6 +18,8 @@ class ArmSecurityController(
     override val path: String = "/security/arm"
     override val method: String = "PUT"
 
+    override suspend fun requiresAuthorization(request: HttpRequest): Boolean = false
+
     override suspend fun getResponse(request: HttpRequest): HttpResponse {
         config.armSecurity()
 

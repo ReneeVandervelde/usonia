@@ -6,10 +6,12 @@ package usonia.server.http
 interface HttpController {
     val path: String
     val method: String get() = "GET"
-    val authorized: Boolean get() = true
+
+    suspend fun requiresAuthorization(
+        request: HttpRequest
+    ): Boolean = true
 
     suspend fun getResponse(
         request: HttpRequest
     ): HttpResponse
 }
-

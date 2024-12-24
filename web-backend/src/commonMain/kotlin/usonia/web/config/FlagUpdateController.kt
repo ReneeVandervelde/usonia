@@ -22,6 +22,8 @@ class FlagUpdateController(
     override val serializer: KSerializer<Status> = Status.serializer()
     override val deserializer: KSerializer<String?> = String.serializer().nullable
 
+    override suspend fun requiresAuthorization(data: String?, request: HttpRequest): Boolean = false
+
     override suspend fun getResponse(data: String?, request: HttpRequest): RestResponse<Status> {
         val key = request.parameters["key"]?.firstOrNull() ?: return RestResponse(Statuses.missingRequired("key"))
         config.setFlag(key, data)
