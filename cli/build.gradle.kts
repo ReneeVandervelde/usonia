@@ -37,7 +37,6 @@ dependencies {
     implementation(projects.serverKtor)
     implementation(projects.stateMemory)
     implementation(projects.stateSqldelight)
-    implementation(projects.todoistBridge)
     implementation(projects.telegramBridge)
     implementation(projects.weather)
     implementation(projects.webBackend)
