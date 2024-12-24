@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 internal sealed interface NotionResponse {
     @Serializable
     data class ListResponse<T>(
-        val results: List<T>,
+        val results: List<T> = emptyList(),
     ): NotionResponse
 }
