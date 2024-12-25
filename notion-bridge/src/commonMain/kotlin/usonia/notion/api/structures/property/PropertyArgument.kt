@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import usonia.notion.api.structures.block.BlockArgument
+import usonia.notion.api.structures.block.RichTextArgument
 
 @Serializable(with = PropertyArgumentSerializer::class)
 internal sealed interface PropertyArgument {
@@ -16,10 +16,10 @@ internal sealed interface PropertyArgument {
         val select: SelectArgument
     ): PropertyArgument
     data class Title(
-        val title: List<BlockArgument>,
+        val title: List<usonia.notion.api.structures.block.RichTextArgument>,
     ): PropertyArgument
     data class RichText(
-        val rich_text: List<BlockArgument>,
+        val rich_text: List<usonia.notion.api.structures.block.RichTextArgument>,
     ): PropertyArgument
     data class Status(
         val status: StatusArgument,
@@ -31,8 +31,8 @@ internal class PropertyArgumentSerializer: KSerializer<PropertyArgument> {
     private data class Surrogate(
         val multi_select: List<MultiSelectArgument>? = null,
         val select: SelectArgument? = null,
-        val title: List<BlockArgument>? = null,
-        val rich_text: List<BlockArgument>? = null,
+        val title: List<RichTextArgument>? = null,
+        val rich_text: List<RichTextArgument>? = null,
         val status: StatusArgument? = null,
     )
 

@@ -19,15 +19,16 @@ import usonia.foundation.unit.compareTo
 import usonia.kotlin.*
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
+import usonia.kotlin.datetime.current
 import usonia.notion.api.NotionApi
 import usonia.notion.api.structures.NotionBearerToken
 import usonia.notion.api.structures.Parent
-import usonia.notion.api.structures.block.Block
 import usonia.notion.api.structures.block.BlockArgument
+import usonia.notion.api.structures.block.RichText
+import usonia.notion.api.structures.block.RichTextArgument
 import usonia.notion.api.structures.database.DatabaseId
 import usonia.notion.api.structures.database.DatabaseQuery
 import usonia.notion.api.structures.page.*
-import usonia.notion.api.structures.property.*
 import usonia.notion.api.structures.property.MultiSelectArgument
 import usonia.notion.api.structures.property.Property
 import usonia.notion.api.structures.property.PropertyArgument
@@ -162,7 +163,10 @@ internal class AwolDeviceReporter(
                         multi_select = listOf(
                             MultiSelectArgument(
                                 name = NotionConfig.Tags.DEAD_BATTERY
-                            )
+                            ),
+                            MultiSelectArgument(
+                                name = NotionConfig.Tags.USONIA
+                            ),
                         )
                     )
                 ))
@@ -284,8 +288,8 @@ internal class AwolDeviceReporter(
                 properties = mapOf(
                     NotionConfig.Properties.TITLE to PropertyArgument.Title(
                         title = listOf(
-                            BlockArgument.RichText(
-                                text = BlockArgument.RichText.Text(
+                            RichTextArgument.Text(
+                                text = RichTextArgument.Text.TextContent(
                                     content = content,
                                 )
                             )
@@ -293,8 +297,8 @@ internal class AwolDeviceReporter(
                     ),
                     NotionConfig.Properties.REF to PropertyArgument.RichText(
                         rich_text = listOf(
-                            BlockArgument.RichText(
-                                text = BlockArgument.RichText.Text(
+                            RichTextArgument.Text(
+                                text = RichTextArgument.Text.TextContent(
                                     content = ref.value,
                                 )
                             )
@@ -304,7 +308,10 @@ internal class AwolDeviceReporter(
                         multi_select = listOf(
                             MultiSelectArgument(
                                 name = tag,
-                            )
+                            ),
+                            MultiSelectArgument(
+                                name = NotionConfig.Tags.USONIA
+                            ),
                         )
                     ),
                     NotionConfig.Properties.IMPACT to PropertyArgument.Select(
@@ -315,6 +322,17 @@ internal class AwolDeviceReporter(
                     NotionConfig.Properties.URGENCY to PropertyArgument.Select(
                         select = SelectArgument(
                             name = NotionConfig.UrgencyValues.HIGH
+                        )
+                    )
+                ),
+                children = listOf(
+                    BlockArgument.Paragraph(
+                        richText = listOf(
+                            RichTextArgument.Text(
+                                text = RichTextArgument.Text.TextContent(
+                                    content = "Report opened: ${clock.current}"
+                                )
+                            )
                         )
                     )
                 )
@@ -367,7 +385,7 @@ internal class AwolDeviceReporter(
             ?.let { it as? Property.RichText }
             ?.rich_text
             ?.first()
-            ?.let { it as? Block.RichText }
+            ?.let { it as? RichText.Text }
             ?.plain_text
             ?.let { Identifier(it) }
     }

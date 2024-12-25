@@ -15,8 +15,8 @@ import usonia.kotlin.datetime.current
 import usonia.kotlin.ongoingFlowOf
 import usonia.notion.api.structures.NotionResponse
 import usonia.notion.api.structures.Parent
-import usonia.notion.api.structures.block.Block
-import usonia.notion.api.structures.block.BlockArgument
+import usonia.notion.api.structures.block.RichText
+import usonia.notion.api.structures.block.RichTextArgument
 import usonia.notion.api.structures.database.DatabaseId
 import usonia.notion.api.structures.page.Page
 import usonia.notion.api.structures.page.PageIcon
@@ -115,7 +115,9 @@ class AwolDeviceReporterTest {
                 assertEquals("fake-sensor", it.richTextPropertyText)
             }
             properties[NotionConfig.Properties.TAGS]?.let {
-                assertEquals("Dead Battery", (it as PropertyArgument.MultiSelect).multi_select.single().name)
+                val names = (it as PropertyArgument.MultiSelect).multi_select.map { it.name }
+                assertTrue("Dead Battery" in names, "Dead battery tag sent")
+                assertTrue("Usonia" in names, "Usonia tag sent")
             }
             properties[NotionConfig.Properties.TITLE]?.let {
                 assertEquals("Replace batteries in Fake Sensor", it.titlePropertyText)
@@ -496,8 +498,8 @@ class AwolDeviceReporterTest {
                     NotionConfig.Properties.REF to Property.RichText(
                         id = PropertyId("test-ref-property-id"),
                         rich_text = listOf(
-                            Block.RichText(
-                                text = Block.RichText.Text(
+                            RichText.Text(
+                                text = RichText.Text.TextContent(
                                     content = ref,
                                 ),
                                 plain_text = ref,
@@ -516,7 +518,7 @@ class AwolDeviceReporterTest {
     private val PropertyArgument.richTextPropertyText: String? get() {
         if (this !is PropertyArgument.RichText) return null
         val block = rich_text.single()
-        if (block !is BlockArgument.RichText) return null
+        if (block !is RichTextArgument.Text) return null
 
         return block.text.content
     }
@@ -524,7 +526,7 @@ class AwolDeviceReporterTest {
     private val PropertyArgument.titlePropertyText: String? get() {
         if (this !is PropertyArgument.Title) return null
         val block = title.single()
-        if (block !is BlockArgument.RichText) return null
+        if (block !is RichTextArgument.Text) return null
 
         return block.text.content
     }

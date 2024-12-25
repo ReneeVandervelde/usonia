@@ -6,30 +6,32 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-@Serializable(with = BlockSerializer::class)
-internal sealed interface Block {
-    data class RichText(
+@Serializable(with = RichTextSerializer::class)
+internal sealed interface RichText
+{
+    data class Text(
         val plain_text: String,
-        val text: Text,
-    ): Block {
+        val text: TextContent,
+    ): RichText {
         @Serializable
-        data class Text(
+        data class TextContent(
             val content: String,
             val link: String? = null,
         )
     }
 }
 
-
-internal class BlockSerializer: KSerializer<Block> {
+internal class RichTextSerializer: KSerializer<RichText>
+{
     override val descriptor: SerialDescriptor = Surrogate.serializer().descriptor
 
-    override fun serialize(encoder: Encoder, value: Block) = TODO("Not implemented")
+    override fun serialize(encoder: Encoder, value: RichText) = TODO("Not implemented")
 
-    override fun deserialize(decoder: Decoder): Block {
+    override fun deserialize(decoder: Decoder): RichText
+    {
         val surrogate = Surrogate.serializer().deserialize(decoder)
         return when (surrogate.type) {
-            BlockType.Text -> Block.RichText(
+            RichTextType.Text -> RichText.Text(
                 plain_text = surrogate.plain_text ?: error("Missing plain_text"),
                 text = surrogate.text ?: error("Missing text content"),
             )
@@ -39,8 +41,8 @@ internal class BlockSerializer: KSerializer<Block> {
 
     @Serializable
     private data class Surrogate(
-        val type: BlockType,
+        val type: RichTextType,
         val plain_text: String? = null,
-        val text: Block.RichText.Text? = null,
+        val text: RichText.Text.TextContent? = null,
     )
 }

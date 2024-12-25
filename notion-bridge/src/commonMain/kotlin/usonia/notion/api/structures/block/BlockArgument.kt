@@ -1,33 +1,45 @@
 package usonia.notion.api.structures.block
 
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
 @Serializable(with = BlockArgumentSerializer::class)
-internal sealed interface BlockArgument {
-    data class RichText(
-        val text: Text
-    ): BlockArgument {
-        @Serializable
-        data class Text(
-            val content: String,
-            val link: String? = null,
-        )
-    }
+internal sealed interface BlockArgument
+{
+    @Serializable
+    data class Paragraph(
+        @SerialName("rich_text")
+        val richText: List<RichTextArgument>
+    ): BlockArgument
+
+    @Serializable
+    data class Code(
+        val language: CodeLanguage,
+        @SerialName("rich_text")
+        val content: List<RichTextArgument>
+    ): BlockArgument
 }
 
-internal class BlockArgumentSerializer: KSerializer<BlockArgument> {
-    override val descriptor: SerialDescriptor = Surrogate.serializer().descriptor
+internal class BlockArgumentSerializer: KSerializer<BlockArgument>
+{
+    override val descriptor = Surrogate.serializer().descriptor
 
-    override fun deserialize(decoder: Decoder): BlockArgument = TODO("Not implemented")
+    override fun deserialize(decoder: Decoder): BlockArgument = TODO()
 
-    override fun serialize(encoder: Encoder, value: BlockArgument) {
-        val surrogate = when (value) {
-            is BlockArgument.RichText -> Surrogate(
-                text = value.text,
+    override fun serialize(encoder: Encoder, value: BlockArgument)
+    {
+        val surrogate = when (value)
+        {
+            is BlockArgument.Paragraph -> Surrogate(
+                type = BlockType.PARAGRAPH,
+                paragraph = value,
+            )
+            is BlockArgument.Code -> Surrogate(
+                type = BlockType.CODE,
+                code = value,
             )
         }
         Surrogate.serializer().serialize(encoder, surrogate)
@@ -35,6 +47,10 @@ internal class BlockArgumentSerializer: KSerializer<BlockArgument> {
 
     @Serializable
     private data class Surrogate(
-        val text: BlockArgument.RichText.Text? = null,
+        @SerialName("object")
+        val objectType: String = "block",
+        val type: BlockType,
+        val paragraph: BlockArgument.Paragraph? = null,
+        val code: BlockArgument.Code? = null,
     )
 }

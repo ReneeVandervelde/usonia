@@ -4,11 +4,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @JvmInline
-internal value class BlockType(val value: String)
+internal value class RichTextType(val value: String)
 {
     companion object
     {
-        val PARAGRAPH = BlockType("paragraph")
-        val CODE = BlockType("code")
+        val Text = RichTextType("text")
     }
 }
