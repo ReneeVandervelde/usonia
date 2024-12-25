@@ -12,6 +12,10 @@ internal sealed interface TextFilter {
         val equals: String,
     ): TextFilter
 
+    data class Contains(
+        val contains: String,
+    ): TextFilter
+
     data class Empty(
         val empty: Boolean,
     ): TextFilter
@@ -27,6 +31,9 @@ internal class TextFilterSerializer: KSerializer<TextFilter> {
             is TextFilter.Equals -> Surrogate(
                 equals = value.equals,
             )
+            is TextFilter.Contains -> Surrogate(
+                contains = value.contains,
+            )
             is TextFilter.Empty -> if (value.empty) Surrogate(
                 is_empty = true,
             ) else Surrogate(
@@ -38,6 +45,7 @@ internal class TextFilterSerializer: KSerializer<TextFilter> {
 
     @Serializable
     private data class Surrogate(
+        val contains: String? = null,
         val equals: String? = null,
         val is_empty: Boolean? = null,
         val is_not_empty: Boolean? = null,

@@ -252,10 +252,10 @@ internal class AwolDeviceReporter(
             token = token,
             database = database,
             query = DatabaseQuery(
-                filter = PageFilter.MultiSelect(
+                filter = PageFilter.Text(
                     property = NotionConfig.Properties.REF,
-                    filter = FilterQuery.Contains(
-                        contains = ref.value
+                    filter = TextFilter.Equals(
+                        equals = ref.value
                     )
                 )
             )
@@ -280,6 +280,7 @@ internal class AwolDeviceReporter(
             token = token,
             page = NewPage(
                 parent = Parent.Database(database),
+                icon = PageIcon.Emoji("\uD83E\uDEAB"),
                 properties = mapOf(
                     NotionConfig.Properties.TITLE to PropertyArgument.Title(
                         title = listOf(
