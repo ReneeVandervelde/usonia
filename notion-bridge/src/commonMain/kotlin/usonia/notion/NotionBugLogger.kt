@@ -58,7 +58,7 @@ internal class NotionBugLogger(
 
     private suspend fun handleError(parameters: Parameters)
     {
-        val title = "Usonia Error: ${parameters.log.message.substring(0 until min(parameters.log.message.length, 60))}"
+        val title = "Usonia Error: ${parameters.log.message.take(60)}"
         val existing = notion.queryDatabase(
             token = parameters.token,
             database = parameters.database,
@@ -139,7 +139,10 @@ internal class NotionBugLogger(
                         content = listOf(
                             Text(
                                 text = Text.TextContent(
-                                    content = parameters.log.cause?.stackTraceToString().orEmpty()
+                                    content = parameters.log.cause
+                                        ?.stackTraceToString()
+                                        .orEmpty()
+                                        .take(2000)
                                 ),
                             ),
                         ),
