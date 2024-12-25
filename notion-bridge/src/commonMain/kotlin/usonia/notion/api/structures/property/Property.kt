@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import usonia.notion.api.structures.block.Block
+import usonia.notion.api.structures.block.RichText
 
 @Serializable(with = PropertySerializer::class)
 internal sealed interface Property {
@@ -18,12 +18,12 @@ internal sealed interface Property {
 
     data class Title(
         override val id: PropertyId,
-        val title: List<Block>,
+        val title: List<usonia.notion.api.structures.block.RichText>,
     ): Property
 
     data class RichText(
         override val id: PropertyId,
-        val rich_text: List<Block>,
+        val rich_text: List<usonia.notion.api.structures.block.RichText>,
     ): Property
 
     data class UnknownPropertyType(
@@ -64,7 +64,7 @@ internal class PropertySerializer: KSerializer<Property> {
         val id: PropertyId,
         val type: PropertyType,
         val multi_select: List<MultiSelectOption>? = null,
-        val title: List<Block>? = null,
-        val rich_text: List<Block>? = null,
+        val title: List<RichText>? = null,
+        val rich_text: List<RichText>? = null,
     )
 }

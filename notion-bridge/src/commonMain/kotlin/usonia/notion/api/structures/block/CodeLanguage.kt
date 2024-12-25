@@ -4,11 +4,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @JvmInline
-internal value class BlockType(val value: String)
+value class CodeLanguage(val value: String)
 {
     companion object
     {
-        val PARAGRAPH = BlockType("paragraph")
-        val CODE = BlockType("code")
+        val KOTLIN = CodeLanguage("kotlin")
+        val PLAIN_TEXT = CodeLanguage("plain text")
     }
 }

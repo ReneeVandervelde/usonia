@@ -8,6 +8,7 @@ import usonia.cli.ColorWriter
 import usonia.core.state.memory.InMemoryActionAccess
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
+import usonia.notion.NotionBridgePlugin
 import usonia.rules.alerts.LogErrorAlerts
 import usonia.server.auth.ServerAuthPlugin
 import usonia.server.UsoniaServer
@@ -29,6 +30,7 @@ class CliServerModule(
             LogSocket,
             ColorWriter,
             LogErrorAlerts,
+            NotionBridgePlugin.logWriter,
         )
         .let(::CompositeLogWriter)
         .let(::ConsolidatedLogger)
