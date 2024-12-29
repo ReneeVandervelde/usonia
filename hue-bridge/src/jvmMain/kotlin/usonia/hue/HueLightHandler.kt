@@ -1,5 +1,9 @@
 package usonia.hue
 
+import com.inkapplications.coroutines.ongoing.collect
+import com.inkapplications.coroutines.ongoing.collectLatest
+import com.inkapplications.coroutines.ongoing.filter
+import com.inkapplications.coroutines.ongoing.map
 import com.inkapplications.standard.throwCancels
 import inkapplications.shade.lights.LightControls
 import inkapplications.shade.lights.parameters.*
@@ -13,7 +17,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import regolith.processes.daemon.Daemon
 import usonia.foundation.*
-import usonia.kotlin.*
+import usonia.kotlin.IoScope
+import usonia.kotlin.RetryStrategy
+import usonia.kotlin.runRetryable
 import usonia.server.client.BackendClient
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -34,7 +40,7 @@ internal class HueLightHandler(
                 .map { action -> site.getDevice(action.target) to action }
                 .filter { (device, _) -> site.findAssociatedBridge(device)?.service == HUE_SERVICE }
                 .filter { (device, _) -> device.capabilities.archetypeId == HueArchetypes.color.archetypeId }
-                .collectOn(requestScope) { (device, action) ->
+                .collect { (device, action) ->
                     handleAction(action, device)
                 }
         }
@@ -50,6 +56,7 @@ internal class HueLightHandler(
                 ),
                 dynamics = dynamicsForState(action),
             )
+
             is Action.Dim -> LightUpdateParameters(
                 dimming = DimmingParameters(
                     brightness = action.level,
@@ -61,6 +68,7 @@ internal class HueLightHandler(
                 },
                 dynamics = dynamicsForState(action),
             )
+
             is Action.ColorTemperatureChange -> LightUpdateParameters(
                 colorTemperature = ColorTemperatureParameters(
                     temperature = action.temperature,
@@ -75,6 +83,7 @@ internal class HueLightHandler(
                 },
                 dynamics = dynamicsForState(action),
             )
+
             is Action.ColorChange -> LightUpdateParameters(
                 color = ColorParameters(
                     color = action.color,
@@ -89,6 +98,7 @@ internal class HueLightHandler(
                 },
                 dynamics = dynamicsForState(action),
             )
+
             else -> throw IllegalStateException("Impossible! Did the event filtering change without updating the modification conditions?")
         }
 
@@ -118,12 +128,15 @@ internal class HueLightHandler(
             error is CancellationException -> {
                 logger.warn("Hue Action was Cancelled while updating hue light: ${device.name}", error)
             }
+
             error is ApiStatusError && error.code == 207 -> {
                 logger.warn("Partial success from hue group update for light: ${device.name}", error)
             }
+
             error is ApiStatusError -> {
                 logger.warn("API Error updating hue light: ${device.name}", error)
             }
+
             else -> {
                 logger.warn("Unknown Error updating hue light: ${device.name}.", error)
             }
@@ -135,6 +148,7 @@ internal class HueLightHandler(
             error is ApiStatusError && error.code == 207 -> {
                 logger.warn("Hue light update finished with partial success. Ignoring error.")
             }
+
             else -> {
                 logger.error("Hue operation was unable to succeed for light update: ${device.name}", error)
             }

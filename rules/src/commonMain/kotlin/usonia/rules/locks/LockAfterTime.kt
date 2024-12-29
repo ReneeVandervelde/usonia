@@ -1,5 +1,6 @@
 package usonia.rules.locks
 
+import com.inkapplications.coroutines.ongoing.*
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
@@ -10,7 +11,7 @@ import kotlinx.coroutines.selects.select
 import regolith.processes.daemon.Daemon
 import usonia.core.state.publishAll
 import usonia.foundation.*
-import usonia.kotlin.*
+import usonia.kotlin.DefaultScope
 import usonia.server.client.BackendClient
 import kotlin.time.Duration.Companion.minutes
 

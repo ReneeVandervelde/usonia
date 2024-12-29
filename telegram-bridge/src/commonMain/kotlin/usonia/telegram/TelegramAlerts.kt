@@ -1,5 +1,8 @@
 package usonia.telegram
 
+import com.inkapplications.coroutines.ongoing.collect
+import com.inkapplications.coroutines.ongoing.collectLatest
+import com.inkapplications.coroutines.ongoing.filterIsInstance
 import com.inkapplications.telegram.client.TelegramBotClient
 import com.inkapplications.telegram.structures.ChatReference
 import com.inkapplications.telegram.structures.InputFile
@@ -13,9 +16,6 @@ import regolith.processes.daemon.Daemon
 import usonia.foundation.Action
 import usonia.foundation.Site
 import usonia.kotlin.IoScope
-import usonia.kotlin.collect
-import usonia.kotlin.collectLatest
-import usonia.kotlin.filterIsInstance
 import usonia.server.client.BackendClient
 
 /**
@@ -52,15 +52,19 @@ internal class TelegramAlerts(
         requestScope.launch {
             val stickerId = alert.icon?.asSticker
             if (stickerId != null) {
-                telegram.sendSticker(StickerParameters(
-                    chatId = ChatReference.Id(chatId),
-                    sticker = InputFile.FileId(stickerId),
-                ))
+                telegram.sendSticker(
+                    StickerParameters(
+                        chatId = ChatReference.Id(chatId),
+                        sticker = InputFile.FileId(stickerId),
+                    )
+                )
             }
-            telegram.sendMessage(MessageParameters(
-                chatId = ChatReference.Id(chatId),
-                text = alert.message,
-            ))
+            telegram.sendMessage(
+                MessageParameters(
+                    chatId = ChatReference.Id(chatId),
+                    text = alert.message,
+                )
+            )
         }
     }
 }

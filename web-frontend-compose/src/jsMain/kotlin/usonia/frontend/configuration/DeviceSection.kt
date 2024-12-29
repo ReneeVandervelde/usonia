@@ -1,6 +1,7 @@
 package usonia.frontend.configuration
 
 import androidx.compose.runtime.Composable
+import com.inkapplications.coroutines.ongoing.map
 import inkapplications.spondee.measure.us.toFahrenheit
 import inkapplications.spondee.scalar.toWholePercentage
 import inkapplications.spondee.structure.format
@@ -13,7 +14,6 @@ import usonia.frontend.navigation.NavigationSection
 import usonia.frontend.navigation.Routing
 import usonia.frontend.widgets.KeyValue
 import usonia.frontend.widgets.LoadingIndicator
-import usonia.kotlin.map
 
 class DeviceSection(
     private val client: FrontendClient,

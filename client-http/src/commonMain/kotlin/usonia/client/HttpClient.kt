@@ -1,5 +1,7 @@
 package usonia.client
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlow
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.websocket.*
@@ -21,8 +23,6 @@ import kotlinx.serialization.json.Json
 import usonia.auth.Auth
 import usonia.client.ktor.PlatformEngine
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlow
 import kotlin.random.Random
 import kotlin.reflect.KClass
 import kotlin.time.Duration
@@ -37,7 +37,7 @@ class HttpClient(
     private val json: Json,
     private val clock: Clock,
     private val logger: KimchiLogger = EmptyLogger,
-): FrontendClient {
+) : FrontendClient {
     private val httpClient = HttpClient(PlatformEngine) {
         install(WebSockets)
         install(ContentNegotiation) {
@@ -267,7 +267,7 @@ class HttpClient(
         httpClient.put(request)
     }
 
-    override suspend fun <T: Event> getState(id: Identifier, type: KClass<T>): T? {
+    override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
         val request = HttpRequestBuilder(
             host = host,
             port = port,

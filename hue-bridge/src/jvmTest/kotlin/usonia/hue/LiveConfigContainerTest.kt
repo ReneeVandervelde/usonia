@@ -1,5 +1,7 @@
 package usonia.hue
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import inkapplications.shade.structures.SecurityStrategy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
@@ -11,8 +13,6 @@ import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.FakeBridge
 import usonia.foundation.FakeSite
 import usonia.foundation.Site
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 import kotlin.test.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -29,7 +29,7 @@ class LiveConfigContainerTest {
     @Test
     fun authTokenUpdates() {
         val scope = TestScope()
-        val config = object: ConfigurationAccess by ConfigurationAccessStub {
+        val config = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     bridges = setOf(
@@ -40,7 +40,7 @@ class LiveConfigContainerTest {
                             ),
                         ),
                     ),
-                ),
+                )
             )
         }
         val container = LiveConfigContainer(config, scope)
@@ -62,7 +62,7 @@ class LiveConfigContainerTest {
     @Test
     fun hostnameUpdates() {
         val scope = TestScope()
-        val config = object: ConfigurationAccess by ConfigurationAccessStub {
+        val config = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     bridges = setOf(
@@ -73,7 +73,7 @@ class LiveConfigContainerTest {
                             ),
                         ),
                     ),
-                ),
+                )
             )
         }
         val container = LiveConfigContainer(config, scope)
@@ -95,7 +95,7 @@ class LiveConfigContainerTest {
     @Test
     fun securityStrategyUpdates() {
         val scope = TestScope()
-        val config = object: ConfigurationAccess by ConfigurationAccessStub {
+        val config = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     bridges = setOf(
@@ -106,7 +106,7 @@ class LiveConfigContainerTest {
                             ),
                         ),
                     ),
-                ),
+                )
             )
         }
         val container = LiveConfigContainer(config, scope)

@@ -1,5 +1,7 @@
 package usonia.rules.lights
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.scalar.percent
 import inkapplications.spondee.scalar.toWholePercentage
@@ -17,10 +19,8 @@ import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.FakeRooms
 import usonia.foundation.FakeSite
 import usonia.foundation.Site
-import usonia.kotlin.OngoingFlow
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
-import usonia.kotlin.ongoingFlowOf
 import usonia.weather.Conditions
 import usonia.weather.FullForecast
 import usonia.weather.LocalWeatherAccess
@@ -40,22 +40,24 @@ class CircadianColorsTest {
     private val sunset = startOfDay.plus(18.hours)
     private val nightStart = startOfDay.plus(DEFAULT_NIGHT_START.minutes)
 
-    val weather = object: LocalWeatherAccess {
-        override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(FullForecast(
-            timestamp = Instant.DISTANT_PAST,
-            sunrise = sunrise,
-            sunset = sunset,
-            rainChance = 0.percent,
-            snowChance = 0.percent,
-            highTemperature = 0.fahrenheit,
-            lowTemperature = 0.fahrenheit,
-        ))
+    val weather = object : LocalWeatherAccess {
+        override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(
+            FullForecast(
+                timestamp = Instant.DISTANT_PAST,
+                sunrise = sunrise,
+                sunset = sunset,
+                rainChance = 0.percent,
+                snowChance = 0.percent,
+                highTemperature = 0.fahrenheit,
+                lowTemperature = 0.fahrenheit,
+            )
+        )
         override val conditions: OngoingFlow<Conditions> get() = TODO()
         override val currentConditions: Conditions get() = TODO()
         override val currentForecast: FullForecast get() = TODO()
     }
 
-    val config = object: ConfigurationAccess by ConfigurationAccessStub {
+    val config = object : ConfigurationAccess by ConfigurationAccessStub {
         override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite)
     }
 
@@ -78,16 +80,18 @@ class CircadianColorsTest {
         val clock = object: ZonedClock by ZonedSystemClock {
             override fun now(): Instant = startOfDay.plus(1.days)
         }
-        val weather = object: LocalWeatherAccess {
-            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(FullForecast(
-                timestamp = Instant.DISTANT_PAST,
-                sunrise = sunrise,
-                sunset = sunset,
-                rainChance = 0.percent,
-                snowChance = 0.percent,
-                highTemperature = 0.fahrenheit,
-                lowTemperature = 0.fahrenheit,
-            ))
+        val weather = object : LocalWeatherAccess {
+            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(
+                FullForecast(
+                    timestamp = Instant.DISTANT_PAST,
+                    sunrise = sunrise,
+                    sunset = sunset,
+                    rainChance = 0.percent,
+                    snowChance = 0.percent,
+                    highTemperature = 0.fahrenheit,
+                    lowTemperature = 0.fahrenheit,
+                )
+            )
             override val conditions: OngoingFlow<Conditions> get() = TODO()
             override val currentConditions: Conditions get() = TODO()
             override val currentForecast: FullForecast get() = TODO()
@@ -240,16 +244,18 @@ class CircadianColorsTest {
 
     @Test
     fun overlapStart() = runTest {
-        val weather = object: LocalWeatherAccess {
-            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(FullForecast(
-                timestamp = Instant.DISTANT_PAST,
-                sunrise = sunrise,
-                sunset = nightStart,
-                rainChance = 0.percent,
-                snowChance = 0.percent,
-                highTemperature = 0.fahrenheit,
-                lowTemperature = 0.fahrenheit,
-            ))
+        val weather = object : LocalWeatherAccess {
+            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(
+                FullForecast(
+                    timestamp = Instant.DISTANT_PAST,
+                    sunrise = sunrise,
+                    sunset = nightStart,
+                    rainChance = 0.percent,
+                    snowChance = 0.percent,
+                    highTemperature = 0.fahrenheit,
+                    lowTemperature = 0.fahrenheit,
+                )
+            )
             override val conditions: OngoingFlow<Conditions> get() = TODO()
             override val currentConditions: Conditions get() = TODO()
             override val currentForecast: FullForecast get() = TODO()

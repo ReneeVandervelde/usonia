@@ -1,5 +1,7 @@
 package usonia.hue
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import inkapplications.shade.events.Events
 import inkapplications.shade.groupedlights.events.GroupedLightEvent
 import inkapplications.shade.lights.events.LightEvent
@@ -16,8 +18,6 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventPublisherSpy
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -41,7 +41,7 @@ class HueEventPublisherTest {
         )
     }
 
-    private val configuration = object: ConfigurationAccess by ConfigurationAccessStub {
+    private val configuration = object : ConfigurationAccess by ConfigurationAccessStub {
         override val site: OngoingFlow<Site> = ongoingFlowOf(
             FakeSite.copy(
                 bridges = setOf(

@@ -1,9 +1,9 @@
 package usonia.core.state
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.first
+import com.inkapplications.coroutines.ongoing.map
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.first
-import usonia.kotlin.map
 
 /**
  * Provides access to the configuration of the application.
@@ -45,12 +45,13 @@ interface ConfigurationAccess {
     suspend fun armSecurity()
 }
 
-val ConfigurationAccess.booleanFlags: OngoingFlow<Map<String, Boolean>> get() = flags
-    .map {
-        it.filter {
-            it.value.equals("true", ignoreCase = true) || it.value.equals("false", ignoreCase = true)
-        }.mapValues { it.value!!.toBooleanStrict() }
-    }
+val ConfigurationAccess.booleanFlags: OngoingFlow<Map<String, Boolean>>
+    get() = flags
+        .map {
+            it.filter {
+                it.value.equals("true", ignoreCase = true) || it.value.equals("false", ignoreCase = true)
+            }.mapValues { it.value!!.toBooleanStrict() }
+        }
 
 /**
  * Rooms configured on the site.
@@ -98,7 +99,8 @@ suspend fun ConfigurationAccess.findDevicesBy(predicate: (Device) -> Boolean) = 
 /**
  * @see [Site.findBridgeByServiceTag]
  */
-suspend fun ConfigurationAccess.findBridgeByServiceTag(service: String): Bridge? = getSite().findBridgeByServiceTag(service)
+suspend fun ConfigurationAccess.findBridgeByServiceTag(service: String): Bridge? =
+    getSite().findBridgeByServiceTag(service)
 
 /**
  * Get a bridge config by its ID.

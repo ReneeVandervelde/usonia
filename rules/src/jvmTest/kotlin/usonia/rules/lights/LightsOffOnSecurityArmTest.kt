@@ -1,5 +1,8 @@
 package usonia.rules.lights
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.asOngoing
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -10,9 +13,6 @@ import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.asOngoing
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.test.assertEquals
 
@@ -20,7 +20,7 @@ class LightsOffOnSecurityArmTest {
     @Test
     fun turnLightsOff() = runTest {
         val securityState = MutableStateFlow(SecurityState.Disarmed)
-        val config = object: ConfigurationAccess by ConfigurationAccessStub {
+        val config = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     rooms = setOf(
@@ -52,7 +52,7 @@ class LightsOffOnSecurityArmTest {
     @Test
     fun noChangeWhenDisarmed() = runTest {
         val securityState = MutableStateFlow(SecurityState.Armed)
-        val config = object: ConfigurationAccess by ConfigurationAccessStub {
+        val config = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     rooms = setOf(

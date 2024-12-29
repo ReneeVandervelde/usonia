@@ -1,5 +1,7 @@
 package usonia.rules.greenhouse
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.scalar.percent
 import kotlinx.coroutines.test.currentTime
@@ -12,8 +14,6 @@ import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import usonia.weather.Conditions
 import usonia.weather.FullForecast
@@ -24,33 +24,37 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 class MorningPlantLightTest {
-    private val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-        override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-            rooms = setOf(
-                FakeRooms.LivingRoom.copy(
-                    devices = setOf(
-                        FakeDevices.Switch.copy(id = Identifier("plant-switch"), fixture = Fixture.Plant),
-                        FakeDevices.Switch.copy(id = Identifier("unrelated-switch")),
+    private val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
+        override val site: OngoingFlow<Site> = ongoingFlowOf(
+            FakeSite.copy(
+                rooms = setOf(
+                    FakeRooms.LivingRoom.copy(
+                        devices = setOf(
+                            FakeDevices.Switch.copy(id = Identifier("plant-switch"), fixture = Fixture.Plant),
+                            FakeDevices.Switch.copy(id = Identifier("unrelated-switch")),
+                        ),
                     ),
-                ),
+                )
             )
-        ))
+        )
     }
 
     @Test
     fun before() = runTest {
         val sunriseTime = Instant.fromEpochMilliseconds(currentTime + 4.hours.inWholeMilliseconds)
         val now = Instant.fromEpochMilliseconds(currentTime)
-        val weatherAccess = object: LocalWeatherAccess {
-            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(FullForecast(
-                timestamp = Instant.DISTANT_PAST,
-                sunrise = sunriseTime,
-                sunset = sunriseTime + 12.hours,
-                rainChance = 0.percent,
-                snowChance = 0.percent,
-                highTemperature = 0.fahrenheit,
-                lowTemperature = 0.fahrenheit,
-            ))
+        val weatherAccess = object : LocalWeatherAccess {
+            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(
+                FullForecast(
+                    timestamp = Instant.DISTANT_PAST,
+                    sunrise = sunriseTime,
+                    sunset = sunriseTime + 12.hours,
+                    rainChance = 0.percent,
+                    snowChance = 0.percent,
+                    highTemperature = 0.fahrenheit,
+                    lowTemperature = 0.fahrenheit,
+                )
+            )
             override val conditions: OngoingFlow<Conditions> get() = TODO()
             override val currentConditions: Conditions get() = TODO()
             override val currentForecast: FullForecast get() = TODO()
@@ -71,16 +75,18 @@ class MorningPlantLightTest {
     fun afterStart() = runTest {
         val sunriseTime = Instant.fromEpochMilliseconds(currentTime + 4.hours.inWholeMilliseconds)
         val now = sunriseTime - 20.minutes
-        val weatherAccess = object: LocalWeatherAccess {
-            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(FullForecast(
-                timestamp = Instant.DISTANT_PAST,
-                sunrise = sunriseTime,
-                sunset = sunriseTime + 12.hours,
-                rainChance = 0.percent,
-                snowChance = 0.percent,
-                lowTemperature = 0.fahrenheit,
-                highTemperature = 0.fahrenheit,
-            ))
+        val weatherAccess = object : LocalWeatherAccess {
+            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(
+                FullForecast(
+                    timestamp = Instant.DISTANT_PAST,
+                    sunrise = sunriseTime,
+                    sunset = sunriseTime + 12.hours,
+                    rainChance = 0.percent,
+                    snowChance = 0.percent,
+                    lowTemperature = 0.fahrenheit,
+                    highTemperature = 0.fahrenheit,
+                )
+            )
             override val conditions: OngoingFlow<Conditions> get() = TODO()
             override val currentConditions: Conditions get() = TODO()
             override val currentForecast: FullForecast get() = TODO()
@@ -102,16 +108,18 @@ class MorningPlantLightTest {
     fun afterEnd() = runTest {
         val sunriseTime = Instant.fromEpochMilliseconds(currentTime + 20.hours.inWholeMilliseconds)
         val now = sunriseTime + 3.hours
-        val weatherAccess = object: LocalWeatherAccess {
-            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(FullForecast(
-                timestamp = Instant.DISTANT_PAST,
-                sunrise = sunriseTime,
-                sunset = sunriseTime + 12.hours,
-                rainChance = 0.percent,
-                snowChance = 0.percent,
-                lowTemperature = 0.fahrenheit,
-                highTemperature = 0.fahrenheit,
-            ))
+        val weatherAccess = object : LocalWeatherAccess {
+            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(
+                FullForecast(
+                    timestamp = Instant.DISTANT_PAST,
+                    sunrise = sunriseTime,
+                    sunset = sunriseTime + 12.hours,
+                    rainChance = 0.percent,
+                    snowChance = 0.percent,
+                    lowTemperature = 0.fahrenheit,
+                    highTemperature = 0.fahrenheit,
+                )
+            )
             override val conditions: OngoingFlow<Conditions> get() = TODO()
             override val currentConditions: Conditions get() = TODO()
             override val currentForecast: FullForecast get() = TODO()

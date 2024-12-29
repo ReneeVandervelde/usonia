@@ -1,11 +1,11 @@
 package usonia.telegram
 
+import com.inkapplications.coroutines.ongoing.collectLatest
 import com.inkapplications.telegram.client.TelegramClientModule
 import com.inkapplications.telegram.structures.WebhookParameters
 import kimchi.logger.KimchiLogger
 import regolith.processes.daemon.Daemon
 import usonia.foundation.Site
-import usonia.kotlin.collectLatest
 import usonia.server.client.BackendClient
 
 private const val BOT_KEY = "bot"
@@ -46,9 +46,11 @@ internal class TelegramTokenUpdater(
         }
 
         proxy.delegate = clientModule.createClient("$bot:$token").also {
-            it.setWebhook(WebhookParameters(
-                url = callback,
-            ))
+            it.setWebhook(
+                WebhookParameters(
+                    url = callback,
+                )
+            )
         }
     }
 }

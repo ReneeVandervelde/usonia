@@ -1,5 +1,7 @@
 package usonia.rules.lights
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.measure.us.inches
 import inkapplications.spondee.scalar.percent
@@ -7,8 +9,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import usonia.foundation.FakeRooms
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 import usonia.weather.Conditions
 import usonia.weather.FullForecast
 import usonia.weather.LocalWeatherAccess
@@ -41,7 +41,7 @@ class DayModeTest {
 
     @Test
     fun dayModeTest() = runTest {
-        val fakeWeather = object: LocalWeatherAccess {
+        val fakeWeather = object : LocalWeatherAccess {
             override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(idealForecast)
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions)
             override val currentConditions: Conditions get() = TODO()
@@ -55,10 +55,12 @@ class DayModeTest {
 
     @Test
     fun rainy() = runTest {
-        val fakeWeather = object: LocalWeatherAccess {
-            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(idealForecast.copy(
-                rainChance = 20.percent,
-            ))
+        val fakeWeather = object : LocalWeatherAccess {
+            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(
+                idealForecast.copy(
+                    rainChance = 20.percent,
+                )
+            )
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions)
             override val currentConditions: Conditions get() = TODO()
             override val currentForecast: FullForecast get() = TODO()
@@ -70,10 +72,12 @@ class DayModeTest {
 
     @Test
     fun snowy() = runTest {
-        val fakeWeather = object: LocalWeatherAccess {
-            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(idealForecast.copy(
-                snowChance = 20.percent,
-            ))
+        val fakeWeather = object : LocalWeatherAccess {
+            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(
+                idealForecast.copy(
+                    snowChance = 20.percent,
+                )
+            )
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions)
             override val currentConditions: Conditions get() = TODO()
             override val currentForecast: FullForecast get() = TODO()
@@ -85,11 +89,13 @@ class DayModeTest {
 
     @Test
     fun cloudy() = runTest {
-        val fakeWeather = object: LocalWeatherAccess {
+        val fakeWeather = object : LocalWeatherAccess {
             override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(idealForecast)
-            override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions.copy(
-                cloudCover = 69.percent
-            ))
+            override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(
+                idealConditions.copy(
+                    cloudCover = 69.percent
+                )
+            )
             override val currentConditions: Conditions get() = TODO()
             override val currentForecast: FullForecast get() = TODO()
         }
@@ -100,10 +106,12 @@ class DayModeTest {
 
     @Test
     fun evening() = runTest {
-        val fakeWeather = object: LocalWeatherAccess {
-            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(idealForecast.copy(
-                sunset = now + 40.minutes
-            ))
+        val fakeWeather = object : LocalWeatherAccess {
+            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(
+                idealForecast.copy(
+                    sunset = now + 40.minutes
+                )
+            )
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions)
             override val currentConditions: Conditions get() = TODO()
             override val currentForecast: FullForecast get() = TODO()
@@ -115,10 +123,12 @@ class DayModeTest {
 
     @Test
     fun morning() = runTest {
-        val fakeWeather = object: LocalWeatherAccess {
-            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(idealForecast.copy(
-                sunrise = now - 40.minutes
-            ))
+        val fakeWeather = object : LocalWeatherAccess {
+            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(
+                idealForecast.copy(
+                    sunrise = now - 40.minutes
+                )
+            )
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(idealConditions)
             override val currentConditions: Conditions get() = TODO()
             override val currentForecast: FullForecast get() = TODO()

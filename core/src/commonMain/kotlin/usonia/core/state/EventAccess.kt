@@ -1,11 +1,11 @@
 package usonia.core.state
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.first
+import com.inkapplications.coroutines.ongoing.map
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.first
-import usonia.kotlin.map
 import kotlin.reflect.KClass
 import kotlin.time.Duration
 
@@ -31,7 +31,7 @@ interface EventAccess {
     /**
      * Get the last known event for an item.
      */
-    suspend fun <T: Event> getState(id: Identifier, type: KClass<T>): T?
+    suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T?
 
     /**
      * Latest events for a specific device.
@@ -60,7 +60,10 @@ interface EventAccess {
      *        implementation.
      * @return A map of temperatures grouped by the number of hours (negative) in the past they were reported.
      */
-    fun temperatureHistorySnapshots(devices: Collection<Identifier>, limit: Duration? = null): OngoingFlow<List<TemperatureSnapshot>>
+    fun temperatureHistorySnapshots(
+        devices: Collection<Identifier>,
+        limit: Duration? = null
+    ): OngoingFlow<List<TemperatureSnapshot>>
 
     /**
      * Get the most recent event, of any type, for a particular device.

@@ -1,5 +1,9 @@
 package usonia.rules.locks
 
+import com.inkapplications.coroutines.ongoing.collectLatest
+import com.inkapplications.coroutines.ongoing.combinePair
+import com.inkapplications.coroutines.ongoing.filter
+import com.inkapplications.coroutines.ongoing.filterIsInstance
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import regolith.processes.daemon.Daemon
@@ -7,10 +11,6 @@ import usonia.foundation.Event
 import usonia.foundation.LockState
 import usonia.foundation.Site
 import usonia.foundation.getDevice
-import usonia.kotlin.collectLatest
-import usonia.kotlin.combineToPair
-import usonia.kotlin.filter
-import usonia.kotlin.filterIsInstance
 import usonia.server.client.BackendClient
 
 class DisarmOnPrimaryCode(
@@ -22,7 +22,7 @@ class DisarmOnPrimaryCode(
             .filterIsInstance<Event.Lock>()
             .filter { it.state == LockState.UNLOCKED }
             .filter { it.method == Event.Lock.LockMethod.KEYPAD }
-            .combineToPair(client.site)
+            .combinePair(client.site)
             .collectLatest { (event, site) -> unlockEvent(event, site) }
     }
 

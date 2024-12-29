@@ -1,5 +1,8 @@
 package usonia.rules.locks
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.asOngoing
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -11,9 +14,6 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessStub
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.asOngoing
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -21,14 +21,18 @@ import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LockOnSleepTest {
-    private val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
+    private val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
         val mutableFlags = MutableSharedFlow<Map<String, String?>>()
         override val flags = mutableFlags.asOngoing()
-        override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-            rooms = setOf(FakeRooms.FakeBedroom.copy(
-                devices = setOf(FakeDevices.Lock)
-            ))
-        ))
+        override val site: OngoingFlow<Site> = ongoingFlowOf(
+            FakeSite.copy(
+                rooms = setOf(
+                    FakeRooms.FakeBedroom.copy(
+                        devices = setOf(FakeDevices.Lock)
+                    )
+                )
+            )
+        )
     }
 
     @Test

@@ -1,12 +1,12 @@
 package usonia.rules.lights
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.FakeRooms
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -15,10 +15,12 @@ import kotlin.test.assertEquals
 class LightingEnabledFlagTest {
     @Test
     fun enabled() = runTest {
-        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(mapOf(
-                "Motion Lighting" to "true"
-            ))
+        val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
+            override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(
+                mapOf(
+                    "Motion Lighting" to "true"
+                )
+            )
         }
         val client = DummyClient.copy(
             configurationAccess = fakeConfig,
@@ -29,10 +31,12 @@ class LightingEnabledFlagTest {
 
     @Test
     fun disabled() = runTest {
-        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(mapOf(
-                "Motion Lighting" to "false"
-            ))
+        val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
+            override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(
+                mapOf(
+                    "Motion Lighting" to "false"
+                )
+            )
         }
         val client = DummyClient.copy(
             configurationAccess = fakeConfig,
@@ -43,7 +47,7 @@ class LightingEnabledFlagTest {
 
     @Test
     fun unspecified() = runTest {
-        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
+        val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(emptyMap<String, String>())
         }
         val client = DummyClient.copy(

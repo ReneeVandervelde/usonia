@@ -1,5 +1,9 @@
 package usonia.rules.greenhouse
 
+import com.inkapplications.coroutines.ongoing.collectLatest
+import com.inkapplications.coroutines.ongoing.collectOn
+import com.inkapplications.coroutines.ongoing.filter
+import com.inkapplications.coroutines.ongoing.filterIsInstance
 import inkapplications.spondee.measure.us.toFahrenheit
 import inkapplications.spondee.structure.toFloat
 import kimchi.logger.EmptyLogger
@@ -11,7 +15,7 @@ import regolith.processes.daemon.DaemonRunAttempt
 import regolith.processes.daemon.FailureSignal
 import usonia.core.state.publishAll
 import usonia.foundation.*
-import usonia.kotlin.*
+import usonia.kotlin.DefaultScope
 import usonia.server.client.BackendClient
 
 private const val DEFAULT_HIGH_BOUND = 80
@@ -53,10 +57,12 @@ class FanControl(
                 logger.info("Temperature of <${device.name}> exceeds upper greenhouse bound. Currently ${event.temperature}ºF")
                 switchFans(room, SwitchState.ON)
             }
+
             event.temperature.toFahrenheit().toFloat() < DEFAULT_HIGH_BOUND - DEFAULT_UPPER_BUFFER -> {
                 logger.trace("Temperature of <${device.name}> is within bounds <${event.temperature}ºF>")
                 switchFans(room, SwitchState.OFF)
             }
+
             else -> {
                 logger.trace("Temperature is within buffer range <${event.temperature}ºF>. Taking No action.")
             }

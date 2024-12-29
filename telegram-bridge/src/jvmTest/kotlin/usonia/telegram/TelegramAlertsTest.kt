@@ -1,5 +1,7 @@
 package usonia.telegram
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import com.inkapplications.telegram.structures.ChatReference
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
@@ -10,8 +12,6 @@ import usonia.core.state.ActionAccessFake
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -20,7 +20,7 @@ import kotlin.test.assertEquals
 class TelegramAlertsTest {
     @Test
     fun sendAlert() = runTest {
-        val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
+        val fakeConfigAccess = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     users = setOf(
@@ -72,7 +72,7 @@ class TelegramAlertsTest {
 
     @Test
     fun sendAlertWithSticker() = runTest {
-        val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
+        val fakeConfigAccess = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     users = setOf(
@@ -128,7 +128,7 @@ class TelegramAlertsTest {
 
     @Test
     fun unknownUser() = runTest {
-        val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
+        val fakeConfigAccess = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     users = setOf(
@@ -178,7 +178,7 @@ class TelegramAlertsTest {
 
     @Test
     fun noUserConfig() = runTest {
-        val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
+        val fakeConfigAccess = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     users = setOf(
@@ -224,7 +224,7 @@ class TelegramAlertsTest {
 
     @Test
     fun noConfig() = runTest {
-        val fakeConfigAccess = object: ConfigurationAccess by ConfigurationAccessStub {
+        val fakeConfigAccess = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite
             )

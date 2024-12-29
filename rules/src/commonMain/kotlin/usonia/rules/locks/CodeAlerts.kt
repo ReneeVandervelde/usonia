@@ -1,14 +1,14 @@
 package usonia.rules.locks
 
+import com.inkapplications.coroutines.ongoing.collectLatest
+import com.inkapplications.coroutines.ongoing.combinePair
+import com.inkapplications.coroutines.ongoing.filter
+import com.inkapplications.coroutines.ongoing.filterIsInstance
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import regolith.processes.daemon.Daemon
 import usonia.core.client.alertAll
 import usonia.foundation.*
-import usonia.kotlin.collectLatest
-import usonia.kotlin.combineToPair
-import usonia.kotlin.filter
-import usonia.kotlin.filterIsInstance
 import usonia.server.client.BackendClient
 
 /**
@@ -28,7 +28,7 @@ class CodeAlerts(
             .filterIsInstance<Event.Lock>()
             .filter { it.state == LockState.UNLOCKED }
             .filter { it.method == Event.Lock.LockMethod.KEYPAD }
-            .combineToPair(client.site)
+            .combinePair(client.site)
             .collectLatest { (event, site) -> unlockEvent(event, site) }
     }
 

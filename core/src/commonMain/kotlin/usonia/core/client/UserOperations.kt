@@ -1,11 +1,11 @@
 package usonia.core.client
 
+import com.inkapplications.coroutines.ongoing.*
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import usonia.core.state.getSite
 import usonia.foundation.*
-import usonia.kotlin.*
 
 /**
  * Observes a specific user's presence state, starting with its last known state.
@@ -15,8 +15,9 @@ fun UsoniaClient.userPresence(user: Identifier): OngoingFlow<Event.Presence?> {
         .filter { it.source == user }
         .filterIsInstance<Event.Presence>()
         .filterIsInstance<Event.Presence?>()
-        .unsafeModify { onStart { getState(user, Event.Presence::class).also { emit(it) } }
-    }
+        .unsafeTransform {
+            onStart { getState(user, Event.Presence::class).also { emit(it) } }
+        }
 }
 
 /**
@@ -29,17 +30,18 @@ suspend fun UsoniaClient.getUserPresence(user: Identifier): PresenceState? {
 /**
  * Observes all users' presence states, starting with their last known state.
  */
-val UsoniaClient.userPresenceStates: OngoingFlow<List<Pair<User, Event.Presence?>>> get() {
-    return site
-        .map { it.users }
-        .flatMapLatest { users ->
-            users.map { user ->
-                userPresence(user.id).asFlow().map { user to it }
-            }.let {
-                combine(it) { it.toList() }
+val UsoniaClient.userPresenceStates: OngoingFlow<List<Pair<User, Event.Presence?>>>
+    get() {
+        return site
+            .map { it.users }
+            .flatMapLatest { users ->
+                users.map { user ->
+                    userPresence(user.id).asFlow().map { user to it }
+                }.let {
+                    combine(it) { it.toList() }
+                }
             }
-        }
-}
+    }
 
 /**
  * Send an Alert to all users that meet a given level threshold.
@@ -55,11 +57,13 @@ suspend fun UsoniaClient.alertAll(
     getSite().users
         .filter { level >= it.alertLevel }
         .forEach { user ->
-            publishAction(Action.Alert(
-                target = user.id,
-                message = message,
-                level = level,
-                icon = icon,
-            ))
+            publishAction(
+                Action.Alert(
+                    target = user.id,
+                    message = message,
+                    level = level,
+                    icon = icon,
+                )
+            )
         }
 }

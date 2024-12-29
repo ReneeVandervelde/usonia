@@ -1,5 +1,8 @@
 package usonia.weather.accuweather
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.asOngoing
+import com.inkapplications.coroutines.ongoing.first
 import com.inkapplications.standard.throwCancels
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.measure.us.inches
@@ -18,7 +21,8 @@ import regolith.init.TargetManager
 import regolith.processes.cron.CronJob
 import regolith.processes.cron.Schedule
 import usonia.core.state.findBridgeByServiceTag
-import usonia.kotlin.*
+import usonia.kotlin.RetryStrategy
+import usonia.kotlin.runRetryable
 import usonia.server.client.BackendClient
 import usonia.weather.Conditions
 import usonia.weather.FullForecast
@@ -44,7 +48,7 @@ internal class AccuweatherAccess(
     private val client: BackendClient,
     private val clock: Clock = Clock.System,
     private val logger: KimchiLogger = EmptyLogger,
-): LocalWeatherAccess, CronJob, Initializer {
+) : LocalWeatherAccess, CronJob, Initializer {
     private val retryStrategy = RetryStrategy.Bracket(
         attempts = 4,
         timeouts = listOf(200.milliseconds, 1.seconds, 5.seconds),
@@ -136,7 +140,7 @@ internal class AccuweatherAccess(
             api.getConditions(location, token)
         }.throwCancels()
 
-        conditionsResult.onSuccess {  conditionsResponse ->
+        conditionsResult.onSuccess { conditionsResponse ->
             return Conditions(
                 timestamp = clock.now(),
                 cloudCover = conditionsResponse.cloudCover.percent,

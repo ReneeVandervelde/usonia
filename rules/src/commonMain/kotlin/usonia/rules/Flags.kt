@@ -1,7 +1,7 @@
 package usonia.rules
 
+import com.inkapplications.coroutines.ongoing.map
 import usonia.core.state.ConfigurationAccess
-import usonia.kotlin.map
 
 object Flags {
     val SleepMode = "Sleep Mode"

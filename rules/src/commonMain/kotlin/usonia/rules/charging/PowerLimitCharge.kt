@@ -1,14 +1,14 @@
 package usonia.rules.charging
 
+import com.inkapplications.coroutines.ongoing.collectLatest
+import com.inkapplications.coroutines.ongoing.filter
+import com.inkapplications.coroutines.ongoing.filterIsInstance
 import inkapplications.spondee.measure.Power
 import inkapplications.spondee.measure.metric.watts
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import regolith.processes.daemon.Daemon
 import usonia.foundation.*
-import usonia.kotlin.collectLatest
-import usonia.kotlin.filter
-import usonia.kotlin.filterIsInstance
 import usonia.kotlin.rollingWindow
 import usonia.server.client.BackendClient
 
@@ -47,9 +47,11 @@ class PowerLimitCharge(
             }
 
         logger.info("Shutting off charger with consecutive decreased wattage events")
-        backendClient.publishAction(Action.Switch(
-            target = events.first().source,
-            state = SwitchState.OFF,
-        ))
+        backendClient.publishAction(
+            Action.Switch(
+                target = events.first().source,
+                state = SwitchState.OFF,
+            )
+        )
     }
 }

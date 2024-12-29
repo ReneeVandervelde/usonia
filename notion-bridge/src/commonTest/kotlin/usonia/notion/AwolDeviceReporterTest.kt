@@ -1,5 +1,7 @@
 package usonia.notion
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -9,10 +11,8 @@ import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccess
 import usonia.core.state.EventAccessStub
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
 import usonia.kotlin.datetime.UtcClock
 import usonia.kotlin.datetime.current
-import usonia.kotlin.ongoingFlowOf
 import usonia.notion.api.structures.NotionResponse
 import usonia.notion.api.structures.Parent
 import usonia.notion.api.structures.block.RichText
@@ -30,31 +30,37 @@ import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
 
 class AwolDeviceReporterTest {
-    val config = object: ConfigurationAccess by ConfigurationAccessStub {
-        override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-            rooms = setOf(FakeRooms.LivingRoom.copy(
-                devices = setOf(FakeDevices.WaterSensor.copy(
-                    id = Identifier("fake-sensor"),
-                    name = "Fake Sensor",
-                    capabilities = FakeDevices.WaterSensor.capabilities.copy(
-                        heartbeat = 1.minutes,
-                        events = setOf(
-                            Event.Water::class,
-                            Event.Battery::class,
+    val config = object : ConfigurationAccess by ConfigurationAccessStub {
+        override val site: OngoingFlow<Site> = ongoingFlowOf(
+            FakeSite.copy(
+                rooms = setOf(
+                    FakeRooms.LivingRoom.copy(
+                        devices = setOf(
+                            FakeDevices.WaterSensor.copy(
+                                id = Identifier("fake-sensor"),
+                                name = "Fake Sensor",
+                                capabilities = FakeDevices.WaterSensor.capabilities.copy(
+                                    heartbeat = 1.minutes,
+                                    events = setOf(
+                                        Event.Water::class,
+                                        Event.Battery::class,
+                                    )
+                                )
+                            )
                         )
                     )
-                ))
-            )),
-            bridges = setOf(
-                FakeBridge.copy(
-                    service = "notion",
-                    parameters = mapOf(
-                        "token" to "test-token",
-                        "database" to "666",
+                ),
+                bridges = setOf(
+                    FakeBridge.copy(
+                        service = "notion",
+                        parameters = mapOf(
+                            "token" to "test-token",
+                            "database" to "666",
+                        )
                     )
                 )
             )
-        ))
+        )
     }
     val testClient = DummyClient.copy(
         configurationAccess = config,
@@ -63,7 +69,7 @@ class AwolDeviceReporterTest {
 
     @Test
     fun noAwolDevices() = runTest {
-        val events = object: EventAccess by EventAccessStub {
+        val events = object : EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Water::class) {
@@ -87,7 +93,7 @@ class AwolDeviceReporterTest {
 
     @Test
     fun ticketCreated() = runTest {
-        val events = object: EventAccess by EventAccessStub {
+        val events = object : EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Water::class) {
@@ -133,7 +139,7 @@ class AwolDeviceReporterTest {
 
     @Test
     fun taskCreatedWithoutHistoryWhenStale() = runTest {
-        val events = object: EventAccess by EventAccessStub {
+        val events = object : EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
         }
         val apiSpy = NotionApiSpy()
@@ -150,7 +156,7 @@ class AwolDeviceReporterTest {
 
     @Test
     fun notCreatedWithoutHistory() = runTest {
-        val events = object: EventAccess by EventAccessStub {
+        val events = object : EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(time.instant)
         }
         val apiSpy = NotionApiSpy()
@@ -167,7 +173,7 @@ class AwolDeviceReporterTest {
 
     @Test
     fun taskClosed() = runTest {
-        val events = object: EventAccess by EventAccessStub {
+        val events = object : EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Water::class) {
@@ -203,7 +209,7 @@ class AwolDeviceReporterTest {
 
     @Test
     fun stilAwol() = runTest {
-        val events = object: EventAccess by EventAccessStub {
+        val events = object : EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Water::class) {
@@ -312,11 +318,11 @@ class AwolDeviceReporterTest {
     @Test
     fun lowBattery() = runTest {
         val api = NotionApiSpy()
-        val events = object: EventAccess by EventAccessStub {
+        val events = object : EventAccess by EventAccessStub {
             override val events: OngoingFlow<Event> = ongoingFlowOf(
                 FakeEvents.LowBattery.copy(
                     source = Identifier("fake-sensor"),
-                ),
+                )
             )
         }
         val client = testClient.copy(
@@ -349,11 +355,11 @@ class AwolDeviceReporterTest {
             parent = DatabaseId("test-database"),
             ref = "test-ref",
         ))
-        val events = object: EventAccess by EventAccessStub {
+        val events = object : EventAccess by EventAccessStub {
             override val events: OngoingFlow<Event> = ongoingFlowOf(
                 FakeEvents.LowBattery.copy(
                     source = Identifier("fake-sensor"),
-                ),
+                )
             )
         }
         val client = testClient.copy(
@@ -385,7 +391,7 @@ class AwolDeviceReporterTest {
                 name = "Low Battery"
             )),
         ))
-        val events = object: EventAccess by EventAccessStub {
+        val events = object : EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Battery::class) {
@@ -427,7 +433,7 @@ class AwolDeviceReporterTest {
             )),
         ))
         val time = UtcClock.current
-        val events = object: EventAccess by EventAccessStub {
+        val events = object : EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Water::class) {
@@ -450,7 +456,7 @@ class AwolDeviceReporterTest {
     @Test
     fun lowBatteryUpgraded() = runTest {
         val time = UtcClock.current
-        val events = object: EventAccess by EventAccessStub {
+        val events = object : EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
                 return if (id.value == "fake-sensor" && type == Event.Water::class) {

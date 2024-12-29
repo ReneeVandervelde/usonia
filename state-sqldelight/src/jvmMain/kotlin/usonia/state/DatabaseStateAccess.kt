@@ -3,6 +3,8 @@ package usonia.state
 import com.inkapplications.coroutines.filterItemSuccess
 import com.inkapplications.coroutines.mapItemsCatching
 import com.inkapplications.coroutines.onItemFailure
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.asOngoing
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
@@ -26,8 +28,6 @@ import regolith.data.settings.writeSetting
 import usonia.foundation.*
 import usonia.foundation.Event
 import usonia.foundation.Site
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.asOngoing
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
 import kotlin.reflect.KClass
@@ -57,7 +57,7 @@ internal class DatabaseStateAccess(
     private val json: Json,
     private val zonedClock: ZonedClock = ZonedSystemClock,
     private val logger: KimchiLogger = EmptyLogger,
-): DatabaseServices {
+) : DatabaseServices {
     private val securityStateSetting = StringData(
         key = "usonia.state.security",
         name = "Security State",
@@ -144,7 +144,10 @@ internal class DatabaseStateAccess(
         }.executeAsOneOrNull() as T?
     }
 
-    override fun temperatureHistorySnapshots(devices: Collection<Identifier>, limit: Duration?): OngoingFlow<List<TemperatureSnapshot>> {
+    override fun temperatureHistorySnapshots(
+        devices: Collection<Identifier>,
+        limit: Duration?
+    ): OngoingFlow<List<TemperatureSnapshot>> {
         return devices
             .map { it.value }
             .let {

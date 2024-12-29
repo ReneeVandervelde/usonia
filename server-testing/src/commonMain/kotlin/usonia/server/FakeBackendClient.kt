@@ -1,10 +1,10 @@
 package usonia.server
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import usonia.core.state.*
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
 import usonia.server.client.ComposedBackendClient
 import kotlin.reflect.KClass
 import kotlin.time.Duration
@@ -24,7 +24,11 @@ val DummyClient = ComposedBackendClient(
         override fun deviceEventHistory(id: Identifier, size: Int?): OngoingFlow<List<Event>> = TODO()
         override fun eventCount(id: Identifier, category: EventCategory): OngoingFlow<Long> = TODO()
 
-        override fun temperatureHistorySnapshots(devices: Collection<Identifier>, limit: Duration?): OngoingFlow<List<TemperatureSnapshot>> = TODO()
+        override fun temperatureHistorySnapshots(
+            devices: Collection<Identifier>,
+            limit: Duration?
+        ): OngoingFlow<List<TemperatureSnapshot>> = TODO()
+
         override fun getLatestEvent(id: Identifier): OngoingFlow<Event> = TODO()
     },
     eventPublisher = object: EventPublisher {

@@ -1,5 +1,6 @@
 package usonia.web.events
 
+import com.inkapplications.coroutines.ongoing.collect
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CancellationException
@@ -7,7 +8,6 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.serialization.json.Json
 import usonia.foundation.EventSerializer
-import usonia.kotlin.collect
 import usonia.server.client.BackendClient
 import usonia.server.http.WebSocketController
 

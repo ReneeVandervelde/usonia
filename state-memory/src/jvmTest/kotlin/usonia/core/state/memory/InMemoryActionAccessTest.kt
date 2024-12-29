@@ -1,11 +1,11 @@
 package usonia.core.state.memory
 
+import com.inkapplications.coroutines.ongoing.first
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import usonia.foundation.FakeActions
-import usonia.kotlin.first
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -1,5 +1,8 @@
 package usonia.weather.accuweather
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.collect
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.measure.us.inches
 import inkapplications.spondee.measure.us.toFahrenheit
@@ -20,9 +23,6 @@ import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.FakeBridge
 import usonia.foundation.FakeSite
 import usonia.foundation.Site
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.collect
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import usonia.server.test.DummyManager
 import usonia.weather.Conditions
@@ -83,18 +83,20 @@ class AccuweatherAccessTest {
         }
     }
     private val testClient = DummyClient.copy(
-        configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-                bridges = setOf(
-                    FakeBridge.copy(
-                        service = "accuweather",
-                        parameters = mapOf(
-                            "token" to "test-token",
-                            "location" to "test-location",
+        configurationAccess = object : ConfigurationAccess by ConfigurationAccessStub {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(
+                FakeSite.copy(
+                    bridges = setOf(
+                        FakeBridge.copy(
+                            service = "accuweather",
+                            parameters = mapOf(
+                                "token" to "test-token",
+                                "location" to "test-location",
+                            )
                         )
                     )
                 )
-            ))
+            )
         }
     )
 
@@ -106,7 +108,7 @@ class AccuweatherAccessTest {
 
     @Test
     fun noConfig() = runTest {
-        val config = object: ConfigurationAccess by ConfigurationAccessStub {
+        val config = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite)
         }
         val client = testClient.copy(

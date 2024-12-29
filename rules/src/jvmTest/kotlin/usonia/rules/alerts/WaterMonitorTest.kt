@@ -1,5 +1,7 @@
 package usonia.rules.alerts
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
@@ -11,23 +13,23 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessFake
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class WaterMonitorTest {
-    private val standardConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-        override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-            users = setOf(FakeUsers.John),
-            rooms = setOf(
-                FakeRooms.LivingRoom.copy(
-                    devices = setOf(FakeDevices.WaterSensor)
+    private val standardConfig = object : ConfigurationAccess by ConfigurationAccessStub {
+        override val site: OngoingFlow<Site> = ongoingFlowOf(
+            FakeSite.copy(
+                users = setOf(FakeUsers.John),
+                rooms = setOf(
+                    FakeRooms.LivingRoom.copy(
+                        devices = setOf(FakeDevices.WaterSensor)
+                    )
                 )
             )
-        ))
+        )
     }
 
     private val testClient = DummyClient.copy(
@@ -42,7 +44,7 @@ class WaterMonitorTest {
             eventAccess = events,
             actionPublisher = actionPublisherSpy,
         )
-        val monitor = WaterMonitor(client, backgroundScope = this)
+        val monitor = WaterMonitor(client)
 
         val monitorJob = launch { monitor.startDaemon() }
         advanceUntilIdle()
@@ -64,7 +66,7 @@ class WaterMonitorTest {
             eventAccess = events,
             actionPublisher = actionPublisherSpy,
         )
-        val monitor = WaterMonitor(client, backgroundScope = this)
+        val monitor = WaterMonitor(client)
 
         val monitorJob = launch { monitor.startDaemon() }
         advanceUntilIdle()
@@ -86,7 +88,7 @@ class WaterMonitorTest {
             eventAccess = events,
             actionPublisher = actionPublisherSpy,
         )
-        val monitor = WaterMonitor(client, backgroundScope = this)
+        val monitor = WaterMonitor(client)
 
         val monitorJob = launch { monitor.startDaemon() }
         advanceUntilIdle()
@@ -108,7 +110,7 @@ class WaterMonitorTest {
             eventAccess = events,
             actionPublisher = actionPublisherSpy,
         )
-        val monitor = WaterMonitor(client, backgroundScope = this)
+        val monitor = WaterMonitor(client)
 
         val monitorJob = launch { monitor.startDaemon() }
         advanceUntilIdle()
@@ -128,7 +130,7 @@ class WaterMonitorTest {
             eventAccess = events,
             actionPublisher = actionPublisherSpy,
         )
-        val monitor = WaterMonitor(client, backgroundScope = this)
+        val monitor = WaterMonitor(client)
 
         val monitorJob = launch { monitor.startDaemon() }
         advanceUntilIdle()

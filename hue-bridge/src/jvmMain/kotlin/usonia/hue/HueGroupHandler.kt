@@ -1,5 +1,9 @@
 package usonia.hue
 
+import com.inkapplications.coroutines.ongoing.collect
+import com.inkapplications.coroutines.ongoing.collectLatest
+import com.inkapplications.coroutines.ongoing.filter
+import com.inkapplications.coroutines.ongoing.map
 import com.inkapplications.standard.throwCancels
 import inkapplications.shade.groupedlights.GroupedLightControls
 import inkapplications.shade.groupedlights.parameters.GroupedLightUpdateParameters
@@ -16,7 +20,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import regolith.processes.daemon.Daemon
 import usonia.foundation.*
-import usonia.kotlin.*
+import usonia.kotlin.IoScope
+import usonia.kotlin.RetryStrategy
+import usonia.kotlin.runRetryable
 import usonia.server.client.BackendClient
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -37,7 +43,7 @@ internal class HueGroupHandler(
                 .map { action -> site.getDevice(action.target) to action }
                 .filter { (device, _) -> site.findAssociatedBridge(device)?.service == HUE_SERVICE }
                 .filter { (device, _) -> device.capabilities.archetypeId == HueArchetypes.group.archetypeId }
-                .collectOn(requestScope) { (device, action) ->
+                .collect { (device, action) ->
                     handleAction(action, device)
                 }
         }
@@ -53,17 +59,19 @@ internal class HueGroupHandler(
                 ),
                 dynamics = dynamicsForState(action),
             )
+
             is Action.Dim -> GroupedLightUpdateParameters(
                 dimming = DimmingParameters(
                     brightness = action.level,
                 ),
-                power =  action.switchState?.equals(SwitchState.ON)?.let {
+                power = action.switchState?.equals(SwitchState.ON)?.let {
                     PowerParameters(
                         on = it,
                     )
                 },
                 dynamics = dynamicsForState(action),
             )
+
             is Action.ColorTemperatureChange -> GroupedLightUpdateParameters(
                 colorTemperature = ColorTemperatureParameters(
                     temperature = action.temperature,
@@ -78,6 +86,7 @@ internal class HueGroupHandler(
                 },
                 dynamics = dynamicsForState(action),
             )
+
             is Action.ColorChange -> GroupedLightUpdateParameters(
                 color = ColorParameters(
                     color = action.color,
@@ -92,6 +101,7 @@ internal class HueGroupHandler(
                 },
                 dynamics = dynamicsForState(action),
             )
+
             else -> throw IllegalStateException("Impossible! Did the event filtering change without updating the modification conditions?")
         }
 
@@ -121,12 +131,15 @@ internal class HueGroupHandler(
             error is CancellationException -> {
                 logger.warn("Hue Action was Cancelled while updating hue group: ${device.name}", error)
             }
+
             error is ApiStatusError && error.code == 207 -> {
                 logger.warn("Partial success from hue group update for group: ${device.name}", error)
             }
+
             error is ApiStatusError -> {
                 logger.warn("API Error updating hue group: ${device.name}", error)
             }
+
             else -> {
                 logger.warn("Unknown Error updating hue group: ${device.name}.", error)
             }
@@ -138,6 +151,7 @@ internal class HueGroupHandler(
             error is ApiStatusError && error.code == 207 -> {
                 logger.warn("Hue Group update finished with partial success. Ignoring error.")
             }
+
             else -> {
                 logger.error("Hue operation was unable to succeed for group update: ${device.name}", error)
             }

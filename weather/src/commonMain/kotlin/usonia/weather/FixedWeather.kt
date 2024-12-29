@@ -1,8 +1,8 @@
 package usonia.weather
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.asOngoing
 import kotlinx.coroutines.flow.MutableStateFlow
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.asOngoing
 
 /**
  * A weather access implementation that provides a single data set.
@@ -10,7 +10,7 @@ import usonia.kotlin.asOngoing
 class FixedWeather(
     initialConditions: Conditions,
     initialForecast: FullForecast,
-): LocalWeatherAccess {
+) : LocalWeatherAccess {
     private val mutableForecast = MutableStateFlow(initialForecast)
     private val mutableConditions = MutableStateFlow(initialConditions)
     override val forecast: OngoingFlow<FullForecast> = mutableForecast.asOngoing()
@@ -21,6 +21,7 @@ class FixedWeather(
     fun updateConditions(conditions: Conditions) {
         mutableConditions.value = conditions
     }
+
     fun updateForecast(forecast: FullForecast) {
         mutableForecast.value = forecast
     }

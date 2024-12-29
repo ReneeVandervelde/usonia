@@ -3,6 +3,7 @@ package usonia.frontend.metrics
 import androidx.compose.runtime.Composable
 import chart.LineChart
 import chart.LineChartConfig
+import com.inkapplications.coroutines.ongoing.map
 import inkapplications.spondee.measure.us.toFahrenheit
 import kimchi.logger.KimchiLogger
 import org.jetbrains.compose.web.dom.*
@@ -13,13 +14,12 @@ import usonia.foundation.ParameterBag
 import usonia.frontend.extensions.collectAsState
 import usonia.frontend.navigation.NavigationSection
 import usonia.frontend.navigation.Routing
-import usonia.kotlin.map
 import kotlin.time.DurationUnit
 
 class MetricsSection(
     private val client: FrontendClient,
     private val logger: KimchiLogger,
-): NavigationSection {
+) : NavigationSection {
     override val route: Routing = Routing.TopLevel(
         route = "/metrics",
         title = "Metrics",
@@ -54,7 +54,11 @@ class MetricsSection(
         rooms.value.forEach { room ->
             H3 { Text(room.name) }
             val temperatureData = client.roomTemperatureHistory(room)
-                .map { it.map { it.timeAgo.toInt(DurationUnit.HOURS).toString() to it.temperature.toFahrenheit().value } }
+                .map {
+                    it.map {
+                        it.timeAgo.toInt(DurationUnit.HOURS).toString() to it.temperature.toFahrenheit().value
+                    }
+                }
                 .collectAsState(emptyList())
 
             LineChart(

@@ -1,5 +1,7 @@
 package usonia.telegram
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import com.inkapplications.telegram.client.TelegramBotClient
 import com.inkapplications.telegram.structures.*
 import kimchi.logger.EmptyLogger
@@ -12,8 +14,6 @@ import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.EventPublisherSpy
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 import usonia.rules.Flags
 import usonia.server.DummyClient
 import usonia.server.client.BackendClient
@@ -55,15 +55,20 @@ class TelegramBotTest {
         val setFlags = mutableListOf<Pair<String, String?>>()
         val bot = TelegramBot(
             client = DummyClient.copy(
-                configurationAccess = object: ConfigurationAccess by DummyClient {
-                    override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-                        users = setOf(FakeUsers.John.copy(
-                            alertLevel = Action.Alert.Level.Debug,
-                            parameters = mapOf(
-                                CHAT_ID_KEY to "123"
+                configurationAccess = object : ConfigurationAccess by DummyClient {
+                    override val site: OngoingFlow<Site> = ongoingFlowOf(
+                        FakeSite.copy(
+                            users = setOf(
+                                FakeUsers.John.copy(
+                                    alertLevel = Action.Alert.Level.Debug,
+                                    parameters = mapOf(
+                                        CHAT_ID_KEY to "123"
+                                    )
+                                )
                             )
-                        ))
-                    ))
+                        )
+                    )
+
                     override suspend fun setFlag(key: String, value: String?) {
                         setFlags.add(key to value)
                     }
@@ -106,15 +111,19 @@ class TelegramBotTest {
         val actionSpy = ActionPublisherSpy()
         val bot = TelegramBot(
             client = DummyClient.copy(
-                configurationAccess = object: ConfigurationAccess by DummyClient {
-                    override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-                        users = setOf(FakeUsers.John.copy(
-                            alertLevel = Action.Alert.Level.Debug,
-                            parameters = mapOf(
-                                CHAT_ID_KEY to "123"
+                configurationAccess = object : ConfigurationAccess by DummyClient {
+                    override val site: OngoingFlow<Site> = ongoingFlowOf(
+                        FakeSite.copy(
+                            users = setOf(
+                                FakeUsers.John.copy(
+                                    alertLevel = Action.Alert.Level.Debug,
+                                    parameters = mapOf(
+                                        CHAT_ID_KEY to "123"
+                                    )
+                                )
                             )
-                        ))
-                    ))
+                        )
+                    )
                 },
                 actionPublisher = actionSpy,
             ),
@@ -148,15 +157,19 @@ class TelegramBotTest {
         val actionSpy = ActionPublisherSpy()
         val bot = TelegramBot(
             client = DummyClient.copy(
-                configurationAccess = object: ConfigurationAccess by DummyClient {
-                    override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-                        users = setOf(FakeUsers.John.copy(
-                            alertLevel = Action.Alert.Level.Debug,
-                            parameters = mapOf(
-                                CHAT_ID_KEY to "123"
+                configurationAccess = object : ConfigurationAccess by DummyClient {
+                    override val site: OngoingFlow<Site> = ongoingFlowOf(
+                        FakeSite.copy(
+                            users = setOf(
+                                FakeUsers.John.copy(
+                                    alertLevel = Action.Alert.Level.Debug,
+                                    parameters = mapOf(
+                                        CHAT_ID_KEY to "123"
+                                    )
+                                )
                             )
-                        ))
-                    ))
+                        )
+                    )
                 },
                 actionPublisher = actionSpy,
             ),
@@ -311,26 +324,29 @@ class TelegramBotTest {
         val eventSpy = EventPublisherSpy()
         val setFlags = mutableListOf<Pair<String, String?>>()
         val client = DummyClient.copy(
-            configurationAccess = object: ConfigurationAccess by DummyClient {
+            configurationAccess = object : ConfigurationAccess by DummyClient {
                 override suspend fun setFlag(key: String, value: String?) {
                     setFlags.add(key to value)
                 }
-                override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-                    users = setOf(
-                        FakeUsers.John.copy(
-                            alertLevel = Action.Alert.Level.Debug,
-                            parameters = mapOf(
-                                CHAT_ID_KEY to "123"
-                            )
-                        ),
-                        FakeUsers.Jane.copy(
-                            alertLevel = Action.Alert.Level.Info,
-                            parameters = mapOf(
-                                CHAT_ID_KEY to "456"
+
+                override val site: OngoingFlow<Site> = ongoingFlowOf(
+                    FakeSite.copy(
+                        users = setOf(
+                            FakeUsers.John.copy(
+                                alertLevel = Action.Alert.Level.Debug,
+                                parameters = mapOf(
+                                    CHAT_ID_KEY to "123"
+                                )
+                            ),
+                            FakeUsers.Jane.copy(
+                                alertLevel = Action.Alert.Level.Info,
+                                parameters = mapOf(
+                                    CHAT_ID_KEY to "456"
+                                )
                             )
                         )
                     )
-                ))
+                )
             },
             actionPublisher = actionSpy,
             eventPublisher = eventSpy,

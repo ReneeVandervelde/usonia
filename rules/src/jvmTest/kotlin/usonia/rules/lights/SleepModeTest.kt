@@ -1,5 +1,8 @@
 package usonia.rules.lights
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.asOngoing
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import inkapplications.spondee.scalar.percent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
@@ -11,13 +14,10 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.*
 import usonia.core.state.*
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.asOngoing
 import usonia.kotlin.datetime.UtcClock
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.parseLocalDateTime
 import usonia.kotlin.datetime.withTimeZone
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -43,7 +43,7 @@ class SleepModeTest {
 
     @Test
     fun enabled() = runTest {
-        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
+        val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(
                 mapOf("Sleep Mode" to "true")
@@ -76,7 +76,7 @@ class SleepModeTest {
 
     @Test
     fun enabledMorning() = runTest {
-        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
+        val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(
                 mapOf("Sleep Mode" to "true")
@@ -107,7 +107,7 @@ class SleepModeTest {
 
     @Test
     fun disabled() = runTest {
-        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
+        val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(
                 mapOf("Sleep Mode" to "false")
@@ -148,7 +148,7 @@ class SleepModeTest {
                 nanosecond = 0,
             ).toInstant(timeZone)
         }
-        val spyConfig = object: ConfigurationAccessSpy() {
+        val spyConfig = object : ConfigurationAccessSpy() {
             override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
         }
         val fakeEvents = EventAccessFake()
@@ -191,7 +191,7 @@ class SleepModeTest {
                 nanosecond = 0,
             ).toInstant(timeZone)
         }
-        val spyConfig = object: ConfigurationAccessSpy() {
+        val spyConfig = object : ConfigurationAccessSpy() {
             override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
         }
         val fakeEvents = EventAccessFake()
@@ -234,7 +234,7 @@ class SleepModeTest {
                 nanosecond = 0,
             ).toInstant(timeZone)
         }
-        val spyConfig = object: ConfigurationAccessSpy() {
+        val spyConfig = object : ConfigurationAccessSpy() {
             override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
         }
         val fakeEvents = EventAccessFake()
@@ -263,7 +263,7 @@ class SleepModeTest {
 
     @Test
     fun lightsOffOnEnable() = runTest {
-        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
+        val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
             val mutableFlags = MutableSharedFlow<Map<String, String?>>()
             override val flags = mutableFlags.asOngoing()
@@ -295,7 +295,7 @@ class SleepModeTest {
 
     @Test
     fun noopOnDisable() = runTest {
-        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
+        val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
             val mutableFlags = MutableSharedFlow<Map<String, String?>>()
             override val flags = mutableFlags.asOngoing()
         }
@@ -331,7 +331,7 @@ class SleepModeTest {
                 nanosecond = 0,
             ).toInstant(timeZone)
         }
-        val spyConfig = object: ConfigurationAccessSpy() {
+        val spyConfig = object : ConfigurationAccessSpy() {
             override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
         }
         val actions = ActionAccessFake()
@@ -359,7 +359,7 @@ class SleepModeTest {
 
     @Test
     fun autoDisableByCron() = runTest {
-        val spyConfig = object: ConfigurationAccessSpy() {
+        val spyConfig = object : ConfigurationAccessSpy() {
             override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
         }
         val client = DummyClient.copy(
@@ -386,7 +386,7 @@ class SleepModeTest {
                 nanosecond = 0,
             ).toInstant(timeZone)
         }
-        val spyConfig = object: ConfigurationAccessSpy() {
+        val spyConfig = object : ConfigurationAccessSpy() {
             override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
         }
         val fakeEvents = EventAccessFake()
@@ -428,7 +428,7 @@ class SleepModeTest {
                 nanosecond = 0,
             ).toInstant(timeZone)
         }
-        val spyConfig = object: ConfigurationAccessSpy() {
+        val spyConfig = object : ConfigurationAccessSpy() {
             override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
         }
         val fakeEvents = EventAccessFake()

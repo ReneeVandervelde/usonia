@@ -5,8 +5,8 @@ import org.jetbrains.compose.web.renderComposable
 import regolith.init.Initializer
 import regolith.init.TargetManager
 import usonia.auth.AuthInit
-import usonia.frontend.auth.WebAuthentication
 import usonia.frontend.auth.LoginLayout
+import usonia.frontend.auth.WebAuthentication
 import usonia.frontend.navigation.NavigationContainer
 
 /**

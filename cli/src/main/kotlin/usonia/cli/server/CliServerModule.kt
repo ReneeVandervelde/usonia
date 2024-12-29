@@ -10,7 +10,6 @@ import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.notion.NotionBridgePlugin
 import usonia.rules.alerts.LogErrorAlerts
-import usonia.server.auth.ServerAuthPlugin
 import usonia.server.UsoniaServer
 import usonia.server.client.BackendClient
 import usonia.server.client.ComposedBackendClient

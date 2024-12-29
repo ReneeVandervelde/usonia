@@ -1,5 +1,6 @@
 package usonia.glass
 
+import com.inkapplications.coroutines.ongoing.*
 import com.inkapplications.glassconsole.client.pin.PinValidator
 import inkapplications.spondee.spatial.GeoCoordinates
 import inkapplications.spondee.spatial.latitude
@@ -14,7 +15,6 @@ import kotlinx.datetime.todayIn
 import usonia.core.client.latestDeviceEventOfType
 import usonia.core.state.booleanFlags
 import usonia.foundation.*
-import usonia.kotlin.*
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.rules.Flags
@@ -62,7 +62,7 @@ internal class ViewModelFactory(
         )
     }
     private val expandedWeatherInfo: OngoingFlow<List<ExpandedLocationForecast>> = ongoingFlow {
-        while(coroutineContext.isActive) {
+        while (coroutineContext.isActive) {
             val locations = listOf(
                 "Columbia Heights, MN" to GeoCoordinates(45.0491.latitude, (-93.2472).longitude),
                 "Enderlin, ND" to GeoCoordinates(46.6077.latitude, (-97.6011).longitude),
@@ -110,7 +110,13 @@ internal class ViewModelFactory(
             )
         }
 
-        return combine(flags, doorStates, securityInfo, localWeatherInfo, expandedWeatherInfo) { flags, doors, security, weather, expandedWeather ->
+        return combine(
+            flags,
+            doorStates,
+            securityInfo,
+            localWeatherInfo,
+            expandedWeatherInfo
+        ) { flags, doors, security, weather, expandedWeather ->
             DisplayViewModel(
                 config = config,
                 flags = flags,

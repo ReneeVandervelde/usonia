@@ -1,12 +1,12 @@
 package usonia.rules.lights
 
+import com.inkapplications.coroutines.ongoing.collectLatest
+import com.inkapplications.coroutines.ongoing.combinePair
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import regolith.processes.daemon.Daemon
 import usonia.core.state.publishAll
 import usonia.foundation.*
-import usonia.kotlin.collectLatest
-import usonia.kotlin.combineToPair
 import usonia.server.client.BackendClient
 
 class LightsOffOnSecurityArm(
@@ -15,22 +15,23 @@ class LightsOffOnSecurityArm(
 ): Daemon {
     override suspend fun startDaemon(): Nothing {
         client.securityState
-            .combineToPair(client.site)
+            .combinePair(client.site)
             .collectLatest { (state, site) ->
-            when (state) {
-                SecurityState.Armed -> site
-                    .findDevicesBy {
-                        it.fixture == Fixture.Light && Action.Switch::class in it.capabilities.actions
-                    }
-                    .map {
-                        Action.Switch(it.id, SwitchState.ON)
-                    }
-                    .run {
-                        logger.info("Turning off ${size} lights for security arm.")
-                        client.publishAll(this)
-                    }
-                SecurityState.Disarmed -> {}
+                when (state) {
+                    SecurityState.Armed -> site
+                        .findDevicesBy {
+                            it.fixture == Fixture.Light && Action.Switch::class in it.capabilities.actions
+                        }
+                        .map {
+                            Action.Switch(it.id, SwitchState.ON)
+                        }
+                        .run {
+                            logger.info("Turning off ${size} lights for security arm.")
+                            client.publishAll(this)
+                        }
+
+                    SecurityState.Disarmed -> {}
+                }
             }
-        }
     }
 }

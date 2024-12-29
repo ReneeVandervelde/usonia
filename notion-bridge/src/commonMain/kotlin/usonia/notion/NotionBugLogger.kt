@@ -1,5 +1,6 @@
 package usonia.notion
 
+import com.inkapplications.coroutines.ongoing.*
 import kimchi.logger.LogLevel
 import kimchi.logger.LogWriter
 import kotlinx.coroutines.channels.BufferOverflow
@@ -8,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import regolith.processes.daemon.Daemon
 import usonia.core.state.findBridgeByServiceTag
-import usonia.kotlin.*
 import usonia.notion.api.NotionApi
 import usonia.notion.api.structures.NotionBearerToken
 import usonia.notion.api.structures.Parent
@@ -18,20 +18,16 @@ import usonia.notion.api.structures.block.RichTextArgument.Text
 import usonia.notion.api.structures.database.DatabaseId
 import usonia.notion.api.structures.database.DatabaseQuery
 import usonia.notion.api.structures.page.*
-import usonia.notion.api.structures.page.FilterQuery
-import usonia.notion.api.structures.page.NewPage
-import usonia.notion.api.structures.page.PageFilter
-import usonia.notion.api.structures.page.TextFilter
 import usonia.notion.api.structures.property.MultiSelectArgument
 import usonia.notion.api.structures.property.PropertyArgument
 import usonia.notion.api.structures.property.SelectArgument
 import usonia.server.client.BackendClient
-import kotlin.math.min
 
 internal class NotionBugLogger(
     private val notion: NotionApi,
-): Daemon, LogWriter {
-    private val logs = MutableSharedFlow<LogData>(extraBufferCapacity = 5, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+) : Daemon, LogWriter {
+    private val logs =
+        MutableSharedFlow<LogData>(extraBufferCapacity = 5, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     internal val client = MutableStateFlow<BackendClient?>(null)
     private val service = client.filterNotNull()
         .asOngoing()
@@ -51,13 +47,11 @@ internal class NotionBugLogger(
         Parameters(token, database, log)
     }
 
-    override suspend fun startDaemon(): Nothing
-    {
+    override suspend fun startDaemon(): Nothing {
         data.collectLatest { params -> handleError(params) }
     }
 
-    private suspend fun handleError(parameters: Parameters)
-    {
+    private suspend fun handleError(parameters: Parameters) {
         val title = "Error: ${parameters.log.message.take(60)}"
         val existing = notion.queryDatabase(
             token = parameters.token,
@@ -152,13 +146,11 @@ internal class NotionBugLogger(
         )
     }
 
-    override fun log(level: LogLevel, message: String, cause: Throwable?)
-    {
+    override fun log(level: LogLevel, message: String, cause: Throwable?) {
         logs.tryEmit(LogData(message, cause))
     }
 
-    override fun shouldLog(level: LogLevel, cause: Throwable?): Boolean
-    {
+    override fun shouldLog(level: LogLevel, cause: Throwable?): Boolean {
         return level >= LogLevel.ERROR
     }
 

@@ -1,5 +1,6 @@
 package usonia.rules.lights
 
+import com.inkapplications.coroutines.ongoing.*
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
@@ -15,7 +16,7 @@ import usonia.core.state.publishAll
 import usonia.core.state.setFlag
 import usonia.foundation.*
 import usonia.foundation.Room.Type.*
-import usonia.kotlin.*
+import usonia.kotlin.DefaultScope
 import usonia.rules.Flags
 import usonia.server.client.BackendClient
 import kotlin.time.Duration.Companion.hours
@@ -32,16 +33,18 @@ internal class MovieMode(
         if (!client.getBooleanFlag(Flags.MovieMode)) {
             return LightSettings.Unhandled
         }
-        return when(room.type) {
+        return when (room.type) {
             LivingRoom -> LightSettings.Ignore
             Kitchen, Hallway, Dining -> LightSettings.Temperature(
                 temperature = Colors.Warm,
                 brightness = 1.percent,
             )
+
             Bathroom -> LightSettings.Temperature(
                 temperature = Colors.Warm,
                 brightness = 50.percent,
             )
+
             Bedroom, Garage, Generic, Office, Storage, Utility, Greenhouse -> LightSettings.Unhandled
         }
     }
@@ -101,6 +104,7 @@ internal class MovieMode(
             EndCondition.Disabled -> {
                 logger.info("Movie Mode was disabled. Ending timer")
             }
+
             EndCondition.Expired -> {
                 logger.info("Movie Mode timer expired. Ending Movie Mode.")
                 client.setFlag(Flags.MovieMode, false)
@@ -138,9 +142,10 @@ internal class MovieMode(
         client.publishAll(lightActions + indicatorActions)
     }
 
-    private val Site.indicators get() = rooms
-        .filter { it.type == LivingRoom }
-        .flatMap { it.devices }
-        .filter { it.fixture == Fixture.Indicator }
-        .filter { Action.Dim::class in it.capabilities.actions }
+    private val Site.indicators
+        get() = rooms
+            .filter { it.type == LivingRoom }
+            .flatMap { it.devices }
+            .filter { it.fixture == Fixture.Indicator }
+            .filter { Action.Dim::class in it.capabilities.actions }
 }

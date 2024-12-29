@@ -1,5 +1,8 @@
 package usonia.rules.lights
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.asOngoing
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import inkapplications.spondee.scalar.percent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
@@ -13,9 +16,6 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessSpy
 import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.asOngoing
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -26,10 +26,12 @@ import kotlin.time.Duration.Companion.hours
 class MovieModeTest {
     @Test
     fun enabled() = runTest {
-        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(mapOf(
-                "Movie Mode" to "true"
-            ))
+        val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
+            override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(
+                mapOf(
+                    "Movie Mode" to "true"
+                )
+            )
         }
         val client = DummyClient.copy(
             configurationAccess = fakeConfig,
@@ -58,10 +60,12 @@ class MovieModeTest {
 
     @Test
     fun disabled() = runTest {
-        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(mapOf(
-                "Movie Mode" to "false"
-            ))
+        val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
+            override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(
+                mapOf(
+                    "Movie Mode" to "false"
+                )
+            )
         }
         val client = DummyClient.copy(
             configurationAccess = fakeConfig,
@@ -86,7 +90,7 @@ class MovieModeTest {
 
     @Test
     fun unspecified() = runTest {
-        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
+        val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
             override val flags: OngoingFlow<Map<String, String?>> = ongoingFlowOf(mapOf())
         }
         val client = DummyClient.copy(
@@ -112,12 +116,16 @@ class MovieModeTest {
 
     @Test
     fun dropFirst() = runTest {
-        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-                rooms = setOf(FakeRooms.LivingRoom.copy(
-                    devices = setOf(FakeDevices.HueGroup),
-                )),
-            ))
+        val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(
+                FakeSite.copy(
+                    rooms = setOf(
+                        FakeRooms.LivingRoom.copy(
+                            devices = setOf(FakeDevices.HueGroup),
+                        )
+                    ),
+                )
+            )
             val mutableFlags = MutableSharedFlow<Map<String, String?>>()
             override val flags = mutableFlags.asOngoing()
         }
@@ -143,12 +151,16 @@ class MovieModeTest {
 
     @Test
     fun start() = runTest {
-        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-                rooms = setOf(FakeRooms.LivingRoom.copy(
-                    devices = setOf(FakeDevices.HueGroup),
-                )),
-            ))
+        val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(
+                FakeSite.copy(
+                    rooms = setOf(
+                        FakeRooms.LivingRoom.copy(
+                            devices = setOf(FakeDevices.HueGroup),
+                        )
+                    ),
+                )
+            )
             val mutableFlags = MutableSharedFlow<Map<String, String?>>()
             override val flags = mutableFlags.asOngoing()
         }
@@ -190,12 +202,16 @@ class MovieModeTest {
 
     @Test
     fun stop() = runTest {
-        val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-            override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-                rooms = setOf(FakeRooms.LivingRoom.copy(
-                    devices = setOf(FakeDevices.HueGroup),
-                )),
-            ))
+        val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(
+                FakeSite.copy(
+                    rooms = setOf(
+                        FakeRooms.LivingRoom.copy(
+                            devices = setOf(FakeDevices.HueGroup),
+                        )
+                    ),
+                )
+            )
             val mutableFlags = MutableSharedFlow<Map<String, String?>>()
             override val flags = mutableFlags.asOngoing()
         }
@@ -231,12 +247,16 @@ class MovieModeTest {
 
     @Test
     fun autoDisable() = runTest {
-        val fakeConfig = object: ConfigurationAccessSpy() {
-            override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-                rooms = setOf(FakeRooms.LivingRoom.copy(
-                    devices = setOf(FakeDevices.HueGroup),
-                )),
-            ))
+        val fakeConfig = object : ConfigurationAccessSpy() {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(
+                FakeSite.copy(
+                    rooms = setOf(
+                        FakeRooms.LivingRoom.copy(
+                            devices = setOf(FakeDevices.HueGroup),
+                        )
+                    ),
+                )
+            )
             val mutableFlags = MutableSharedFlow<Map<String, String?>>()
             override val flags = mutableFlags.asOngoing()
         }

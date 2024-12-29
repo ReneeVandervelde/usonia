@@ -1,5 +1,6 @@
 package usonia.rules.greenhouse
 
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.measure.us.inches
 import inkapplications.spondee.scalar.percent
@@ -11,7 +12,6 @@ import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.*
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import usonia.weather.Conditions
 import usonia.weather.FixedWeather
@@ -37,16 +37,20 @@ class SprinklerControlTest {
         highTemperature = 75.fahrenheit,
         lowTemperature = 75.fahrenheit,
     )
-    private val configuration = object: ConfigurationAccess by ConfigurationAccessStub {
-        override val site = ongoingFlowOf(FakeSite.copy(
-            rooms = setOf(
-                FakeRooms.LivingRoom.copy(
-                    devices = setOf(FakeDevices.Switch.copy(
-                        fixture = Fixture.MomentarySprinkler,
-                    ))
-                )
-            ),
-        ))
+    private val configuration = object : ConfigurationAccess by ConfigurationAccessStub {
+        override val site = ongoingFlowOf(
+            FakeSite.copy(
+                rooms = setOf(
+                    FakeRooms.LivingRoom.copy(
+                        devices = setOf(
+                            FakeDevices.Switch.copy(
+                                fixture = Fixture.MomentarySprinkler,
+                            )
+                        )
+                    )
+                ),
+            )
+        )
     }
     private val saturday = LocalDateTime(2024, 7,13, 6, 0, 0)
     private val sunday = LocalDateTime(2024, 7,14, 6, 0, 0)

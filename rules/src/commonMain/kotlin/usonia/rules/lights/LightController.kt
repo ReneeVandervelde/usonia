@@ -1,5 +1,6 @@
 package usonia.rules.lights
 
+import com.inkapplications.coroutines.ongoing.*
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
@@ -10,7 +11,7 @@ import kotlinx.coroutines.selects.select
 import regolith.processes.daemon.Daemon
 import usonia.core.state.publishAll
 import usonia.foundation.*
-import usonia.kotlin.*
+import usonia.kotlin.DefaultScope
 import usonia.server.client.BackendClient
 
 /**
@@ -57,9 +58,11 @@ internal class LightController(
                     logger.trace("Starting ${idleConditions.time} idle timer for ${room.name}")
                     delay(idleConditions.time).let { room }
                 }
+
                 IdleConditions.Ignored -> {
                     logger.trace("Skipping Idle monitor for room $room")
                 }
+
                 IdleConditions.Unhandled -> {
                     logger.warn("Unhandled idle action for room: $room")
                 }
@@ -83,7 +86,7 @@ internal class LightController(
         val settings = lightSettingsPicker.getActiveSettings(room)
         adjustRoomLights(room, settings)
     }
-    
+
     private suspend fun adjustRoomLights(room: Room, settings: LightSettings) {
         logger.trace("Adjusting lights in ${room.name}")
         when (settings) {
@@ -92,6 +95,7 @@ internal class LightController(
             LightSettings.Ignore -> {
                 logger.trace("Ignored action for room event: ${room.name}")
             }
+
             LightSettings.Unhandled -> {
                 logger.warn("Unhandled action for room event: ${room.name}")
             }

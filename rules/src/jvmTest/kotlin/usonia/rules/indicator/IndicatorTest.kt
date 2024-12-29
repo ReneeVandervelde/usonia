@@ -1,6 +1,9 @@
 package usonia.rules.indicator
 
 import com.github.ajalt.colormath.model.RGB
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.asOngoing
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.measure.us.inches
 import inkapplications.spondee.scalar.percent
@@ -17,9 +20,6 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessStub
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.asOngoing
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import usonia.weather.Conditions
 import usonia.weather.FullForecast
@@ -31,17 +31,21 @@ import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class IndicatorTest {
-    val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-        override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-            users = setOf(FakeUsers.John),
-            rooms = setOf(
-                FakeRooms.LivingRoom.copy(
-                    devices = setOf(FakeDevices.HueGroup.copy(
-                        fixture = Fixture.Indicator,
-                    ))
-                )
-            ),
-        ))
+    val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
+        override val site: OngoingFlow<Site> = ongoingFlowOf(
+            FakeSite.copy(
+                users = setOf(FakeUsers.John),
+                rooms = setOf(
+                    FakeRooms.LivingRoom.copy(
+                        devices = setOf(
+                            FakeDevices.HueGroup.copy(
+                                fixture = Fixture.Indicator,
+                            )
+                        )
+                    )
+                ),
+            )
+        )
     }
 
     val testClient = DummyClient.copy(
@@ -67,7 +71,7 @@ class IndicatorTest {
         isRaining = false,
     )
 
-    val fakeWeather = object: LocalWeatherAccess {
+    val fakeWeather = object : LocalWeatherAccess {
         override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(fakeForecast)
         override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(fakeConditions)
         override val currentConditions: Conditions get() = TODO()
@@ -102,10 +106,12 @@ class IndicatorTest {
         val client = testClient.copy(
             actionPublisher = spyPublisher,
         )
-        val fakeWeather = object: LocalWeatherAccess by this@IndicatorTest.fakeWeather {
-            override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(fakeConditions.copy(
-                temperature = 100,
-            ))
+        val fakeWeather = object : LocalWeatherAccess by this@IndicatorTest.fakeWeather {
+            override val conditions: OngoingFlow<Conditions> = ongoingFlowOf(
+                fakeConditions.copy(
+                    temperature = 100,
+                )
+            )
         }
 
         val indicator = Indicator(client, fakeWeather)
@@ -129,10 +135,12 @@ class IndicatorTest {
         val client = testClient.copy(
             actionPublisher = spyPublisher,
         )
-        val fakeWeather = object: LocalWeatherAccess by this@IndicatorTest.fakeWeather {
-            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(fakeForecast.copy(
-                snowChance = 25.percent
-            ))
+        val fakeWeather = object : LocalWeatherAccess by this@IndicatorTest.fakeWeather {
+            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(
+                fakeForecast.copy(
+                    snowChance = 25.percent
+                )
+            )
         }
 
         val indicator = Indicator(client, fakeWeather)
@@ -156,10 +164,12 @@ class IndicatorTest {
         val client = testClient.copy(
             actionPublisher = spyPublisher,
         )
-        val fakeWeather = object: LocalWeatherAccess by this@IndicatorTest.fakeWeather {
-            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(fakeForecast.copy(
-                rainChance = 25.percent
-            ))
+        val fakeWeather = object : LocalWeatherAccess by this@IndicatorTest.fakeWeather {
+            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(
+                fakeForecast.copy(
+                    rainChance = 25.percent
+                )
+            )
         }
 
         val indicator = Indicator(client, fakeWeather)
@@ -183,11 +193,13 @@ class IndicatorTest {
         val client = testClient.copy(
             actionPublisher = spyPublisher,
         )
-        val fakeWeather = object: LocalWeatherAccess by this@IndicatorTest.fakeWeather {
-            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(fakeForecast.copy(
-                rainChance = 25.percent,
-                snowChance = 25.percent,
-            ))
+        val fakeWeather = object : LocalWeatherAccess by this@IndicatorTest.fakeWeather {
+            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(
+                fakeForecast.copy(
+                    rainChance = 25.percent,
+                    snowChance = 25.percent,
+                )
+            )
         }
 
         val indicator = Indicator(client, fakeWeather)
@@ -211,11 +223,11 @@ class IndicatorTest {
         val securityState = MutableStateFlow(SecurityState.Disarmed)
         val client = testClient.copy(
             actionPublisher = spyPublisher,
-            configurationAccess = object: ConfigurationAccess by fakeConfig {
+            configurationAccess = object : ConfigurationAccess by fakeConfig {
                 override val securityState = securityState.asOngoing()
             },
         )
-        val fakeWeather = object: LocalWeatherAccess by this@IndicatorTest.fakeWeather {
+        val fakeWeather = object : LocalWeatherAccess by this@IndicatorTest.fakeWeather {
             override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf()
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf()
         }
@@ -246,11 +258,11 @@ class IndicatorTest {
         val securityState = MutableStateFlow(SecurityState.Armed)
         val client = testClient.copy(
             actionPublisher = spyPublisher,
-            configurationAccess = object: ConfigurationAccess by fakeConfig {
+            configurationAccess = object : ConfigurationAccess by fakeConfig {
                 override val securityState = securityState.asOngoing()
             },
         )
-        val fakeWeather = object: LocalWeatherAccess by this@IndicatorTest.fakeWeather {
+        val fakeWeather = object : LocalWeatherAccess by this@IndicatorTest.fakeWeather {
             override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf()
             override val conditions: OngoingFlow<Conditions> = ongoingFlowOf()
         }

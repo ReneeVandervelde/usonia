@@ -1,5 +1,7 @@
 package usonia.rules.greenhouse
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import inkapplications.spondee.measure.us.fahrenheit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
@@ -13,8 +15,6 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessFake
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 import usonia.rules.DummyFailureHandler
 import usonia.server.DummyClient
 import kotlin.test.Test
@@ -25,21 +25,23 @@ import kotlin.time.Duration.Companion.minutes
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HeatControlTest {
-    private val fakeConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-        override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-            rooms = setOf(
-                FakeRooms.FakeGreenhouse.copy(
-                    devices = setOf(FakeDevices.TemperatureSensor, FakeDevices.Switch.copy(fixture = Fixture.Heat))
-                ),
-                FakeRooms.LivingRoom.copy(
-                    devices = setOf(
-                        FakeDevices.TemperatureSensor.copy(id = Identifier("unrelated-sensor")),
-                        FakeDevices.Switch.copy(id = Identifier("unrelated-switch")),
+    private val fakeConfig = object : ConfigurationAccess by ConfigurationAccessStub {
+        override val site: OngoingFlow<Site> = ongoingFlowOf(
+            FakeSite.copy(
+                rooms = setOf(
+                    FakeRooms.FakeGreenhouse.copy(
+                        devices = setOf(FakeDevices.TemperatureSensor, FakeDevices.Switch.copy(fixture = Fixture.Heat))
+                    ),
+                    FakeRooms.LivingRoom.copy(
+                        devices = setOf(
+                            FakeDevices.TemperatureSensor.copy(id = Identifier("unrelated-sensor")),
+                            FakeDevices.Switch.copy(id = Identifier("unrelated-switch")),
+                        ),
                     ),
                 ),
-            ),
-            users = setOf(FakeUsers.John),
-        ))
+                users = setOf(FakeUsers.John),
+            )
+        )
         override val securityState: OngoingFlow<SecurityState> = ongoingFlowOf(SecurityState.Disarmed)
     }
 
@@ -236,7 +238,7 @@ class HeatControlTest {
     @Test
     fun awayShift() = runTest {
         val actionSpy = ActionPublisherSpy()
-        val armedConfig = object: ConfigurationAccess by fakeConfig {
+        val armedConfig = object : ConfigurationAccess by fakeConfig {
             override val securityState: OngoingFlow<SecurityState> = ongoingFlowOf(SecurityState.Armed)
         }
         val fakeEvents = EventAccessFake()

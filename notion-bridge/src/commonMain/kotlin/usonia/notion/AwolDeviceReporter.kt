@@ -1,5 +1,9 @@
 package usonia.notion
 
+import com.inkapplications.coroutines.ongoing.collectLatest
+import com.inkapplications.coroutines.ongoing.combinePair
+import com.inkapplications.coroutines.ongoing.filter
+import com.inkapplications.coroutines.ongoing.filterIsInstance
 import com.inkapplications.standard.throwCancels
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
@@ -16,10 +20,11 @@ import usonia.core.state.findDevicesBy
 import usonia.core.state.getOldestEvent
 import usonia.foundation.*
 import usonia.foundation.unit.compareTo
-import usonia.kotlin.*
+import usonia.kotlin.RetryStrategy
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.kotlin.datetime.current
+import usonia.kotlin.runRetryable
 import usonia.notion.api.NotionApi
 import usonia.notion.api.structures.NotionBearerToken
 import usonia.notion.api.structures.Parent
@@ -29,11 +34,7 @@ import usonia.notion.api.structures.block.RichTextArgument
 import usonia.notion.api.structures.database.DatabaseId
 import usonia.notion.api.structures.database.DatabaseQuery
 import usonia.notion.api.structures.page.*
-import usonia.notion.api.structures.property.MultiSelectArgument
-import usonia.notion.api.structures.property.Property
-import usonia.notion.api.structures.property.PropertyArgument
-import usonia.notion.api.structures.property.SelectArgument
-import usonia.notion.api.structures.property.StatusArgument
+import usonia.notion.api.structures.property.*
 import usonia.server.client.BackendClient
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -118,7 +119,7 @@ internal class AwolDeviceReporter(
         }.getOrNull() ?: return
         val new = awol
             .filter { (device, _) -> device.id !in reports.map { it.device } }
-            .map { (device, _) -> device}
+            .map { (device, _) -> device }
             .also { logger.debug("${it.size} devices are new reports") }
         val upgraded = awol
             .map { (device, _) -> reports.filter { it.isWarning }.find { it.device == device.id } }
@@ -131,7 +132,9 @@ internal class AwolDeviceReporter(
             .also { logger.debug("${it.size} devices have been found") }
         val saved = reports
             .filter { it.isWarning }
-            .filter { backendClient.getState(it.device!!, Event.Battery::class)?.percentage?.let { it > 80.percent } ?: false }
+            .filter {
+                backendClient.getState(it.device!!, Event.Battery::class)?.percentage?.let { it > 80.percent } ?: false
+            }
             .also { logger.debug("${it.size} devices are no longer low-battery.") }
         val retryStrategy = RetryStrategy.Bracket(
             attempts = 5,
@@ -145,7 +148,13 @@ internal class AwolDeviceReporter(
                 attemptTimeout = timeout,
                 onError = { error -> logger.warn("Error attempting to create AWOL task", error) },
             ) {
-                newBatteryTicket(token, database, "Replace batteries in ${device.name}", device.id, NotionConfig.Tags.DEAD_BATTERY)
+                newBatteryTicket(
+                    token,
+                    database,
+                    "Replace batteries in ${device.name}",
+                    device.id,
+                    NotionConfig.Tags.DEAD_BATTERY
+                )
             }.onSuccess {
                 logger.info("Created AWOL Task for device: ${device.id}")
             }.throwCancels().onFailure { error ->
@@ -158,18 +167,20 @@ internal class AwolDeviceReporter(
                 attemptTimeout = timeout,
                 onError = { error -> logger.warn("Error updating AWOL task", error) },
             ) {
-                notionClient.updatePage(token, report.id, mapOf(
-                    NotionConfig.Properties.TAGS to PropertyArgument.MultiSelect(
-                        multi_select = listOf(
-                            MultiSelectArgument(
-                                name = NotionConfig.Tags.DEAD_BATTERY
-                            ),
-                            MultiSelectArgument(
-                                name = NotionConfig.Tags.USONIA
-                            ),
+                notionClient.updatePage(
+                    token, report.id, mapOf(
+                        NotionConfig.Properties.TAGS to PropertyArgument.MultiSelect(
+                            multi_select = listOf(
+                                MultiSelectArgument(
+                                    name = NotionConfig.Tags.DEAD_BATTERY
+                                ),
+                                MultiSelectArgument(
+                                    name = NotionConfig.Tags.USONIA
+                                ),
+                            )
                         )
                     )
-                ))
+                )
             }.onSuccess {
                 logger.info("Updated AWOL Task: ${report.id}")
             }.throwCancels().onFailure { error ->
@@ -182,13 +193,15 @@ internal class AwolDeviceReporter(
                 attemptTimeout = timeout,
                 onError = { error -> logger.warn("Error updating AWOL task", error) },
             ) {
-                notionClient.updatePage(token, task.id, mapOf(
-                    NotionConfig.Properties.STATUS to PropertyArgument.Status(
-                        status = StatusArgument(
-                            name = NotionConfig.PropertyValues.STATUS_DONE,
+                notionClient.updatePage(
+                    token, task.id, mapOf(
+                        NotionConfig.Properties.STATUS to PropertyArgument.Status(
+                            status = StatusArgument(
+                                name = NotionConfig.PropertyValues.STATUS_DONE,
+                            ),
                         ),
-                    ),
-                ))
+                    )
+                )
             }.onSuccess {
                 logger.info("Closed Task: ${task.id}")
             }.throwCancels().onFailure { error ->
@@ -201,7 +214,7 @@ internal class AwolDeviceReporter(
         backendClient.events
             .filterIsInstance<Event.Battery>()
             .filter { it.percentage < 20.percent }
-            .combineToPair(backendClient.site)
+            .combinePair(backendClient.site)
             .collectLatest { (event, site) -> reportLowBattery(site, event) }
     }
 
@@ -372,21 +385,23 @@ internal class AwolDeviceReporter(
         return events.lastOrNull()
     }
 
-    private val Page.isWarning: Boolean get() {
-        return properties[NotionConfig.Properties.TAGS]
-            ?.let { it as? Property.MultiSelect }
-            ?.multi_select
-            ?.any { it.name == NotionConfig.Tags.LOW_BATTERY }
-            ?: false
-    }
+    private val Page.isWarning: Boolean
+        get() {
+            return properties[NotionConfig.Properties.TAGS]
+                ?.let { it as? Property.MultiSelect }
+                ?.multi_select
+                ?.any { it.name == NotionConfig.Tags.LOW_BATTERY }
+                ?: false
+        }
 
-    private val Page.device: Identifier? get() {
-        return properties[NotionConfig.Properties.REF]
-            ?.let { it as? Property.RichText }
-            ?.rich_text
-            ?.first()
-            ?.let { it as? RichText.Text }
-            ?.plain_text
-            ?.let { Identifier(it) }
-    }
+    private val Page.device: Identifier?
+        get() {
+            return properties[NotionConfig.Properties.REF]
+                ?.let { it as? Property.RichText }
+                ?.rich_text
+                ?.first()
+                ?.let { it as? RichText.Text }
+                ?.plain_text
+                ?.let { Identifier(it) }
+        }
 }

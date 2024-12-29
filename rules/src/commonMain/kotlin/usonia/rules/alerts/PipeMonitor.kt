@@ -1,5 +1,6 @@
 package usonia.rules.alerts
 
+import com.inkapplications.coroutines.ongoing.*
 import inkapplications.spondee.measure.us.toFahrenheit
 import inkapplications.spondee.structure.toFloat
 import kimchi.logger.EmptyLogger
@@ -10,7 +11,7 @@ import kotlinx.coroutines.launch
 import regolith.processes.daemon.Daemon
 import usonia.core.client.alertAll
 import usonia.foundation.*
-import usonia.kotlin.*
+import usonia.kotlin.DefaultScope
 import usonia.server.client.BackendClient
 
 /**

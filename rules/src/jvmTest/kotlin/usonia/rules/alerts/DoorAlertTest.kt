@@ -1,5 +1,8 @@
 package usonia.rules.alerts
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.asOngoing
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -12,9 +15,6 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessFake
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.asOngoing
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.reflect.KClass
 import kotlin.test.Test
@@ -24,21 +24,27 @@ import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DoorAlertTest {
-    private val baseConfig = object: ConfigurationAccess by ConfigurationAccessStub {
-        override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-            users = setOf(FakeUsers.John, FakeUsers.Jane),
-            rooms = setOf(FakeRooms.LivingRoom.copy(
-                devices = setOf(FakeDevices.Latch.copy(
-                    fixture = Fixture.EntryPoint,
-                )),
-            )),
-        ))
+    private val baseConfig = object : ConfigurationAccess by ConfigurationAccessStub {
+        override val site: OngoingFlow<Site> = ongoingFlowOf(
+            FakeSite.copy(
+                users = setOf(FakeUsers.John, FakeUsers.Jane),
+                rooms = setOf(
+                    FakeRooms.LivingRoom.copy(
+                        devices = setOf(
+                            FakeDevices.Latch.copy(
+                                fixture = Fixture.EntryPoint,
+                            )
+                        ),
+                    )
+                ),
+            )
+        )
         override val securityState: OngoingFlow<SecurityState> = ongoingFlowOf(SecurityState.Disarmed)
     }
-    private val disarmedEntryConfig = object: ConfigurationAccess by baseConfig {
+    private val disarmedEntryConfig = object : ConfigurationAccess by baseConfig {
         override val securityState: OngoingFlow<SecurityState> = ongoingFlowOf(SecurityState.Disarmed)
     }
-    private val armedEntryConfig = object: ConfigurationAccess by baseConfig {
+    private val armedEntryConfig = object : ConfigurationAccess by baseConfig {
         override val securityState: OngoingFlow<SecurityState> = ongoingFlowOf(SecurityState.Armed)
     }
 
@@ -100,13 +106,17 @@ class DoorAlertTest {
     @Test
     fun nonEntryPoint() = runTest {
         val fakeEvents = EventAccessFake()
-        val config = object: ConfigurationAccess by armedEntryConfig {
-            override val site: OngoingFlow<Site> = ongoingFlowOf(FakeSite.copy(
-                users = setOf(FakeUsers.John),
-                rooms = setOf(FakeRooms.LivingRoom.copy(
-                    devices = setOf(FakeDevices.Latch),
-                )),
-            ))
+        val config = object : ConfigurationAccess by armedEntryConfig {
+            override val site: OngoingFlow<Site> = ongoingFlowOf(
+                FakeSite.copy(
+                    users = setOf(FakeUsers.John),
+                    rooms = setOf(
+                        FakeRooms.LivingRoom.copy(
+                            devices = setOf(FakeDevices.Latch),
+                        )
+                    ),
+                )
+            )
         }
         val actionSpy = ActionPublisherSpy()
         val client = DummyClient.copy(
@@ -157,7 +167,7 @@ class DoorAlertTest {
         val actionSpy = ActionPublisherSpy()
         val securityState = MutableStateFlow(SecurityState.Armed)
         val client = DummyClient.copy(
-            configurationAccess = object: ConfigurationAccess by baseConfig {
+            configurationAccess = object : ConfigurationAccess by baseConfig {
                 override val securityState: OngoingFlow<SecurityState> = securityState.asOngoing()
             },
             eventAccess = fakeEvents,
@@ -192,7 +202,7 @@ class DoorAlertTest {
         val actionSpy = ActionPublisherSpy()
         val securityState = MutableStateFlow(SecurityState.Armed)
         val client = DummyClient.copy(
-            configurationAccess = object: ConfigurationAccess by baseConfig {
+            configurationAccess = object : ConfigurationAccess by baseConfig {
                 override val securityState: OngoingFlow<SecurityState> = securityState.asOngoing()
             },
             eventAccess = fakeEvents,

@@ -1,6 +1,7 @@
 package usonia.frontend.configuration
 
 import androidx.compose.runtime.Composable
+import com.inkapplications.coroutines.ongoing.map
 import org.jetbrains.compose.web.dom.*
 import usonia.client.FrontendClient
 import usonia.foundation.ParameterBag
@@ -12,7 +13,6 @@ import usonia.frontend.navigation.NavigationSection
 import usonia.frontend.navigation.Routing
 import usonia.frontend.widgets.KeyValue
 import usonia.frontend.widgets.LoadingIndicator
-import usonia.kotlin.map
 
 class RoomSection(
     private val client: FrontendClient,

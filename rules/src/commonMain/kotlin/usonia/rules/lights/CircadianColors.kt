@@ -1,5 +1,6 @@
 package usonia.rules.lights
 
+import com.inkapplications.coroutines.ongoing.first
 import inkapplications.spondee.measure.ColorTemperature
 import inkapplications.spondee.measure.metric.kelvin
 import inkapplications.spondee.scalar.Percentage
@@ -16,7 +17,6 @@ import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.kotlin.datetime.current
 import usonia.kotlin.datetime.withZone
-import usonia.kotlin.first
 import usonia.weather.LocalWeatherAccess
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -91,12 +91,15 @@ internal class CircadianColors(
         when {
             now.instant >= forecast.sunrise.minus(period) && now.instant <= forecast.sunrise -> {
                 logger.trace("In morning blue hour")
-                val position = ((now - forecast.sunrise.minus(period)).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
+                val position = ((now - forecast.sunrise.minus(period)).toDouble(DurationUnit.MINUTES) / period.toDouble(
+                    DurationUnit.MINUTES
+                )).toFloat()
                 return LightSettings.Temperature(
                     temperature = transition(modifiedNightColor, daylightColor, position),
                     brightness = transition(modifiedNightBrightness, 100.percent, position),
                 )
             }
+
             now.instant > forecast.sunrise && now.instant < forecast.sunset -> {
                 logger.trace("In daytime")
                 return LightSettings.Temperature(
@@ -104,35 +107,42 @@ internal class CircadianColors(
                     brightness = 100.percent,
                 )
             }
+
             now >= nightStartInstant -> {
                 logger.trace("In twilight")
 
-                val eveningTransitionPosition = ((now - forecast.sunset).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
+                val eveningTransitionPosition =
+                    ((now - forecast.sunset).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
                 val eveningTransitionColor = transition(daylightColor, eveningColor, eveningTransitionPosition)
-                val position = ((now - nightStartInstant).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
+                val position =
+                    ((now - nightStartInstant).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
                 return LightSettings.Temperature(
                     temperature = transition(eveningTransitionColor, modifiedNightColor, position),
                     brightness = transition(100.percent, modifiedNightBrightness, position),
                 )
             }
+
             now.instant < forecast.sunrise
                 || now > nightStartInstant.plus(period)
                 || now.localDate.dayOfYear > forecast.sunset.toLocalDateTime(clock.timeZone).dayOfYear
-            -> {
+                -> {
                 logger.trace("In nighttime")
                 return LightSettings.Temperature(
                     temperature = modifiedNightColor,
                     brightness = modifiedNightBrightness,
                 )
             }
+
             now.instant >= forecast.sunset -> {
                 logger.trace("In evening")
-                val position = ((now - forecast.sunset).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
+                val position =
+                    ((now - forecast.sunset).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
                 return LightSettings.Temperature(
                     temperature = transition(daylightColor, eveningColor, position),
                     brightness = 100.percent,
                 )
             }
+
             else -> throw IllegalStateException("Time not covered in color conditions.")
         }
     }

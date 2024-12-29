@@ -1,13 +1,13 @@
 package usonia.rules.locks
 
+import com.inkapplications.coroutines.ongoing.collectLatest
+import com.inkapplications.coroutines.ongoing.distinctUntilChanged
+import com.inkapplications.coroutines.ongoing.filter
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import regolith.processes.daemon.Daemon
 import usonia.core.state.publishAll
 import usonia.foundation.*
-import usonia.kotlin.collectLatest
-import usonia.kotlin.distinctUntilChanged
-import usonia.kotlin.filter
 import usonia.server.client.BackendClient
 
 internal class LockOnSecure(

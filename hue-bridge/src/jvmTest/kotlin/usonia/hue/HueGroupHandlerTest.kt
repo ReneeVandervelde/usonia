@@ -1,6 +1,8 @@
 package usonia.hue
 
 import com.github.ajalt.colormath.model.RGB
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import inkapplications.shade.groupedlights.GroupedLightControls
 import inkapplications.shade.groupedlights.parameters.GroupedLightUpdateParameters
 import inkapplications.shade.groupedlights.structures.GroupedLight
@@ -18,8 +20,6 @@ import usonia.core.state.ActionAccessFake
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -42,7 +42,7 @@ class HueGroupHandlerTest {
     fun notConfigured() = runTest {
         val shadeSpy = ShadeGroupsSpy()
         val actionAccess = ActionAccessFake()
-        val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
+        val configurationAccess = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     rooms = setOf(
@@ -79,7 +79,7 @@ class HueGroupHandlerTest {
     fun nonHueGroup() = runTest {
         val shadeSpy = ShadeGroupsSpy()
         val actionAccess = ActionAccessFake()
-        val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
+        val configurationAccess = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     rooms = setOf(
@@ -116,7 +116,7 @@ class HueGroupHandlerTest {
     fun nonLightAction() = runTest {
         val shadeSpy = ShadeGroupsSpy()
         val actionAccess = ActionAccessFake()
-        val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
+        val configurationAccess = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     rooms = setOf(
@@ -176,7 +176,7 @@ class HueGroupHandlerTest {
     private fun handlesAction(action: Action) = runTest {
         val shadeSpy = ShadeGroupsSpy()
         val actionAccess = ActionAccessFake()
-        val configurationAccess = object: ConfigurationAccess by ConfigurationAccessStub {
+        val configurationAccess = object : ConfigurationAccess by ConfigurationAccessStub {
             override val site: OngoingFlow<Site> = ongoingFlowOf(
                 FakeSite.copy(
                     rooms = setOf(
