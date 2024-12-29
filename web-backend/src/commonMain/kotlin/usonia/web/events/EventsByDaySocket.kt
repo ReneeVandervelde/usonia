@@ -1,10 +1,10 @@
 package usonia.web.events
 
+import com.inkapplications.coroutines.ongoing.collectLatest
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.serialization.json.Json
 import usonia.foundation.DateMetricSerializer
-import usonia.kotlin.collectLatest
 import usonia.server.client.BackendClient
 import usonia.server.http.WebSocketController
 

@@ -1,5 +1,7 @@
 package usonia.rules.greenhouse
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import inkapplications.spondee.measure.us.fahrenheit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
@@ -12,8 +14,6 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessFake
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 import usonia.rules.DummyFailureHandler
 import usonia.server.DummyClient
 import kotlin.test.Test
@@ -50,7 +50,7 @@ class FanControlTest {
         val daemon = FanControl(
             client = client,
             failureHandler = DummyFailureHandler,
-            backgroundScope = this,
+            backgroundScope = backgroundScope,
         )
 
         val daemonJob = launch { daemon.startDaemon() }
@@ -78,7 +78,7 @@ class FanControlTest {
         val daemon = FanControl(
             client = client,
             failureHandler = DummyFailureHandler,
-            backgroundScope = this,
+            backgroundScope = backgroundScope,
         )
 
         val daemonJob = launch { daemon.startDaemon() }
@@ -103,7 +103,7 @@ class FanControlTest {
         val daemon = FanControl(
             client = client,
             failureHandler = DummyFailureHandler,
-            backgroundScope = this,
+            backgroundScope = backgroundScope,
         )
 
         val daemonJob = launch { daemon.startDaemon() }
@@ -131,7 +131,7 @@ class FanControlTest {
         val daemon = FanControl(
             client = client,
             failureHandler = DummyFailureHandler,
-            backgroundScope = this,
+            backgroundScope = backgroundScope,
         )
 
         val daemonJob = launch { daemon.startDaemon() }

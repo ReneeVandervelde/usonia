@@ -1,5 +1,6 @@
 package usonia.rules.lights
 
+import com.inkapplications.coroutines.ongoing.*
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
@@ -15,7 +16,7 @@ import usonia.core.state.publishAll
 import usonia.core.state.setFlag
 import usonia.foundation.*
 import usonia.foundation.Room.Type.*
-import usonia.kotlin.*
+import usonia.kotlin.DefaultScope
 import usonia.rules.Flags
 import usonia.server.client.BackendClient
 import kotlin.time.Duration.Companion.hours

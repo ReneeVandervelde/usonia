@@ -1,5 +1,7 @@
 package usonia.rules.alerts
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import kimchi.logger.LogLevel
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
@@ -12,8 +14,6 @@ import usonia.foundation.Action
 import usonia.foundation.FakeSite
 import usonia.foundation.FakeUsers
 import usonia.foundation.Site
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals

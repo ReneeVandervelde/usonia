@@ -1,5 +1,8 @@
 package usonia.hue
 
+import com.inkapplications.coroutines.ongoing.collectLatest
+import com.inkapplications.coroutines.ongoing.filter
+import com.inkapplications.coroutines.ongoing.flatMapLatest
 import inkapplications.shade.events.Events
 import inkapplications.shade.groupedlights.events.GroupedLightEvent
 import inkapplications.shade.lights.events.LightEvent
@@ -13,9 +16,6 @@ import regolith.processes.daemon.Daemon
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.EventPublisher
 import usonia.foundation.*
-import usonia.kotlin.collectLatest
-import usonia.kotlin.filter
-import usonia.kotlin.flatMapLatest
 
 @OptIn(UndocumentedApi::class)
 class HueEventPublisher(

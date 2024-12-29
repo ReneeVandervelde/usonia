@@ -1,5 +1,7 @@
 package usonia.telegram
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import com.inkapplications.telegram.client.TelegramBotClient
 import com.inkapplications.telegram.structures.*
 import kimchi.logger.EmptyLogger
@@ -12,8 +14,6 @@ import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.EventPublisherSpy
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 import usonia.rules.Flags
 import usonia.server.DummyClient
 import usonia.server.client.BackendClient

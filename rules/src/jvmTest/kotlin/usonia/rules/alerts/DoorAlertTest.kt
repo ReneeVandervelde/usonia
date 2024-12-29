@@ -1,5 +1,8 @@
 package usonia.rules.alerts
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.asOngoing
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -12,9 +15,6 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessFake
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.asOngoing
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.reflect.KClass
 import kotlin.test.Test

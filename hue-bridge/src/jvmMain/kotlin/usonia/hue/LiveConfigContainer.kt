@@ -1,5 +1,6 @@
 package usonia.hue
 
+import com.inkapplications.coroutines.ongoing.map
 import inkapplications.shade.structures.AuthToken
 import inkapplications.shade.structures.HueConfigurationContainer
 import inkapplications.shade.structures.SecurityStrategy
@@ -11,7 +12,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import usonia.core.state.ConfigurationAccess
 import usonia.kotlin.alsoIfNull
-import usonia.kotlin.map
 
 /**
  * Loads Hue configurations from the live data of the site configuration.

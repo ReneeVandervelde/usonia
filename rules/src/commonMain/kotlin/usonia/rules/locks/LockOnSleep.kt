@@ -1,5 +1,7 @@
 package usonia.rules.locks
 
+import com.inkapplications.coroutines.ongoing.collectLatest
+import com.inkapplications.coroutines.ongoing.distinctUntilChanged
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import regolith.processes.daemon.Daemon
@@ -7,8 +9,6 @@ import usonia.core.state.publishAll
 import usonia.foundation.Action
 import usonia.foundation.LockState
 import usonia.foundation.findDevicesBy
-import usonia.kotlin.collectLatest
-import usonia.kotlin.distinctUntilChanged
 import usonia.kotlin.filterTrue
 import usonia.rules.sleepMode
 import usonia.server.client.BackendClient

@@ -1,11 +1,11 @@
 package usonia.core.client
 
+import com.inkapplications.coroutines.ongoing.*
 import kotlinx.coroutines.flow.onStart
 import usonia.foundation.Device
 import usonia.foundation.Event
 import usonia.foundation.Identifier
 import usonia.foundation.getDevice
-import usonia.kotlin.*
 
 /**
  * Listen to a device's latest events
@@ -32,7 +32,7 @@ inline fun <reified T: Event> UsoniaClient.latestDeviceEventOfType(device: Devic
     return events.filterIsInstance<T>()
         .filter { it.source == device.id }
         .map { it as T? }
-        .unsafeModify { onStart { emit(getState(device.id, T::class)) } }
+        .unsafeTransform { onStart { emit(getState(device.id, T::class)) } }
         .map { DeviceProperty(device, it) }
 }
 

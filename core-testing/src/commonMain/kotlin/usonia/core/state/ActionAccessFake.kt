@@ -1,8 +1,8 @@
 package usonia.core.state
 
+import com.inkapplications.coroutines.ongoing.asOngoing
 import kotlinx.coroutines.flow.MutableSharedFlow
 import usonia.foundation.Action
-import usonia.kotlin.asOngoing
 
 class ActionAccessFake: ActionAccess {
     val mutableActions = MutableSharedFlow<Action>()

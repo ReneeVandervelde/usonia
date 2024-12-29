@@ -1,5 +1,8 @@
 package usonia.rules.greenhouse
 
+import com.inkapplications.coroutines.ongoing.combinePair
+import com.inkapplications.coroutines.ongoing.first
+import com.inkapplications.coroutines.ongoing.map
 import inkapplications.spondee.measure.metric.kelvin
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
@@ -12,11 +15,8 @@ import usonia.foundation.Action
 import usonia.foundation.Fixture
 import usonia.foundation.SwitchState
 import usonia.foundation.findDevicesBy
-import usonia.kotlin.combineToPair
 import usonia.kotlin.datetime.ZonedDateTime
 import usonia.kotlin.datetime.withZone
-import usonia.kotlin.first
-import usonia.kotlin.map
 import usonia.server.client.BackendClient
 import usonia.weather.FullForecast
 import usonia.weather.LocalWeatherAccess
@@ -36,7 +36,7 @@ class MorningPlantLight(
     override suspend fun runCron(time: LocalDateTime, zone: TimeZone) {
         val (devices, forecast) = client.site
             .map { it.findDevicesBy { it.fixture == Fixture.Plant } }
-            .combineToPair(weatherAccess.forecast)
+            .combinePair(weatherAccess.forecast)
             .first()
 
         // Fix for late forecast updates in the morning.

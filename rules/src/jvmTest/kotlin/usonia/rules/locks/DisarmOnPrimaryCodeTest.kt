@@ -1,5 +1,7 @@
 package usonia.rules.locks
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -11,8 +13,6 @@ import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessFake
 import usonia.core.state.FullSecurityAccessSpy
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals

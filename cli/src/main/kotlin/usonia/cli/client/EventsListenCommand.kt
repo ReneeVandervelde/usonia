@@ -1,6 +1,6 @@
 package usonia.cli.client
 
-import usonia.kotlin.collect
+import com.inkapplications.coroutines.ongoing.collect
 
 class EventsListenCommand(
     module: ClientModule,

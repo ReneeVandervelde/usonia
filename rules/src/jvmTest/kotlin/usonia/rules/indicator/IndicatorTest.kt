@@ -1,6 +1,9 @@
 package usonia.rules.indicator
 
 import com.github.ajalt.colormath.model.RGB
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.asOngoing
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.measure.us.inches
 import inkapplications.spondee.scalar.percent
@@ -17,9 +20,6 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessStub
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.asOngoing
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import usonia.weather.Conditions
 import usonia.weather.FullForecast

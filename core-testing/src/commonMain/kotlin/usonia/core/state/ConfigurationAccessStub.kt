@@ -1,9 +1,9 @@
 package usonia.core.state
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import usonia.foundation.SecurityState
 import usonia.foundation.Site
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 
 object ConfigurationAccessStub: ConfigurationAccess {
     override val site: OngoingFlow<Site> get() = ongoingFlowOf()

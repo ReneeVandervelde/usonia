@@ -1,8 +1,11 @@
 package usonia.rules.alerts
 
+import com.inkapplications.coroutines.ongoing.collect
+import com.inkapplications.coroutines.ongoing.filterIsInstance
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import regolith.processes.daemon.Daemon
 import usonia.core.client.alertAll
 import usonia.core.state.findDevice
@@ -12,8 +15,6 @@ import usonia.foundation.Identifier
 import usonia.foundation.WaterState.DRY
 import usonia.foundation.WaterState.WET
 import usonia.kotlin.DefaultScope
-import usonia.kotlin.collectOn
-import usonia.kotlin.filterIsInstance
 import usonia.server.client.BackendClient
 
 /**
@@ -29,7 +30,7 @@ internal class WaterMonitor(
     override suspend fun startDaemon(): Nothing {
         client.events
             .filterIsInstance<Event.Water>()
-            .collectOn(backgroundScope) {
+            .collect {
                 when (it.state) {
                     WET -> onWet(it)
                     DRY -> onDry(it)
@@ -56,10 +57,12 @@ internal class WaterMonitor(
             logger.error("Unable to find device with ID: <${event.source}>")
         }
         logger.trace("Sending out alerts for <$name>")
-        client.alertAll(
-            message = "Water detected by $name!",
-            level = Action.Alert.Level.Emergency,
-            icon = Action.Alert.Icon.Flood,
-        )
+        backgroundScope.launch {
+            client.alertAll(
+                message = "Water detected by $name!",
+                level = Action.Alert.Level.Emergency,
+                icon = Action.Alert.Icon.Flood,
+            )
+        }
     }
 }

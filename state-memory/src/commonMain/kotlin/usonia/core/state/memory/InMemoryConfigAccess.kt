@@ -1,14 +1,14 @@
 package usonia.core.state.memory
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.asOngoing
+import com.inkapplications.coroutines.ongoing.first
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import usonia.core.state.ConfigurationAccess
 import usonia.foundation.SecurityState
 import usonia.foundation.Site
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.asOngoing
-import usonia.kotlin.first
 
 /**
  * Stores configuration temporarily in memory.

@@ -1,5 +1,9 @@
 package usonia.rules.alerts
 
+import com.inkapplications.coroutines.ongoing.asOngoing
+import com.inkapplications.coroutines.ongoing.collect
+import com.inkapplications.coroutines.ongoing.flatMapLatest
+import com.inkapplications.coroutines.ongoing.map
 import kimchi.logger.LogLevel
 import kimchi.logger.LogWriter
 import kotlinx.coroutines.channels.BufferOverflow
@@ -7,10 +11,6 @@ import kotlinx.coroutines.flow.*
 import regolith.processes.daemon.Daemon
 import usonia.core.client.alertAll
 import usonia.foundation.Action
-import usonia.kotlin.asOngoing
-import usonia.kotlin.collect
-import usonia.kotlin.flatMapLatest
-import usonia.kotlin.map
 import usonia.rules.Flags
 import usonia.server.client.BackendClient
 

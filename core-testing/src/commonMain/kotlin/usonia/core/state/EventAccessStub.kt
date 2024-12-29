@@ -1,13 +1,13 @@
 package usonia.core.state
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import usonia.foundation.Event
 import usonia.foundation.EventCategory
 import usonia.foundation.Identifier
 import usonia.foundation.TemperatureSnapshot
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 import kotlin.reflect.KClass
 import kotlin.time.Duration
 

@@ -1,5 +1,7 @@
 package usonia.notion
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -9,10 +11,8 @@ import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccess
 import usonia.core.state.EventAccessStub
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
 import usonia.kotlin.datetime.UtcClock
 import usonia.kotlin.datetime.current
-import usonia.kotlin.ongoingFlowOf
 import usonia.notion.api.structures.NotionResponse
 import usonia.notion.api.structures.Parent
 import usonia.notion.api.structures.block.RichText

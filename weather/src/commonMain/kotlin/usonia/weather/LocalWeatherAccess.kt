@@ -1,7 +1,7 @@
 package usonia.weather
 
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.combineToPair
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.combinePair
 
 /**
  * Provides access to weather information updates.
@@ -16,4 +16,4 @@ interface LocalWeatherAccess {
 /**
  * Combine current conditions with forecast data.
  */
-val LocalWeatherAccess.combinedData get() = conditions.combineToPair(forecast)
+val LocalWeatherAccess.combinedData get() = conditions.combinePair(forecast)

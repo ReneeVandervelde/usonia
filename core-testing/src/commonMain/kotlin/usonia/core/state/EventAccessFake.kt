@@ -1,8 +1,8 @@
 package usonia.core.state
 
+import com.inkapplications.coroutines.ongoing.asOngoing
 import kotlinx.coroutines.flow.MutableSharedFlow
 import usonia.foundation.Event
-import usonia.kotlin.asOngoing
 
 open class EventAccessFake: EventAccess by EventAccessStub {
     val mutableEvents = MutableSharedFlow<Event>()

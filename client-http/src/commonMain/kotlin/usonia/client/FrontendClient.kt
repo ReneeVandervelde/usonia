@@ -1,8 +1,8 @@
 package usonia.client
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
 import usonia.core.client.UsoniaClient
 import usonia.foundation.LogMessage
-import usonia.kotlin.OngoingFlow
 
 interface FrontendClient: UsoniaClient {
     /**
