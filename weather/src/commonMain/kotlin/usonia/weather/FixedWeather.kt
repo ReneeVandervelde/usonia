@@ -1,8 +1,8 @@
 package usonia.weather
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.asOngoing
 import kotlinx.coroutines.flow.MutableStateFlow
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.asOngoing
 
 /**
  * A weather access implementation that provides a single data set.

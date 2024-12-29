@@ -1,5 +1,6 @@
 package usonia.server.client
 
+import com.inkapplications.coroutines.ongoing.first
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.measure.us.toFahrenheit
 import inkapplications.spondee.scalar.percent
@@ -7,7 +8,6 @@ import inkapplications.spondee.scalar.toWholePercentage
 import inkapplications.spondee.structure.plus
 import usonia.foundation.Event
 import usonia.foundation.findDevice
-import usonia.kotlin.first
 
 /**
  * Creates a copy of an event with the data points adjusted.

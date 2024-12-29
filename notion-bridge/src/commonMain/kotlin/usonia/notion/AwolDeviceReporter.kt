@@ -1,5 +1,9 @@
 package usonia.notion
 
+import com.inkapplications.coroutines.ongoing.collectLatest
+import com.inkapplications.coroutines.ongoing.combinePair
+import com.inkapplications.coroutines.ongoing.filter
+import com.inkapplications.coroutines.ongoing.filterIsInstance
 import com.inkapplications.standard.throwCancels
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
@@ -16,10 +20,11 @@ import usonia.core.state.findDevicesBy
 import usonia.core.state.getOldestEvent
 import usonia.foundation.*
 import usonia.foundation.unit.compareTo
-import usonia.kotlin.*
+import usonia.kotlin.RetryStrategy
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.kotlin.datetime.current
+import usonia.kotlin.runRetryable
 import usonia.notion.api.NotionApi
 import usonia.notion.api.structures.NotionBearerToken
 import usonia.notion.api.structures.Parent
@@ -29,11 +34,7 @@ import usonia.notion.api.structures.block.RichTextArgument
 import usonia.notion.api.structures.database.DatabaseId
 import usonia.notion.api.structures.database.DatabaseQuery
 import usonia.notion.api.structures.page.*
-import usonia.notion.api.structures.property.MultiSelectArgument
-import usonia.notion.api.structures.property.Property
-import usonia.notion.api.structures.property.PropertyArgument
-import usonia.notion.api.structures.property.SelectArgument
-import usonia.notion.api.structures.property.StatusArgument
+import usonia.notion.api.structures.property.*
 import usonia.server.client.BackendClient
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -201,7 +202,7 @@ internal class AwolDeviceReporter(
         backendClient.events
             .filterIsInstance<Event.Battery>()
             .filter { it.percentage < 20.percent }
-            .combineToPair(backendClient.site)
+            .combinePair(backendClient.site)
             .collectLatest { (event, site) -> reportLowBattery(site, event) }
     }
 

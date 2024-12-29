@@ -1,5 +1,9 @@
 package usonia.hue
 
+import com.inkapplications.coroutines.ongoing.collect
+import com.inkapplications.coroutines.ongoing.collectLatest
+import com.inkapplications.coroutines.ongoing.filter
+import com.inkapplications.coroutines.ongoing.map
 import com.inkapplications.standard.throwCancels
 import inkapplications.shade.lights.LightControls
 import inkapplications.shade.lights.parameters.*
@@ -13,7 +17,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import regolith.processes.daemon.Daemon
 import usonia.foundation.*
-import usonia.kotlin.*
+import usonia.kotlin.IoScope
+import usonia.kotlin.RetryStrategy
+import usonia.kotlin.runRetryable
 import usonia.server.client.BackendClient
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -34,7 +40,7 @@ internal class HueLightHandler(
                 .map { action -> site.getDevice(action.target) to action }
                 .filter { (device, _) -> site.findAssociatedBridge(device)?.service == HUE_SERVICE }
                 .filter { (device, _) -> device.capabilities.archetypeId == HueArchetypes.color.archetypeId }
-                .collectOn(requestScope) { (device, action) ->
+                .collect { (device, action) ->
                     handleAction(action, device)
                 }
         }

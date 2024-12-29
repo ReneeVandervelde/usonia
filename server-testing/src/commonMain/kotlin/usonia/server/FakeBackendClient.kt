@@ -1,10 +1,10 @@
 package usonia.server
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import usonia.core.state.*
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
 import usonia.server.client.ComposedBackendClient
 import kotlin.reflect.KClass
 import kotlin.time.Duration

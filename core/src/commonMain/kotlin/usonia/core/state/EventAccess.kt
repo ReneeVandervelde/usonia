@@ -1,11 +1,11 @@
 package usonia.core.state
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.first
+import com.inkapplications.coroutines.ongoing.map
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.first
-import usonia.kotlin.map
 import kotlin.reflect.KClass
 import kotlin.time.Duration
 

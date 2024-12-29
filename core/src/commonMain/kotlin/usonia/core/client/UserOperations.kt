@@ -1,11 +1,11 @@
 package usonia.core.client
 
+import com.inkapplications.coroutines.ongoing.*
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import usonia.core.state.getSite
 import usonia.foundation.*
-import usonia.kotlin.*
 
 /**
  * Observes a specific user's presence state, starting with its last known state.
@@ -15,7 +15,7 @@ fun UsoniaClient.userPresence(user: Identifier): OngoingFlow<Event.Presence?> {
         .filter { it.source == user }
         .filterIsInstance<Event.Presence>()
         .filterIsInstance<Event.Presence?>()
-        .unsafeModify { onStart { getState(user, Event.Presence::class).also { emit(it) } }
+        .unsafeTransform { onStart { getState(user, Event.Presence::class).also { emit(it) } }
     }
 }
 

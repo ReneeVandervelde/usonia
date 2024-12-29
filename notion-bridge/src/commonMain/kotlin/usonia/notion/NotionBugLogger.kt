@@ -1,5 +1,6 @@
 package usonia.notion
 
+import com.inkapplications.coroutines.ongoing.*
 import kimchi.logger.LogLevel
 import kimchi.logger.LogWriter
 import kotlinx.coroutines.channels.BufferOverflow
@@ -8,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import regolith.processes.daemon.Daemon
 import usonia.core.state.findBridgeByServiceTag
-import usonia.kotlin.*
 import usonia.notion.api.NotionApi
 import usonia.notion.api.structures.NotionBearerToken
 import usonia.notion.api.structures.Parent
@@ -18,15 +18,10 @@ import usonia.notion.api.structures.block.RichTextArgument.Text
 import usonia.notion.api.structures.database.DatabaseId
 import usonia.notion.api.structures.database.DatabaseQuery
 import usonia.notion.api.structures.page.*
-import usonia.notion.api.structures.page.FilterQuery
-import usonia.notion.api.structures.page.NewPage
-import usonia.notion.api.structures.page.PageFilter
-import usonia.notion.api.structures.page.TextFilter
 import usonia.notion.api.structures.property.MultiSelectArgument
 import usonia.notion.api.structures.property.PropertyArgument
 import usonia.notion.api.structures.property.SelectArgument
 import usonia.server.client.BackendClient
-import kotlin.math.min
 
 internal class NotionBugLogger(
     private val notion: NotionApi,

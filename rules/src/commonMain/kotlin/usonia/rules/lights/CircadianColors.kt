@@ -1,5 +1,6 @@
 package usonia.rules.lights
 
+import com.inkapplications.coroutines.ongoing.first
 import inkapplications.spondee.measure.ColorTemperature
 import inkapplications.spondee.measure.metric.kelvin
 import inkapplications.spondee.scalar.Percentage
@@ -16,7 +17,6 @@ import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.kotlin.datetime.current
 import usonia.kotlin.datetime.withZone
-import usonia.kotlin.first
 import usonia.weather.LocalWeatherAccess
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes

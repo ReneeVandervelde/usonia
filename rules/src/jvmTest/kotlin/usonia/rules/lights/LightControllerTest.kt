@@ -1,5 +1,7 @@
 package usonia.rules.lights
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import inkapplications.spondee.measure.metric.kelvin
 import inkapplications.spondee.scalar.percent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,8 +17,6 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessFake
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -64,7 +64,7 @@ class LightControllerTest {
             actionPublisher = actionPublisher,
         )
 
-        val controller = LightController(client, settingsPicker, backgroundScope = this)
+        val controller = LightController(client, settingsPicker, backgroundScope = backgroundScope)
         val daemonJob = launch { controller.startDaemon() }
         runCurrent()
 
@@ -95,7 +95,7 @@ class LightControllerTest {
             override suspend fun getActiveSettings(room: Room): LightSettings = LightSettings.Ignore
         }
 
-        val controller = LightController(client, settingsPicker, backgroundScope = this)
+        val controller = LightController(client, settingsPicker, backgroundScope = backgroundScope)
         val daemonJob = launch { controller.startDaemon() }
 
         eventAccess.mutableEvents.emit(Event.Motion(
@@ -122,7 +122,7 @@ class LightControllerTest {
             override suspend fun getActiveSettings(room: Room): LightSettings = LightSettings.Unhandled
         }
 
-        val controller = LightController(client, settingsPicker, backgroundScope = this)
+        val controller = LightController(client, settingsPicker, backgroundScope = backgroundScope)
         val daemonJob = launch { controller.startDaemon() }
         runCurrent()
 
@@ -147,7 +147,7 @@ class LightControllerTest {
             actionPublisher = actionPublisher,
         )
 
-        val controller = LightController(client, settingsPicker, backgroundScope = this)
+        val controller = LightController(client, settingsPicker, backgroundScope = backgroundScope)
         val daemonJob = launch { controller.startDaemon() }
         runCurrent()
 
@@ -177,7 +177,7 @@ class LightControllerTest {
             actionPublisher = actionPublisher,
         )
 
-        val controller = LightController(client, settingsPicker, backgroundScope = this)
+        val controller = LightController(client, settingsPicker, backgroundScope = backgroundScope)
         val daemonJob = launch { controller.startDaemon() }
         runCurrent()
 

@@ -1,5 +1,7 @@
 package usonia.rules.alerts
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import inkapplications.spondee.measure.us.fahrenheit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
@@ -13,8 +15,6 @@ import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccessFake
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlowOf
 import usonia.server.DummyClient
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -44,7 +44,7 @@ class PipeMonitorTest {
             eventAccess = events,
             actionPublisher = actionPublisherSpy,
         )
-        val monitor = PipeMonitor(client, backgroundScope = this)
+        val monitor = PipeMonitor(client, backgroundScope = backgroundScope)
 
         val monitorJob = launch { monitor.startDaemon() }
         advanceUntilIdle()
@@ -72,7 +72,7 @@ class PipeMonitorTest {
             eventAccess = events,
             actionPublisher = actionPublisherSpy,
         )
-        val monitor = PipeMonitor(client, backgroundScope = this)
+        val monitor = PipeMonitor(client, backgroundScope = backgroundScope)
 
         val monitorJob = launch { monitor.startDaemon() }
         advanceUntilIdle()
@@ -101,7 +101,7 @@ class PipeMonitorTest {
             eventAccess = events,
             actionPublisher = actionPublisherSpy,
         )
-        val monitor = PipeMonitor(client, backgroundScope = this)
+        val monitor = PipeMonitor(client, backgroundScope = backgroundScope)
 
         val monitorJob = launch { monitor.startDaemon() }
         advanceUntilIdle()

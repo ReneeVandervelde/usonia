@@ -1,5 +1,7 @@
 package usonia.client
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlow
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.websocket.*
@@ -21,8 +23,6 @@ import kotlinx.serialization.json.Json
 import usonia.auth.Auth
 import usonia.client.ktor.PlatformEngine
 import usonia.foundation.*
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.ongoingFlow
 import kotlin.random.Random
 import kotlin.reflect.KClass
 import kotlin.time.Duration

@@ -1,11 +1,11 @@
 package usonia.web.config
 
+import com.inkapplications.coroutines.ongoing.collectLatest
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.serialization.json.Json
 import usonia.core.state.ConfigurationAccess
 import usonia.foundation.FlagSerializer
-import usonia.kotlin.collectLatest
 import usonia.server.http.WebSocketController
 
 class FlagListSocket(

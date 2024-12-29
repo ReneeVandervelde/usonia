@@ -1,11 +1,11 @@
 package usonia.core.state.memory
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.asOngoing
 import kotlinx.coroutines.flow.MutableSharedFlow
 import usonia.core.state.ActionAccess
 import usonia.core.state.ActionPublisher
 import usonia.foundation.Action
-import usonia.kotlin.OngoingFlow
-import usonia.kotlin.asOngoing
 
 class InMemoryActionAccess: ActionPublisher, ActionAccess {
     private val sharedActions = MutableSharedFlow<Action>()

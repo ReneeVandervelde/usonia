@@ -3,6 +3,7 @@ package usonia.frontend.metrics
 import androidx.compose.runtime.Composable
 import chart.LineChart
 import chart.LineChartConfig
+import com.inkapplications.coroutines.ongoing.map
 import inkapplications.spondee.measure.us.toFahrenheit
 import kimchi.logger.KimchiLogger
 import org.jetbrains.compose.web.dom.*
@@ -13,7 +14,6 @@ import usonia.foundation.ParameterBag
 import usonia.frontend.extensions.collectAsState
 import usonia.frontend.navigation.NavigationSection
 import usonia.frontend.navigation.Routing
-import usonia.kotlin.map
 import kotlin.time.DurationUnit
 
 class MetricsSection(

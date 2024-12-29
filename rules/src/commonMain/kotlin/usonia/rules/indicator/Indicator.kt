@@ -1,6 +1,10 @@
 package usonia.rules.indicator
 
 import com.github.ajalt.colormath.model.RGB
+import com.inkapplications.coroutines.ongoing.collectLatest
+import com.inkapplications.coroutines.ongoing.map
+import com.inkapplications.coroutines.ongoing.mapLatest
+import com.inkapplications.coroutines.ongoing.onEach
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
@@ -9,10 +13,6 @@ import kotlinx.coroutines.launch
 import regolith.processes.daemon.Daemon
 import usonia.foundation.*
 import usonia.foundation.unit.compareTo
-import usonia.kotlin.collectLatest
-import usonia.kotlin.map
-import usonia.kotlin.mapLatest
-import usonia.kotlin.onEach
 import usonia.server.client.BackendClient
 import usonia.weather.Conditions
 import usonia.weather.FullForecast

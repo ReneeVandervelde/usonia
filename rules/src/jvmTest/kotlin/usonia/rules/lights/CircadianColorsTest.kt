@@ -1,5 +1,7 @@
 package usonia.rules.lights
 
+import com.inkapplications.coroutines.ongoing.OngoingFlow
+import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.scalar.percent
 import inkapplications.spondee.scalar.toWholePercentage
@@ -17,10 +19,8 @@ import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.FakeRooms
 import usonia.foundation.FakeSite
 import usonia.foundation.Site
-import usonia.kotlin.OngoingFlow
 import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.datetime.ZonedSystemClock
-import usonia.kotlin.ongoingFlowOf
 import usonia.weather.Conditions
 import usonia.weather.FullForecast
 import usonia.weather.LocalWeatherAccess
