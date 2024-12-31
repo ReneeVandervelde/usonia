@@ -4,6 +4,7 @@ rootProject.name = "usonia"
 
 include("archetypes")
 include("auth")
+include("celestials")
 include("cli")
 include("client-http")
 include("client-ktor")
