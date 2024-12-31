@@ -1,5 +1,6 @@
 package usonia.foundation
 
+import inkapplications.spondee.spatial.GeoCoordinates
 import kotlinx.serialization.Serializable
 
 /**
@@ -13,6 +14,8 @@ import kotlinx.serialization.Serializable
 data class Site(
     val id: Identifier,
     val name: String,
+    @Serializable(with = GeoCoordinatesSerializer::class)
+    val location: GeoCoordinates = GeoCoordinatesSerializer.Defaults.CENTRAL_US,
     val users: Set<User> = emptySet(),
     val rooms: Set<Room> = emptySet(),
     val bridges: Set<Bridge> = emptySet(),

@@ -164,6 +164,10 @@ module = "com.ionspin.kotlin:multiplatform-crypto-libsodium-bindings"
 version = "4.12"
 module = "junit:junit"
 
+[libraries.sunrisesunsetcalculator]
+version = "1.2"
+module = "com.luckycatlabs:SunriseSunsetCalculator"
+
 [bundles]
 watermelon-kotlin = [
     "watermelon-coroutines",
