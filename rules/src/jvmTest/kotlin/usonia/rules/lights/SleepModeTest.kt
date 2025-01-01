@@ -3,6 +3,7 @@ package usonia.rules.lights
 import com.inkapplications.coroutines.ongoing.OngoingFlow
 import com.inkapplications.coroutines.ongoing.asOngoing
 import com.inkapplications.coroutines.ongoing.ongoingFlowOf
+import com.inkapplications.datetime.atZone
 import inkapplications.spondee.scalar.percent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
@@ -14,10 +15,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.*
 import usonia.core.state.*
 import usonia.foundation.*
-import usonia.kotlin.datetime.UtcClock
-import usonia.kotlin.datetime.ZonedClock
-import usonia.kotlin.datetime.parseLocalDateTime
-import usonia.kotlin.datetime.withTimeZone
 import usonia.server.DummyClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -33,12 +30,12 @@ class SleepModeTest {
         ))
     )
 
-    private val night = object: ZonedClock by UtcClock {
-        override fun now(): Instant = parseLocalDateTime("2020-01-02T23:00:00").instant
+    private val night = object: Clock {
+        override fun now(): Instant = LocalDateTime.parse("2020-01-02T23:00:00").atZone(TimeZone.UTC).instant
     }
 
-    private val morning = object: ZonedClock by UtcClock {
-        override fun now(): Instant = parseLocalDateTime("2020-01-02T05:00:00").instant
+    private val morning = object: Clock {
+        override fun now(): Instant = LocalDateTime.parse("2020-01-02T05:00:00").atZone(TimeZone.UTC).instant
     }
 
     @Test
@@ -53,7 +50,7 @@ class SleepModeTest {
             configurationAccess = fakeConfig,
             actionAccess = ActionAccessFake(),
         )
-        val rule = SleepMode(client, clock = night)
+        val rule = SleepMode(client, clock = night.atZone(TimeZone.UTC))
 
         val bedroom = rule.getActiveSettings(FakeRooms.FakeBedroom)
         val livingRoom = rule.getActiveSettings(FakeRooms.LivingRoom)
@@ -86,7 +83,7 @@ class SleepModeTest {
             configurationAccess = fakeConfig,
             actionAccess = ActionAccessFake(),
         )
-        val rule = SleepMode(client, clock = morning)
+        val rule = SleepMode(client, clock = morning.atZone(TimeZone.UTC))
 
         val bedroom = rule.getActiveSettings(FakeRooms.FakeBedroom)
         val livingRoom = rule.getActiveSettings(FakeRooms.LivingRoom)
@@ -159,7 +156,7 @@ class SleepModeTest {
         )
         val rule = SleepMode(
             client = client,
-            clock = clock.withTimeZone(timeZone),
+            clock = clock.atZone(timeZone),
         )
 
         val daemon = launch { rule.startDaemon() }
@@ -202,7 +199,7 @@ class SleepModeTest {
         )
         val rule = SleepMode(
             client = client,
-            clock = clock.withTimeZone(timeZone),
+            clock = clock.atZone(timeZone),
         )
 
         val daemon = launch { rule.startDaemon() }
@@ -245,7 +242,7 @@ class SleepModeTest {
         )
         val rule = SleepMode(
             client = client,
-            clock = clock.withTimeZone(timeZone),
+            clock = clock.atZone(timeZone),
         )
 
         val daemon = launch { rule.startDaemon() }
@@ -342,7 +339,7 @@ class SleepModeTest {
         )
         val sleepMode = SleepMode(
             client = client,
-            clock = clock.withTimeZone(timeZone)
+            clock = clock.atZone(timeZone)
         )
 
         val daemon = launch { sleepMode.startDaemon() }
@@ -397,7 +394,7 @@ class SleepModeTest {
         )
         val sleepMode = SleepMode(
             client = client,
-            clock = clock.withTimeZone(timeZone),
+            clock = clock.atZone(timeZone),
             backgroundScope = this,
         )
         val daemon = launch { sleepMode.startDaemon() }
@@ -439,7 +436,7 @@ class SleepModeTest {
         )
         val sleepMode = SleepMode(
             client = client,
-            clock = clock.withTimeZone(timeZone),
+            clock = clock.atZone(timeZone),
             backgroundScope = this,
         )
         val daemon = launch { sleepMode.startDaemon() }

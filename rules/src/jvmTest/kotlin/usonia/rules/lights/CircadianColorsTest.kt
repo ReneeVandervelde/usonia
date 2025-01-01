@@ -2,6 +2,7 @@ package usonia.rules.lights
 
 import com.inkapplications.coroutines.ongoing.OngoingFlow
 import com.inkapplications.coroutines.ongoing.ongoingFlowOf
+import com.inkapplications.datetime.atZone
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.scalar.percent
 import inkapplications.spondee.scalar.toWholePercentage
@@ -10,17 +11,12 @@ import inkapplications.spondee.structure.minus
 import inkapplications.spondee.structure.plus
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
+import kotlinx.datetime.*
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.FakeRooms
 import usonia.foundation.FakeSite
 import usonia.foundation.Site
-import usonia.kotlin.datetime.ZonedClock
-import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.weather.Conditions
 import usonia.weather.FullForecast
 import usonia.weather.LocalWeatherAccess
@@ -32,10 +28,10 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalTime::class)
 class CircadianColorsTest {
     private val startOfDay = LocalDateTime(0, 1, 1, 0, 0, 0)
-        .toInstant(TimeZone.currentSystemDefault())
+        .toInstant(TimeZone.UTC)
     private val sunrise = startOfDay.plus(7.hours)
     private val sunset = startOfDay.plus(18.hours)
     private val nightStart = startOfDay.plus(DEFAULT_NIGHT_START.minutes)
@@ -61,10 +57,10 @@ class CircadianColorsTest {
 
     @Test
     fun afterMidnight() = runTest {
-        val clock = object: ZonedClock by ZonedSystemClock {
+        val clock = object: Clock {
             override fun now(): Instant = sunrise.minus(DEFAULT_PERIOD).minus(2.minutes)
         }
-        val colors = CircadianColors(config, weather, clock)
+        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -75,7 +71,7 @@ class CircadianColorsTest {
 
     @Test
     fun staleForecast() = runTest {
-        val clock = object: ZonedClock by ZonedSystemClock {
+        val clock = object: Clock {
             override fun now(): Instant = startOfDay.plus(1.days)
         }
         val weather = object: LocalWeatherAccess {
@@ -92,7 +88,7 @@ class CircadianColorsTest {
             override val currentConditions: Conditions get() = TODO()
             override val currentForecast: FullForecast get() = TODO()
         }
-        val colors = CircadianColors(config, weather, clock)
+        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -104,10 +100,10 @@ class CircadianColorsTest {
 
     @Test
     fun morningBlueHour() = runTest {
-        val clock = object: ZonedClock by ZonedSystemClock {
+        val clock = object: Clock {
             override fun now(): Instant = sunrise.minus(DEFAULT_PERIOD / 4)
         }
-        val colors = CircadianColors(config, weather, clock)
+        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -123,10 +119,10 @@ class CircadianColorsTest {
 
     @Test
     fun dawn() = runTest {
-        val clock = object: ZonedClock by ZonedSystemClock {
+        val clock = object: Clock {
             override fun now(): Instant = sunrise
         }
-        val colors = CircadianColors(config, weather, clock)
+        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -137,10 +133,10 @@ class CircadianColorsTest {
 
     @Test
     fun day() = runTest {
-        val clock = object: ZonedClock by ZonedSystemClock {
+        val clock = object: Clock {
             override fun now(): Instant = sunrise.plus(2.minutes)
         }
-        val colors = CircadianColors(config, weather, clock)
+        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -151,10 +147,10 @@ class CircadianColorsTest {
 
     @Test
     fun sunset() = runTest {
-        val clock = object: ZonedClock by ZonedSystemClock {
+        val clock = object: Clock {
             override fun now(): Instant = sunset
         }
-        val colors = CircadianColors(config, weather, clock)
+        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -165,10 +161,10 @@ class CircadianColorsTest {
 
     @Test
     fun evening() = runTest {
-        val clock = object: ZonedClock by ZonedSystemClock {
+        val clock = object: Clock {
             override fun now(): Instant = sunset.plus(DEFAULT_PERIOD)
         }
-        val colors = CircadianColors(config, weather, clock)
+        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -179,10 +175,10 @@ class CircadianColorsTest {
 
     @Test
     fun twilight() = runTest {
-        val clock = object: ZonedClock by ZonedSystemClock {
+        val clock = object: Clock {
             override fun now(): Instant = nightStart.plus(DEFAULT_PERIOD / 4)
         }
-        val colors = CircadianColors(config, weather, clock)
+        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -198,10 +194,10 @@ class CircadianColorsTest {
 
     @Test
     fun twilightExempt() = runTest {
-        val clock = object: ZonedClock by ZonedSystemClock {
+        val clock = object: Clock {
             override fun now(): Instant = nightStart.plus(DEFAULT_PERIOD / 4)
         }
-        val colors = CircadianColors(config, weather, clock)
+        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.Office)
 
@@ -212,10 +208,10 @@ class CircadianColorsTest {
 
     @Test
     fun night() = runTest {
-        val clock = object: ZonedClock by ZonedSystemClock {
+        val clock = object: Clock {
             override fun now(): Instant = nightStart.plus(DEFAULT_PERIOD).plus(2.minutes)
         }
-        val colors = CircadianColors(config, weather, clock)
+        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -226,10 +222,10 @@ class CircadianColorsTest {
 
     @Test
     fun nightExempt() = runTest {
-        val clock = object: ZonedClock by ZonedSystemClock {
+        val clock = object: Clock {
             override fun now(): Instant = nightStart.plus(DEFAULT_PERIOD).plus(2.minutes)
         }
-        val colors = CircadianColors(config, weather, clock)
+        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.Office)
 
@@ -254,10 +250,10 @@ class CircadianColorsTest {
             override val currentConditions: Conditions get() = TODO()
             override val currentForecast: FullForecast get() = TODO()
         }
-        val clock = object: ZonedClock by ZonedSystemClock {
+        val clock = object: Clock {
             override fun now(): Instant = nightStart
         }
-        val colors = CircadianColors(config, weather, clock)
+        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 

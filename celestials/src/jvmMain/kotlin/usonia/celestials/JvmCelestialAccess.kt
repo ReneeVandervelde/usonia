@@ -1,6 +1,9 @@
 package usonia.celestials
 
 import com.inkapplications.coroutines.ongoing.*
+import com.inkapplications.datetime.ZonedClock
+import com.inkapplications.datetime.ZonedDateTime
+import com.inkapplications.datetime.atZone
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator
 import com.luckycatlabs.sunrisesunset.dto.Location
 import kotlinx.coroutines.currentCoroutineContext
@@ -12,10 +15,7 @@ import kotlinx.datetime.toJavaInstant
 import kotlinx.datetime.toJavaZoneId
 import kotlinx.datetime.TimeZone as KotlinTimeZone
 import kotlinx.datetime.toKotlinInstant
-import usonia.kotlin.datetime.ZonedClock
-import usonia.kotlin.datetime.ZonedDateTime
-import usonia.kotlin.datetime.current
-import usonia.kotlin.datetime.withZone
+import kotlinx.datetime.toLocalDateTime
 import usonia.server.client.BackendClient
 import java.util.*
 
@@ -35,7 +35,7 @@ internal class JvmCelestialAccess(
 
     override val localCelestials: OngoingFlow<UpcomingCelestials> = location
         .map { location ->
-            SunriseSunsetCalculator(location, clock.timeZone.toJavaZoneId().id)
+            SunriseSunsetCalculator(location, clock.zone.toJavaZoneId().id)
         }
         .flatMapLatest { calculator ->
             updatingCelestialsFlow(calculator)
@@ -46,7 +46,7 @@ internal class JvmCelestialAccess(
      */
     private val ZonedClock.currentCalendar: Calendar
         get() {
-            return Calendar.getInstance(TimeZone.getTimeZone(timeZone.toJavaZoneId()))
+            return Calendar.getInstance(TimeZone.getTimeZone(zone.toJavaZoneId()))
                 .apply {
                     time = Date.from(now().toJavaInstant())
                 }
@@ -61,7 +61,7 @@ internal class JvmCelestialAccess(
             while (currentCoroutineContext().isActive) {
                 val celestials = currentCelestials(calculator)
                 emit(celestials)
-                delay(celestials.firstEvent - clock.now())
+                delay(celestials.firstEvent.instant - clock.now())
             }
         }
     }
@@ -75,7 +75,7 @@ internal class JvmCelestialAccess(
         val tomorrowCalendar = clock.currentCalendar.apply {
             add(Calendar.DATE, 1)
         }
-        val now = clock.current
+        val now = clock.zonedDateTime()
 
         return UpcomingCelestials(
             timestamp = now,
@@ -96,14 +96,14 @@ internal class JvmCelestialAccess(
 
         return Celestials(
             daylight = sunrise.toZonedDateTime(
-                clock.timeZone
+                clock.zone
             )..sunset.toZonedDateTime(
-                clock.timeZone
+                clock.zone
             ),
             civilTwilight = civilTwilightStart.toZonedDateTime(
-                clock.timeZone
+                clock.zone
             )..civilTwilightEnd.toZonedDateTime(
-                clock.timeZone
+                clock.zone
             ),
         )
     }
@@ -113,6 +113,6 @@ internal class JvmCelestialAccess(
      */
     private fun Calendar.toZonedDateTime(zone: KotlinTimeZone): ZonedDateTime
     {
-        return toInstant().toKotlinInstant().withZone(zone)
+        return toInstant().toKotlinInstant().toLocalDateTime(zone).atZone(zone)
     }
 }

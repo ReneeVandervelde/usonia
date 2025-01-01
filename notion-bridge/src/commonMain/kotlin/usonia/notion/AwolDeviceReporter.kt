@@ -4,6 +4,7 @@ import com.inkapplications.coroutines.ongoing.collectLatest
 import com.inkapplications.coroutines.ongoing.combinePair
 import com.inkapplications.coroutines.ongoing.filter
 import com.inkapplications.coroutines.ongoing.filterIsInstance
+import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.standard.throwCancels
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
@@ -21,9 +22,6 @@ import usonia.core.state.getOldestEvent
 import usonia.foundation.*
 import usonia.foundation.unit.compareTo
 import usonia.kotlin.RetryStrategy
-import usonia.kotlin.datetime.ZonedClock
-import usonia.kotlin.datetime.ZonedSystemClock
-import usonia.kotlin.datetime.current
 import usonia.kotlin.runRetryable
 import usonia.notion.api.NotionApi
 import usonia.notion.api.structures.NotionBearerToken
@@ -43,7 +41,7 @@ import kotlin.time.Duration.Companion.seconds
 internal class AwolDeviceReporter(
     private val notionClient: NotionApi,
     private val backendClient: BackendClient,
-    private val clock: ZonedClock = ZonedSystemClock,
+    private val clock: ZonedClock = ZonedClock.System,
     private val logger: KimchiLogger = EmptyLogger,
 ): CronJob, Daemon {
     override val schedule: Schedule = Schedule().withMinutes { it % 20 == 0 }
@@ -331,7 +329,7 @@ internal class AwolDeviceReporter(
                         richText = listOf(
                             RichTextArgument.Text(
                                 text = RichTextArgument.Text.TextContent(
-                                    content = "Report opened: ${clock.current}"
+                                    content = "Report opened: ${clock.zonedDateTime()}"
                                 )
                             )
                         )

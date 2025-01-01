@@ -1,8 +1,8 @@
 package usonia.celestials
 
+import com.inkapplications.datetime.atZone
 import kotlinx.datetime.atTime
 import usonia.celestials.doubles.KnownCelestials
-import usonia.kotlin.datetime.withZone
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.minutes
@@ -12,7 +12,7 @@ class UpcomingCelestialsTest
     @Test
     fun testEarliestSchedule()
     {
-        val now = KnownCelestials.FIRST_DATE.atTime(1, 0).withZone(KnownCelestials.ZONE)
+        val now = KnownCelestials.FIRST_DATE.atTime(1, 0).atZone(KnownCelestials.ZONE)
 
         val upcoming = UpcomingCelestials(
             timestamp = now,
@@ -52,7 +52,7 @@ class UpcomingCelestialsTest
     {
         val now = KnownCelestials.FIRST_DATE
             .atTime(KnownCelestials.FIRST.civilTwilight.start.plus(1.minutes).localDateTime.time)
-            .withZone(KnownCelestials.ZONE)
+            .atZone(KnownCelestials.ZONE)
 
         val upcoming = UpcomingCelestials(
             timestamp = now,
@@ -92,7 +92,7 @@ class UpcomingCelestialsTest
     {
         val now = KnownCelestials.FIRST_DATE
             .atTime(KnownCelestials.FIRST.daylight.start.plus(1.minutes).localDateTime.time)
-            .withZone(KnownCelestials.ZONE)
+            .atZone(KnownCelestials.ZONE)
 
         val upcoming = UpcomingCelestials(
             timestamp = now,
@@ -132,7 +132,7 @@ class UpcomingCelestialsTest
     {
         val now = KnownCelestials.FIRST_DATE
             .atTime(KnownCelestials.FIRST.daylight.endInclusive.plus(1.minutes).localDateTime.time)
-            .withZone(KnownCelestials.ZONE)
+            .atZone(KnownCelestials.ZONE)
 
         val upcoming = UpcomingCelestials(
             timestamp = now,
@@ -172,7 +172,7 @@ class UpcomingCelestialsTest
     {
         val now = KnownCelestials.FIRST_DATE
             .atTime(KnownCelestials.FIRST.civilTwilight.endInclusive.plus(1.minutes).localDateTime.time)
-            .withZone(KnownCelestials.ZONE)
+            .atZone(KnownCelestials.ZONE)
 
         val upcoming = UpcomingCelestials(
             timestamp = now,

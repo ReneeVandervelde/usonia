@@ -1,6 +1,7 @@
 package usonia.glass
 
 import com.inkapplications.coroutines.ongoing.*
+import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.glassconsole.client.pin.PinValidator
 import inkapplications.spondee.spatial.GeoCoordinates
 import inkapplications.spondee.spatial.latitude
@@ -15,8 +16,6 @@ import kotlinx.datetime.todayIn
 import usonia.core.client.latestDeviceEventOfType
 import usonia.core.state.booleanFlags
 import usonia.foundation.*
-import usonia.kotlin.datetime.ZonedClock
-import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.rules.Flags
 import usonia.server.client.BackendClient
 import usonia.weather.Forecast
@@ -43,7 +42,7 @@ internal class ViewModelFactory(
     private val pinValidator: PinValidator,
     private val localWeatherAccess: LocalWeatherAccess,
     private val locationWeatherAccess: LocationWeatherAccess,
-    private val clock: ZonedClock = ZonedSystemClock,
+    private val clock: ZonedClock = ZonedClock.System,
 ) {
     private val sleepMode = client.booleanFlags.map { it[Flags.SleepMode] ?: false }
     private val movieMode = client.booleanFlags.map { it[Flags.MovieMode] ?: false }
@@ -69,7 +68,7 @@ internal class ViewModelFactory(
                 "Portage, WI" to GeoCoordinates(43.5393.latitude, (-89.4626).longitude),
                 "Superior, WI" to GeoCoordinates(46.7208.latitude, (-92.1041).longitude),
             )
-            val today = clock.todayIn(clock.timeZone)
+            val today = clock.todayIn(clock.zone)
             emit(locations.map { (name, location) ->
                 ExpandedLocationForecast(
                     name = name,

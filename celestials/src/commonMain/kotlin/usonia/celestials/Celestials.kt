@@ -1,6 +1,6 @@
 package usonia.celestials
 
-import usonia.kotlin.datetime.ZonedDateTime
+import com.inkapplications.datetime.ZonedDateTime
 import kotlin.time.Duration
 
 /**
@@ -10,6 +10,6 @@ data class Celestials(
     val daylight: ClosedRange<ZonedDateTime>,
     val civilTwilight: ClosedRange<ZonedDateTime>,
 ) {
-    val solarNoon: ZonedDateTime = daylight.start + ((daylight.endInclusive - daylight.start) / 2)
-    val dayLength: Duration = daylight.endInclusive - daylight.start
+    val solarNoon: ZonedDateTime = daylight.start + ((daylight.endInclusive.instant - daylight.start.instant) / 2)
+    val dayLength: Duration = daylight.endInclusive.instant - daylight.start.instant
 }

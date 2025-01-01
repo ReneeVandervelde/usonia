@@ -1,6 +1,7 @@
 package usonia.glass
 
 import com.inkapplications.coroutines.ongoing.*
+import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.glassconsole.client.HttpException
 import com.inkapplications.glassconsole.client.remote.GlassHttpClient
 import com.inkapplications.glassconsole.structures.pin.Pin
@@ -10,8 +11,6 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.flow.merge
 import regolith.processes.daemon.Daemon
 import regolith.timemachine.InexactDurationMachine
-import usonia.kotlin.datetime.ZonedClock
-import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.server.client.BackendClient
 import java.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
@@ -26,7 +25,7 @@ internal class DisplayUpdater(
     private val composer: DisplayConfigFactory,
     private val glassClient: GlassHttpClient,
     private val logger: KimchiLogger = EmptyLogger,
-    clock: ZonedClock = ZonedSystemClock,
+    clock: ZonedClock = ZonedClock.System,
 ): Daemon {
     private val updateTicks = InexactDurationMachine(UPDATE_RATE, clock).ticks.asOngoing()
 

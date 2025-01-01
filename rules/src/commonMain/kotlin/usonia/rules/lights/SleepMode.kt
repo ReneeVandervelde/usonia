@@ -1,6 +1,7 @@
 package usonia.rules.lights
 
 import com.inkapplications.coroutines.ongoing.*
+import com.inkapplications.datetime.ZonedClock
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
@@ -20,9 +21,6 @@ import usonia.core.state.publishAll
 import usonia.core.state.setFlag
 import usonia.foundation.*
 import usonia.kotlin.DefaultScope
-import usonia.kotlin.datetime.ZonedClock
-import usonia.kotlin.datetime.ZonedSystemClock
-import usonia.kotlin.datetime.current
 import usonia.kotlin.datetime.minuteOfDay
 import usonia.kotlin.filterTrue
 import usonia.rules.Flags
@@ -48,7 +46,7 @@ private val DEFAULT_MORNING_END = 16.hours.inWholeMinutes
 internal class SleepMode(
     private val client: BackendClient,
     private val logger: KimchiLogger = EmptyLogger,
-    private val clock: ZonedClock = ZonedSystemClock,
+    private val clock: ZonedClock = ZonedClock.System,
     private val backgroundScope: CoroutineScope = DefaultScope(),
 ): LightSettingsPicker, Daemon, CronJob {
 
@@ -62,7 +60,7 @@ internal class SleepMode(
 
         return when (room.type) {
             Room.Type.Bathroom -> {
-                if (clock.current.localDateTime.minuteOfDay > 4 * 60 && clock.current.localDateTime.minuteOfDay < 12 * 60) {
+                if (clock.localDateTime().minuteOfDay > 4 * 60 && clock.localDateTime().minuteOfDay < 12 * 60) {
                     LightSettings.Unhandled
                 } else {
                     LightSettings.Temperature(
@@ -164,7 +162,7 @@ internal class SleepMode(
 
         client.actions.filterIsInstance<Action.Intent>()
             .filter { it.action == "bed.enter" }
-            .filter { clock.current.localDateTime.minuteOfDay >= nightStartMinute || clock.current.localDateTime.minuteOfDay <= nightEndMinute }
+            .filter { clock.localDateTime().minuteOfDay >= nightStartMinute || clock.localDateTime().minuteOfDay <= nightEndMinute }
             .onEach { logger.info("Enabling Night Mode based on Intent") }
             .collectLatest { client.setFlag(Flags.SleepMode, true) }
     }
@@ -178,7 +176,7 @@ internal class SleepMode(
             ?: DEFAULT_NIGHT_END
 
         client.events
-            .filter { clock.current.localDateTime.minuteOfDay >= nightStartMinute || clock.current.localDateTime.minuteOfDay <= nightEndMinute }
+            .filter { clock.localDateTime().minuteOfDay >= nightStartMinute || clock.localDateTime().minuteOfDay <= nightEndMinute }
             .filterIsInstance<Event.Latch>()
             .filter { it.state == LatchState.CLOSED }
             .filter { site.findRoomContainingDevice(it.source)?.type == Room.Type.Bedroom }
@@ -196,7 +194,7 @@ internal class SleepMode(
             ?: DEFAULT_MORNING_END
 
         client.events
-            .filter { clock.current.localDateTime.minuteOfDay in morningStartMinute..morningEndMinute }
+            .filter { clock.localDateTime().minuteOfDay in morningStartMinute..morningEndMinute }
             .filterIsInstance<Event.Latch>()
             .filter { it.state == LatchState.OPEN }
             .filter { site.findRoomContainingDevice(it.source)?.type == Room.Type.Bedroom }

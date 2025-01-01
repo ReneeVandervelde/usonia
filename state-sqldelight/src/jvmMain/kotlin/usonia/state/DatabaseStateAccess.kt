@@ -5,6 +5,7 @@ import com.inkapplications.coroutines.mapItemsCatching
 import com.inkapplications.coroutines.onItemFailure
 import com.inkapplications.coroutines.ongoing.OngoingFlow
 import com.inkapplications.coroutines.ongoing.asOngoing
+import com.inkapplications.datetime.ZonedClock
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
@@ -28,8 +29,6 @@ import regolith.data.settings.writeSetting
 import usonia.foundation.*
 import usonia.foundation.Event
 import usonia.foundation.Site
-import usonia.kotlin.datetime.ZonedClock
-import usonia.kotlin.datetime.ZonedSystemClock
 import kotlin.reflect.KClass
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -55,7 +54,7 @@ internal class DatabaseStateAccess(
     private val flagQueries: Lazy<FlagQueries>,
     private val settingsAccess: SettingsAccess,
     private val json: Json,
-    private val zonedClock: ZonedClock = ZonedSystemClock,
+    private val zonedClock: ZonedClock = ZonedClock.System,
     private val logger: KimchiLogger = EmptyLogger,
 ): DatabaseServices {
     private val securityStateSetting = StringData(
