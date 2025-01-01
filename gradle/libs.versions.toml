@@ -5,7 +5,7 @@ ktor = "2.3.13"
 kimchi = "2.0.3"
 watermelon = "1.8.1"
 regolith = "1.6.0"
-glass = "0.15.1"
+glass = "0.16.0"
 sqldelight = "1.5.5"
 
 ##
