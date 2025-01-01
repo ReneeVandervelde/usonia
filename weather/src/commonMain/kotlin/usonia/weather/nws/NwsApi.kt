@@ -1,5 +1,6 @@
 package usonia.weather.nws
 
+import com.inkapplications.datetime.ZonedClock
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.scalar.percent
 import inkapplications.spondee.spatial.GeoCoordinates
@@ -17,7 +18,6 @@ import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import usonia.kotlin.RetryStrategy
-import usonia.kotlin.datetime.ZonedClock
 import usonia.kotlin.runRetryable
 import usonia.weather.Forecast
 import usonia.weather.LocationWeatherAccess
@@ -167,7 +167,7 @@ internal class NwsLocationWeatherAccess(
         daytime: Boolean
     ): Forecast? {
         val period = properties.periods.firstOrNull {
-            it.startTime.toLocalDateTime(clock.timeZone).date == date && it.isDaytime == daytime
+            it.startTime.toLocalDateTime(clock.zone).date == date && it.isDaytime == daytime
         } ?: return null
         return Forecast(
             timestamp = properties.updateTime,

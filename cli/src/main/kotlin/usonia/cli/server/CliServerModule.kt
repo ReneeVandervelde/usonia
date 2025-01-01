@@ -1,16 +1,14 @@
 package usonia.cli.server
 
+import com.inkapplications.datetime.ZonedClock
 import kimchi.logger.CompositeLogWriter
 import kimchi.logger.ConsolidatedLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.json.Json
 import usonia.cli.ColorWriter
 import usonia.core.state.memory.InMemoryActionAccess
-import usonia.kotlin.datetime.ZonedClock
-import usonia.kotlin.datetime.ZonedSystemClock
 import usonia.notion.NotionBridgePlugin
 import usonia.rules.alerts.LogErrorAlerts
-import usonia.server.auth.ServerAuthPlugin
 import usonia.server.UsoniaServer
 import usonia.server.client.BackendClient
 import usonia.server.client.ComposedBackendClient
@@ -24,7 +22,7 @@ import java.io.File
  */
 class CliServerModule(
     private val json: Json,
-    private val clock: ZonedClock = ZonedSystemClock,
+    private val clock: ZonedClock = ZonedClock.System,
 ) {
     val logger: KimchiLogger = setOf(
             LogSocket,

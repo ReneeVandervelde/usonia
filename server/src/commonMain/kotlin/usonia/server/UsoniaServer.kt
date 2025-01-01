@@ -1,5 +1,6 @@
 package usonia.server
 
+import com.inkapplications.datetime.ZonedClock
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
@@ -13,8 +14,6 @@ import regolith.processes.cron.CoroutineCronDaemon
 import regolith.processes.daemon.Daemon
 import regolith.processes.daemon.DaemonCallbacks
 import regolith.processes.daemon.DaemonInitializer
-import usonia.kotlin.datetime.ZonedClock
-import usonia.kotlin.datetime.ZonedSystemClock
 
 /**
  * The "backend" part of the application that starts up long running services.
@@ -24,13 +23,13 @@ class UsoniaServer(
     private val server: WebServer,
     private val logger: KimchiLogger = EmptyLogger,
     private val daemonScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
-    clock: ZonedClock = ZonedSystemClock,
+    clock: ZonedClock = ZonedClock.System,
 ): AppConfig, Daemon {
     private val kimchiRegolith = KimchiRegolithAdapter(logger)
     private val cronDaemon = CoroutineCronDaemon(
         jobs = plugins.flatMap { it.crons },
         clock = clock,
-        zone = clock.timeZone,
+        zone = clock.zone,
     )
 
     private val daemonInitializer = DaemonInitializer(

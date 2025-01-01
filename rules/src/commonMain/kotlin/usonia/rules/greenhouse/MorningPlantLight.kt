@@ -3,6 +3,8 @@ package usonia.rules.greenhouse
 import com.inkapplications.coroutines.ongoing.combinePair
 import com.inkapplications.coroutines.ongoing.first
 import com.inkapplications.coroutines.ongoing.map
+import com.inkapplications.datetime.ZonedDateTime
+import com.inkapplications.datetime.atZone
 import inkapplications.spondee.measure.metric.kelvin
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
@@ -15,8 +17,6 @@ import usonia.foundation.Action
 import usonia.foundation.Fixture
 import usonia.foundation.SwitchState
 import usonia.foundation.findDevicesBy
-import usonia.kotlin.datetime.ZonedDateTime
-import usonia.kotlin.datetime.withZone
 import usonia.server.client.BackendClient
 import usonia.weather.FullForecast
 import usonia.weather.LocalWeatherAccess
@@ -40,8 +40,8 @@ class MorningPlantLight(
             .first()
 
         // Fix for late forecast updates in the morning.
-        val sunrise = forecast.sunriseToday(time.withZone(zone))
-        val sunset = forecast.sunsetToday(time.withZone(zone))
+        val sunrise = forecast.sunriseToday(time.atZone(zone))
+        val sunset = forecast.sunsetToday(time.atZone(zone))
         val additionalTime = (TARGET_LIGHT_TIME - (sunset - sunrise)).takeIf { it > 0.hours } ?: 0.hours
         val offset = 30.minutes
         val onTime = sunrise - additionalTime + offset

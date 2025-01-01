@@ -120,6 +120,10 @@ module = "com.inkapplications.watermelon:coroutines"
 version.ref = "watermelon"
 module = "com.inkapplications.watermelon:standard"
 
+[libraries.watermelon-datetime]
+version.ref = "watermelon"
+module = "com.inkapplications.watermelon:datetime"
+
 [libraries.regolith-processes]
 version.ref = "regolith"
 module = "com.inkapplications.regolith:processes"
@@ -172,5 +176,6 @@ module = "com.luckycatlabs:SunriseSunsetCalculator"
 watermelon-kotlin = [
     "watermelon-coroutines",
     "watermelon-standard",
+    "watermelon-datetime",
 ]
 sqldelight = ["sqldelight-driver", "sqldelight-coroutines"]

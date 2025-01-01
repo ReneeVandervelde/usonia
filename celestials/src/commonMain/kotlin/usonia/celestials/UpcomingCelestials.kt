@@ -1,6 +1,6 @@
 package usonia.celestials
 
-import usonia.kotlin.datetime.ZonedDateTime
+import com.inkapplications.datetime.ZonedDateTime
 
 /**
  * A schedule of celestial events relevant to a given time.

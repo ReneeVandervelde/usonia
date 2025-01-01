@@ -2,6 +2,7 @@ package usonia.notion
 
 import com.inkapplications.coroutines.ongoing.OngoingFlow
 import com.inkapplications.coroutines.ongoing.ongoingFlowOf
+import com.inkapplications.datetime.ZonedClock
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -11,8 +12,6 @@ import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccess
 import usonia.core.state.EventAccessStub
 import usonia.foundation.*
-import usonia.kotlin.datetime.UtcClock
-import usonia.kotlin.datetime.current
 import usonia.notion.api.structures.NotionResponse
 import usonia.notion.api.structures.Parent
 import usonia.notion.api.structures.block.RichText
@@ -59,7 +58,7 @@ class AwolDeviceReporterTest {
     val testClient = DummyClient.copy(
         configurationAccess = config,
     )
-    val time = UtcClock.current
+    val time = ZonedClock.UTC.zonedDateTime()
 
     @Test
     fun noAwolDevices() = runTest {
@@ -426,7 +425,7 @@ class AwolDeviceReporterTest {
                 name = "Low Battery"
             )),
         ))
-        val time = UtcClock.current
+        val time = ZonedClock.UTC.zonedDateTime()
         val events = object: EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
@@ -449,7 +448,7 @@ class AwolDeviceReporterTest {
 
     @Test
     fun lowBatteryUpgraded() = runTest {
-        val time = UtcClock.current
+        val time = ZonedClock.UTC.zonedDateTime()
         val events = object: EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {

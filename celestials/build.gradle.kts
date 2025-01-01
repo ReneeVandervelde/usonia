@@ -8,6 +8,7 @@ kotlin {
             api(projects.server)
             api(libs.kotlin.coroutines.core)
             api(libs.kotlin.datetime)
+            api(libs.bundles.watermelon.kotlin)
         }
 
         jvmMain.dependencies {
