@@ -137,7 +137,7 @@ version.ref = "glass"
 module = "com.inkapplications.glassconsole:client"
 
 [libraries.glass-structures]
-version.ref = "glass"
+version = "0.17.0"
 module = "com.inkapplications.glassconsole:structures"
 
 ##
