@@ -6,9 +6,11 @@ import ink.ui.structures.Sentiment
 import ink.ui.structures.Symbol
 import ink.ui.structures.TextStyle
 import ink.ui.structures.elements.*
+import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.measure.us.toFahrenheit
 import inkapplications.spondee.scalar.percent
 import inkapplications.spondee.scalar.toWholePercentage
+import inkapplications.spondee.structure.compareTo
 import inkapplications.spondee.structure.roundToInt
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.encodeToString
@@ -159,13 +161,22 @@ internal class DisplayConfigFactory(
                     EmptyElement.asDisplayItem()
                 }.toTypedArray(),
                 *location.forecasts.map { forecast ->
+                    val precipitationExpected = forecast.forecast.precipitation.toWholePercentage() > 20.percent
+                    val condition = when {
+                        precipitationExpected && forecast.forecast.temperature.toFahrenheit() >= 36.fahrenheit-> WeatherElement.Condition.Rainy
+                        precipitationExpected -> WeatherElement.Condition.Snowy
+                        else -> WeatherElement.Condition.Clear
+                    }
                     WeatherElement(
-                        temperature = forecast.forecast.temperature.toFahrenheit().roundToInt().let { "$it°" },
-                        condition = when {
-                            forecast.forecast.precipitation.toWholePercentage() > 20.percent -> WeatherElement.Condition.Rainy
-                            else -> WeatherElement.Condition.Clear
+                        // TODO: Remove when text cutoff issues are resolved.
+                        temperature = forecast.forecast.temperature.toFahrenheit().roundToInt().let {
+                            if (it >= 0) "$it°" else "$it"
                         },
-                        title = forecast.title.orEmpty(),
+                        condition = condition,
+                        daytime = forecast.daytime,
+                        title = forecast.title,
+                        // TODO: Remove when night color is fixed in InkUI
+                        sentiment = if (!forecast.daytime && condition == WeatherElement.Condition.Clear) Sentiment.Idle else null,
                         secondaryText = forecast.forecast.precipitation.toWholePercentage().takeIf { it > 15.percent }?.roundToInt()?.let { "$it%" },
                     ).asDisplayItem(
                         span = weatherElementSpan,

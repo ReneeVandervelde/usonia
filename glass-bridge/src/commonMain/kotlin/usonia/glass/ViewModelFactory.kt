@@ -30,8 +30,9 @@ data class ExpandedLocationForecast(
     val forecasts: List<ExpandedForecast>,
 ) {
     data class ExpandedForecast(
-        val title: String?,
+        val title: String,
         val forecast: Forecast,
+        val daytime: Boolean,
     )
 }
 
@@ -89,9 +90,10 @@ internal class ViewModelFactory(
                                 5 -> "Fri"
                                 6 -> "Sat"
                                 7 -> "Sun"
-                                else -> ""
-                            }.takeIf { daytime },
-                            forecast = forecast
+                                else -> "--"
+                            },
+                            forecast = forecast,
+                            daytime = daytime,
                         )
                     }.filterNotNull()
                 )

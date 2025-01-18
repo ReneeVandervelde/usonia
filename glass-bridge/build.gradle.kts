@@ -15,6 +15,7 @@ kotlin {
                 api(libs.kotlin.coroutines.core)
                 implementation(libs.ktor.client.core)
                 implementation(libs.glass.client)
+                implementation(libs.glass.structures)
                 implementation(libs.regolith.timemachine)
             }
         }
