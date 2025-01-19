@@ -33,12 +33,5 @@ kotlin {
                 implementation(libs.junit)
             }
         }
-
-        val jsMain by getting {
-            dependencies {
-                implementation(libs.ktor.client.js.core)
-                implementation(libs.ktor.client.js.json)
-            }
-        }
     }
 }

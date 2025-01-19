@@ -28,10 +28,6 @@ class WebPlugin(
         FlagToggleController(client, json, logger),
         FlagDeleteController(client, json),
         ArmSecurityController(client, json),
-        StaticResourceController("html", "text/html"),
-        StaticResourceController("js", "application/javascript"),
-        StaticResourceController("js.map", "application/javascript"),
-        StaticResourceController("css", "text/css"),
         DefaultController,
         AppRouteController,
     )
