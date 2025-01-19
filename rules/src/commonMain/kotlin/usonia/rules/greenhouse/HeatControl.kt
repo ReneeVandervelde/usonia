@@ -1,9 +1,6 @@
 package usonia.rules.greenhouse
 
-import com.inkapplications.coroutines.ongoing.collectLatest
-import com.inkapplications.coroutines.ongoing.collectOn
-import com.inkapplications.coroutines.ongoing.filter
-import com.inkapplications.coroutines.ongoing.filterIsInstance
+import com.inkapplications.coroutines.ongoing.*
 import inkapplications.spondee.measure.us.toFahrenheit
 import inkapplications.spondee.structure.toFloat
 import kimchi.logger.EmptyLogger
@@ -46,7 +43,7 @@ class HeatControl(
             client.events
                 .filterIsInstance<Event.Temperature>()
                 .filter { event -> site.findRoomContainingDevice(event.source)?.type == Room.Type.Greenhouse }
-                .collectOn(backgroundScope) { event -> onTemperature(site, event) }
+                .collect { event -> backgroundScope.launch { onTemperature(site, event) } }
         }
     }
 

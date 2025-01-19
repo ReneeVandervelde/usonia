@@ -33,8 +33,10 @@ class PipeMonitor(
                         .filter { it.temperature.toFahrenheit().toFloat() < 38 }
                         .map { site.findDevice(it.source) to it }
                         .filter { (device, _) -> device?.fixture == Fixture.Pipe }
-                        .collectOn(backgroundScope) { (device, event) ->
-                            sendAlert(device!!, event)
+                        .collect { (device, event) ->
+                            backgroundScope.launch {
+                                sendAlert(device!!, event)
+                            }
                         }
                 }
                 launch {
