@@ -14,7 +14,7 @@ jobs:
                 uses: actions/setup-java@v4
                 with:
                     distribution: adopt
-                    java-version: '15'
+                    java-version: 21
             -
                 name: JVM Tests
                 run: bin/gradlew jvmTest
