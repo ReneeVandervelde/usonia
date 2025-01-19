@@ -22,7 +22,7 @@ sourceSets {
 }
 
 kotlin {
-    jvmToolchain(15)
+    jvmToolchain(21)
 }
 
 dependencies {
