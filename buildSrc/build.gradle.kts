@@ -3,8 +3,7 @@ plugins {
 }
 kotlin {
     jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(15)
-        vendor = JvmVendorSpec.ADOPTOPENJDK
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 repositories {
