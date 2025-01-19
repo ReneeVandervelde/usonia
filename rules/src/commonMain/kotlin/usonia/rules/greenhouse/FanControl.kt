@@ -1,7 +1,7 @@
 package usonia.rules.greenhouse
 
+import com.inkapplications.coroutines.ongoing.collect
 import com.inkapplications.coroutines.ongoing.collectLatest
-import com.inkapplications.coroutines.ongoing.collectOn
 import com.inkapplications.coroutines.ongoing.filter
 import com.inkapplications.coroutines.ongoing.filterIsInstance
 import inkapplications.spondee.measure.us.toFahrenheit
@@ -9,6 +9,7 @@ import inkapplications.spondee.structure.toFloat
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import regolith.processes.daemon.Daemon
 import regolith.processes.daemon.DaemonFailureHandler
 import regolith.processes.daemon.DaemonRunAttempt
@@ -39,7 +40,9 @@ class FanControl(
             client.events
                 .filterIsInstance<Event.Temperature>()
                 .filter { event -> site.findRoomContainingDevice(event.source)?.type == Room.Type.Greenhouse }
-                .collectOn(backgroundScope) { event -> onTemperature(site, event) }
+                .collect { event ->
+                    backgroundScope.launch { onTemperature(site, event) }
+                }
         }
     }
 

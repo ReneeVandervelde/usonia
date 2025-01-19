@@ -2,13 +2,6 @@ plugins {
     kotlin("jvm")
 }
 
-kotlin {
-    jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(15)
-        vendor = JvmVendorSpec.ADOPTOPENJDK
-    }
-}
-
 dependencies {
     api(libs.kimchi.logger)
     api(project(":server"))

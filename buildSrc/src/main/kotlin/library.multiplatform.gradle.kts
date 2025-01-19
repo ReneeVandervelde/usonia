@@ -1,9 +1,10 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     kotlin("multiplatform")
 }
 
 kotlin {
-    jvmToolchain(15)
     jvm()
     js {
         browser()

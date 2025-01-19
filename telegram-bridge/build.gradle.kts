@@ -1,5 +1,6 @@
 plugins {
     backendlibrary()
+    kotlin("plugin.serialization")
 }
 
 kotlin {
@@ -13,8 +14,11 @@ kotlin {
                 implementation(projects.serialization)
                 implementation(projects.rules)
                 api(libs.kotlin.coroutines.core)
+                implementation(projects.clientKtor)
+                implementation(libs.ktor.client.contentnegotiation)
+                implementation(libs.ktor.serialization.json)
                 implementation(libs.ktor.client.core)
-                implementation("com.inkapplications.telegram:client:0.3.1")
+                implementation(libs.ktor.client.serialization)
             }
         }
 

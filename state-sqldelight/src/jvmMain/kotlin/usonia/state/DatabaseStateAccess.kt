@@ -64,7 +64,9 @@ internal class DatabaseStateAccess(
         defaultValue = SecurityState.Disarmed,
         level = SettingLevel.Hidden,
     )
-    private val eventsFlow = MutableSharedFlow<Event>()
+    private val eventsFlow = MutableSharedFlow<Event>(
+        extraBufferCapacity = 10,
+    )
     override val securityState: OngoingFlow<SecurityState> = settingsAccess
         .observeSetting(securityStateSetting)
         .asOngoing()

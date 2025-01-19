@@ -27,7 +27,9 @@ internal class LightController(
         client.site.collectLatest { site ->
             client.events
                 .filterIsInstance<Event.Motion>()
-                .collectOn(backgroundScope) { event -> onMotionEvent(event, site) }
+                .collect { event ->
+                    backgroundScope.launch { onMotionEvent(event, site) }
+                }
         }
     }
 
