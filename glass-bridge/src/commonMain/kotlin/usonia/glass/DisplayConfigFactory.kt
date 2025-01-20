@@ -161,7 +161,7 @@ internal class DisplayConfigFactory(
                     EmptyElement.asDisplayItem()
                 }.toTypedArray(),
                 *location.forecasts.map { forecast ->
-                    val precipitationExpected = forecast.forecast.precipitation.toWholePercentage() > 20.percent
+                    val precipitationExpected = forecast.forecast.precipitation.toWholePercentage() > 15.percent
                     val condition = when {
                         precipitationExpected && forecast.forecast.temperature.toFahrenheit() >= 36.fahrenheit-> WeatherElement.Condition.Rainy
                         precipitationExpected -> WeatherElement.Condition.Snowy
