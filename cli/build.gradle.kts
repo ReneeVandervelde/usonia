@@ -47,6 +47,6 @@ dependencies {
     implementation(projects.notionBridge)
     implementation(libs.kotlin.coroutines.core)
     implementation(libs.kimchi.core)
-    implementation("com.github.ajalt.clikt:clikt:3.5.0")
+    implementation("com.github.ajalt.clikt:clikt:5.0.2")
     implementation("org.slf4j:slf4j-nop:2.0.16")
 }
