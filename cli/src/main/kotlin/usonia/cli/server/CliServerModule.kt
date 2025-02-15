@@ -5,6 +5,8 @@ import kimchi.logger.CompositeLogWriter
 import kimchi.logger.ConsolidatedLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.json.Json
+import usonia.celestials.CelestialAccess
+import usonia.celestials.CelestialModule
 import usonia.cli.ColorWriter
 import usonia.core.state.memory.InMemoryActionAccess
 import usonia.notion.NotionBridgePlugin
@@ -33,9 +35,19 @@ class CliServerModule(
         .let(::CompositeLogWriter)
         .let(::ConsolidatedLogger)
 
+    fun createCelestialsModule(
+        client: BackendClient,
+    ): CelestialModule {
+        return CelestialModule(
+            usoniaClient = client,
+            clock = clock,
+        )
+    }
+
     fun createPluginsModule(
         client: BackendClient,
-    ) = PluginsModule(client, logger, json, clock)
+        celestialAccess: CelestialAccess,
+    ) = PluginsModule(client, celestialAccess, logger, json, clock)
 
     fun databaseBackendClient(
         databasePath: String?,
@@ -61,7 +73,8 @@ class CliServerModule(
         databasePath: String?,
     ): UsoniaServer {
         val client = databaseBackendClient(databasePath, settingsFile)
-        val pluginsModule = createPluginsModule(client)
+        val celestialModule = createCelestialsModule(client)
+        val pluginsModule = createPluginsModule(client, celestialModule.celestialAccess)
         val server = KtorWebServer(
             authorization = pluginsModule.serverAuthPlugin.auth,
             port = port,

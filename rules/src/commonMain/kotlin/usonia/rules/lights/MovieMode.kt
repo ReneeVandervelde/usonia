@@ -20,6 +20,8 @@ import usonia.kotlin.DefaultScope
 import usonia.rules.Flags
 import usonia.server.client.BackendClient
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Dims lights during when a flag is set.
@@ -44,6 +46,18 @@ internal class MovieMode(
                 brightness = 50.percent,
             )
             Bedroom, Garage, Generic, Office, Storage, Utility, Greenhouse -> LightSettings.Unhandled
+        }
+    }
+
+    override suspend fun getIdleConditions(room: Room): IdleConditions {
+        if (!client.getBooleanFlag(Flags.MovieMode)) {
+            return IdleConditions.Unhandled
+        }
+        return when(room.type) {
+            Hallway -> IdleConditions.Timed(5.seconds)
+            Kitchen, Dining -> IdleConditions.Timed(30.seconds)
+            Bathroom -> IdleConditions.Timed(2.minutes)
+            else -> IdleConditions.Unhandled
         }
     }
 

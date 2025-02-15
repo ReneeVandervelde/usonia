@@ -12,6 +12,7 @@ kotlin {
             implementation(projects.weather)
             api(libs.kotlin.coroutines.core)
             implementation(libs.ktor.client.core)
+            api(projects.celestials)
         }
         jvmTest.dependencies {
             implementation(libs.kotlin.test.core)

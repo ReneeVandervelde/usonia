@@ -1,6 +1,10 @@
 package usonia.celestials
 
 import com.inkapplications.datetime.ZonedDateTime
+import com.inkapplications.datetime.atZone
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 /**
  * A schedule of celestial events relevant to a given time.
@@ -63,3 +67,9 @@ data class UpcomingCelestials(
         return if (this < timestamp) otherwise else this
     }
 }
+
+val FakeUpcomingCelestials = UpcomingCelestials(
+    timestamp = Instant.DISTANT_PAST.toLocalDateTime(TimeZone.UTC).atZone(TimeZone.UTC),
+    today = FakeCelestials,
+    tomorrow = FakeCelestials
+)

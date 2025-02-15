@@ -3,6 +3,7 @@ package usonia.cli.server
 import com.inkapplications.datetime.ZonedClock
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.json.Json
+import usonia.celestials.CelestialAccess
 import usonia.glass.GlassPlugin
 import usonia.hubitat.HubitatPlugin
 import usonia.hue.HueBridgePlugin
@@ -19,6 +20,7 @@ import usonia.web.WebPlugin
  */
 class PluginsModule(
     client: BackendClient,
+    celestialAccess: CelestialAccess,
     logger: KimchiLogger,
     json: Json,
     clock: ZonedClock,
@@ -37,7 +39,7 @@ class PluginsModule(
             clock = clock
         ),
         weatherPlugin,
-        RulesPlugin(client, weatherPlugin.weatherAccess, logger),
+        RulesPlugin(client, weatherPlugin.weatherAccess, celestialAccess, clock, logger),
         HubitatPlugin(client, logger),
         HueBridgePlugin(client, logger),
         TelegramBridgePlugin(client, logger),

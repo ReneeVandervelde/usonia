@@ -18,4 +18,5 @@ enum class Fixture {
     MomentarySprinkler,
     Heat,
     DataExfiltrator,
+    WakeLight,
 }
