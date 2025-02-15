@@ -6,9 +6,7 @@ import com.inkapplications.datetime.atZone
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.scalar.percent
 import inkapplications.spondee.scalar.toWholePercentage
-import inkapplications.spondee.structure.div
-import inkapplications.spondee.structure.minus
-import inkapplications.spondee.structure.plus
+import inkapplications.spondee.structure.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.*
@@ -65,8 +63,8 @@ class CircadianColorsTest {
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
         assertTrue(result is LightSettings.Temperature)
-        assertEquals(DEFAULT_NIGHTLIGHT, result.temperature)
-        assertEquals(DEFAULT_NIGHT_BRIGHTNESS, result.brightness)
+        assertEquals(DEFAULT_NIGHTLIGHT.toInt(), result.temperature.toKelvin().toInt())
+        assertEquals(DEFAULT_NIGHT_BRIGHTNESS.toInt(), result.brightness.toWholePercentage().toInt())
     }
 
     @Test
@@ -93,8 +91,8 @@ class CircadianColorsTest {
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
         assertTrue(result is LightSettings.Temperature)
-        assertEquals(DEFAULT_NIGHTLIGHT, result.temperature)
-        assertEquals(DEFAULT_NIGHT_BRIGHTNESS, result.brightness)
+        assertEquals(DEFAULT_NIGHTLIGHT.toInt(), result.temperature.toKelvin().toInt())
+        assertEquals(DEFAULT_NIGHT_BRIGHTNESS.toInt(), result.brightness.toWholePercentage().toInt())
     }
 
 
@@ -127,8 +125,8 @@ class CircadianColorsTest {
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
         assertTrue(result is LightSettings.Temperature)
-        assertEquals(DEFAULT_DAYLIGHT, result.temperature)
-        assertEquals(100.percent, result.brightness)
+        assertEquals(DEFAULT_DAYLIGHT.toInt(), result.temperature.toKelvin().toInt())
+        assertEquals(100, result.brightness.toWholePercentage().toInt())
     }
 
     @Test
@@ -141,8 +139,8 @@ class CircadianColorsTest {
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
         assertTrue(result is LightSettings.Temperature)
-        assertEquals(DEFAULT_DAYLIGHT, result.temperature)
-        assertEquals(100.percent, result.brightness)
+        assertEquals(DEFAULT_DAYLIGHT.toInt(), result.temperature.toKelvin().toInt())
+        assertEquals(100, result.brightness.toWholePercentage().toInt())
     }
 
     @Test
@@ -155,8 +153,8 @@ class CircadianColorsTest {
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
         assertTrue(result is LightSettings.Temperature)
-        assertEquals(DEFAULT_DAYLIGHT, result.temperature)
-        assertEquals(100.percent, result.brightness)
+        assertEquals(DEFAULT_DAYLIGHT.toInt(), result.temperature.toKelvin().toInt())
+        assertEquals(100, result.brightness.toWholePercentage().toInt())
     }
 
     @Test
@@ -169,8 +167,8 @@ class CircadianColorsTest {
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
         assertTrue(result is LightSettings.Temperature)
-        assertEquals(DEFAULT_EVENING, result.temperature)
-        assertEquals(100.percent, result.brightness)
+        assertEquals(DEFAULT_EVENING.toInt(), result.temperature.toKelvin().toInt())
+        assertEquals(100, result.brightness.toWholePercentage().toInt())
     }
 
     @Test
@@ -202,8 +200,8 @@ class CircadianColorsTest {
         val result = colors.getActiveSettings(FakeRooms.Office)
 
         assertTrue(result is LightSettings.Temperature)
-        assertEquals(DEFAULT_EVENING, result.temperature)
-        assertEquals(100.percent, result.brightness)
+        assertEquals(DEFAULT_EVENING.toInt(), result.temperature.toKelvin().toInt())
+        assertEquals(100, result.brightness.toWholePercentage().toInt())
     }
 
     @Test
@@ -216,8 +214,8 @@ class CircadianColorsTest {
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
         assertTrue(result is LightSettings.Temperature)
-        assertEquals(DEFAULT_NIGHTLIGHT, result.temperature)
-        assertEquals(DEFAULT_NIGHT_BRIGHTNESS, result.brightness)
+        assertEquals(DEFAULT_NIGHTLIGHT.toInt(), result.temperature.toKelvin().toInt())
+        assertEquals(DEFAULT_NIGHT_BRIGHTNESS.toWholePercentage().toInt(), result.brightness.toWholePercentage().toInt())
     }
 
     @Test
@@ -230,8 +228,8 @@ class CircadianColorsTest {
         val result = colors.getActiveSettings(FakeRooms.Office)
 
         assertTrue(result is LightSettings.Temperature)
-        assertEquals(DEFAULT_EVENING, result.temperature)
-        assertEquals(100.percent, result.brightness)
+        assertEquals(DEFAULT_EVENING.toInt(), result.temperature.toKelvin().toInt())
+        assertEquals(100, result.brightness.toWholePercentage().toInt())
     }
 
     @Test
@@ -259,8 +257,8 @@ class CircadianColorsTest {
 
         assertTrue(result is LightSettings.Temperature)
         assertEquals(
-            DEFAULT_DAYLIGHT,
-            result.temperature
+            DEFAULT_DAYLIGHT.toInt(),
+            result.temperature.toKelvin().toInt(),
         )
         assertTrue(
             (100f - ((100 - DEFAULT_NIGHT_BRIGHTNESS.toWholePercentage().value.toInt()) / 4)).toInt() - result.brightness.toWholePercentage().value.toInt() <= 1

@@ -15,6 +15,7 @@ import kotlinx.datetime.toLocalDateTime
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.getSite
 import usonia.foundation.Room
+import usonia.foundation.unit.interpolate
 import usonia.weather.LocalWeatherAccess
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -91,8 +92,8 @@ internal class CircadianColors(
                 logger.trace("In morning blue hour")
                 val position = ((now.instant - forecast.sunrise.minus(period)).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
                 return LightSettings.Temperature(
-                    temperature = transition(modifiedNightColor, daylightColor, position),
-                    brightness = transition(modifiedNightBrightness, 100.percent, position),
+                    temperature = interpolate(modifiedNightColor, daylightColor, position),
+                    brightness = interpolate(modifiedNightBrightness, 100.percent, position),
                 )
             }
             now.instant > forecast.sunrise && now.instant < forecast.sunset -> {
@@ -106,11 +107,11 @@ internal class CircadianColors(
                 logger.trace("In twilight")
 
                 val eveningTransitionPosition = ((now.instant - forecast.sunset).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
-                val eveningTransitionColor = transition(daylightColor, eveningColor, eveningTransitionPosition)
+                val eveningTransitionColor = interpolate(daylightColor, eveningColor, eveningTransitionPosition)
                 val position = ((now.instant - nightStartInstant.instant).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
                 return LightSettings.Temperature(
-                    temperature = transition(eveningTransitionColor, modifiedNightColor, position),
-                    brightness = transition(100.percent, modifiedNightBrightness, position),
+                    temperature = interpolate(eveningTransitionColor, modifiedNightColor, position),
+                    brightness = interpolate(100.percent, modifiedNightBrightness, position),
                 )
             }
             now.instant < forecast.sunrise
@@ -127,25 +128,11 @@ internal class CircadianColors(
                 logger.trace("In evening")
                 val position = ((now.instant - forecast.sunset).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
                 return LightSettings.Temperature(
-                    temperature = transition(daylightColor, eveningColor, position),
+                    temperature = interpolate(daylightColor, eveningColor, position),
                     brightness = 100.percent,
                 )
             }
             else -> throw IllegalStateException("Time not covered in color conditions.")
         }
-    }
-
-    private fun IntRange.transition(position: Float) = (start + ((endInclusive - start) * kotlin.math.max(0f, kotlin.math.min(1f, position)))).toInt()
-    private fun transition(start: ColorTemperature, end: ColorTemperature, position: Float): ColorTemperature {
-        val startKelvin = start.toKelvin().value.toInt()
-        val endKelvin = end.toKelvin().value.toInt()
-
-        return (startKelvin..endKelvin).transition(position).kelvin
-    }
-    private fun transition(start: Percentage, end: Percentage, position: Float): Percentage {
-        val startPercentage = start.toWholePercentage().value.toInt()
-        val endPercentage = end.toWholePercentage().value.toInt()
-
-        return (startPercentage..endPercentage).transition(position).percent
     }
 }
