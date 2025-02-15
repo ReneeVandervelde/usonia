@@ -26,4 +26,12 @@ internal class LightingEnabledFlag(
 
         return LightSettings.Ignore
     }
+
+    override suspend fun getStartIdleSettings(room: Room): LightSettings {
+        if (client.getBooleanFlag(Flags.MotionLights, default = true)) {
+            return LightSettings.Unhandled
+        }
+
+        return LightSettings.Ignore
+    }
 }
