@@ -55,10 +55,21 @@ internal class LightController(
         }
         val action = backgroundScope.async {
             val idleConditions = lightSettingsPicker.getIdleConditions(room)
+            val settings = lightSettingsPicker.getIdleSettings(room)
             when (idleConditions) {
                 is IdleConditions.Timed -> {
                     logger.trace("Starting ${idleConditions.time} idle timer for ${room.name}")
-                    delay(idleConditions.time).let { room }
+                    delay(idleConditions.time)
+                    adjustRoomLights(room, settings)
+                }
+                is IdleConditions.Phased -> {
+                    logger.trace("Starting ${idleConditions.startAfter} initial idle phase for ${room.name}")
+                    delay(idleConditions.startAfter)
+                    val initialIdle = lightSettingsPicker.getStartIdleSettings(room)
+                    adjustRoomLights(room, initialIdle)
+                    logger.trace("Starting ${idleConditions.endAfter} final idle phase for ${room.name}")
+                    delay(idleConditions.endAfter - idleConditions.startAfter)
+                    adjustRoomLights(room, settings)
                 }
                 IdleConditions.Ignored -> {
                     logger.trace("Skipping Idle monitor for room $room")
@@ -74,11 +85,6 @@ internal class LightController(
         }
         cancellation.cancel()
         action.cancel()
-
-        if (cancelled != null) {
-            val settings = lightSettingsPicker.getIdleSettings(room)
-            adjustRoomLights(cancelled, settings)
-        }
     }
 
     private suspend fun onRoomMotion(room: Room) {
@@ -91,6 +97,7 @@ internal class LightController(
         logger.trace("Adjusting lights in ${room.name}")
         when (settings) {
             is LightSettings.Temperature -> setRoomTemperature(room, settings)
+            is LightSettings.Brightness -> setRoomBrightness(room, settings)
             is LightSettings.Switch -> switchRoomLights(room, settings.state)
             LightSettings.Ignore -> {
                 logger.trace("Ignored action for room event: ${room.name}")
@@ -136,6 +143,30 @@ internal class LightController(
             }
 
         client.publishAll(colorTemperatureDevices + dimmingDevices + switchDevices)
+    }
+
+    private suspend fun setRoomBrightness(room: Room, color: LightSettings.Brightness) {
+        val dimmingDevices = room.devices
+            .filter { Action.Dim::class in it.capabilities.actions }
+            .map {
+                Action.Dim(
+                    target = it.id,
+                    level = color.brightness,
+                    switchState = SwitchState.ON,
+                )
+            }
+        val switchDevices = room.devices
+            .filter { Fixture.Light == it.fixture }
+            .filter { Action.Dim::class !in it.capabilities.actions }
+            .filter { Action.Switch::class in it.capabilities.actions }
+            .map {
+                Action.Switch(
+                    target = it.id,
+                    state = SwitchState.ON,
+                )
+            }
+
+        client.publishAll(dimmingDevices + switchDevices)
     }
 
     private suspend fun switchRoomLights(room: Room, state: SwitchState) {

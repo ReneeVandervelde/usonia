@@ -4,19 +4,27 @@ import inkapplications.spondee.measure.ColorTemperature
 import inkapplications.spondee.scalar.Percentage
 import usonia.foundation.SwitchState
 
-internal sealed class LightSettings {
+internal sealed interface LightSettings
+{
     /**
      * Lighting settings via temperature/brightness.
      */
     data class Temperature(
         val temperature: ColorTemperature,
         val brightness: Percentage,
-    ): LightSettings()
+    ): LightSettings
+
+    /**
+     * Lighting settings that only change brightness.
+     */
+    data class Brightness(
+        val brightness: Percentage,
+    ): LightSettings
 
     /**
      * Indicates that a light should be toggled on/off without any settings.
      */
-    data class Switch(val state: SwitchState): LightSettings()
+    data class Switch(val state: SwitchState): LightSettings
 
     /**
      * Indicates that lights should not be controlled by the application.
@@ -25,10 +33,10 @@ internal sealed class LightSettings {
      * controller to stop seeking any controls for this light from any
      * light settings picker.
      */
-    object Ignore: LightSettings()
+    data object Ignore: LightSettings
 
     /**
      * Indicates that this lighting picker does not handle this light at this time.
      */
-    object Unhandled: LightSettings()
+    data object Unhandled: LightSettings
 }

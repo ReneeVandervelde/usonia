@@ -46,6 +46,7 @@ class RulesPlugin(
         DayMode(weather),
         CircadianColors(client, weather, logger = logger),
         FixedTimeouts,
+        DimmingPhaseHandler,
         OnOffHandler,
     )
 

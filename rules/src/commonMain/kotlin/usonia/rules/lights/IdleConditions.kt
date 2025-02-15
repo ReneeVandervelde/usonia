@@ -1,7 +1,6 @@
 package usonia.rules.lights
 
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
 
 /**
  * Indicates a strategy for determining when a room is considered idle.
@@ -10,8 +9,16 @@ sealed class IdleConditions {
     /**
      * Specify the amount of time to wait for a room to be considered idle.
      */
-    @OptIn(ExperimentalTime::class)
     data class Timed(val time: Duration): IdleConditions()
+
+    /**
+     * Specify a two-phase amount of time before considering a room to be
+     * fully idle.
+     */
+    data class Phased(
+        val startAfter: Duration,
+        val endAfter: Duration,
+    ): IdleConditions()
 
     /**
      * Indicates that this picker does not specify an idle condition.
