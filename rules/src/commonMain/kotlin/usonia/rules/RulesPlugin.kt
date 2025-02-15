@@ -1,9 +1,12 @@
 package usonia.rules
 
+import com.inkapplications.datetime.ZonedClock
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
+import kotlinx.coroutines.CoroutineScope
 import regolith.processes.cron.CronJob
 import regolith.processes.daemon.Daemon
+import usonia.celestials.CelestialAccess
 import usonia.rules.alerts.DoorAlert
 import usonia.rules.alerts.LogErrorAlerts
 import usonia.rules.alerts.PipeMonitor
@@ -24,6 +27,8 @@ import usonia.weather.LocalWeatherAccess
 class RulesPlugin(
     client: BackendClient,
     weather: LocalWeatherAccess,
+    celestialAccess: CelestialAccess,
+    clock: ZonedClock,
     logger: KimchiLogger = EmptyLogger,
 ): ServerPlugin {
     private val failureHandler = ThrottledFailureHandler()
@@ -44,6 +49,8 @@ class RulesPlugin(
         OnOffHandler,
     )
 
+    private val wakeLight = WakeLight(client, client, client, celestialAccess, clock, logger)
+
     override val daemons: List<Daemon> = listOf(
         LogErrorAlerts.also { it.client.value = client },
         WaterMonitor(client, logger),
@@ -63,10 +70,12 @@ class RulesPlugin(
         CodeAlerts(client, logger),
         DisarmOnPrimaryCode(client, logger),
         LockJammed(client, logger),
+        wakeLight,
     )
 
     override val crons: List<CronJob> = listOf(
         MorningPlantLight(client, weather, logger),
         SprinklerControl(client, weather, logger),
+        wakeLight,
     )
 }

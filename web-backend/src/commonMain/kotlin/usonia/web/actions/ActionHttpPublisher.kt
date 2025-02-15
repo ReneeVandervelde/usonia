@@ -25,6 +25,16 @@ internal class ActionHttpPublisher(
     override val method: String = "POST"
     override val path: String = "/actions"
 
+    override suspend fun requiresAuthorization(data: Action, request: HttpRequest): Boolean {
+        return when (data) {
+            is Action.Intent -> when (data.action) {
+                "usonia.rules.lights.WakeLight.dismiss" -> return false
+                else -> super.requiresAuthorization(data, request)
+            }
+            else -> super.requiresAuthorization(data, request)
+        }
+    }
+
     override suspend fun getResponse(data: Action, request: HttpRequest): RestResponse<Status> {
         client.publishAction(data)
         return RestResponse(Statuses.SUCCESS)

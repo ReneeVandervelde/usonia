@@ -15,6 +15,7 @@ import inkapplications.spondee.structure.roundToInt
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import usonia.foundation.Identifier
 import usonia.foundation.LatchState
 import usonia.foundation.unit.compareTo
 import usonia.glass.GlassPluginConfig.DisplayMode
@@ -122,6 +123,18 @@ internal class DisplayConfigFactory(
                 position = Positioning.Center,
                 span = controlSpan,
             ),
+            ButtonItem(
+                text = "Snooze".takeIf { viewModel.config.type == Large }.orEmpty(),
+                leadingSymbol = Symbol.AlarmOff,
+                action = Action.Post("http://${viewModel.config.homeIp}/actions", usonia.foundation.Action.Intent(
+                    target = Identifier("usonia.rules.lights.WakeLight"),
+                    action = "usonia.rules.lights.WakeLight.dismiss"
+                ).let { Json.encodeToString(usonia.foundation.ActionSerializer, it) }),
+                latching = true,
+                sentiment = Sentiment.Idle,
+                position = Positioning.Center,
+                span = controlSpan,
+            ).takeIf { viewModel.config.type != Large },
             ButtonItem(
                 text = "Lock".takeIf { viewModel.config.type == Large }.orEmpty(),
                 leadingSymbol = Symbol.Lock,
