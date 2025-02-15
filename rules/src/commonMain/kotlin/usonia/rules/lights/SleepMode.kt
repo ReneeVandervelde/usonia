@@ -164,7 +164,9 @@ internal class SleepMode(
             .filter { it.action == "bed.enter" }
             .filter { clock.localDateTime().minuteOfDay >= nightStartMinute || clock.localDateTime().minuteOfDay <= nightEndMinute }
             .onEach { logger.info("Enabling Night Mode based on Intent") }
-            .collectLatest { client.setFlag(Flags.SleepMode, true) }
+            .collectLatest {
+                backgroundScope.launch { client.setFlag(Flags.SleepMode, true) }
+            }
     }
 
     private suspend fun autoEnable(site: Site) {

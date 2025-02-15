@@ -339,7 +339,8 @@ class SleepModeTest {
         )
         val sleepMode = SleepMode(
             client = client,
-            clock = clock.atZone(timeZone)
+            clock = clock.atZone(timeZone),
+            backgroundScope = backgroundScope,
         )
 
         val daemon = launch { sleepMode.startDaemon() }
