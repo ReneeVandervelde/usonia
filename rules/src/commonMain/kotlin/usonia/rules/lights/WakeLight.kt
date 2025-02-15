@@ -4,6 +4,7 @@ import com.inkapplications.coroutines.ongoing.*
 import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.datetime.atZone
 import inkapplications.spondee.measure.ColorTemperature
+import inkapplications.spondee.measure.metric.Kelvin
 import inkapplications.spondee.measure.metric.kelvin
 import inkapplications.spondee.scalar.decimalPercentage
 import inkapplications.spondee.scalar.percent
@@ -25,6 +26,7 @@ import usonia.core.state.ActionPublisher
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.getSite
 import usonia.foundation.*
+import usonia.foundation.unit.interpolate
 import usonia.kotlin.DefaultScope
 import kotlin.math.max
 import kotlin.math.min
@@ -109,7 +111,7 @@ class WakeLight(
 
         val progress = ((now.instant - startTime.instant) / span).let { min(1.0, it) }
         val currentBrightness = max(0.01, progress).decimalPercentage
-        val currentColor = transition(startColor, endColor, progress.toFloat())
+        val currentColor = interpolate(startColor, endColor, progress)
 
         wakeLights.map {
             actionPublisher.publishAction(Action.ColorTemperatureChange(
@@ -119,14 +121,5 @@ class WakeLight(
                 level = currentBrightness,
             ))
         }
-    }
-
-    // TODO: Share this with CircadianColors
-    private fun IntRange.transition(position: Float) = (start + ((endInclusive - start) * max(0f, min(1f, position)))).toInt()
-    private fun transition(start: ColorTemperature, end: ColorTemperature, position: Float): ColorTemperature {
-        val startKelvin = start.toKelvin().value.toInt()
-        val endKelvin = end.toKelvin().value.toInt()
-
-        return (startKelvin..endKelvin).transition(position).kelvin
     }
 }

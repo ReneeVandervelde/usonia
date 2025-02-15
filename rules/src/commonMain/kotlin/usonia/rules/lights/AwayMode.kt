@@ -12,7 +12,6 @@ internal class AwayMode(
         return when (client.getSecurityState()) {
             SecurityState.Armed -> LightSettings.Ignore
             SecurityState.Disarmed -> LightSettings.Unhandled
-
         }
     }
 }

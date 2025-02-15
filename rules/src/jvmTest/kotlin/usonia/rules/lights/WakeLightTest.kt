@@ -4,7 +4,9 @@ import com.inkapplications.coroutines.ongoing.OngoingFlow
 import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import com.inkapplications.datetime.atZone
 import inkapplications.spondee.scalar.decimalPercentage
+import inkapplications.spondee.scalar.toWholePercentage
 import inkapplications.spondee.structure.toDouble
+import inkapplications.spondee.structure.toInt
 import kimchi.logger.EmptyLogger
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.*
@@ -95,8 +97,8 @@ class WakeLightTest {
         assertTrue(action is Action.ColorTemperatureChange, "Action should be a color change")
         assertEquals("test-wake-light", action.target.value)
         assertEquals(SwitchState.ON, action.switchState)
-        assertEquals(Colors.Warm, action.temperature)
-        assertEquals(0.01.decimalPercentage, action.level)
+        assertEquals(Colors.Warm.toInt(), action.temperature.toKelvin().toInt())
+        assertEquals(1, action.level?.toWholePercentage()?.toInt())
     }
 
     @Test
@@ -157,8 +159,8 @@ class WakeLightTest {
         assertTrue(action is Action.ColorTemperatureChange, "Action should be a color change")
         assertEquals("test-wake-light", action.target.value)
         assertEquals(SwitchState.ON, action.switchState)
-        assertEquals(Colors.Daylight, action.temperature)
-        assertEquals(1.0.decimalPercentage, action.level)
+        assertEquals(Colors.Daylight.toInt(), action.temperature.toKelvin().toInt())
+        assertEquals(100, action.level?.toWholePercentage()?.toInt())
     }
 
     @Test

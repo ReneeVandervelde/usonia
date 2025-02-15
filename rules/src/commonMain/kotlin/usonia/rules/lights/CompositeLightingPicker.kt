@@ -36,4 +36,12 @@ internal class CompositeLightingPicker(
         }
         throw IllegalStateException("No Picker handled room Idle conditions!")
     }
+
+    override suspend fun getStartIdleSettings(room: Room): LightSettings {
+        pickers.forEach {
+            val result = it.getStartIdleSettings(room)
+            if (result != LightSettings.Unhandled) return result
+        }
+        throw IllegalStateException("No Picker handled room Idle start settings!")
+    }
 }

@@ -9,10 +9,10 @@ internal object DimmingPhaseHandler: LightSettingsPicker
     override suspend fun getStartIdleSettings(room: Room): LightSettings {
         return when (room.type) {
             Hallway, Bedroom -> LightSettings.Brightness(
-                brightness = 1.percent,
+                brightness = 10.percent,
             )
             else -> LightSettings.Brightness(
-                brightness = 10.percent,
+                brightness = 15.percent,
             )
         }
     }
