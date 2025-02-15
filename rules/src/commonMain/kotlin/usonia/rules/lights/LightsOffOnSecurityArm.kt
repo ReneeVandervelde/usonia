@@ -17,20 +17,20 @@ class LightsOffOnSecurityArm(
         client.securityState
             .combinePair(client.site)
             .collectLatest { (state, site) ->
-            when (state) {
-                SecurityState.Armed -> site
-                    .findDevicesBy {
-                        it.fixture == Fixture.Light && Action.Switch::class in it.capabilities.actions
-                    }
-                    .map {
-                        Action.Switch(it.id, SwitchState.ON)
-                    }
-                    .run {
-                        logger.info("Turning off ${size} lights for security arm.")
-                        client.publishAll(this)
-                    }
-                SecurityState.Disarmed -> {}
+                when (state) {
+                    SecurityState.Armed -> site
+                        .findDevicesBy {
+                            it.fixture == Fixture.Light && Action.Switch::class in it.capabilities.actions
+                        }
+                        .map {
+                            Action.Switch(it.id, SwitchState.ON)
+                        }
+                        .run {
+                            logger.info("Turning off ${size} lights for security arm.")
+                            client.publishAll(this)
+                        }
+                    SecurityState.Disarmed -> {}
+                }
             }
-        }
     }
 }

@@ -14,10 +14,10 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import regolith.processes.daemon.Daemon
 import usonia.foundation.*
-import usonia.kotlin.IoScope
 import usonia.kotlin.RetryStrategy
 import usonia.kotlin.runRetryable
 import usonia.server.client.BackendClient
@@ -31,7 +31,7 @@ internal class HueLightHandler(
     private val client: BackendClient,
     private val shade: LightControls,
     private val logger: KimchiLogger = EmptyLogger,
-    private val requestScope: CoroutineScope = IoScope()
+    private val requestScope: CoroutineScope,
 ): Daemon {
     override suspend fun startDaemon(): Nothing {
         client.site.collectLatest { site ->
@@ -116,6 +116,7 @@ internal class HueLightHandler(
             }.onFailure { error ->
                 onFailure(error, device)
             }
+            delay(100.milliseconds)
         }
     }
 
