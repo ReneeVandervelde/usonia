@@ -55,14 +55,13 @@ class WakeLight(
             .filter { it.action == "usonia.rules.lights.WakeLight.dismiss" }
             .collect {
                 backgroundScope.launch {
-                    dismiss()
+                    dismiss(today = clock.localDate())
                 }
             }
     }
 
-    private suspend fun dismiss()
+    private suspend fun dismiss(today: LocalDate)
     {
-        val today = clock.localDate()
         if (lastDismissed.value == today) {
             logger.trace("Already dismissed today. Ignoring.")
             return
@@ -102,14 +101,15 @@ class WakeLight(
             logger.trace("Wake light dismissed today, not running.")
             return
         }
-        if (now > endTime + dismissAfter) {
+        if (now >= endTime + dismissAfter) {
             logger.trace("After wake time, dismissing.")
-            dismiss()
+            dismiss(now.localDate)
             return
         }
 
-        val currentBrightness = ((now.instant - startTime.instant) / span).let { min(1.0, it) }.decimalPercentage
-        val currentColor = transition(startColor, endColor, currentBrightness.toDecimal().toFloat())
+        val progress = ((now.instant - startTime.instant) / span).let { min(1.0, it) }
+        val currentBrightness = max(0.01, progress).decimalPercentage
+        val currentColor = transition(startColor, endColor, progress.toFloat())
 
         wakeLights.map {
             actionPublisher.publishAction(Action.ColorTemperatureChange(
