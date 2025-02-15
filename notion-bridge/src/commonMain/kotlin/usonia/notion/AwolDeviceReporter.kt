@@ -255,10 +255,20 @@ internal class AwolDeviceReporter(
             token = token,
             database = database,
             query = DatabaseQuery(
-                filter = PageFilter.Text(
-                    property = NotionConfig.Properties.REF,
-                    filter = TextFilter.Equals(
-                        equals = ref.value
+                filter = PageFilter.And(
+                    filters = listOf(
+                        PageFilter.Text(
+                            property = NotionConfig.Properties.REF,
+                            filter = TextFilter.Equals(
+                                equals = ref.value
+                            )
+                        ),
+                        PageFilter.Status(
+                            property = NotionConfig.Properties.STATUS,
+                            filter = FilterQuery.DoesNotEqual(
+                                value = NotionConfig.PropertyValues.STATUS_DONE
+                            )
+                        ),
                     )
                 )
             )
