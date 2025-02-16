@@ -1,10 +1,10 @@
 package usonia.notion
 
+import com.reneevandervelde.notion.NotionModule
 import kimchi.logger.KimchiLogger
 import kimchi.logger.LogWriter
 import regolith.processes.cron.CronJob
 import regolith.processes.daemon.Daemon
-import usonia.notion.api.NotionApiClient
 import usonia.server.ServerPlugin
 import usonia.server.client.BackendClient
 
@@ -26,7 +26,7 @@ class NotionBridgePlugin(
 
     companion object
     {
-        internal val notion = NotionApiClient()
+        internal val notion = NotionModule().client
         private val notionBugLogger = NotionBugLogger(notion)
         val logWriter: LogWriter = notionBugLogger
     }

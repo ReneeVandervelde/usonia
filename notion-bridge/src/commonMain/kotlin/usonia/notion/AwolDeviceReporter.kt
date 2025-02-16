@@ -6,6 +6,16 @@ import com.inkapplications.coroutines.ongoing.filter
 import com.inkapplications.coroutines.ongoing.filterIsInstance
 import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.standard.throwCancels
+import com.reneevandervelde.notion.NotionApi
+import com.reneevandervelde.notion.NotionBearerToken
+import com.reneevandervelde.notion.Parent
+import com.reneevandervelde.notion.block.BlockArgument
+import com.reneevandervelde.notion.block.RichText
+import com.reneevandervelde.notion.block.RichTextArgument
+import com.reneevandervelde.notion.database.DatabaseId
+import com.reneevandervelde.notion.database.DatabaseQuery
+import com.reneevandervelde.notion.page.*
+import com.reneevandervelde.notion.property.*
 import inkapplications.spondee.scalar.percent
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
@@ -23,16 +33,6 @@ import usonia.foundation.*
 import usonia.foundation.unit.compareTo
 import usonia.kotlin.RetryStrategy
 import usonia.kotlin.runRetryable
-import usonia.notion.api.NotionApi
-import usonia.notion.api.structures.NotionBearerToken
-import usonia.notion.api.structures.Parent
-import usonia.notion.api.structures.block.BlockArgument
-import usonia.notion.api.structures.block.RichText
-import usonia.notion.api.structures.block.RichTextArgument
-import usonia.notion.api.structures.database.DatabaseId
-import usonia.notion.api.structures.database.DatabaseQuery
-import usonia.notion.api.structures.page.*
-import usonia.notion.api.structures.property.*
 import usonia.server.client.BackendClient
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -86,11 +86,11 @@ internal class AwolDeviceReporter(
                         filters = listOf(
                             PageFilter.Text(
                                 property = NotionConfig.Properties.REF,
-                                filter = TextFilter.Empty(false),
+                                filter = TextFilter.IsNotEmpty,
                             ),
                             PageFilter.Status(
                                 property = NotionConfig.Properties.STATUS,
-                                filter = FilterQuery.DoesNotEqual(
+                                filter = ValueFilter.DoesNotEqual(
                                     value = NotionConfig.PropertyValues.STATUS_DONE
                                 )
                             ),
@@ -98,13 +98,13 @@ internal class AwolDeviceReporter(
                                 filters = listOf(
                                     PageFilter.MultiSelect(
                                         property = NotionConfig.Properties.TAGS,
-                                        filter = FilterQuery.Contains(
+                                        filter = ValueFilter.Contains(
                                             contains = NotionConfig.Tags.LOW_BATTERY
                                         )
                                     ),
                                     PageFilter.MultiSelect(
                                         property = NotionConfig.Properties.TAGS,
-                                        filter = FilterQuery.Contains(
+                                        filter = ValueFilter.Contains(
                                             contains = NotionConfig.Tags.DEAD_BATTERY
                                         )
                                     )
@@ -265,7 +265,7 @@ internal class AwolDeviceReporter(
                         ),
                         PageFilter.Status(
                             property = NotionConfig.Properties.STATUS,
-                            filter = FilterQuery.DoesNotEqual(
+                            filter = ValueFilter.DoesNotEqual(
                                 value = NotionConfig.PropertyValues.STATUS_DONE
                             )
                         ),

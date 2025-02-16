@@ -3,6 +3,18 @@ package usonia.notion
 import com.inkapplications.coroutines.ongoing.OngoingFlow
 import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import com.inkapplications.datetime.ZonedClock
+import com.reneevandervelde.notion.NotionBearerToken
+import com.reneevandervelde.notion.NotionResponse
+import com.reneevandervelde.notion.Parent
+import com.reneevandervelde.notion.block.RichText
+import com.reneevandervelde.notion.block.RichTextArgument
+import com.reneevandervelde.notion.database.DatabaseId
+import com.reneevandervelde.notion.database.DatabaseQuery
+import com.reneevandervelde.notion.page.Page
+import com.reneevandervelde.notion.page.PageIcon
+import com.reneevandervelde.notion.page.PageId
+import com.reneevandervelde.notion.property.*
+import com.reneevandervelde.notion.testing.NotionApiSpy
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -12,15 +24,6 @@ import usonia.core.state.ConfigurationAccessStub
 import usonia.core.state.EventAccess
 import usonia.core.state.EventAccessStub
 import usonia.foundation.*
-import usonia.notion.api.structures.NotionResponse
-import usonia.notion.api.structures.Parent
-import usonia.notion.api.structures.block.RichText
-import usonia.notion.api.structures.block.RichTextArgument
-import usonia.notion.api.structures.database.DatabaseId
-import usonia.notion.api.structures.page.Page
-import usonia.notion.api.structures.page.PageIcon
-import usonia.notion.api.structures.page.PageId
-import usonia.notion.api.structures.property.*
 import usonia.server.DummyClient
 import kotlin.reflect.KClass
 import kotlin.test.Test
@@ -106,27 +109,28 @@ class AwolDeviceReporterTest {
         assertEquals(0, apiSpy.updatedPages.size, "No pages should be updated")
         assertEquals(0, apiSpy.archivedPages.size, "No pages should be archived")
         assertEquals(1, apiSpy.createdPages.size, "Expected one page to be created")
-        apiSpy.createdPages.first().run {
-            assertTrue(parent is Parent.Database)
-            assertEquals("666", parent.database_id.value)
-            assertEquals(5, properties.size)
-            properties[NotionConfig.Properties.REF]?.let {
-                assertEquals("fake-sensor", it.richTextPropertyText)
-            }
-            properties[NotionConfig.Properties.TAGS]?.let {
-                val names = (it as PropertyArgument.MultiSelect).multi_select.map { it.name }
-                assertTrue("Dead Battery" in names, "Dead battery tag sent")
-                assertTrue("Usonia" in names, "Usonia tag sent")
-            }
-            properties[NotionConfig.Properties.TITLE]?.let {
-                assertEquals("Replace batteries in Fake Sensor", it.titlePropertyText)
-            }
-            properties[NotionConfig.Properties.IMPACT]?.let {
-                assertEquals("Medium", (it as PropertyArgument.Select).select.name)
-            }
-            properties[NotionConfig.Properties.URGENCY]?.let {
-                assertEquals("High", (it as PropertyArgument.Select).select.name)
-            }
+        val page = apiSpy.createdPages.first()
+        val parent = page.parent
+        val properties = page.properties
+        assertTrue(parent is Parent.Database)
+        assertEquals("666", parent.database_id.value)
+        assertEquals(5, properties.size)
+        properties[NotionConfig.Properties.REF]?.let {
+            assertEquals("fake-sensor", it.richTextPropertyText)
+        }
+        properties[NotionConfig.Properties.TAGS]?.let {
+            val names = (it as PropertyArgument.MultiSelect).multi_select.map { it.name }
+            assertTrue("Dead Battery" in names, "Dead battery tag sent")
+            assertTrue("Usonia" in names, "Usonia tag sent")
+        }
+        properties[NotionConfig.Properties.TITLE]?.let {
+            assertEquals("Replace batteries in Fake Sensor", it.titlePropertyText)
+        }
+        properties[NotionConfig.Properties.IMPACT]?.let {
+            assertEquals("Medium", (it as PropertyArgument.Select).select.name)
+        }
+        properties[NotionConfig.Properties.URGENCY]?.let {
+            assertEquals("High", (it as PropertyArgument.Select).select.name)
         }
     }
 
@@ -176,23 +180,29 @@ class AwolDeviceReporterTest {
                 } else null
             }
         }
-        val apiSpy = NotionApiSpy()
-        val api = apiSpy.withFakeQueryResponse(
-            createPageResponse(
-                id = PageId("432"),
-                parent = DatabaseId("666"),
-                ref = "fake-sensor",
-                tags = listOf(MultiSelectOption(
-                    id = "123",
-                    name = "Dead Battery"
-                ))
-            )
-        )
+        val apiSpy = object: NotionApiSpy() {
+            override suspend fun queryDatabase(
+                token: NotionBearerToken,
+                database: DatabaseId,
+                query: DatabaseQuery,
+            ): NotionResponse.ListResponse<Page> {
+                super.queryDatabase(token, database, query)
+                return createPageResponse(
+                    id = PageId("432"),
+                    parent = DatabaseId("666"),
+                    ref = "fake-sensor",
+                    tags = listOf(MultiSelectOption(
+                        id = "123",
+                        name = "Dead Battery"
+                    ))
+                )
+            }
+        }
         val client = testClient.copy(
             eventAccess = events,
         )
 
-        AwolDeviceReporter(api, client).runCron(time.localDateTime, time.zone)
+        AwolDeviceReporter(apiSpy, client).runCron(time.localDateTime, time.zone)
 
         assertEquals(0, apiSpy.createdPages.size)
         assertEquals(1, apiSpy.updatedPages.size)
@@ -212,23 +222,29 @@ class AwolDeviceReporterTest {
                 } else null
             }
         }
-        val apiSpy = NotionApiSpy()
-        val api = apiSpy.withFakeQueryResponse(
-            createPageResponse(
-                id = PageId("432"),
-                parent = DatabaseId("666"),
-                ref = "fake-sensor",
-                tags = listOf(MultiSelectOption(
-                    id = "123",
-                    name = "Dead Battery"
-                ))
-            )
-        )
+        val apiSpy = object: NotionApiSpy() {
+            override suspend fun queryDatabase(
+                token: NotionBearerToken,
+                database: DatabaseId,
+                query: DatabaseQuery,
+            ): NotionResponse.ListResponse<Page> {
+                super.queryDatabase(token, database, query)
+                return createPageResponse(
+                    id = PageId("432"),
+                    parent = DatabaseId("666"),
+                    ref = "fake-sensor",
+                    tags = listOf(MultiSelectOption(
+                        id = "123",
+                        name = "Dead Battery"
+                    ))
+                )
+            }
+        }
         val client = testClient.copy(
             eventAccess = events,
         )
 
-        AwolDeviceReporter(api, client).runCron(time.localDateTime, time.zone)
+        AwolDeviceReporter(apiSpy, client).runCron(time.localDateTime, time.zone)
 
         assertEquals(0, apiSpy.createdPages.size)
         assertEquals(0, apiSpy.archivedPages.size)
@@ -264,23 +280,29 @@ class AwolDeviceReporterTest {
                 } else null
             }
         }
-        val apiSpy = NotionApiSpy()
-        val api = apiSpy.withFakeQueryResponse(
-            createPageResponse(
-                id = PageId("123"),
-                parent = DatabaseId("666"),
-                ref = "fake-sensor",
-                tags = listOf(MultiSelectOption(
-                    id = "123",
-                    name = "Dead Battery"
-                ))
-            )
-        )
+        val apiSpy = object: NotionApiSpy() {
+            override suspend fun queryDatabase(
+                token: NotionBearerToken,
+                database: DatabaseId,
+                query: DatabaseQuery,
+            ): NotionResponse.ListResponse<Page> {
+                super.queryDatabase(token, database, query)
+                return createPageResponse(
+                    id = PageId("123"),
+                    parent = DatabaseId("666"),
+                    ref = "fake-sensor",
+                    tags = listOf(MultiSelectOption(
+                        id = "123",
+                        name = "Dead Battery"
+                    ))
+                )
+            }
+        }
         val client = testClient.copy(
             eventAccess = events,
         )
 
-        AwolDeviceReporter(api, client).runCron(time.localDateTime, time.zone)
+        AwolDeviceReporter(apiSpy, client).runCron(time.localDateTime, time.zone)
 
         assertEquals(0, apiSpy.createdPages.size)
         assertEquals(0, apiSpy.updatedPages.size)
@@ -342,12 +364,20 @@ class AwolDeviceReporterTest {
 
     @Test
     fun noDuplicateLowBattery() = runTest {
-        val apiSpy = NotionApiSpy()
-        val api = apiSpy.withFakeQueryResponse(createPageResponse(
-            id = PageId("test-page-id"),
-            parent = DatabaseId("test-database"),
-            ref = "test-ref",
-        ))
+        val apiSpy = object: NotionApiSpy() {
+            override suspend fun queryDatabase(
+                token: NotionBearerToken,
+                database: DatabaseId,
+                query: DatabaseQuery,
+            ): NotionResponse.ListResponse<Page> {
+                super.queryDatabase(token, database, query)
+                return createPageResponse(
+                    id = PageId("test-page-id"),
+                    parent = DatabaseId("test-database"),
+                    ref = "test-ref",
+                )
+            }
+        }
         val events = object: EventAccess by EventAccessStub {
             override val events: OngoingFlow<Event> = ongoingFlowOf(
                 FakeEvents.LowBattery.copy(
@@ -360,7 +390,7 @@ class AwolDeviceReporterTest {
             configurationAccess = config,
         )
         val reporter = AwolDeviceReporter(
-            notionClient = api,
+            notionClient = apiSpy,
             backendClient = client,
         )
 
@@ -374,16 +404,24 @@ class AwolDeviceReporterTest {
 
     @Test
     fun lowBatteryCleared() = runTest {
-        val apiSpy = NotionApiSpy()
-        val api = apiSpy.withFakeQueryResponse(createPageResponse(
-            id = PageId("test-page-id"),
-            parent = DatabaseId("test-database"),
-            ref = "fake-sensor",
-            tags = listOf(MultiSelectOption(
-                id = "test-tag-id",
-                name = "Low Battery"
-            )),
-        ))
+        val apiSpy = object: NotionApiSpy() {
+            override suspend fun queryDatabase(
+                token: NotionBearerToken,
+                database: DatabaseId,
+                query: DatabaseQuery,
+            ): NotionResponse.ListResponse<Page> {
+                super.queryDatabase(token, database, query)
+                return createPageResponse(
+                    id = PageId("test-page-id"),
+                    parent = DatabaseId("test-database"),
+                    ref = "fake-sensor",
+                    tags = listOf(MultiSelectOption(
+                        id = "test-tag-id",
+                        name = "Low Battery"
+                    )),
+                )
+            }
+        }
         val events = object: EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
             override suspend fun <T : Event> getState(id: Identifier, type: KClass<T>): T? {
@@ -398,7 +436,7 @@ class AwolDeviceReporterTest {
             eventAccess = events,
             configurationAccess = config,
         )
-        AwolDeviceReporter(api, client).runCron(time.localDateTime, time.zone)
+        AwolDeviceReporter(apiSpy, client).runCron(time.localDateTime, time.zone)
 
         assertEquals(0, apiSpy.archivedPages.size)
         assertEquals(0, apiSpy.createdPages.size)
@@ -415,16 +453,24 @@ class AwolDeviceReporterTest {
 
     @Test
     fun lowBatteryNotCleared() = runTest {
-        val apiSpy = NotionApiSpy()
-        val api = apiSpy.withFakeQueryResponse(createPageResponse(
-            id = PageId("test-page-id"),
-            parent = DatabaseId("test-database"),
-            ref = "fake-sensor",
-            tags = listOf(MultiSelectOption(
-                id = "test-tag-id",
-                name = "Low Battery"
-            )),
-        ))
+        val apiSpy = object: NotionApiSpy() {
+            override suspend fun queryDatabase(
+                token: NotionBearerToken,
+                database: DatabaseId,
+                query: DatabaseQuery,
+            ): NotionResponse.ListResponse<Page> {
+                super.queryDatabase(token, database, query)
+                return createPageResponse(
+                    id = PageId("test-page-id"),
+                    parent = DatabaseId("test-database"),
+                    ref = "fake-sensor",
+                    tags = listOf(MultiSelectOption(
+                        id = "test-tag-id",
+                        name = "Low Battery"
+                    )),
+                )
+            }
+        }
         val time = ZonedClock.UTC.zonedDateTime()
         val events = object: EventAccess by EventAccessStub {
             override val oldestEventTime: OngoingFlow<Instant?> = ongoingFlowOf(Instant.DISTANT_PAST)
@@ -439,7 +485,7 @@ class AwolDeviceReporterTest {
         val client = testClient.copy(
             eventAccess = events,
         )
-        AwolDeviceReporter(api, client).runCron(time.localDateTime, time.zone)
+        AwolDeviceReporter(apiSpy, client).runCron(time.localDateTime, time.zone)
 
         assertEquals(0, apiSpy.archivedPages.size)
         assertEquals(0, apiSpy.createdPages.size)
@@ -459,22 +505,30 @@ class AwolDeviceReporterTest {
                 } else null
             }
         }
-        val apiSpy = NotionApiSpy()
-        val api = apiSpy.withFakeQueryResponse(createPageResponse(
-            id = PageId("test-page-id"),
-            parent = DatabaseId("test-database"),
-            ref = "fake-sensor",
-            tags = listOf(MultiSelectOption(
-                id = "test-tag-id",
-                name = "Low Battery"
-            )),
-        ))
+        val apiSpy = object: NotionApiSpy() {
+            override suspend fun queryDatabase(
+                token: NotionBearerToken,
+                database: DatabaseId,
+                query: DatabaseQuery,
+            ): NotionResponse.ListResponse<Page> {
+                super.queryDatabase(token, database, query)
+                return createPageResponse(
+                    id = PageId("test-page-id"),
+                    parent = DatabaseId("test-database"),
+                    ref = "fake-sensor",
+                    tags = listOf(MultiSelectOption(
+                        id = "test-tag-id",
+                        name = "Low Battery"
+                    )),
+                )
+            }
+        }
 
         val client = testClient.copy(
             eventAccess = events,
         )
 
-        AwolDeviceReporter(api, client).runCron(time.localDateTime, time.zone)
+        AwolDeviceReporter(apiSpy, client).runCron(time.localDateTime, time.zone)
 
         assertEquals(0, apiSpy.archivedPages.size)
         assertEquals(0, apiSpy.createdPages.size)
@@ -509,7 +563,8 @@ class AwolDeviceReporterTest {
                         id = PropertyId("test-tags-property-id"),
                         multi_select = tags,
                     )
-                )
+                ),
+                url = "https://reneevandervelde.com/test"
             )
         )
     )

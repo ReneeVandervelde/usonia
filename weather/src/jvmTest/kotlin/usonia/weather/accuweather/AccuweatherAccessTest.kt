@@ -3,6 +3,7 @@ package usonia.weather.accuweather
 import com.inkapplications.coroutines.ongoing.OngoingFlow
 import com.inkapplications.coroutines.ongoing.collect
 import com.inkapplications.coroutines.ongoing.ongoingFlowOf
+import com.inkapplications.datetime.FixedClock
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.measure.us.inches
 import inkapplications.spondee.measure.us.toFahrenheit
@@ -99,10 +100,7 @@ class AccuweatherAccessTest {
     )
 
     private val now = Clock.System.now()
-
-    private val stubClock = object: Clock {
-        override fun now(): Instant = now
-    }
+    private val stubClock = FixedClock(now)
 
     @Test
     fun noConfig() = runTest {
@@ -242,7 +240,7 @@ class AccuweatherAccessTest {
 
         access.initialize(DummyManager)
         runCurrent()
-        fakeClock.current = fakeClock.current + 5.hours
+        fakeClock.current += 5.hours
         fakeApi.forecast = ForecastResponse(
             daily = listOf(
                 ForecastResponse.Daily(

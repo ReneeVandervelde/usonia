@@ -3,6 +3,7 @@ package usonia.rules.lights
 import com.inkapplications.coroutines.ongoing.OngoingFlow
 import com.inkapplications.coroutines.ongoing.asOngoing
 import com.inkapplications.coroutines.ongoing.ongoingFlowOf
+import com.inkapplications.datetime.FixedClock
 import com.inkapplications.datetime.atZone
 import inkapplications.spondee.scalar.percent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,13 +31,8 @@ class SleepModeTest {
         ))
     )
 
-    private val night = object: Clock {
-        override fun now(): Instant = LocalDateTime.parse("2020-01-02T23:00:00").atZone(TimeZone.UTC).instant
-    }
-
-    private val morning = object: Clock {
-        override fun now(): Instant = LocalDateTime.parse("2020-01-02T05:00:00").atZone(TimeZone.UTC).instant
-    }
+    private val night = FixedClock(LocalDateTime.parse("2020-01-02T23:00:00").atZone(TimeZone.UTC).instant)
+    private val morning = FixedClock(LocalDateTime.parse("2020-01-02T05:00:00").atZone(TimeZone.UTC).instant)
 
     @Test
     fun enabled() = runTest {
@@ -134,8 +130,7 @@ class SleepModeTest {
     @Test
     fun autoEnable() = runTest {
         val timeZone = TimeZone.UTC
-        val clock = object: Clock {
-            override fun now(): Instant = LocalDateTime(
+        val clock = FixedClock(LocalDateTime(
                 year = 2000,
                 monthNumber = 1,
                 dayOfMonth = 1,
@@ -144,7 +139,7 @@ class SleepModeTest {
                 second = 0,
                 nanosecond = 0,
             ).toInstant(timeZone)
-        }
+        )
         val spyConfig = object: ConfigurationAccessSpy() {
             override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
         }
@@ -177,8 +172,7 @@ class SleepModeTest {
     @Test
     fun autoEnableAfterMidnight() = runTest {
         val timeZone = TimeZone.UTC
-        val clock = object: Clock {
-            override fun now(): Instant = LocalDateTime(
+        val clock = FixedClock(LocalDateTime(
                 year = 2000,
                 monthNumber = 1,
                 dayOfMonth = 1,
@@ -187,7 +181,7 @@ class SleepModeTest {
                 second = 0,
                 nanosecond = 0,
             ).toInstant(timeZone)
-        }
+        )
         val spyConfig = object: ConfigurationAccessSpy() {
             override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
         }
@@ -220,8 +214,7 @@ class SleepModeTest {
     @Test
     fun skipEnableBeforeNight() = runTest {
         val timeZone = TimeZone.UTC
-        val clock = object: Clock {
-            override fun now(): Instant = LocalDateTime(
+        val clock = FixedClock(LocalDateTime(
                 year = 2000,
                 monthNumber = 1,
                 dayOfMonth = 1,
@@ -230,7 +223,7 @@ class SleepModeTest {
                 second = 0,
                 nanosecond = 0,
             ).toInstant(timeZone)
-        }
+        )
         val spyConfig = object: ConfigurationAccessSpy() {
             override val site: OngoingFlow<Site> = ongoingFlowOf(fakeSite)
         }

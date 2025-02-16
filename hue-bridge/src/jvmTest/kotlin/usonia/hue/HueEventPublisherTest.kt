@@ -2,6 +2,7 @@ package usonia.hue
 
 import com.inkapplications.coroutines.ongoing.OngoingFlow
 import com.inkapplications.coroutines.ongoing.ongoingFlowOf
+import com.inkapplications.datetime.FixedClock
 import inkapplications.shade.events.Events
 import inkapplications.shade.groupedlights.events.GroupedLightEvent
 import inkapplications.shade.lights.events.LightEvent
@@ -12,7 +13,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
@@ -71,9 +71,7 @@ class HueEventPublisherTest {
         )
     }
 
-    val clock = object: Clock {
-        override fun now(): Instant = Instant.fromEpochSeconds(42069)
-    }
+    val clock = FixedClock(Instant.fromEpochSeconds(42069))
 
     @Test
     fun publishSwitchState() = runTest {

@@ -2,6 +2,7 @@ package usonia.celestials
 
 import com.inkapplications.datetime.ZonedDateTime
 import com.inkapplications.datetime.atZone
+import com.inkapplications.datetime.toZonedDateTime
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -69,7 +70,7 @@ data class UpcomingCelestials(
 }
 
 val FakeUpcomingCelestials = UpcomingCelestials(
-    timestamp = Instant.DISTANT_PAST.toLocalDateTime(TimeZone.UTC).atZone(TimeZone.UTC),
+    timestamp = Instant.DISTANT_PAST.toZonedDateTime(TimeZone.UTC),
     today = FakeCelestials,
     tomorrow = FakeCelestials
 )

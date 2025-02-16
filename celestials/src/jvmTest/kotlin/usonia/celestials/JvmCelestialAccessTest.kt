@@ -2,6 +2,7 @@ package usonia.celestials
 
 import com.inkapplications.coroutines.ongoing.collect
 import com.inkapplications.coroutines.ongoing.ongoingFlowOf
+import com.inkapplications.datetime.FixedClock
 import com.inkapplications.datetime.ZonedClock
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
@@ -30,9 +31,7 @@ class JvmCelestialAccessTest
     @Test
     fun initialOutput()
     {
-        val clock = object: Clock {
-            override fun now(): Instant = KnownCelestials.FIRST_DATE.atTime(1, 0).toInstant(KnownCelestials.ZONE)
-        }
+        val clock = FixedClock(KnownCelestials.FIRST_DATE.atTime(1, 0).toInstant(KnownCelestials.ZONE))
         val celestialAccess = JvmCelestialAccess(
             usonia  = backendClient,
             clock = ZonedClock(clock, KnownCelestials.ZONE),
@@ -57,9 +56,7 @@ class JvmCelestialAccessTest
     @Test
     fun afterEventPass()
     {
-        val clock = object: Clock {
-            override fun now(): Instant = KnownCelestials.FIRST_DATE.atTime(0, 0).toInstant(KnownCelestials.ZONE)
-        }
+        val clock = FixedClock(KnownCelestials.FIRST_DATE.atTime(0, 0).toInstant(KnownCelestials.ZONE))
         val celestialAccess = JvmCelestialAccess(
             usonia  = backendClient,
             clock = ZonedClock(clock, KnownCelestials.ZONE),

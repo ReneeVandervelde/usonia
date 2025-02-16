@@ -4,6 +4,7 @@ import com.inkapplications.coroutines.ongoing.*
 import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.datetime.ZonedDateTime
 import com.inkapplications.datetime.atZone
+import com.inkapplications.datetime.toZonedDateTime
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator
 import com.luckycatlabs.sunrisesunset.dto.Location
 import kotlinx.coroutines.currentCoroutineContext
@@ -113,6 +114,6 @@ internal class JvmCelestialAccess(
      */
     private fun Calendar.toZonedDateTime(zone: KotlinTimeZone): ZonedDateTime
     {
-        return toInstant().toKotlinInstant().toLocalDateTime(zone).atZone(zone)
+        return toInstant().toKotlinInstant().toZonedDateTime(zone)
     }
 }

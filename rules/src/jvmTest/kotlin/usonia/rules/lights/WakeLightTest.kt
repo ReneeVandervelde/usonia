@@ -2,8 +2,8 @@ package usonia.rules.lights
 
 import com.inkapplications.coroutines.ongoing.OngoingFlow
 import com.inkapplications.coroutines.ongoing.ongoingFlowOf
+import com.inkapplications.datetime.FixedClock
 import com.inkapplications.datetime.atZone
-import inkapplications.spondee.scalar.decimalPercentage
 import inkapplications.spondee.scalar.toWholePercentage
 import inkapplications.spondee.structure.toDouble
 import inkapplications.spondee.structure.toInt
@@ -49,9 +49,7 @@ class WakeLightTest {
             )
         )
     }
-    private val dummyClock = object : Clock {
-        override fun now(): Instant = TODO()
-    }.atZone(TimeZone.UTC)
+    private val fakeClock = FixedClock(Instant.DISTANT_PAST).atZone(TimeZone.UTC)
 
     @Test
     fun beforeWake() {
@@ -63,7 +61,7 @@ class WakeLightTest {
                 actionAccess = actionAccess,
                 actionPublisher = actionPublisher,
                 celestialAccess = celestialAccess,
-                clock = dummyClock,
+                clock = fakeClock,
                 logger = EmptyLogger,
                 backgroundScope = backgroundScope,
             )
@@ -84,7 +82,7 @@ class WakeLightTest {
                 actionAccess = actionAccess,
                 actionPublisher = actionPublisher,
                 celestialAccess = celestialAccess,
-                clock = dummyClock,
+                clock = fakeClock,
                 logger = EmptyLogger,
                 backgroundScope = backgroundScope,
             )
@@ -111,7 +109,7 @@ class WakeLightTest {
                 actionAccess = actionAccess,
                 actionPublisher = actionPublisher,
                 celestialAccess = celestialAccess,
-                clock = dummyClock,
+                clock = fakeClock,
                 logger = EmptyLogger,
                 backgroundScope = backgroundScope,
             )
@@ -146,7 +144,7 @@ class WakeLightTest {
                 actionAccess = actionAccess,
                 actionPublisher = actionPublisher,
                 celestialAccess = celestialAccess,
-                clock = dummyClock,
+                clock = fakeClock,
                 logger = EmptyLogger,
                 backgroundScope = backgroundScope,
             )
@@ -173,7 +171,7 @@ class WakeLightTest {
                 actionAccess = actionAccess,
                 actionPublisher = actionPublisher,
                 celestialAccess = celestialAccess,
-                clock = dummyClock,
+                clock = fakeClock,
                 logger = EmptyLogger,
                 backgroundScope = backgroundScope,
             )
@@ -202,9 +200,7 @@ class WakeLightTest {
         val actionPublisher = ActionPublisherSpy()
 
         runTest {
-            val clock = object: Clock {
-                override fun now(): Instant = (sunrise.instant + 2.hours)
-            }.atZone(TimeZone.UTC)
+            val clock = FixedClock(sunrise.instant + 2.hours).atZone(TimeZone.UTC)
             val wakeLight = WakeLight(
                 configurationAccess = configuration,
                 actionAccess = actionAccess,
