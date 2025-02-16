@@ -49,6 +49,7 @@ class RulesPlugin(
         DimmingPhaseHandler,
         OnOffHandler,
     )
+    private val fanControl = FanControl(client, failureHandler, logger)
 
     private val wakeLight = WakeLight(client, client, client, celestialAccess, clock, logger)
 
@@ -64,7 +65,7 @@ class RulesPlugin(
         LockOnSecure(client, logger),
         LockAfterTime(client, logger),
         PipeMonitor(client, logger),
-        FanControl(client, failureHandler, logger),
+        fanControl,
         HeatControl(client, failureHandler, logger),
         PowerLimitCharge(client, logger),
         DoorAlert(client, logger),
@@ -78,5 +79,6 @@ class RulesPlugin(
         MorningPlantLight(client, weather, logger),
         SprinklerControl(client, weather, logger),
         wakeLight,
+        fanControl,
     )
 }
