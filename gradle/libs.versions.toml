@@ -9,6 +9,13 @@ glass = "0.17.1"
 sqldelight = "1.5.5"
 
 ##
+# Multitool Project builds
+##
+[libraries.multitool-notion]
+version = "SNAPSHOT"
+module = "com.reneevandervelde:notion-api"
+
+##
 # Kotlin Libraries
 ##
 

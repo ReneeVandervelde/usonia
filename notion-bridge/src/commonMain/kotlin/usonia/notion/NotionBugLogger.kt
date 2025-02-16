@@ -1,6 +1,19 @@
 package usonia.notion
 
 import com.inkapplications.coroutines.ongoing.*
+import com.reneevandervelde.notion.NotionApi
+import com.reneevandervelde.notion.NotionBearerToken
+import com.reneevandervelde.notion.Parent
+import com.reneevandervelde.notion.block.BlockArgument
+import com.reneevandervelde.notion.block.CodeLanguage
+import com.reneevandervelde.notion.block.RichTextArgument
+import com.reneevandervelde.notion.block.RichTextArgument.Text
+import com.reneevandervelde.notion.database.DatabaseId
+import com.reneevandervelde.notion.database.DatabaseQuery
+import com.reneevandervelde.notion.page.*
+import com.reneevandervelde.notion.property.MultiSelectArgument
+import com.reneevandervelde.notion.property.PropertyArgument
+import com.reneevandervelde.notion.property.SelectArgument
 import kimchi.logger.LogLevel
 import kimchi.logger.LogWriter
 import kotlinx.coroutines.channels.BufferOverflow
@@ -9,18 +22,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import regolith.processes.daemon.Daemon
 import usonia.core.state.findBridgeByServiceTag
-import usonia.notion.api.NotionApi
-import usonia.notion.api.structures.NotionBearerToken
-import usonia.notion.api.structures.Parent
-import usonia.notion.api.structures.block.BlockArgument
-import usonia.notion.api.structures.block.CodeLanguage
-import usonia.notion.api.structures.block.RichTextArgument.Text
-import usonia.notion.api.structures.database.DatabaseId
-import usonia.notion.api.structures.database.DatabaseQuery
-import usonia.notion.api.structures.page.*
-import usonia.notion.api.structures.property.MultiSelectArgument
-import usonia.notion.api.structures.property.PropertyArgument
-import usonia.notion.api.structures.property.SelectArgument
 import usonia.server.client.BackendClient
 
 internal class NotionBugLogger(
@@ -66,13 +67,13 @@ internal class NotionBugLogger(
                         ),
                         PageFilter.Status(
                             property = NotionConfig.Properties.STATUS,
-                            filter = FilterQuery.DoesNotEqual(
+                            filter = ValueFilter.DoesNotEqual(
                                 value = NotionConfig.PropertyValues.STATUS_DONE
                             )
                         ),
                         PageFilter.MultiSelect(
                             property = NotionConfig.Properties.TAGS,
-                            filter = FilterQuery.Contains(NotionConfig.Tags.BUG)
+                            filter = ValueFilter.Contains(NotionConfig.Tags.BUG)
                         )
                     )
                 )

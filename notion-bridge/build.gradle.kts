@@ -17,6 +17,7 @@ kotlin {
                 implementation(libs.ktor.serialization.json)
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.serialization)
+                implementation(libs.multitool.notion)
             }
         }
 

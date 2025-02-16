@@ -1,6 +1,6 @@
 package usonia.notion
 
-import usonia.notion.api.structures.property.PropertyName
+import com.reneevandervelde.notion.property.PropertyName
 
 internal object NotionConfig
 {
