@@ -2,6 +2,7 @@ package usonia.rules.lights
 
 import com.inkapplications.coroutines.ongoing.OngoingFlow
 import com.inkapplications.coroutines.ongoing.ongoingFlowOf
+import com.inkapplications.datetime.FixedClock
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.measure.us.inches
 import inkapplications.spondee.scalar.percent
@@ -19,9 +20,7 @@ import kotlin.time.Duration.Companion.minutes
 
 class DayModeTest {
     private val now = Instant.fromEpochMilliseconds(1234567)
-    private val fakeClock = object: Clock {
-        override fun now(): Instant = now
-    }
+    private val fakeClock = FixedClock(now)
     private val idealForecast = FullForecast(
         timestamp = now,
         sunrise = now - 2.hours,

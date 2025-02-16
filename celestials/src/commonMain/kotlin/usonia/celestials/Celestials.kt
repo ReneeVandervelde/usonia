@@ -2,6 +2,7 @@ package usonia.celestials
 
 import com.inkapplications.datetime.ZonedDateTime
 import com.inkapplications.datetime.atZone
+import com.inkapplications.datetime.toZonedDateTime
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -19,6 +20,6 @@ data class Celestials(
 }
 
 val FakeCelestials = Celestials(
-    daylight = Instant.DISTANT_PAST.toLocalDateTime(TimeZone.UTC).atZone(TimeZone.UTC)..Instant.DISTANT_FUTURE.toLocalDateTime(TimeZone.UTC).atZone(TimeZone.UTC),
-    civilTwilight = Instant.DISTANT_PAST.toLocalDateTime(TimeZone.UTC).atZone(TimeZone.UTC)..Instant.DISTANT_FUTURE.toLocalDateTime(TimeZone.UTC).atZone(TimeZone.UTC),
+    daylight = Instant.DISTANT_PAST.toZonedDateTime(TimeZone.UTC)..Instant.DISTANT_FUTURE.toZonedDateTime(TimeZone.UTC),
+    civilTwilight = Instant.DISTANT_PAST.toZonedDateTime(TimeZone.UTC)..Instant.DISTANT_FUTURE.toZonedDateTime(TimeZone.UTC),
 )
