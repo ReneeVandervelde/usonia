@@ -8,5 +8,5 @@ dependencies {
     api(libs.kotlin.coroutines.core)
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.websockets)
-    implementation("org.slf4j:slf4j-nop:2.0.16")
+    implementation("org.slf4j:slf4j-nop:2.0.17")
 }
