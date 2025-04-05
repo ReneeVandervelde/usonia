@@ -1,8 +1,6 @@
 package usonia.rules.greenhouse
 
-import com.inkapplications.coroutines.ongoing.combinePair
 import com.inkapplications.coroutines.ongoing.first
-import com.inkapplications.coroutines.ongoing.map
 import com.inkapplications.datetime.ZonedDateTime
 import com.inkapplications.datetime.atZone
 import inkapplications.spondee.measure.metric.kelvin
@@ -12,46 +10,38 @@ import kimchi.logger.KimchiLogger
 import kotlinx.datetime.*
 import regolith.processes.cron.CronJob
 import regolith.processes.cron.Schedule
+import usonia.celestials.CelestialAccess
+import usonia.core.state.findDevicesBy
 import usonia.core.state.publishAll
 import usonia.foundation.Action
 import usonia.foundation.Fixture
 import usonia.foundation.SwitchState
-import usonia.foundation.findDevicesBy
 import usonia.server.client.BackendClient
 import usonia.weather.FullForecast
-import usonia.weather.LocalWeatherAccess
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
 
 private val TARGET_LIGHT_TIME = 15.hours
 
-class MorningPlantLight(
+class PlantLight(
     private val client: BackendClient,
-    private val weatherAccess: LocalWeatherAccess,
+    private val celestials: CelestialAccess,
     private val logger: KimchiLogger = EmptyLogger,
 ): CronJob {
     override val schedule: Schedule = Schedule().withMinutes { it % 10 == 0 }
 
     override suspend fun runCron(time: LocalDateTime, zone: TimeZone) {
-        val (devices, forecast) = client.site
-            .map { it.findDevicesBy { it.fixture == Fixture.Plant } }
-            .combinePair(weatherAccess.forecast)
-            .first()
+        val devices = client.findDevicesBy { it.fixture == Fixture.Plant }
+        val today = celestials.localCelestials.first().today
 
-        // Fix for late forecast updates in the morning.
-        val sunrise = forecast.sunriseToday(time.atZone(zone))
-        val sunset = forecast.sunsetToday(time.atZone(zone))
-        val additionalTime = (TARGET_LIGHT_TIME - (sunset - sunrise)).takeIf { it > 0.hours } ?: 0.hours
-        val offset = 30.minutes
-        val onTime = sunrise - additionalTime + offset
-        val offTime = sunset + offset
-        val instant = time.toInstant(zone)
+        val onTime = today.daylight.endInclusive - TARGET_LIGHT_TIME
+        val offTime = today.daylight.endInclusive
+        val now = time.atZone(zone)
 
-        logger.trace("Sunrise is ${sunrise} onTime: $onTime offTime: $offTime")
+        logger.trace("Plant Light onTime: $onTime offTime: $offTime")
 
         when {
-            instant >= onTime && instant < offTime -> {
+            now >= onTime && now < offTime -> {
                 logger.trace("Turning on ${devices.size} Morning Plant Lights")
                 devices.map {
                     Action.ColorTemperatureChange(
@@ -62,7 +52,7 @@ class MorningPlantLight(
                     )
                 }.run { client.publishAll(this) }
             }
-            instant >= offTime -> {
+            now >= offTime -> {
                 logger.trace("Turning off ${devices.size} Morning Plant Lights")
                 devices.map {
                     Action.Switch(it.id, SwitchState.OFF)
