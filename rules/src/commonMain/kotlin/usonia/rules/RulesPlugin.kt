@@ -3,7 +3,6 @@ package usonia.rules
 import com.inkapplications.datetime.ZonedClock
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
-import kotlinx.coroutines.CoroutineScope
 import regolith.processes.cron.CronJob
 import regolith.processes.daemon.Daemon
 import usonia.celestials.CelestialAccess
@@ -14,7 +13,7 @@ import usonia.rules.alerts.WaterMonitor
 import usonia.rules.charging.PowerLimitCharge
 import usonia.rules.greenhouse.FanControl
 import usonia.rules.greenhouse.HeatControl
-import usonia.rules.greenhouse.MorningPlantLight
+import usonia.rules.greenhouse.PlantLight
 import usonia.rules.greenhouse.SprinklerControl
 import usonia.rules.indicator.Indicator
 import usonia.rules.lights.*
@@ -76,7 +75,7 @@ class RulesPlugin(
     )
 
     override val crons: List<CronJob> = listOf(
-        MorningPlantLight(client, weather, logger),
+        PlantLight(client, celestialAccess, logger),
         SprinklerControl(client, weather, logger),
         wakeLight,
         fanControl,
