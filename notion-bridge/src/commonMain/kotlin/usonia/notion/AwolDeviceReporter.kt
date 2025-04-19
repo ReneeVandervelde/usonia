@@ -73,7 +73,7 @@ internal class AwolDeviceReporter(
 
         val reports = runRetryable(
             strategy = RetryStrategy.Bracket(
-                attempts = 5,
+                attempts = 20,
                 timeouts = listOf(500.milliseconds, 5.seconds, 10.seconds)
             ),
             onError = { logger.error("Error querying notion database", it) }

@@ -29,6 +29,7 @@ import usonia.weather.FullForecast
 import usonia.weather.LocalWeatherAccess
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 private const val SERVICE = "accuweather"
@@ -50,8 +51,8 @@ internal class AccuweatherAccess(
     private val logger: KimchiLogger = EmptyLogger,
 ): LocalWeatherAccess, CronJob, Initializer {
     private val retryStrategy = RetryStrategy.Bracket(
-        attempts = 4,
-        timeouts = listOf(200.milliseconds, 1.seconds, 5.seconds),
+        attempts = 20,
+        timeouts = listOf(200.milliseconds, 1.seconds, 5.seconds, 1.minutes),
     )
     private val timeout = 60.seconds
     private val forecastFlow = MutableStateFlow(

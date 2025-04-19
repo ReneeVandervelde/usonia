@@ -5,8 +5,14 @@ import com.inkapplications.telegram.client.TelegramClientModule
 import com.inkapplications.telegram.structures.WebhookParameters
 import kimchi.logger.KimchiLogger
 import regolith.processes.daemon.Daemon
+import regolith.processes.daemon.DaemonRunAttempt
+import regolith.processes.daemon.FailureSignal
 import usonia.foundation.Site
+import usonia.kotlin.RetryStrategy
+import usonia.kotlin.runRetryable
 import usonia.server.client.BackendClient
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 private const val BOT_KEY = "bot"
 private const val BOT_TOKEN = "token"
@@ -20,11 +26,13 @@ internal class TelegramTokenUpdater(
 ): Daemon {
     private val clientModule = TelegramClientModule()
 
-    override suspend fun startDaemon(): Nothing {
+    override suspend fun startDaemon(): Nothing
+    {
         client.site.collectLatest(::onSiteUpdate)
     }
 
-    private suspend fun onSiteUpdate(site: Site) {
+    private suspend fun onSiteUpdate(site: Site)
+    {
         val bridge = site.bridges.singleOrNull { it.service == "telegram" } ?: run {
             logger.warn("Telegram not configured. Not enabling alerts.")
             return
@@ -45,10 +53,29 @@ internal class TelegramTokenUpdater(
             return
         }
 
-        proxy.delegate = clientModule.createClient("$bot:$token").also {
-            it.setWebhook(WebhookParameters(
-                url = callback,
-            ))
+        runRetryable(
+            attemptTimeout = 2.minutes,
+            strategy = RetryStrategy.Exponential(
+                attempts = 50,
+                initial = 10.seconds,
+                maximum = 10.minutes,
+            ),
+            onError = {
+                logger.warn("Failed to update telegram token.", it)
+            },
+        ) {
+            proxy.delegate = clientModule.createClient("$bot:$token").also {
+                it.setWebhook(
+                    WebhookParameters(
+                        url = callback,
+                    )
+                )
+            }
         }
+    }
+
+    override suspend fun onFailure(attempts: List<DaemonRunAttempt>): FailureSignal
+    {
+        return FailureSignal.Restart
     }
 }
