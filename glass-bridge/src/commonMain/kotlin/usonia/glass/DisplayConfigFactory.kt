@@ -162,7 +162,9 @@ internal class DisplayConfigFactory(
     private fun weatherRows(viewModel: DisplayViewModel): Array<out DisplayItem> {
         if (viewModel.config.type == Small) return emptyArray()
         return viewModel.expandedWeather.map { location ->
-            val weatherElementSpan = viewModel.totalSpan / location.forecasts.size
+            val weatherElementSpan = if (location.forecasts.isNotEmpty()) {
+                viewModel.totalSpan / location.forecasts.size
+            } else 0
             listOf(
                 TextElement(
                     text = location.name,
