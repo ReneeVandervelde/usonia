@@ -32,6 +32,7 @@ class TelegramBridgePlugin(
         EnableAlertsCommand(telegram, client),
         ArmCommand(telegram, client),
         DisarmCommand(telegram, client),
+        SprinkleCommand(telegram, client),
     )
     val allCommands = setOf(
         *baseCommands.toTypedArray(),
