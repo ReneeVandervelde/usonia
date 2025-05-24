@@ -17,6 +17,11 @@ internal class DayMode(
     private val weatherAccess: LocalWeatherAccess,
     private val clock: Clock = Clock.System,
 ): LightSettingsPicker {
+    /**
+     * Amount of time before/after sunrise/sunset to start turning lights on/off.
+     */
+    private val twilightBuffer = (1.5).hours
+
     override suspend fun getActiveSettings(room: Room): LightSettings {
         return when (room.type) {
             Room.Type.Bathroom,
@@ -37,12 +42,13 @@ internal class DayMode(
     private suspend fun handleRoom(): LightSettings {
         val forecast = weatherAccess.forecast.first()
         val conditions = weatherAccess.conditions.first()
+
         return when {
-            conditions.cloudCover > 60.percent -> LightSettings.Unhandled
+            conditions.cloudCover > 40.percent -> LightSettings.Unhandled
             forecast.rainChance > 10.percent -> LightSettings.Unhandled
             forecast.snowChance > 10.percent -> LightSettings.Unhandled
-            clock.now() < forecast.sunrise + 1.hours -> LightSettings.Unhandled
-            clock.now() > forecast.sunset - 1.hours -> LightSettings.Unhandled
+            clock.now() < forecast.sunrise + twilightBuffer -> LightSettings.Unhandled
+            clock.now() > forecast.sunset - twilightBuffer -> LightSettings.Unhandled
             else -> LightSettings.Ignore
         }
     }
