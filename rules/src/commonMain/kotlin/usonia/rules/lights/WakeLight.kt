@@ -93,7 +93,7 @@ class WakeLight(
         val earlyClamp = LocalDateTime(now.localDate, clamp.start).atZone(zone)
         val lateClamp = LocalDateTime(now.localDate, clamp.endInclusive).atZone(zone)
         val startTime = min(max(startWithOffset, earlyClamp), lateClamp)
-        val span = (celestials.today.daylight.start.instant + offset) - startWithOffset.instant
+        val span = (celestials.today.daylight.start.instant + offset) - startTime.instant
         val wakeLights = configurationAccess.getSite().findDevicesBy { it.fixture == Fixture.WakeLight }
 
         if (now < startTime) {
