@@ -51,6 +51,7 @@ class RulesPlugin(
     private val fanControl = FanControl(client, failureHandler, logger)
 
     private val wakeLight = WakeLight(client, client, client, celestialAccess, clock, logger)
+    private val sprinkler = SprinklerControl(client, weather, logger)
 
     override val daemons: List<Daemon> = listOf(
         LogErrorAlerts.also { it.client.value = client },
@@ -72,11 +73,12 @@ class RulesPlugin(
         DisarmOnPrimaryCode(client, logger),
         LockJammed(client, logger),
         wakeLight,
+        sprinkler,
     )
 
     override val crons: List<CronJob> = listOf(
         PlantLight(client, celestialAccess, logger),
-        SprinklerControl(client, weather, logger),
+        sprinkler,
         wakeLight,
         fanControl,
     )
