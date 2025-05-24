@@ -93,7 +93,7 @@ class WakeLight(
         val startWithOffset = celestials.today.civilTwilight.start + offset
         val earlyClamp = LocalDateTime(now.localDate, clamp.start).atZone(zone)
         val lateClamp = LocalDateTime(now.localDate, clamp.endInclusive).atZone(zone)
-        val startTime = min(max(startWithOffset, earlyClamp), lateClamp)
+        val startTime = minOf(maxOf(startWithOffset, earlyClamp), lateClamp)
         val span = ((celestials.today.daylight.start.instant + offset) - startTime.instant).coerceAtLeast(15.minutes)
         val wakeLights = configurationAccess.getSite().findDevicesBy { it.fixture == Fixture.WakeLight }
 
@@ -124,12 +124,4 @@ class WakeLight(
             ))
         }
     }
-
-    private fun max(a: ZonedDateTime, b: ZonedDateTime): ZonedDateTime {
-        return if (a > b) a else b
-    }
-
-    private fun min(a: ZonedDateTime, b: ZonedDateTime): ZonedDateTime {
-        return if (a < b) a else b
-        }
 }
