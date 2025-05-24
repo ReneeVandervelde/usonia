@@ -39,13 +39,15 @@ class WakeLightTest {
         )
     }
     private val actionAccess = ActionAccessFake()
-    private val sunrise = LocalDateTime(2025, 1, 2, 6, 0).atZone(TimeZone.UTC)
+    private val sunrise = LocalDateTime(2025, 1, 2, 7, 0).atZone(TimeZone.UTC)
+    private val celestials = FakeCelestials.copy(
+        civilTwilight = (sunrise - 1.hours)..(sunrise + 13.hours),
+        daylight = sunrise..(sunrise + 12.hours)
+    )
     private val celestialAccess = object : CelestialAccess {
         override val localCelestials = ongoingFlowOf(
             FakeUpcomingCelestials.copy(
-                today = FakeCelestials.copy(
-                    daylight = sunrise..(sunrise + 12.hours)
-                )
+                today = celestials
             )
         )
     }
@@ -66,7 +68,7 @@ class WakeLightTest {
                 backgroundScope = backgroundScope,
             )
 
-            wakeLight.runCron((sunrise.instant - 2.hours).toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
+            wakeLight.runCron((celestials.civilTwilight.start.instant + 25.minutes).toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
         }
 
         assertEquals(0, actionPublisher.actions.size, "No events should be published before wake time")
@@ -87,7 +89,7 @@ class WakeLightTest {
                 backgroundScope = backgroundScope,
             )
 
-            wakeLight.runCron((sunrise.instant - 1.hours).toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
+            wakeLight.runCron((celestials.civilTwilight.start.instant + 30.minutes).toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
         }
 
         assertEquals(1, actionPublisher.actions.size, "Light event should be published")
@@ -97,6 +99,88 @@ class WakeLightTest {
         assertEquals(SwitchState.ON, action.switchState)
         assertEquals(Colors.Warm.toInt(), action.temperature.toKelvin().toInt())
         assertEquals(1, action.level?.toWholePercentage()?.toInt())
+    }
+
+    @Test
+    fun earlyClamp() {
+        val actionPublisher = ActionPublisherSpy()
+        val sunrise = LocalDateTime(2025, 1, 2, 4, 0).atZone(TimeZone.UTC)
+        val celestials = FakeCelestials.copy(
+            civilTwilight = (sunrise - 1.hours)..(sunrise + 13.hours),
+            daylight = sunrise..(sunrise + 12.hours)
+        )
+        val celestialAccess = object : CelestialAccess {
+            override val localCelestials = ongoingFlowOf(
+                FakeUpcomingCelestials.copy(
+                    today = celestials
+                )
+            )
+        }
+
+        runTest {
+            val wakeLight = WakeLight(
+                configurationAccess = configuration,
+                actionAccess = actionAccess,
+                actionPublisher = actionPublisher,
+                celestialAccess = celestialAccess,
+                clock = fakeClock,
+                logger = EmptyLogger,
+                backgroundScope = backgroundScope,
+            )
+
+            wakeLight.runCron((celestials.civilTwilight.start.instant + 30.minutes).toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
+
+            assertEquals(0, actionPublisher.actions.size, "Light should not turn on before clamp time")
+
+            wakeLight.runCron(LocalDateTime(sunrise.localDate, LocalTime(5, 30)), TimeZone.UTC)
+
+            assertEquals(1, actionPublisher.actions.size, "Light turns on after clamp time")
+            val action = actionPublisher.actions.single()
+            assertTrue(action is Action.ColorTemperatureChange, "Action should be a color change")
+            assertEquals("test-wake-light", action.target.value)
+            assertEquals(SwitchState.ON, action.switchState)
+            assertEquals(Colors.Warm.toInt(), action.temperature.toKelvin().toInt())
+            assertEquals(1, action.level?.toWholePercentage()?.toInt())
+        }
+    }
+
+    @Test
+    fun lateClamp() {
+        val actionPublisher = ActionPublisherSpy()
+        val sunrise = LocalDateTime(2025, 1, 2, 9, 0).atZone(TimeZone.UTC)
+        val celestials = FakeCelestials.copy(
+            civilTwilight = (sunrise - 1.hours)..(sunrise + 13.hours),
+            daylight = sunrise..(sunrise + 12.hours)
+        )
+        val celestialAccess = object : CelestialAccess {
+            override val localCelestials = ongoingFlowOf(
+                FakeUpcomingCelestials.copy(
+                    today = celestials
+                )
+            )
+        }
+
+        runTest {
+            val wakeLight = WakeLight(
+                configurationAccess = configuration,
+                actionAccess = actionAccess,
+                actionPublisher = actionPublisher,
+                celestialAccess = celestialAccess,
+                clock = fakeClock,
+                logger = EmptyLogger,
+                backgroundScope = backgroundScope,
+            )
+
+            wakeLight.runCron(LocalDateTime(sunrise.localDate, LocalTime(7, 15)), TimeZone.UTC)
+
+            assertEquals(1, actionPublisher.actions.size, "Light turns on after late clamp time")
+            val action = actionPublisher.actions.single()
+            assertTrue(action is Action.ColorTemperatureChange, "Action should be a color change")
+            assertEquals("test-wake-light", action.target.value)
+            assertEquals(SwitchState.ON, action.switchState)
+            assertEquals(Colors.Warm.toInt(), action.temperature.toKelvin().toInt())
+            assertEquals(1, action.level?.toWholePercentage()?.toInt())
+        }
     }
 
     @Test
@@ -114,7 +198,7 @@ class WakeLightTest {
                 backgroundScope = backgroundScope,
             )
 
-            wakeLight.runCron((sunrise.instant - 1.hours + 20.minutes).toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
+            wakeLight.runCron((celestials.civilTwilight.start.instant + 50.minutes).toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
         }
 
         assertEquals(1, actionPublisher.actions.size, "Light event should be published")
@@ -149,7 +233,7 @@ class WakeLightTest {
                 backgroundScope = backgroundScope,
             )
 
-            wakeLight.runCron((sunrise.instant + 20.minutes).toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
+            wakeLight.runCron((sunrise.instant + 50.minutes).toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
         }
 
         assertEquals(1, actionPublisher.actions.size, "Light event should be published")
@@ -176,9 +260,9 @@ class WakeLightTest {
                 backgroundScope = backgroundScope,
             )
 
-            wakeLight.runCron((sunrise.instant + 2.hours).toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
-            assertEquals(2, actionPublisher.actions.size, "Light event should be published")
             wakeLight.runCron((sunrise.instant + 3.hours).toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
+            assertEquals(2, actionPublisher.actions.size, "Light event should be published")
+            wakeLight.runCron((sunrise.instant + 4.hours).toLocalDateTime(TimeZone.UTC), TimeZone.UTC)
             assertEquals(2, actionPublisher.actions.size, "No new events should be published after dismissing")
         }
 

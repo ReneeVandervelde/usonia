@@ -2,13 +2,10 @@ package usonia.rules.lights
 
 import com.inkapplications.coroutines.ongoing.*
 import com.inkapplications.datetime.ZonedClock
+import com.inkapplications.datetime.ZonedDateTime
 import com.inkapplications.datetime.atZone
-import inkapplications.spondee.measure.ColorTemperature
-import inkapplications.spondee.measure.metric.Kelvin
-import inkapplications.spondee.measure.metric.kelvin
 import inkapplications.spondee.scalar.decimalPercentage
 import inkapplications.spondee.scalar.percent
-import inkapplications.spondee.structure.toFloat
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -16,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import regolith.processes.cron.CronJob
 import regolith.processes.cron.Schedule
@@ -31,6 +29,7 @@ import usonia.kotlin.DefaultScope
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class WakeLight(
@@ -44,9 +43,9 @@ class WakeLight(
 ): CronJob, Daemon {
     override val schedule: Schedule = Schedule()
         .withMinutes { it % 5 == 0 }
-    private val buffer = 1.hours
-    private val span = 1.hours
     private val dismissAfter = 2.hours
+    private val clamp = LocalTime(5, 30)..LocalTime(7, 15)
+    private val offset = 30.minutes
     private val startColor = Colors.Warm
     private val endColor = Colors.Daylight
     private val lastDismissed = MutableStateFlow<LocalDate?>(null)
@@ -87,12 +86,14 @@ class WakeLight(
         lastDismissed.value = today
     }
 
-
     override suspend fun runCron(time: LocalDateTime, zone: TimeZone) {
         val now = time.atZone(zone)
         val celestials = celestialAccess.localCelestials.first()
-        val startTime = celestials.today.daylight.start - buffer
-        val endTime = startTime + span
+        val startWithOffset = celestials.today.civilTwilight.start + offset
+        val earlyClamp = LocalDateTime(now.localDate, clamp.start).atZone(zone)
+        val lateClamp = LocalDateTime(now.localDate, clamp.endInclusive).atZone(zone)
+        val startTime = min(max(startWithOffset, earlyClamp), lateClamp)
+        val span = (celestials.today.daylight.start.instant + offset) - startWithOffset.instant
         val wakeLights = configurationAccess.getSite().findDevicesBy { it.fixture == Fixture.WakeLight }
 
         if (now < startTime) {
@@ -103,7 +104,7 @@ class WakeLight(
             logger.trace("Wake light dismissed today, not running.")
             return
         }
-        if (now >= endTime + dismissAfter) {
+        if (now >= celestials.today.daylight.start + offset + dismissAfter) {
             logger.trace("After wake time, dismissing.")
             dismiss(now.localDate)
             return
@@ -122,4 +123,12 @@ class WakeLight(
             ))
         }
     }
+
+    private fun max(a: ZonedDateTime, b: ZonedDateTime): ZonedDateTime {
+        return if (a > b) a else b
+    }
+
+    private fun min(a: ZonedDateTime, b: ZonedDateTime): ZonedDateTime {
+        return if (a < b) a else b
+        }
 }
