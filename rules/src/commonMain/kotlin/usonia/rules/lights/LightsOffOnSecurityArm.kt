@@ -23,7 +23,7 @@ class LightsOffOnSecurityArm(
                             it.fixture == Fixture.Light && Action.Switch::class in it.capabilities.actions
                         }
                         .map {
-                            Action.Switch(it.id, SwitchState.ON)
+                            Action.Switch(it.id, SwitchState.OFF)
                         }
                         .run {
                             logger.info("Turning off ${size} lights for security arm.")
