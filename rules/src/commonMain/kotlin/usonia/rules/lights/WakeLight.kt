@@ -28,6 +28,7 @@ import usonia.foundation.unit.interpolate
 import usonia.kotlin.DefaultScope
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -93,7 +94,7 @@ class WakeLight(
         val earlyClamp = LocalDateTime(now.localDate, clamp.start).atZone(zone)
         val lateClamp = LocalDateTime(now.localDate, clamp.endInclusive).atZone(zone)
         val startTime = min(max(startWithOffset, earlyClamp), lateClamp)
-        val span = (celestials.today.daylight.start.instant + offset) - startTime.instant
+        val span = max(15.minutes, (celestials.today.daylight.start.instant + offset) - startTime.instant)
         val wakeLights = configurationAccess.getSite().findDevicesBy { it.fixture == Fixture.WakeLight }
 
         if (now < startTime) {
@@ -122,6 +123,10 @@ class WakeLight(
                 level = currentBrightness,
             ))
         }
+    }
+
+    private fun max(a: Duration, b: Duration): Duration {
+        return if (a > b) a else b
     }
 
     private fun max(a: ZonedDateTime, b: ZonedDateTime): ZonedDateTime {
