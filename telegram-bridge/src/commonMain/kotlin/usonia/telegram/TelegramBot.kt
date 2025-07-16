@@ -1,6 +1,7 @@
 package usonia.telegram
 
 import com.inkapplications.telegram.client.TelegramBotClient
+import com.inkapplications.telegram.structures.ChatType.Companion.Private
 import com.inkapplications.telegram.structures.MessageEntityType
 import com.inkapplications.telegram.structures.Update
 import kimchi.logger.KimchiLogger
@@ -33,6 +34,11 @@ internal class TelegramBot(
     override suspend fun getResponse(data: Update, request: HttpRequest): RestResponse<Status> {
         if (data !is Update.MessageUpdate) {
             logger.warn("Ignoring unhandled update type: ${data::class.simpleName}")
+            return RestResponse(Statuses.SUCCESS)
+        }
+
+        if (data.message.chat.type != Private) {
+            logger.warn("Ignoring message from non-private chat: ${data.message.chat.type}")
             return RestResponse(Statuses.SUCCESS)
         }
 
