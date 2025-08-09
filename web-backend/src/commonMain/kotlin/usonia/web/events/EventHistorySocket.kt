@@ -5,9 +5,8 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import usonia.foundation.EventSerializer
 import usonia.foundation.Identifier
 import usonia.server.client.BackendClient
 import usonia.server.http.WebSocketController
@@ -34,7 +33,7 @@ internal class EventHistorySocket(
         val count = parameters["count"]?.firstOrNull()?.toIntOrNull()
 
         client.deviceEventHistory(deviceId, count).collectLatest {
-            output.send(json.encodeToString(ListSerializer(EventSerializer), it))
+            output.send(json.encodeToString(it))
         }
     }
 }

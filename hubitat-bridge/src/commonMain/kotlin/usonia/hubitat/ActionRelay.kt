@@ -104,7 +104,7 @@ internal class ActionRelay(
                         this.parameters.append("access_token", token)
                     }
                     contentType(ContentType.Application.Json)
-                    setBody(json.encodeToString(ActionSerializer, action.withTarget(parent.id)))
+                    setBody(json.encodeToString(action.withTarget(parent.id)))
                 }
             }.throwCancels()
 

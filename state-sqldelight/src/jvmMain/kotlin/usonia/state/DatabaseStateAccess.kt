@@ -157,7 +157,7 @@ internal class DatabaseStateAccess(
             }
             .asFlow()
             .mapToList()
-            .mapItemsCatching { json.decodeFromString(EventSerializer, String(it)) as Event.Temperature }
+            .mapItemsCatching { json.decodeFromString(String(it)) as Event.Temperature }
             .onItemFailure { logger.warn("Failed to deserialize temperature event", it) }
             .filterItemSuccess()
             .map {
@@ -175,7 +175,7 @@ internal class DatabaseStateAccess(
         return eventQueries.value.eventsBySource(setOf(id.value), size?.toLong() ?: DEFAULT_COLLECTION_SIZE)
             .asFlow()
             .mapToList()
-            .mapItemsCatching { json.decodeFromString(EventSerializer, String(it)) }
+            .mapItemsCatching { json.decodeFromString<Event>(String(it)) }
             .onItemFailure { logger.warn("Failed to deserialize event", it) }
             .filterItemSuccess()
             .map { it.toList() }
@@ -194,7 +194,7 @@ internal class DatabaseStateAccess(
         return eventQueries.value.eventsBySource(setOf(id.value), 1)
             .asFlow()
             .mapToOneOrNull()
-            .map { it?.let { json.decodeFromString(EventSerializer, String(it)) } }
+            .map { it?.let { json.decodeFromString<Event>(String(it)) } }
             .filterNotNull()
             .asOngoing()
     }

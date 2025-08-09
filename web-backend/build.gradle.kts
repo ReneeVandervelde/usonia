@@ -10,6 +10,7 @@ kotlin {
                 api(projects.server)
                 api(projects.serialization)
                 api(libs.kimchi.logger)
+                implementation(libs.kotlin.reflect)
             }
         }
     }

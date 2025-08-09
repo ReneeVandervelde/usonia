@@ -4,7 +4,6 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.json.Json
 import usonia.foundation.Event
-import usonia.foundation.EventSerializer
 import usonia.foundation.Status
 import usonia.foundation.Statuses
 import usonia.server.client.BackendClient
@@ -23,7 +22,7 @@ internal class EventHttpPublisher(
 ): RestController<Event, Status>(json, logger) {
     override val method: String = "POST"
     override val path: String = "/events"
-    override val deserializer = EventSerializer
+    override val deserializer = Event.serializer()
     override val serializer = Status.serializer()
 
     override suspend fun requiresAuthorization(data: Event, request: HttpRequest): Boolean {

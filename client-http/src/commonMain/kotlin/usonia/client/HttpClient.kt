@@ -121,7 +121,7 @@ class HttpClient(
             incoming.consumeEach {
                 if (it !is Frame.Text) return@consumeEach
                 try {
-                    emit(json.decodeFromString(EventSerializer, it.readText()))
+                    emit(json.decodeFromString(it.readText()))
                 } catch (error: Throwable) {
                     logger.error("Failed to deserialize Event", error)
                 }
@@ -280,7 +280,7 @@ class HttpClient(
         val response = httpClient.get(request)
 
         return when (response.status) {
-            HttpStatusCode.OK -> response.bodyAsText().let { json.decodeFromString(EventSerializer, it) as T }
+            HttpStatusCode.OK -> response.bodyAsText().let { json.decodeFromString<Event>(it) as T }
             HttpStatusCode.NotFound -> null
             else -> throw RuntimeException("Unexpected Status: ${response.status}")
         }
@@ -328,7 +328,7 @@ class HttpClient(
                     if (it !is Frame.Text) return@consumeEach
 
                     try {
-                        emit(json.decodeFromString(EventSerializer, it.readText()))
+                        emit(json.decodeFromString(it.readText()))
                     } catch (error: Throwable) {
                         logger.error("Failed to deserialize device event", error)
                     }
@@ -352,7 +352,7 @@ class HttpClient(
                     if (it !is Frame.Text) return@consumeEach
 
                     try {
-                        emit(json.decodeFromString(ListSerializer(EventSerializer), it.readText()))
+                        emit(json.decodeFromString(it.readText()))
                     } catch (error: Throwable) {
                         logger.error("Failed to deserialize device event", error)
                     }
@@ -391,7 +391,7 @@ class HttpClient(
             path = "/actions",
         ).apply {
             accept(ContentType.Application.Json)
-            val data = json.encodeToString(ActionSerializer, action)
+            val data = json.encodeToString(action)
             setBody(data)
             withAuthHeaders(data)
         }
@@ -406,7 +406,7 @@ class HttpClient(
             path = "/events",
         ).apply {
             accept(ContentType.Application.Json)
-            val data = json.encodeToString(EventSerializer, event)
+            val data = json.encodeToString(event)
             setBody(data)
             withAuthHeaders(data)
         }

@@ -5,8 +5,8 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import usonia.foundation.EventSerializer
 import usonia.foundation.Identifier
 import usonia.server.client.BackendClient
 import usonia.server.http.WebSocketController
@@ -35,7 +35,7 @@ internal class LatestEventSocket(
             }
 
         client.getLatestEvent(deviceId).collectLatest {
-            output.send(json.encodeToString(EventSerializer, it))
+            output.send(json.encodeToString(it))
         }
     }
 }

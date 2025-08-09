@@ -35,10 +35,10 @@ class DeviceSerializer(
                 null -> Capabilities(
                     archetypeId = null,
                     actions = device.actionTypes.orEmpty().mapSet { action ->
-                        Action.subClasses.singleOrThrow("No Action of type $action") { it.simpleName == action }
+                        Action::class.sealedSubclasses.singleOrThrow("No Action of type $action") { it.simpleName == action }
                     },
                     events = device.eventTypes.orEmpty().mapSet { event ->
-                        Event.subClasses.singleOrThrow("No event of type: $event") { it.simpleName == event }
+                        Event::class.sealedSubclasses.singleOrThrow("No event of type: $event") { it.simpleName == event }
                     },
                     heartbeat = device.heartbeat?.milliseconds,
                 )

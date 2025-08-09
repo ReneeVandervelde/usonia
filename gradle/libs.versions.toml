@@ -23,6 +23,10 @@ module = "com.reneevandervelde:notion-api"
 version.ref = "kotlin"
 module = "org.jetbrains.kotlin:kotlin-gradle-plugin"
 
+[libraries.kotlin-reflect]
+version.ref = "kotlin"
+module = "org.jetbrains.kotlin:kotlin-reflect"
+
 [libraries.kotlin-test-core]
 version.ref = "kotlin"
 module = "org.jetbrains.kotlin:kotlin-test"
