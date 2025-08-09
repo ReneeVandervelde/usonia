@@ -3,7 +3,6 @@ package usonia.web.events
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import usonia.foundation.Event
-import usonia.foundation.EventSerializer
 import usonia.foundation.Identifier
 import usonia.foundation.Statuses
 import usonia.server.client.BackendClient
@@ -43,7 +42,7 @@ class LatestEventController(
         )
 
         return HttpResponse(
-            body = json.encodeToString(EventSerializer, event)
+            body = json.encodeToString(event)
         )
     }
 }

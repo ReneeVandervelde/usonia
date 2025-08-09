@@ -25,7 +25,7 @@ internal class EventBridgeHttpPublisher(
 ): RestController<Event, Status>(json, logger) {
     override val method: String = "POST"
     override val path: String = "/bridges/{$BRIDGE_PARAM}/events"
-    override val deserializer = EventSerializer
+    override val deserializer = Event.serializer()
     override val serializer = Status.serializer()
     override suspend fun requiresAuthorization(data: Event, request: HttpRequest): Boolean {
         return data.isSensitive
