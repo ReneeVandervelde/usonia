@@ -12,19 +12,7 @@ import inkapplications.spondee.measure.Power as PowerUnit
 @Serializable
 sealed class Event {
     companion object Metadata {
-        val subClasses = setOf(
-            Motion::class,
-            Switch::class,
-            Temperature::class,
-            Humidity::class,
-            Lock::class,
-            Water::class,
-            Latch::class,
-            Presence::class,
-            Battery::class,
-            Tilt::class,
-            Movement::class,
-        )
+        val subClasses = Event::class.sealedSubclasses.toSet()
     }
 
     /**

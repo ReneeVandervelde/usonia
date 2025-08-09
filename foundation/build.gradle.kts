@@ -9,6 +9,7 @@ kotlin {
             dependencies {
                 api("com.github.ajalt.colormath:colormath:3.6.1")
                 api(projects.kotlinExtensions)
+                implementation(libs.kotlin.reflect)
                 api(libs.kotlin.datetime)
                 api(libs.kimchi.logger)
                 implementation(libs.kotlin.serialization.json)
