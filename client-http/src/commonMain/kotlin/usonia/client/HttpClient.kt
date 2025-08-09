@@ -391,7 +391,7 @@ class HttpClient(
             path = "/actions",
         ).apply {
             accept(ContentType.Application.Json)
-            val data = json.encodeToString(ActionSerializer, action)
+            val data = json.encodeToString(action)
             setBody(data)
             withAuthHeaders(data)
         }

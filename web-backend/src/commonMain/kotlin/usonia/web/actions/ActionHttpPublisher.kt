@@ -4,7 +4,6 @@ import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.serialization.json.Json
 import usonia.foundation.Action
-import usonia.foundation.ActionSerializer
 import usonia.foundation.Status
 import usonia.foundation.Statuses
 import usonia.server.client.BackendClient
@@ -20,7 +19,7 @@ internal class ActionHttpPublisher(
     json: Json = Json,
     logger: KimchiLogger = EmptyLogger
 ): RestController<Action, Status>(json, logger) {
-    override val deserializer = ActionSerializer
+    override val deserializer = Action.serializer()
     override val serializer = Status.serializer()
     override val method: String = "POST"
     override val path: String = "/actions"

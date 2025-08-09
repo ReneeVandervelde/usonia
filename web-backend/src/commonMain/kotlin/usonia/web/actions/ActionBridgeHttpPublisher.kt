@@ -23,7 +23,7 @@ internal class ActionBridgeHttpPublisher(
 ): RestController<Action, Status>(json, logger) {
     override val path: String = "/bridges/{$BRIDGE_PARAM}/actions"
     override val method: String = "POST"
-    override val deserializer = ActionSerializer
+    override val deserializer = Action.serializer()
     override val serializer = Status.serializer()
 
     override suspend fun getResponse(data: Action, request: HttpRequest): RestResponse<Status> {
