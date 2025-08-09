@@ -10,11 +10,8 @@ import inkapplications.spondee.measure.Power as PowerUnit
  * State changes that have already happened.
  */
 @Serializable
-sealed class Event {
-    companion object Metadata {
-        val subClasses = Event::class.sealedSubclasses.toSet()
-    }
-
+sealed class Event
+{
     /**
      * The device that was affected by this event.
      */

@@ -27,7 +27,7 @@ class LatestEventController(
         val type = request.parameters["type"]
             ?.firstOrNull()
             ?.let { type ->
-                Event.subClasses.find { it.simpleName == type } ?: return HttpResponse(
+                Event::class.sealedSubclasses.find { it.simpleName == type } ?: return HttpResponse(
                     body = Statuses.illegalArgument("type").let(json::encodeToString),
                     status = 400,
                 )
