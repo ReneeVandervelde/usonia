@@ -15,19 +15,8 @@ import kotlinx.serialization.encoding.Encoder
 /**
  * Instructions for devices to do something or change state.
  */
-sealed class Action {
-    companion object Metadata {
-        val subClasses = setOf(
-            Switch::class,
-            Dim::class,
-            ColorTemperatureChange::class,
-            ColorChange::class,
-            Lock::class,
-            Intent::class,
-            Alert::class,
-        )
-    }
-
+sealed class Action
+{
     /**
      * The device intended to receive the action.
      */
