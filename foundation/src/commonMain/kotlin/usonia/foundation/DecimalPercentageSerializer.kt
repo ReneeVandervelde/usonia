@@ -11,7 +11,7 @@ import kotlinx.serialization.encoding.Encoder
 
 class DecimalPercentageSerializer: KSerializer<Percentage>
 {
-    override val descriptor: SerialDescriptor = Float.Companion.serializer().descriptor
+    override val descriptor: SerialDescriptor = Float.serializer().descriptor
 
     override fun deserialize(decoder: Decoder): Percentage
     {

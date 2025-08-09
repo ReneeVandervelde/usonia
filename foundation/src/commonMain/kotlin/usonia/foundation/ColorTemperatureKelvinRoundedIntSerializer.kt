@@ -11,7 +11,7 @@ import kotlinx.serialization.encoding.Encoder
 
 class ColorTemperatureKelvinRoundedIntSerializer: KSerializer<ColorTemperature>
 {
-    override val descriptor: SerialDescriptor = Int.Companion.serializer().descriptor
+    override val descriptor: SerialDescriptor = Int.serializer().descriptor
 
     override fun deserialize(decoder: Decoder): ColorTemperature
     {
