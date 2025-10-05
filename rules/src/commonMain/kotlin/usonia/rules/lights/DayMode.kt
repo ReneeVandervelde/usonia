@@ -1,11 +1,14 @@
 package usonia.rules.lights
 
 import com.inkapplications.coroutines.ongoing.first
+import com.inkapplications.datetime.ZonedClock
 import inkapplications.spondee.scalar.percent
-import kotlinx.datetime.Clock
+import usonia.celestials.CelestialAccess
 import usonia.foundation.Room
 import usonia.foundation.unit.compareTo
 import usonia.weather.LocalWeatherAccess
+import usonia.weather.getLatestConditions
+import usonia.weather.getLatestForecast
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
 
@@ -15,7 +18,8 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 internal class DayMode(
     private val weatherAccess: LocalWeatherAccess,
-    private val clock: Clock = Clock.System,
+    private val celestialsAccess: CelestialAccess,
+    private val clock: ZonedClock = ZonedClock.System,
 ): LightSettingsPicker {
     /**
      * Amount of time before/after sunrise/sunset to start turning lights on/off.
@@ -40,15 +44,19 @@ internal class DayMode(
     }
 
     private suspend fun handleRoom(): LightSettings {
-        val forecast = weatherAccess.forecast.first()
-        val conditions = weatherAccess.conditions.first()
+        val forecast = weatherAccess.getLatestForecast()
+        val conditions = weatherAccess.getLatestConditions()
+        val celestials = celestialsAccess.localCelestials.first().today
+        val currentCloudCover = conditions?.cloudCover
+        val currentRainChance = forecast?.rainChance
+        val currentSnowChance = forecast?.snowChance
 
         return when {
-            conditions.cloudCover > 40.percent -> LightSettings.Unhandled
-            forecast.rainChance > 10.percent -> LightSettings.Unhandled
-            forecast.snowChance > 10.percent -> LightSettings.Unhandled
-            clock.now() < forecast.sunrise + twilightBuffer -> LightSettings.Unhandled
-            clock.now() > forecast.sunset - twilightBuffer -> LightSettings.Unhandled
+            currentCloudCover == null || currentCloudCover > 40.percent -> LightSettings.Unhandled
+            currentRainChance != null && currentRainChance > 10.percent -> LightSettings.Unhandled
+            currentSnowChance != null && currentSnowChance > 10.percent -> LightSettings.Unhandled
+            clock.zonedDateTime() < celestials.daylight.start + twilightBuffer -> LightSettings.Unhandled
+            clock.zonedDateTime() > celestials.daylight.endInclusive - twilightBuffer -> LightSettings.Unhandled
             else -> LightSettings.Ignore
         }
     }

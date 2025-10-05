@@ -9,8 +9,6 @@ import kotlinx.datetime.Instant
  */
 data class FullForecast(
     val timestamp: Instant,
-    val sunrise: Instant,
-    val sunset: Instant,
     val rainChance: Percentage,
     val snowChance: Percentage,
     val highTemperature: Temperature,

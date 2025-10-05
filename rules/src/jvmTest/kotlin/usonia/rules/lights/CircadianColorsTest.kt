@@ -4,6 +4,7 @@ import com.inkapplications.coroutines.ongoing.OngoingFlow
 import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import com.inkapplications.datetime.FixedClock
 import com.inkapplications.datetime.atZone
+import com.inkapplications.datetime.toZonedDateTime
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.scalar.percent
 import inkapplications.spondee.scalar.toWholePercentage
@@ -11,6 +12,9 @@ import inkapplications.spondee.structure.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.*
+import usonia.celestials.CelestialAccess
+import usonia.celestials.Celestials
+import usonia.celestials.UpcomingCelestials
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.FakeRooms
@@ -31,23 +35,24 @@ import kotlin.time.ExperimentalTime
 class CircadianColorsTest {
     private val startOfDay = LocalDateTime(0, 1, 1, 0, 0, 0)
         .toInstant(TimeZone.UTC)
-    private val sunrise = startOfDay.plus(7.hours)
-    private val sunset = startOfDay.plus(18.hours)
+    private val sunrise = startOfDay.plus(7.hours).toZonedDateTime(TimeZone.UTC)
+    private val sunset = startOfDay.plus(18.hours).toZonedDateTime(TimeZone.UTC)
     private val nightStart = startOfDay.plus(DEFAULT_NIGHT_START.minutes)
 
-    val weather = object: LocalWeatherAccess {
-        override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(FullForecast(
-            timestamp = Instant.DISTANT_PAST,
-            sunrise = sunrise,
-            sunset = sunset,
-            rainChance = 0.percent,
-            snowChance = 0.percent,
-            highTemperature = 0.fahrenheit,
-            lowTemperature = 0.fahrenheit,
-        ))
-        override val conditions: OngoingFlow<Conditions> get() = TODO()
-        override val currentConditions: Conditions get() = TODO()
-        override val currentForecast: FullForecast get() = TODO()
+    val celestialAccess = object: CelestialAccess {
+        override val localCelestials: OngoingFlow<UpcomingCelestials> = ongoingFlowOf(
+            UpcomingCelestials(
+                timestamp = Instant.DISTANT_PAST.toZonedDateTime(TimeZone.UTC),
+                today = Celestials(
+                    daylight = sunrise..sunset,
+                    civilTwilight = sunrise.minus(20.minutes)..sunrise.plus(20.minutes),
+                ),
+                tomorrow = Celestials(
+                    daylight = sunrise.plus(1.days)..sunset.plus(1.days),
+                    civilTwilight = sunrise.plus(1.days).minus(20.minutes)..sunrise.plus(1.days).plus(20.minutes),
+                )
+            )
+        )
     }
 
     val config = object: ConfigurationAccess by ConfigurationAccessStub {
@@ -56,8 +61,8 @@ class CircadianColorsTest {
 
     @Test
     fun afterMidnight() = runTest {
-        val clock = FixedClock(sunrise.minus(DEFAULT_PERIOD).minus(2.minutes))
-        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
+        val clock = FixedClock(sunrise.instant.minus(DEFAULT_PERIOD).minus(2.minutes))
+        val colors = CircadianColors(config, celestialAccess, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -69,21 +74,7 @@ class CircadianColorsTest {
     @Test
     fun staleForecast() = runTest {
         val clock = FixedClock(startOfDay.plus(1.days))
-        val weather = object: LocalWeatherAccess {
-            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(FullForecast(
-                timestamp = Instant.DISTANT_PAST,
-                sunrise = sunrise,
-                sunset = sunset,
-                rainChance = 0.percent,
-                snowChance = 0.percent,
-                highTemperature = 0.fahrenheit,
-                lowTemperature = 0.fahrenheit,
-            ))
-            override val conditions: OngoingFlow<Conditions> get() = TODO()
-            override val currentConditions: Conditions get() = TODO()
-            override val currentForecast: FullForecast get() = TODO()
-        }
-        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
+        val colors = CircadianColors(config, celestialAccess, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -95,8 +86,8 @@ class CircadianColorsTest {
 
     @Test
     fun morningBlueHour() = runTest {
-        val clock = FixedClock(sunrise.minus(DEFAULT_PERIOD / 4))
-        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
+        val clock = FixedClock(sunrise.instant.minus(DEFAULT_PERIOD / 4))
+        val colors = CircadianColors(config, celestialAccess, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -112,8 +103,8 @@ class CircadianColorsTest {
 
     @Test
     fun dawn() = runTest {
-        val clock = FixedClock(sunrise)
-        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
+        val clock = FixedClock(sunrise.instant)
+        val colors = CircadianColors(config, celestialAccess, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -124,8 +115,8 @@ class CircadianColorsTest {
 
     @Test
     fun day() = runTest {
-        val clock = FixedClock(sunrise + 2.minutes)
-        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
+        val clock = FixedClock(sunrise.instant + 2.minutes)
+        val colors = CircadianColors(config, celestialAccess, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -136,8 +127,8 @@ class CircadianColorsTest {
 
     @Test
     fun sunset() = runTest {
-        val clock = FixedClock(sunset)
-        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
+        val clock = FixedClock(sunset.instant)
+        val colors = CircadianColors(config, celestialAccess, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -148,8 +139,8 @@ class CircadianColorsTest {
 
     @Test
     fun evening() = runTest {
-        val clock = FixedClock(sunset + DEFAULT_PERIOD)
-        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
+        val clock = FixedClock(sunset.instant + DEFAULT_PERIOD)
+        val colors = CircadianColors(config, celestialAccess, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -161,7 +152,7 @@ class CircadianColorsTest {
     @Test
     fun twilight() = runTest {
         val clock = FixedClock(nightStart.plus(DEFAULT_PERIOD / 4))
-        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
+        val colors = CircadianColors(config, celestialAccess, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -178,7 +169,7 @@ class CircadianColorsTest {
     @Test
     fun twilightExempt() = runTest {
         val clock = FixedClock(nightStart.plus(DEFAULT_PERIOD / 4))
-        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
+        val colors = CircadianColors(config, celestialAccess, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.Office)
 
@@ -190,7 +181,7 @@ class CircadianColorsTest {
     @Test
     fun night() = runTest {
         val clock = FixedClock(nightStart + DEFAULT_PERIOD +2.minutes)
-        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
+        val colors = CircadianColors(config, celestialAccess, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 
@@ -202,7 +193,7 @@ class CircadianColorsTest {
     @Test
     fun nightExempt() = runTest {
         val clock = FixedClock(nightStart + DEFAULT_PERIOD + 2.minutes)
-        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
+        val colors = CircadianColors(config, celestialAccess, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.Office)
 
@@ -213,22 +204,23 @@ class CircadianColorsTest {
 
     @Test
     fun overlapStart() = runTest {
-        val weather = object: LocalWeatherAccess {
-            override val forecast: OngoingFlow<FullForecast> = ongoingFlowOf(FullForecast(
-                timestamp = Instant.DISTANT_PAST,
-                sunrise = sunrise,
-                sunset = nightStart,
-                rainChance = 0.percent,
-                snowChance = 0.percent,
-                highTemperature = 0.fahrenheit,
-                lowTemperature = 0.fahrenheit,
-            ))
-            override val conditions: OngoingFlow<Conditions> get() = TODO()
-            override val currentConditions: Conditions get() = TODO()
-            override val currentForecast: FullForecast get() = TODO()
+        val celestialAccess = object: CelestialAccess {
+            override val localCelestials: OngoingFlow<UpcomingCelestials> = ongoingFlowOf(
+                UpcomingCelestials(
+                    timestamp = Instant.DISTANT_PAST.toZonedDateTime(TimeZone.UTC),
+                    today = Celestials(
+                        daylight = sunrise..nightStart.toZonedDateTime(TimeZone.UTC),
+                        civilTwilight = sunrise.minus(20.minutes)..sunrise.plus(20.minutes),
+                    ),
+                    tomorrow = Celestials(
+                        daylight = sunrise.plus(1.days)..nightStart.toZonedDateTime(TimeZone.UTC).plus(1.days),
+                        civilTwilight = sunrise.plus(1.days).minus(20.minutes)..sunrise.plus(1.days).plus(20.minutes),
+                    )
+                )
+            )
         }
         val clock = FixedClock(nightStart)
-        val colors = CircadianColors(config, weather, clock.atZone(TimeZone.UTC))
+        val colors = CircadianColors(config, celestialAccess, clock.atZone(TimeZone.UTC))
 
         val result = colors.getActiveSettings(FakeRooms.LivingRoom)
 

@@ -7,6 +7,6 @@ interface LocationWeatherAccess {
     suspend fun getWeatherForLocation(
         location: GeoCoordinates,
         date: LocalDate,
-        daytime: Boolean = true,
+        type: ForecastType = ForecastType.FullDay,
     ): Forecast?
 }

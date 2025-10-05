@@ -5,7 +5,7 @@ import com.inkapplications.glassconsole.structures.pin.Nonce
 import usonia.core.client.DeviceProperty
 import usonia.foundation.Event
 import usonia.weather.Conditions
-import usonia.weather.FullForecast
+import usonia.weather.Forecast
 
 internal data class DisplayViewModel(
     val config: GlassPluginConfig,
@@ -32,7 +32,7 @@ internal data class DisplayViewModel(
     )
 
     data class WeatherInfo(
-        val forecast: FullForecast,
-        val conditions: Conditions,
+        val forecast: Forecast?,
+        val conditions: Conditions?,
     )
 }

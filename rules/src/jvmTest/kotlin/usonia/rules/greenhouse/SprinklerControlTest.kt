@@ -17,6 +17,7 @@ import usonia.foundation.*
 import usonia.server.DummyClient
 import usonia.weather.Conditions
 import usonia.weather.FixedWeather
+import usonia.weather.Forecast
 import usonia.weather.FullForecast
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -27,18 +28,17 @@ class SprinklerControlTest {
     private val baseConditions = Conditions(
         timestamp = Instant.DISTANT_PAST,
         cloudCover = 0.percent,
-        temperature = 75,
+        temperature = 75.fahrenheit,
         rainInLast6Hours = 0.inches,
         isRaining = false,
     )
-    private val baseForecast = FullForecast(
+    private val baseForecast = Forecast(
         timestamp = Instant.DISTANT_PAST,
-        sunrise = Instant.DISTANT_PAST,
-        sunset = Instant.DISTANT_PAST,
         rainChance = 0.percent,
         snowChance = 0.percent,
         highTemperature = 75.fahrenheit,
         lowTemperature = 75.fahrenheit,
+        precipitation = 0.percent,
     )
     private val configuration = object: ConfigurationAccess by ConfigurationAccessStub {
         override val site = ongoingFlowOf(FakeSite.copy(
@@ -202,7 +202,7 @@ class SprinklerControlTest {
     fun noTriggerWhenFreezing() = runTest {
         val weather = FixedWeather(
             initialConditions = baseConditions.copy(
-                temperature = 30,
+                temperature = 30.fahrenheit,
             ),
             initialForecast = baseForecast,
         )

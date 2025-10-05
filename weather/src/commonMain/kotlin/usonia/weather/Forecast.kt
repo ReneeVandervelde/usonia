@@ -7,5 +7,8 @@ import kotlinx.datetime.Instant
 data class Forecast(
     val timestamp: Instant,
     val precipitation: Percentage,
-    val temperature: Temperature,
+    val rainChance: Percentage,
+    val snowChance: Percentage,
+    val highTemperature: Temperature,
+    val lowTemperature: Temperature,
 )

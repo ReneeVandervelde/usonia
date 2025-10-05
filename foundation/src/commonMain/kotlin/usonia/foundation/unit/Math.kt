@@ -2,6 +2,8 @@ package usonia.foundation.unit
 
 import inkapplications.spondee.measure.ColorTemperature
 import inkapplications.spondee.measure.metric.kelvin
+import inkapplications.spondee.measure.us.Fahrenheit
+import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.scalar.Percentage
 import inkapplications.spondee.scalar.percent
 import inkapplications.spondee.scalar.toWholePercentage
