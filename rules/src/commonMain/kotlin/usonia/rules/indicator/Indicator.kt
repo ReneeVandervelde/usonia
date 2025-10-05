@@ -18,9 +18,8 @@ import usonia.foundation.unit.compareTo
 import usonia.server.client.BackendClient
 import usonia.weather.Conditions
 import usonia.weather.Forecast
-import usonia.weather.FullForecast
 import usonia.weather.LocalWeatherAccess
-import usonia.weather.combinedData
+import usonia.weather.snaphot
 import kotlin.math.max
 import kotlin.math.min
 
@@ -48,7 +47,7 @@ internal class Indicator(
     }
 
     private suspend fun bindColorUpdates(site: Site) {
-        weatherAccess.combinedData
+        weatherAccess.snaphot
             .onEach { logger.debug("Updating indicator with new data: <$it>") }
             .map { (conditions, forecast) ->
                 site.findDevicesBy { it.fixture == Fixture.Indicator }.map { device ->

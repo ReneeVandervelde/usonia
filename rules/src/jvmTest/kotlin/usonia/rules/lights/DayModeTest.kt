@@ -17,7 +17,6 @@ import usonia.celestials.UpcomingCelestials
 import usonia.foundation.FakeRooms
 import usonia.weather.Conditions
 import usonia.weather.Forecast
-import usonia.weather.FullForecast
 import usonia.weather.LocalWeatherAccess
 import kotlin.test.Test
 import kotlin.test.assertEquals
