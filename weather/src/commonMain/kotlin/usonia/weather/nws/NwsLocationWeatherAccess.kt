@@ -42,7 +42,7 @@ internal class NwsLocationWeatherAccess(
     private val logger: KimchiLogger,
 ): LocationWeatherAccess, LocalWeatherAccess, CronJob, Daemon {
     private val homeGrid = MutableStateFlow<GridInfo?>(null)
-    private val homeStation = MutableStateFlow<NwsStation.StationIdentifier?>(null)
+    private val homeStation = MutableStateFlow<StationProperties.StationIdentifier?>(null)
     private val coordinatesCache: MutableMap<GeoCoordinates, GridInfo.GridCoordinate> = mutableMapOf()
     private val forecastCache: MutableMap<GridInfo.GridCoordinate, Forecast> = mutableMapOf()
     private val localForecastState = MutableStateFlow<Forecast?>(null)
@@ -62,7 +62,9 @@ internal class NwsLocationWeatherAccess(
                 val gridInfo = api.getGridInfo(location)
                 homeGrid.value = gridInfo
                 homeStation.value = api.getStations(gridInfo.properties.gridId, gridInfo.properties.gridX, gridInfo.properties.gridY)
+                    .features
                     .first()
+                    .properties
                     .stationIdentifier
             }
     }
@@ -193,19 +195,21 @@ internal class NwsLocationWeatherAccess(
             rainChance = properties.periods
                 .filter { it.temperature >= 36 }
                 .map { it.probabilityOfPrecipitation }
-                .maxOf { it.value ?: 0 }
-                .percent,
+                .maxOfOrNull { it.value ?: 0 }
+                ?.percent
+                ?: 0.percent,
             snowChance = properties.periods
                 .filter { it.temperature < 36  }
                 .map { it.probabilityOfPrecipitation }
-                .maxOf { it.value ?: 0 }
-                .percent,
+                .maxOfOrNull { it.value ?: 0 }
+                ?.percent
+                ?: 0.percent,
             highTemperature = properties.periods
-                .maxOf { it.temperature }
-                .fahrenheit,
+                .maxOfOrNull { it.temperature }
+                ?.fahrenheit,
             lowTemperature = properties.periods
-                .minOf { it.temperature }
-                .fahrenheit,
+                .minOfOrNull { it.temperature }
+                ?.fahrenheit,
         )
     }
 

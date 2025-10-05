@@ -38,12 +38,12 @@ internal class NwsApiClient: NwsApi {
         gridId: GridInfo.GridId,
         gridX: GridInfo.GridX,
         gridY: GridInfo.GridY,
-    ): List<NwsStation> {
+    ): StationList {
         return client.get("${BASEURL}/gridpoints/${gridId.value}/${gridX.value},${gridY.value}/stations")
             .body()
     }
 
-    override suspend fun getLatestObservations(stationId: NwsStation.StationIdentifier): NwsObservations {
+    override suspend fun getLatestObservations(stationId: StationProperties.StationIdentifier): NwsObservations {
         return client.get("${BASEURL}/stations/${stationId.value}/observations/latest")
             .body()
     }

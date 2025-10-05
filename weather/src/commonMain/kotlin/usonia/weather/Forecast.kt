@@ -9,6 +9,6 @@ data class Forecast(
     val precipitation: Percentage,
     val rainChance: Percentage,
     val snowChance: Percentage,
-    val highTemperature: Temperature,
-    val lowTemperature: Temperature,
+    val highTemperature: Temperature?,
+    val lowTemperature: Temperature?,
 )

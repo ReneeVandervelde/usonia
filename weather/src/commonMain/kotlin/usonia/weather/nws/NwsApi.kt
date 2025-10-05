@@ -13,8 +13,8 @@ interface NwsApi {
         gridId: GridInfo.GridId,
         gridX: GridInfo.GridX,
         gridY: GridInfo.GridY,
-    ): List<NwsStation>
+    ): StationList
     suspend fun getLatestObservations(
-        stationId: NwsStation.StationIdentifier,
+        stationId: StationProperties.StationIdentifier,
     ): NwsObservations
 }
