@@ -23,7 +23,7 @@ suspend fun LocalWeatherAccess.awaitForecast(): Forecast = forecast.filterNotNul
 /**
  * Combine current conditions with forecast data.
  */
-val LocalWeatherAccess.snaphot get() = conditions.combinePair(forecast)
+val LocalWeatherAccess.snapshot get() = conditions.combinePair(forecast)
     .map { WeatherSnapshot(it.first, it.second) }
 
 data class WeatherSnapshot(

@@ -23,7 +23,7 @@ import usonia.weather.Forecast
 import usonia.weather.ForecastType
 import usonia.weather.LocalWeatherAccess
 import usonia.weather.LocationWeatherAccess
-import usonia.weather.snaphot
+import usonia.weather.snapshot
 import kotlin.time.Duration.Companion.minutes
 
 data class ExpandedLocationForecast(
@@ -56,7 +56,7 @@ internal class ViewModelFactory(
                 .let { if (it.isEmpty()) flowOf(emptyList()) else combine(*it.toTypedArray()) { it.toList() } }
         }
     private val isArming = timedArmSecurityController.isActive.asOngoing()
-    private val localWeatherInfo = localWeatherAccess.snaphot.map { (conditions, forecast) ->
+    private val localWeatherInfo = localWeatherAccess.snapshot.map { (conditions, forecast) ->
         DisplayViewModel.WeatherInfo(
             forecast = forecast,
             conditions = conditions
