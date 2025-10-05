@@ -59,6 +59,7 @@ class SprinklerControl(
         val currentConditions = weatherAccess.awaitConditions()
         val currentTemperature = currentConditions.temperature
         val currentForecast = weatherAccess.awaitForecast()
+        val highTemperature = currentForecast.highTemperature
         when {
             currentForecast.rainChance > 40.percent -> {
                 logger.debug("Skipping Sprinkler for day with high chance of rain")
@@ -88,7 +89,7 @@ class SprinklerControl(
                 logger.debug("Starting Sprinkler for scheduled watering (every-day seedling)")
                 sprinkle()
             }
-            currentForecast.highTemperature.toFahrenheit() > 85.fahrenheit && time.hour <= 12 -> {
+            highTemperature != null && highTemperature.toFahrenheit() > 85.fahrenheit && time.hour <= 12 -> {
                 logger.debug("Starting Sprinkler for hot day")
                 sprinkle()
             }

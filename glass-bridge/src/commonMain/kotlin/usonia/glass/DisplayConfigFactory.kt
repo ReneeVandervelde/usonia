@@ -13,7 +13,6 @@ import inkapplications.spondee.scalar.toWholePercentage
 import inkapplications.spondee.structure.compareTo
 import inkapplications.spondee.structure.roundToInt
 import kimchi.logger.KimchiLogger
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import usonia.foundation.Identifier
 import usonia.foundation.LatchState
@@ -177,19 +176,19 @@ internal class DisplayConfigFactory(
                 }.toTypedArray(),
                 *location.forecasts.map { forecast ->
                     val precipitationExpected = forecast.forecast.precipitation.toWholePercentage() > 15.percent
+                    val lowTemperature = forecast.forecast.lowTemperature?.toFahrenheit()
+                    val highTemperature = forecast.forecast.highTemperature?.toFahrenheit()
                     val condition = when {
-                        precipitationExpected && forecast.forecast.lowTemperature.toFahrenheit() >= 36.fahrenheit-> WeatherElement.Condition.Rainy
+                        precipitationExpected && lowTemperature != null && lowTemperature >= 36.fahrenheit-> WeatherElement.Condition.Rainy
                         precipitationExpected -> WeatherElement.Condition.Snowy
                         else -> WeatherElement.Condition.Clear
                     }
                     WeatherElement(
                         // TODO: Remove when text cutoff issues are resolved.
-                        temperature = if (forecast.daytime) {
-                            forecast.forecast.highTemperature.toFahrenheit().roundToInt()
-                        } else {
-                            forecast.forecast.lowTemperature.toFahrenheit().roundToInt()
-                        }.let {
-                            if (it >= 0) "$it°" else "$it"
+                        temperature = when {
+                            forecast.daytime && highTemperature != null -> highTemperature.roundToInt().formatTemp()
+                            !forecast.daytime && lowTemperature != null -> lowTemperature.roundToInt().formatTemp()
+                            else -> "--"
                         },
                         condition = condition,
                         daytime = forecast.daytime,
@@ -203,6 +202,11 @@ internal class DisplayConfigFactory(
                 }.toTypedArray()
             )
         }.flatten().toTypedArray()
+    }
+
+    private fun Int.formatTemp(): String
+    {
+        return if (this >= 0) "$this°" else "$this"
     }
 
     private fun doorRows(viewModel: DisplayViewModel): Array<out DisplayItem> {
