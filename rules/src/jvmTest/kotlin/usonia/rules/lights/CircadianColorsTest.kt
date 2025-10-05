@@ -5,11 +5,8 @@ import com.inkapplications.coroutines.ongoing.ongoingFlowOf
 import com.inkapplications.datetime.FixedClock
 import com.inkapplications.datetime.atZone
 import com.inkapplications.datetime.toZonedDateTime
-import inkapplications.spondee.measure.us.fahrenheit
-import inkapplications.spondee.scalar.percent
 import inkapplications.spondee.scalar.toWholePercentage
 import inkapplications.spondee.structure.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.*
 import usonia.celestials.CelestialAccess
@@ -20,9 +17,6 @@ import usonia.core.state.ConfigurationAccessStub
 import usonia.foundation.FakeRooms
 import usonia.foundation.FakeSite
 import usonia.foundation.Site
-import usonia.weather.Conditions
-import usonia.weather.FullForecast
-import usonia.weather.LocalWeatherAccess
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

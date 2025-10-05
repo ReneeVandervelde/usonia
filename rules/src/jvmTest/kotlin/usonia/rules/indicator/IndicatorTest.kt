@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import usonia.core.state.ActionPublisherSpy
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.ConfigurationAccessStub
@@ -23,7 +22,6 @@ import usonia.foundation.*
 import usonia.server.DummyClient
 import usonia.weather.Conditions
 import usonia.weather.Forecast
-import usonia.weather.FullForecast
 import usonia.weather.LocalWeatherAccess
 import kotlin.test.Test
 import kotlin.test.assertEquals

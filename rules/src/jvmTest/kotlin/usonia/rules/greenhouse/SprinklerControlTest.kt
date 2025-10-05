@@ -18,7 +18,6 @@ import usonia.server.DummyClient
 import usonia.weather.Conditions
 import usonia.weather.FixedWeather
 import usonia.weather.Forecast
-import usonia.weather.FullForecast
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
