@@ -44,7 +44,7 @@ internal class NwsLocationWeatherAccess(
     private val homeGrid = MutableStateFlow<GridInfo?>(null)
     private val homeStation = MutableStateFlow<StationProperties.StationIdentifier?>(null)
     private val coordinatesCache: MutableMap<GeoCoordinates, GridInfo.GridCoordinate> = mutableMapOf()
-    private val forecastCache: MutableMap<GridInfo.GridCoordinate, Forecast> = mutableMapOf()
+    private val forecastCache: MutableMap<GridInfo.GridCoordinate, NwsForecast> = mutableMapOf()
     private val localForecastState = MutableStateFlow<Forecast?>(null)
     private val localConditionsState = MutableStateFlow<Conditions?>(null)
 
@@ -99,12 +99,12 @@ internal class NwsLocationWeatherAccess(
             return
         }
 
-        val forecast = api.getForecast(grid.properties.gridId, grid.properties.gridX, grid.properties.gridY)
-            .toForecast(date = time.date)
+        val nwsForecast = api.getForecast(grid.properties.gridId, grid.properties.gridX, grid.properties.gridY)
+        val forecast = nwsForecast.toForecast(date = time.date)
 
         localForecastState.value = forecast
         if (forecast != null) {
-            forecastCache[grid.properties.coordinate] = forecast
+            forecastCache[grid.properties.coordinate] = nwsForecast
         }
     }
 
@@ -147,8 +147,8 @@ internal class NwsLocationWeatherAccess(
         val coordinates = getGridCoordinates(location) ?: return null
         val cachedForecast = forecastCache[coordinates]
 
-        if (cachedForecast != null && cachedForecast.timestamp > clock.now() - 6.hours) {
-            return cachedForecast
+        if (cachedForecast != null && cachedForecast.properties.updateTime > clock.now() - 6.hours) {
+            return cachedForecast.toForecast(date, type)
         }
 
         val nwsForecast = runRetryable(
@@ -163,7 +163,7 @@ internal class NwsLocationWeatherAccess(
         val forecast = nwsForecast.toForecast(date, type)
 
         if (forecast != null) {
-            forecastCache[coordinates] = forecast
+            forecastCache[coordinates] = nwsForecast
         }
 
         return forecast
@@ -189,25 +189,26 @@ internal class NwsLocationWeatherAccess(
 
         return Forecast(
             timestamp = properties.updateTime,
-            precipitation = relevant.map { it.probabilityOfPrecipitation }
+            precipitation = relevant
+                .map { it.probabilityOfPrecipitation }
                 .maxOf { it.value ?: 0 }
                 .percent,
-            rainChance = properties.periods
+            rainChance = relevant
                 .filter { it.temperature >= 36 }
                 .map { it.probabilityOfPrecipitation }
                 .maxOfOrNull { it.value ?: 0 }
                 ?.percent
                 ?: 0.percent,
-            snowChance = properties.periods
+            snowChance = relevant
                 .filter { it.temperature < 36  }
                 .map { it.probabilityOfPrecipitation }
                 .maxOfOrNull { it.value ?: 0 }
                 ?.percent
                 ?: 0.percent,
-            highTemperature = properties.periods
+            highTemperature = relevant
                 .maxOfOrNull { it.temperature }
                 ?.fahrenheit,
-            lowTemperature = properties.periods
+            lowTemperature = relevant
                 .minOfOrNull { it.temperature }
                 ?.fahrenheit,
         )
