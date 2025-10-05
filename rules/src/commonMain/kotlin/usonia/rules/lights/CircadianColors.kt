@@ -3,20 +3,16 @@ package usonia.rules.lights
 import com.inkapplications.coroutines.ongoing.first
 import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.datetime.atZone
-import inkapplications.spondee.measure.ColorTemperature
 import inkapplications.spondee.measure.metric.kelvin
-import inkapplications.spondee.scalar.Percentage
 import inkapplications.spondee.scalar.percent
-import inkapplications.spondee.scalar.toWholePercentage
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.toLocalDateTime
+import usonia.celestials.CelestialAccess
 import usonia.core.state.ConfigurationAccess
 import usonia.core.state.getSite
 import usonia.foundation.Room
 import usonia.foundation.unit.interpolate
-import usonia.weather.LocalWeatherAccess
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
@@ -42,12 +38,11 @@ internal val DEFAULT_PERIOD = 2.hours
 @OptIn(ExperimentalTime::class)
 internal class CircadianColors(
     private val configurationAccess: ConfigurationAccess,
-    private val weather: LocalWeatherAccess,
+    private val celestialAccess: CelestialAccess,
     private val clock: ZonedClock = ZonedClock.System,
     private val logger: KimchiLogger = EmptyLogger,
 ): LightSettingsPicker {
     override suspend fun getActiveSettings(room: Room): LightSettings {
-        val forecast = weather.forecast.first()
         val site = configurationAccess.getSite()
         val daylightColor = site.parameters[DAYLIGHT]
             ?.toInt()
@@ -86,17 +81,20 @@ internal class CircadianColors(
         val nightExemptRooms = setOf(Room.Type.Office, Room.Type.Storage, Room.Type.Utility)
         val modifiedNightColor = if (room.type in nightExemptRooms) eveningColor else nightColor
         val modifiedNightBrightness = if (room.type in nightExemptRooms) 100.percent else nightBrightness
+        val celestials = celestialAccess.localCelestials.first()
+        val sunriseToday = celestials.today.daylight.start
+        val sunsetToday = celestials.today.daylight.endInclusive
 
         when {
-            now.instant >= forecast.sunrise.minus(period) && now.instant <= forecast.sunrise -> {
+            now >= sunriseToday.minus(period) && now <= sunriseToday -> {
                 logger.trace("In morning blue hour")
-                val position = ((now.instant - forecast.sunrise.minus(period)).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
+                val position = ((now.instant - sunriseToday.instant.minus(period)).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
                 return LightSettings.Temperature(
                     temperature = interpolate(modifiedNightColor, daylightColor, position),
                     brightness = interpolate(modifiedNightBrightness, 100.percent, position),
                 )
             }
-            now.instant > forecast.sunrise && now.instant < forecast.sunset -> {
+            now > sunriseToday && now < sunsetToday -> {
                 logger.trace("In daytime")
                 return LightSettings.Temperature(
                     temperature = daylightColor,
@@ -106,7 +104,7 @@ internal class CircadianColors(
             now >= nightStartInstant -> {
                 logger.trace("In twilight")
 
-                val eveningTransitionPosition = ((now.instant - forecast.sunset).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
+                val eveningTransitionPosition = ((now.instant - sunsetToday.instant).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
                 val eveningTransitionColor = interpolate(daylightColor, eveningColor, eveningTransitionPosition)
                 val position = ((now.instant - nightStartInstant.instant).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
                 return LightSettings.Temperature(
@@ -114,9 +112,9 @@ internal class CircadianColors(
                     brightness = interpolate(100.percent, modifiedNightBrightness, position),
                 )
             }
-            now.instant < forecast.sunrise
+            now < sunriseToday
                 || now > nightStartInstant.plus(period)
-                || now.localDate.dayOfYear > forecast.sunset.toLocalDateTime(clock.zone).dayOfYear
+                || now.localDate.dayOfYear > sunsetToday.localDateTime.dayOfYear
             -> {
                 logger.trace("In nighttime")
                 return LightSettings.Temperature(
@@ -124,9 +122,9 @@ internal class CircadianColors(
                     brightness = modifiedNightBrightness,
                 )
             }
-            now.instant >= forecast.sunset -> {
+            now >= sunsetToday -> {
                 logger.trace("In evening")
-                val position = ((now.instant - forecast.sunset).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
+                val position = ((now.instant - sunsetToday.instant).toDouble(DurationUnit.MINUTES) / period.toDouble(DurationUnit.MINUTES)).toFloat()
                 return LightSettings.Temperature(
                     temperature = interpolate(daylightColor, eveningColor, position),
                     brightness = 100.percent,

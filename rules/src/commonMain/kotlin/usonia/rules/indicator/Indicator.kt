@@ -5,7 +5,9 @@ import com.inkapplications.coroutines.ongoing.collectLatest
 import com.inkapplications.coroutines.ongoing.map
 import com.inkapplications.coroutines.ongoing.mapLatest
 import com.inkapplications.coroutines.ongoing.onEach
+import inkapplications.spondee.measure.us.toFahrenheit
 import inkapplications.spondee.scalar.percent
+import inkapplications.spondee.structure.toFloat
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.coroutineScope
@@ -15,9 +17,9 @@ import usonia.foundation.*
 import usonia.foundation.unit.compareTo
 import usonia.server.client.BackendClient
 import usonia.weather.Conditions
-import usonia.weather.FullForecast
+import usonia.weather.Forecast
 import usonia.weather.LocalWeatherAccess
-import usonia.weather.combinedData
+import usonia.weather.snapshot
 import kotlin.math.max
 import kotlin.math.min
 
@@ -33,6 +35,7 @@ internal class Indicator(
     private val coldIndicator = RGB(0, 0 , 255)
     private val snowColor = RGB(255, 255 , 255)
     private val rainColor = RGB(0, 255 , 255)
+    private val unknownColor = RGB(0, 255 , 0)
 
     override suspend fun startDaemon(): Nothing {
         client.site.collectLatest { site ->
@@ -44,7 +47,7 @@ internal class Indicator(
     }
 
     private suspend fun bindColorUpdates(site: Site) {
-        weatherAccess.combinedData
+        weatherAccess.snapshot
             .onEach { logger.debug("Updating indicator with new data: <$it>") }
             .map { (conditions, forecast) ->
                 site.findDevicesBy { it.fixture == Fixture.Indicator }.map { device ->
@@ -74,11 +77,13 @@ internal class Indicator(
             }
     }
 
-    private fun getColor(forecast: FullForecast, conditions: Conditions): RGB {
+    private fun getColor(forecast: Forecast?, conditions: Conditions?): RGB {
+        val currentTemperature = conditions?.temperature?.toFahrenheit()?.toFloat()
         return when {
+            forecast == null || conditions == null || currentTemperature == null -> unknownColor
             forecast.snowChance > 20.percent -> snowColor
             forecast.rainChance > 20.percent -> rainColor
-            else -> colorTransition(coldIndicator, hotIndicator, conditions.temperature / 100f)
+            else -> colorTransition(coldIndicator, hotIndicator, currentTemperature / 100f)
         }
     }
 

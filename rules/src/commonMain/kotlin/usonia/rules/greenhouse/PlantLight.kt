@@ -1,7 +1,6 @@
 package usonia.rules.greenhouse
 
 import com.inkapplications.coroutines.ongoing.first
-import com.inkapplications.datetime.ZonedDateTime
 import com.inkapplications.datetime.atZone
 import inkapplications.spondee.measure.metric.kelvin
 import inkapplications.spondee.scalar.percent
@@ -17,8 +16,6 @@ import usonia.foundation.Action
 import usonia.foundation.Fixture
 import usonia.foundation.SwitchState
 import usonia.server.client.BackendClient
-import usonia.weather.FullForecast
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
 private val TARGET_LIGHT_TIME = 15.hours
@@ -61,22 +58,6 @@ class PlantLight(
             else -> {
                 logger.trace("No action for plant lights before hours.")
             }
-        }
-    }
-
-    private fun FullForecast.sunriseToday(now: ZonedDateTime): Instant {
-        return when {
-            sunrise.toLocalDateTime(now.zone).date > now.localDate -> sunrise - 1.days
-            sunrise.toLocalDateTime(now.zone).date < now.localDate -> sunrise + 1.days
-            else -> sunrise
-        }
-    }
-
-    private fun FullForecast.sunsetToday(now: ZonedDateTime): Instant {
-        return when {
-            sunset.toLocalDateTime(now.zone).date > now.localDate -> sunset - 1.days
-            sunset.toLocalDateTime(now.zone).date < now.localDate -> sunset + 1.days
-            else -> sunset
         }
     }
 }

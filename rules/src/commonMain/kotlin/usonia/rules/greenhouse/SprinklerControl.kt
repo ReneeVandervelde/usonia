@@ -31,6 +31,8 @@ import usonia.foundation.unit.compareTo
 import usonia.kotlin.DefaultScope
 import usonia.server.client.BackendClient
 import usonia.weather.LocalWeatherAccess
+import usonia.weather.awaitConditions
+import usonia.weather.awaitForecast
 import kotlin.time.Duration.Companion.minutes
 
 class SprinklerControl(
@@ -54,24 +56,31 @@ class SprinklerControl(
     }
 
     override suspend fun runCron(time: LocalDateTime, zone: TimeZone) {
+        val currentConditions = weatherAccess.awaitConditions()
+        val currentTemperature = currentConditions.temperature
+        val currentForecast = weatherAccess.awaitForecast()
         when {
-            weatherAccess.currentForecast.rainChance > 40.percent -> {
+            currentForecast.rainChance > 40.percent -> {
                 logger.debug("Skipping Sprinkler for day with high chance of rain")
                 return
             }
-            weatherAccess.currentConditions.rainInLast6Hours.toInches() > 0.5.inches -> {
+            (currentConditions.rainInLast6Hours?.toInches() ?: 0.inches) > 0.5.inches -> {
                 logger.debug("Skipping Sprinkler with recent rain")
                 return
             }
-            weatherAccess.currentConditions.isRaining -> {
+            currentConditions.isRaining == true -> {
                 logger.debug("Skipping Sprinkler while currently raining")
                 return
             }
-            weatherAccess.currentConditions.temperature < 32.fahrenheit -> {
+            currentTemperature == null -> {
+                logger.warn("Unknown temperature. Skipping Sprinkler to avoid potential freezing damage")
+                return
+            }
+            currentTemperature.toFahrenheit() < 32.fahrenheit -> {
                 logger.debug("Skipping Sprinkler for freezing conditions")
                 return
             }
-            time.date.month <= Month.MAY && weatherAccess.currentConditions.temperature > 72.degrees -> {
+            time.date.month <= Month.MAY && currentTemperature.toFahrenheit() > 72.fahrenheit -> {
                 logger.debug("Starting Sprinkler seedling watering in warm weather")
                 sprinkle()
             }
@@ -79,7 +88,7 @@ class SprinklerControl(
                 logger.debug("Starting Sprinkler for scheduled watering (every-day seedling)")
                 sprinkle()
             }
-            weatherAccess.currentForecast.highTemperature.toFahrenheit() > 85.fahrenheit && time.hour <= 12 -> {
+            currentForecast.highTemperature.toFahrenheit() > 85.fahrenheit && time.hour <= 12 -> {
                 logger.debug("Starting Sprinkler for hot day")
                 sprinkle()
             }

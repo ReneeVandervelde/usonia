@@ -6,6 +6,7 @@ import com.inkapplications.glassconsole.client.pin.PinValidator
 import inkapplications.spondee.spatial.GeoCoordinates
 import inkapplications.spondee.spatial.latitude
 import inkapplications.spondee.spatial.longitude
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
@@ -19,10 +20,10 @@ import usonia.foundation.*
 import usonia.rules.Flags
 import usonia.server.client.BackendClient
 import usonia.weather.Forecast
+import usonia.weather.ForecastType
 import usonia.weather.LocalWeatherAccess
 import usonia.weather.LocationWeatherAccess
-import usonia.weather.combinedData
-import kotlin.coroutines.coroutineContext
+import usonia.weather.snapshot
 import kotlin.time.Duration.Companion.minutes
 
 data class ExpandedLocationForecast(
@@ -55,14 +56,14 @@ internal class ViewModelFactory(
                 .let { if (it.isEmpty()) flowOf(emptyList()) else combine(*it.toTypedArray()) { it.toList() } }
         }
     private val isArming = timedArmSecurityController.isActive.asOngoing()
-    private val localWeatherInfo = localWeatherAccess.combinedData.map { (conditions, forecast) ->
+    private val localWeatherInfo = localWeatherAccess.snapshot.map { (conditions, forecast) ->
         DisplayViewModel.WeatherInfo(
             forecast = forecast,
             conditions = conditions
         )
     }
     private val expandedWeatherInfo: OngoingFlow<List<ExpandedLocationForecast>> = ongoingFlow {
-        while(coroutineContext.isActive) {
+        while(currentCoroutineContext().isActive) {
             val locations = listOf(
                 "Columbia Heights, MN" to GeoCoordinates(45.0491.latitude, (-93.2472).longitude),
                 "Enderlin, ND" to GeoCoordinates(46.6077.latitude, (-97.6011).longitude),
@@ -79,7 +80,7 @@ internal class ViewModelFactory(
                         val forecast = locationWeatherAccess.getWeatherForLocation(
                             location = location,
                             date = forecastDay,
-                            daytime = daytime
+                            type = if (daytime) ForecastType.Daytime else ForecastType.Overnight,
                         ) ?: return@map null
                         ExpandedLocationForecast.ExpandedForecast(
                             title = when (forecastDay.dayOfWeek.value) {

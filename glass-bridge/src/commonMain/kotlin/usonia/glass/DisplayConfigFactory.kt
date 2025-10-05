@@ -178,13 +178,17 @@ internal class DisplayConfigFactory(
                 *location.forecasts.map { forecast ->
                     val precipitationExpected = forecast.forecast.precipitation.toWholePercentage() > 15.percent
                     val condition = when {
-                        precipitationExpected && forecast.forecast.temperature.toFahrenheit() >= 36.fahrenheit-> WeatherElement.Condition.Rainy
+                        precipitationExpected && forecast.forecast.lowTemperature.toFahrenheit() >= 36.fahrenheit-> WeatherElement.Condition.Rainy
                         precipitationExpected -> WeatherElement.Condition.Snowy
                         else -> WeatherElement.Condition.Clear
                     }
                     WeatherElement(
                         // TODO: Remove when text cutoff issues are resolved.
-                        temperature = forecast.forecast.temperature.toFahrenheit().roundToInt().let {
+                        temperature = if (forecast.daytime) {
+                            forecast.forecast.highTemperature.toFahrenheit().roundToInt()
+                        } else {
+                            forecast.forecast.lowTemperature.toFahrenheit().roundToInt()
+                        }.let {
                             if (it >= 0) "$it°" else "$it"
                         },
                         condition = condition,

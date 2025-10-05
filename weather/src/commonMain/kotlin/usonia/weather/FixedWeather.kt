@@ -2,26 +2,32 @@ package usonia.weather
 
 import com.inkapplications.coroutines.ongoing.OngoingFlow
 import com.inkapplications.coroutines.ongoing.asOngoing
+import inkapplications.spondee.spatial.GeoCoordinates
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.datetime.LocalDate
 
 /**
  * A weather access implementation that provides a single data set.
  */
 class FixedWeather(
-    initialConditions: Conditions,
-    initialForecast: FullForecast,
-): LocalWeatherAccess {
+    initialConditions: Conditions?,
+    initialForecast: Forecast?,
+): LocalWeatherAccess, LocationWeatherAccess {
     private val mutableForecast = MutableStateFlow(initialForecast)
     private val mutableConditions = MutableStateFlow(initialConditions)
-    override val forecast: OngoingFlow<FullForecast> = mutableForecast.asOngoing()
-    override val conditions: OngoingFlow<Conditions> = mutableConditions.asOngoing()
-    override val currentConditions: Conditions = mutableConditions.value
-    override val currentForecast: FullForecast = mutableForecast.value
+    override val forecast: OngoingFlow<Forecast?> = mutableForecast.asOngoing()
+    override val conditions: OngoingFlow<Conditions?> = mutableConditions.asOngoing()
 
     fun updateConditions(conditions: Conditions) {
         mutableConditions.value = conditions
     }
-    fun updateForecast(forecast: FullForecast) {
+    fun updateForecast(forecast: Forecast) {
         mutableForecast.value = forecast
     }
+
+    override suspend fun getWeatherForLocation(
+        location: GeoCoordinates,
+        date: LocalDate,
+        type: ForecastType,
+    ): Forecast? = mutableForecast.value
 }
