@@ -5,6 +5,7 @@ import com.inkapplications.coroutines.ongoing.asOngoing
 import com.inkapplications.coroutines.ongoing.collectLatest
 import com.inkapplications.coroutines.ongoing.map
 import com.inkapplications.datetime.ZonedClock
+import inkapplications.spondee.measure.metric.celsius
 import usonia.weather.nws.NwsObservations.Observation.CloudLayer.CloudLayerAmount
 import inkapplications.spondee.measure.us.fahrenheit
 import inkapplications.spondee.measure.us.inches
@@ -18,9 +19,13 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import regolith.init.Initializer
+import regolith.init.TargetManager
 import regolith.processes.cron.CronJob
 import regolith.processes.cron.Schedule
 import regolith.processes.daemon.Daemon
+import regolith.processes.daemon.DaemonRunAttempt
+import regolith.processes.daemon.FailureSignal
 import usonia.kotlin.RetryStrategy
 import usonia.kotlin.runRetryable
 import usonia.server.client.BackendClient
@@ -29,7 +34,6 @@ import usonia.weather.Forecast
 import usonia.weather.ForecastType
 import usonia.weather.LocalWeatherAccess
 import usonia.weather.LocationWeatherAccess
-import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -54,6 +58,10 @@ internal class NwsLocationWeatherAccess(
         minutes = setOf(0)
     )
 
+    override suspend fun onFailure(attempts: List<DaemonRunAttempt>): FailureSignal {
+        return FailureSignal.Restart
+    }
+
     override suspend fun startDaemon(): Nothing
     {
         client.site
@@ -66,26 +74,39 @@ internal class NwsLocationWeatherAccess(
                     .first()
                     .properties
                     .stationIdentifier
+
+                updateLocals(clock.localDateTime())
             }
     }
 
     override suspend fun runCron(time: LocalDateTime, zone: TimeZone)
     {
+        updateLocals(time)
+    }
+
+    private suspend fun updateLocals(time: LocalDateTime)
+    {
         coroutineScope {
             val forecastUpdate = async {
                 runRetryable(
-                    strategy = RetryStrategy.Exponential(attempts = 10, initial = 10.seconds, maximum = 5.minutes)
+                    strategy = RetryStrategy.Exponential(attempts = 10, initial = 10.seconds, maximum = 5.minutes),
+                    onError = { error -> logger.warn("Error updating local weather forecast", error) },
                 ) {
+                    logger.trace("Updating local weather forecast")
                     updateLocalForecast(time)
+                    logger.debug("Updated local forecast: ${localForecastState.value}")
                 }
             }
             val conditionsUpdate = async {
                 runRetryable(
-                    strategy = RetryStrategy.Exponential(attempts = 10, initial = 10.seconds, maximum = 5.minutes)
+                    strategy = RetryStrategy.Exponential(attempts = 10, initial = 10.seconds, maximum = 5.minutes),
+                    onError = { error -> logger.warn("Error updating local weather conditions", error) },
                 ) {
+                    logger.trace("Updating local weather conditions")
                     updateLocalConditions()
+                    logger.debug("Updated local conditions: ${localConditionsState.value}")
                 }
-                }
+            }
 
             forecastUpdate.await()
             conditionsUpdate.await()
@@ -228,7 +249,15 @@ internal class NwsLocationWeatherAccess(
                     logger.warn("Unknown cloud cover state: ${properties.cloudLayers}")
                 }
             },
-            temperature = properties.temperature?.value?.roundToInt()?.fahrenheit,
+            temperature = properties.temperature?.let { temperature ->
+                when (temperature.unitCode) {
+                    NwsObservations.Observation.Temperature.TempUnit.Celsius -> temperature.value?.celsius
+                    NwsObservations.Observation.Temperature.TempUnit.Fahrenheit -> temperature.value?.fahrenheit
+                    else -> temperature.value?.fahrenheit.also {
+                        logger.warn("Unknown temperature unit: ${temperature.unitCode}")
+                    }
+                }
+            },
             rainInLast6Hours = properties.precipitationLast6Hours?.value?.inches,
             isRaining = properties.presentWeather?.any { it.weather == NwsObservations.Observation.Phenomenon.Type.rain },
         )
