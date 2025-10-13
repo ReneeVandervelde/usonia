@@ -5,12 +5,15 @@ import com.inkapplications.coroutines.ongoing.collectLatest
 import com.inkapplications.coroutines.ongoing.map
 import com.inkapplications.coroutines.ongoing.mapLatest
 import com.inkapplications.coroutines.ongoing.onEach
+import com.inkapplications.coroutines.ongoing.unsafeTransform
 import inkapplications.spondee.measure.us.toFahrenheit
 import inkapplications.spondee.scalar.percent
 import inkapplications.spondee.structure.toFloat
 import kimchi.logger.EmptyLogger
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import regolith.processes.daemon.Daemon
 import usonia.foundation.*
@@ -22,6 +25,7 @@ import usonia.weather.LocalWeatherAccess
 import usonia.weather.snapshot
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Updates a light based on weather data.
@@ -48,6 +52,7 @@ internal class Indicator(
 
     private suspend fun bindColorUpdates(site: Site) {
         weatherAccess.snapshot
+            .unsafeTransform { debounce(1.seconds) }
             .onEach { logger.debug("Updating indicator with new data: <$it>") }
             .map { (conditions, forecast) ->
                 site.findDevicesBy { it.fixture == Fixture.Indicator }.map { device ->
