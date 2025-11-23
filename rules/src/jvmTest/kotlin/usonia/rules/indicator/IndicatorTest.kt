@@ -11,6 +11,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
@@ -81,7 +82,7 @@ class IndicatorTest {
 
         val indicatorJob = launch { indicator.startDaemon() }
 
-        runCurrent()
+        advanceUntilIdle()
         assertEquals(1, spyPublisher.actions.size)
         val action = spyPublisher.actions.single()
         assertTrue(action is Action.ColorChange)
@@ -108,7 +109,7 @@ class IndicatorTest {
 
         val indicatorJob = launch { indicator.startDaemon() }
 
-        runCurrent()
+        advanceUntilIdle()
         assertEquals(1, spyPublisher.actions.size)
         val action = spyPublisher.actions.single()
         assertTrue(action is Action.ColorChange)
@@ -135,7 +136,7 @@ class IndicatorTest {
 
         val indicatorJob = launch { indicator.startDaemon() }
 
-        runCurrent()
+        advanceUntilIdle()
         assertEquals(1, spyPublisher.actions.size)
         val action = spyPublisher.actions.single()
         assertTrue(action is Action.ColorChange)
@@ -162,7 +163,7 @@ class IndicatorTest {
 
         val indicatorJob = launch { indicator.startDaemon() }
 
-        runCurrent()
+        advanceUntilIdle()
         assertEquals(1, spyPublisher.actions.size)
         val action = spyPublisher.actions.single()
         assertTrue(action is Action.ColorChange)
@@ -190,7 +191,7 @@ class IndicatorTest {
 
         val indicatorJob = launch { indicator.startDaemon() }
 
-        runCurrent()
+        advanceUntilIdle()
         assertEquals(1, spyPublisher.actions.size)
         val action = spyPublisher.actions.single()
         assertTrue(action is Action.ColorChange)
@@ -219,9 +220,9 @@ class IndicatorTest {
         val indicator = Indicator(client, fakeWeather)
 
         val indicatorJob = launch { indicator.startDaemon() }
-        runCurrent()
+        advanceUntilIdle()
         securityState.value = SecurityState.Armed
-        runCurrent()
+        advanceUntilIdle()
 
         assertEquals(2, spyPublisher.actions.size)
         val initialDimAction = spyPublisher.actions[0]
@@ -254,9 +255,9 @@ class IndicatorTest {
         val indicator = Indicator(client, fakeWeather)
 
         val indicatorJob = launch { indicator.startDaemon() }
-        runCurrent()
+        advanceUntilIdle()
         securityState.value = SecurityState.Disarmed
-        runCurrent()
+        advanceUntilIdle()
 
         assertEquals(2, spyPublisher.actions.size)
         val initialDimAction = spyPublisher.actions[0]
