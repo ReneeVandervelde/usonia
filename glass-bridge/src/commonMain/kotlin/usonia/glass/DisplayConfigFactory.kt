@@ -128,7 +128,7 @@ internal class DisplayConfigFactory(
                 action = Action.Post("http://${viewModel.config.homeIp}/actions", usonia.foundation.Action.Intent(
                     target = Identifier("usonia.rules.lights.WakeLight"),
                     action = "usonia.rules.lights.WakeLight.dismiss"
-                ).let { Json.encodeToString(it) }),
+                ).let { Json.encodeToString(usonia.foundation.Action.serializer(), it) }),
                 latching = true,
                 sentiment = Sentiment.Idle,
                 position = Positioning.Center,
