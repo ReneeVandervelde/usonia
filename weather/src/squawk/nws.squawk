@@ -1,0 +1,16 @@
+namespace = "nws"
+
+endpoint {
+    name = "stations"
+    url = "https://api.weather.gov/gridpoints/${property("gridpoint", "MPX/107,71")}/stations"
+}
+
+endpoint {
+    name = "forecast"
+    url = "https://api.weather.gov/gridpoints/${property("gridpoint", "MPX/107,71")}/forecast"
+}
+
+endpoint {
+    name = "conditions"
+    url = "https://api.weather.gov/stations/${property("station", "KMSP")}/observations/latest"
+}

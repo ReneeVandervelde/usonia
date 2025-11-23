@@ -12,21 +12,33 @@ data class NwsObservations(
     data class Observation(
         @Serializable(with = InstantIso8601Serializer::class)
         val timestamp: Instant,
-        val temperature: Temperature?,
-        val presentWeather: List<Phenomenon>?,
-        val precipitationLastHour: PrecipitationMeasurement?,
-        val precipitationLast3Hours: PrecipitationMeasurement?,
-        val precipitationLast6Hours: PrecipitationMeasurement?,
-        val cloudLayers: List<CloudLayer>?,
+        val temperature: Temperature? = null,
+        val presentWeather: List<Phenomenon>? = null,
+        val precipitationLastHour: PrecipitationMeasurement? = null,
+        val precipitationLast3Hours: PrecipitationMeasurement? = null,
+        val precipitationLast6Hours: PrecipitationMeasurement? = null,
+        val cloudLayers: List<CloudLayer>? = null,
     ) {
         @Serializable
         data class Temperature(
-            val value: Double?,
-        )
+            val value: Double? = null,
+            val unitCode: TempUnit? = null,
+        ) {
+            @JvmInline
+            @Serializable
+            value class TempUnit(val key: String)
+            {
+                companion object
+                {
+                    val Celsius = TempUnit("wmoUnit:degC")
+                    val Fahrenheit = TempUnit("wmoUnit:degF")
+                }
+            }
+        }
 
         @Serializable
         data class PrecipitationMeasurement(
-            val value: Double?,
+            val value: Double? = null,
         )
 
         @Serializable
