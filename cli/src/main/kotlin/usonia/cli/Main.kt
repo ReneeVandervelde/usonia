@@ -1,6 +1,7 @@
 package usonia.cli
 
 import com.github.ajalt.clikt.core.NoOpCliktCommand
+import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.core.subcommands
 import kotlin.system.exitProcess
 
