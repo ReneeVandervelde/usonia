@@ -37,7 +37,8 @@ class TelegramBridgePlugin(
     val allCommands = setOf(
         *baseCommands.toTypedArray(),
         WelcomeCommand(telegram, baseCommands),
-        HelpCommand(telegram, baseCommands)
+        HelpCommand(telegram, baseCommands),
+        AdminHelpCommand(telegram, baseCommands),
     )
 
     override val daemons: List<Daemon> = listOf(
